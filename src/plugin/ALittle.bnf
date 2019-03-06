@@ -1,0 +1,309 @@
+{
+  parserClass="plugin.parser.ALittleParser"
+  parserUtilClass="plugin.parser.ALittleParserUtil"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="ALittle"
+  psiImplClassSuffix="Impl"
+  psiPackage="plugin.psi"
+  psiImplPackage="plugin.psi.impl"
+  psiImplUtilClass="plugin.psi.impl.ALittlePsiImplUtil"
+
+  elementTypeHolderClass="plugin.psi.ALittleTypes"
+  elementTypeClass="plugin.psi.ALittleElementType"
+  tokenTypeClass="plugin.psi.ALittleTokenType"
+
+  tokens=[
+      LBRACE               =  '{'
+      RBRACE               =  '}'
+      LBRACK               =  '['
+      RBRACK               =  ']'
+      LPAREN               =  '('
+      RPAREN               =  ')'
+      COLON                =  ':'
+      SEMI                 =  ';'
+      COMMA                =  ','
+      EQ                   =  '=='
+      ASSIGN               =  '='
+      NOT_EQ               =  '!='
+      NOT                  =  '!'
+      PLUS_PLUS            =  '++'
+      PLUS_ASSIGN          =  '+='
+      PLUS                 =  '+'
+      CONCAT               =  '..'
+      MINUS_MINUS          =  '--'
+      MINUS_ASSIGN         =  '-='
+      MINUS                =  '-'
+      COND_OR              =  '||'
+      BIT_OR_ASSIGN        =  '|='
+      COND_AND             =  '&&'
+      BIT_AND_ASSIGN       =  '&='
+      BIT_AND              =  '&'
+      BIT_OR               =  '|'
+      BIT_NOT              =  '~'
+      SHIFT_LEFT_ASSIGN    =  '<<='
+      SHIFT_LEFT           =  '<<'
+      LESS_OR_EQUAL        =  '<='
+      LESS                 =  '<'
+      BIT_XOR_ASSIGN       =  '^='
+      BIT_XOR              =  '^'
+      MUL_ASSIGN           =  '*='
+      MUL                  =  '*'
+      QUOTIENT_ASSIGN      =  '/='
+      QUOTIENT             =  '/'
+      REMAINDER_ASSIGN     =  '%='
+      REMAINDER            =  '%'
+      SHIFT_RIGHT_ASSIGN   =  '>>='
+      SHIFT_RIGHT          =  '>>'
+      GREATER_OR_EQUAL     =  '>='
+      GREATER              =  '>'
+      DOT                  =  '.'
+      APOS                 =  "'"
+      QUOTE                =  '"'
+      BACK                 =  '\'
+
+      WHITE_SPACE          = 'regexp:\s+'
+      COMMENT              = 'regexp://.*'
+      DIGIT_CONTENT        = 'regexp:0x[0-9a-fA-F]+|\d+(\.\d*)?'
+      STRING_CONTENT       = "regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
+      ID_CONTENT           = 'regexp:[_a-zA-Z][_a-zA-Z0-9]*'
+  ]
+}
+
+alittleFile ::= namespace_dec?
+
+// 命名域
+namespace_dec ::= namespace namespace_name_dec SEMI (global_method_dec | class_dec | enum_dec | struct_dec | instance_dec)* {pin=1}
+namespace_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleNamespaceNameDecElementImpl"
+                                    implements="plugin.psi.ALittleNamespaceNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+
+// 单例定义
+instance_dec ::= access_modifier? instance instance_name_dec COLON all_type (ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN)? SEMI {pin=2}
+instance_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleInstanceNameDecElementImpl"
+                                 implements="plugin.psi.ALittleInstanceNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+
+instance_class_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleInstanceClassNameDecElementImpl"
+                                       implements="plugin.psi.ALittleInstanceClassNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+
+// 类定义
+class_dec ::= class_access_modifier? class class_name_dec (COLON class_extends_access_modifier? (class_extends_namespace_name_dec DOT)? class_extends_name_dec)? LBRACE (class_var_dec | class_ctor_dec | class_getter_dec | class_setter_dec | class_static_dec | class_method_dec)* RBRACE {pin=2}
+class_access_modifier ::= access_modifier
+class_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleClassNameDecElementImpl"
+                              implements="plugin.psi.ALittleClassNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+class_extends_access_modifier ::= access_modifier
+class_extends_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleClassExtendsNameDecElementImpl"
+                                      implements="plugin.psi.ALittleClassExtendsNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+class_extends_namespace_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleClassExtendsNamespaceNameDecElementImpl"
+                                                implements="plugin.psi.ALittleClassExtendsNamespaceNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+// 函数参数类型
+method_param_type_dec ::= all_type
+// 函数参数名
+method_param_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleMethodParamNameDecElementImpl"
+                                            implements="plugin.psi.ALittleMethodParamNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+// 函数参数部分
+method_param_one_dec ::= method_param_name_dec COLON method_param_type_dec
+method_param_dec ::= LPAREN (method_param_one_dec (COMMA method_param_one_dec)*)? RPAREN {pin=1}
+// 函数体部分
+method_body_dec ::= LBRACE all_expr* RBRACE {pin=1}
+// 函数名部分
+method_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleMethodNameDecElementImpl"
+                                     implements="plugin.psi.ALittleMethodNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+// 函数返回值类型
+method_return_dec ::= COLON method_return_type_dec (COMMA method_return_type_dec)*
+method_return_type_dec ::= all_type
+
+// 类构造函数定义
+class_ctor_dec ::= access_modifier? Ctor method_param_dec method_body_dec {pin=2}
+// 类getter函数
+class_getter_dec ::= access_modifier? get method_name_dec LPAREN RPAREN COLON method_return_type_dec method_body_dec {pin=2}
+// 类setter函数
+class_setter_dec ::= access_modifier? set method_name_dec LPAREN method_param_one_dec RPAREN method_body_dec {pin=2}
+// 类成员函数定义
+class_method_dec ::= access_modifier? fun method_name_dec method_param_dec method_return_dec? method_body_dec {pin=2}
+// 类静态函数定义
+class_static_dec ::= access_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=2}
+// 类成员变量定义
+class_var_dec ::= access_modifier? class_var_name_dec COLON all_type SEMI {pin=2}
+class_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleClassVarNameDecElementImpl"
+                                  implements="plugin.psi.ALittleClassVarNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+// 全局函数
+global_method_dec ::= access_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=2}
+
+
+// 结构体
+struct_dec ::= access_modifier? struct struct_name_dec (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec)? LBRACE (struct_var_dec)* RBRACE
+struct_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructNameDecElementImpl"
+                               implements="plugin.psi.ALittleStructNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+struct_extends_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructExtendsNameDecElementImpl"
+                                                                     implements="plugin.psi.ALittleStructExtendsNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+struct_extends_namespace_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructExtendsNamespaceNameDecElementImpl"
+                                                                               implements="plugin.psi.ALittleStructExtendsNamespaceNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+
+struct_var_dec ::= struct_var_name_dec COLON all_type SEMI {pin=1}
+struct_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructVarNameDecElementImpl"
+                                   implements="plugin.psi.ALittleStructVarNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+
+// 枚举描述
+enum_dec ::= access_modifier? enum enum_name_dec LBRACE (enum_var_dec (COMMA enum_var_dec)* COMMA?)? RBRACE
+enum_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleEnumNameDecElementImpl"
+                             implements="plugin.psi.ALittleEnumNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+enum_var_dec ::= enum_var_name_dec (ASSIGN enum_var_value_dec)? {pin=1}
+enum_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleEnumVarNameDecElementImpl"
+                                 implements="plugin.psi.ALittleEnumVarNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+enum_var_value_dec ::= DIGIT_CONTENT | STRING_CONTENT
+
+// 访问修饰符
+access_modifier ::= (public | private | protected)
+
+// 表达式
+all_expr ::= var_assign_expr |
+            op_assign_expr |
+            op_1_expr |
+            if_expr |
+            for_expr |
+            while_expr |
+            do_while_expr |
+            return_expr |
+            flow_expr |
+            wrap_expr |
+            property_value_expr
+
+// for 流程控制
+for_expr ::= for LPAREN (for_step_condition | for_in_condition) RPAREN (LBRACE all_expr* RBRACE | all_expr) {pin=1}
+
+for_step_condition ::= for_start_stat COMMA for_end_stat COMMA for_step_stat
+for_start_stat ::= for_pair_dec ASSIGN value_stat {pin=2}
+for_end_stat ::= value_stat
+for_step_stat ::= value_stat
+
+for_in_condition ::= for_pair_dec (COMMA for_pair_dec)* in value_stat {pin=2}
+for_pair_dec ::= var_assign_name_dec COLON all_type
+
+// while 流程控制
+while_expr ::= while LPAREN value_stat RPAREN (LBRACE all_expr* RBRACE | all_expr) {pin=1}
+
+// do while 流程控制
+do_while_expr ::= do LBRACE all_expr* RBRACE while LPAREN value_stat RPAREN SEMI {pin=1}
+
+// if else 流程控制
+if_expr ::= if LPAREN value_stat RPAREN (LBRACE all_expr* RBRACE | all_expr) else_if_expr* else_expr? {pin=1}
+else_expr ::= else (LBRACE all_expr* RBRACE | all_expr) {pin=1}
+else_if_expr ::= elseif LPAREN value_stat RPAREN (LBRACE all_expr* RBRACE | all_expr) {pin=1}
+
+// 表达式包装 比如 { 表达式列表 }
+wrap_expr ::= LBRACE all_expr* RBRACE
+
+// return
+return_expr ::= return (value_stat (COMMA value_stat)*)? SEMI {pin=1}
+
+// break, [ continue 后续添加功能 ]
+flow_expr ::= break SEMI {pin=1}
+
+// 定义语句
+var_assign_expr ::= var var_assign_pair_dec (COMMA var_assign_pair_dec)* (ASSIGN value_stat)? SEMI {pin=1}
+var_assign_pair_dec ::= var_assign_name_dec COLON all_type
+var_assign_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleVarAssignNameDecElementImpl"
+                                   implements="plugin.psi.ALittleVarAssignNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+// 所有类型
+all_type ::= primitive_type | generic_type | custom_type
+// 自定义类型
+custom_type ::= (custom_type_namespace_name_dec DOT)? custom_type_name_dec
+custom_type_namespace_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleCustomTypeNamespaceNameDecElementImpl"
+                                              implements="plugin.psi.ALittleCustomTypeNamespaceNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+custom_type_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleCustomTypeNameDecElementImpl"
+                                    implements="plugin.psi.ALittleCustomTypeNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+
+// 通用类型
+generic_type ::= generic_list_type | generic_map_type | generic_functor_type
+generic_map_type ::= Map LESS all_type COMMA all_type GREATER {pin=1}
+generic_list_type ::= List LESS all_type GREATER {pin=1}
+generic_functor_type ::= Functor LESS LPAREN generic_functor_param_type? RPAREN generic_functor_return_type? GREATER {pin=1}
+generic_functor_param_type ::= all_type (COMMA all_type)*
+generic_functor_return_type ::=  COLON all_type (COMMA all_type)*
+
+// 基本类型
+primitive_type ::= bool | double | int | any | string {mixin="plugin.psi.impl.ALittlePrimitiveTypeElementImpl"
+                                                      implements="plugin.psi.ALittlePrimitiveTypeElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+
+//运算符，值越低，优先级越高///////////////////////////////////////////////////////////////////
+
+// 赋值
+op_assign ::= ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | QUOTIENT_ASSIGN | REMAINDER_ASSIGN
+op_assign_expr ::= property_value ((COMMA property_value)* op_assign value_stat)? SEMI {pin=1}
+
+// 值
+value_stat ::= op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor
+
+// new
+op_new_stat ::= new (custom_type | generic_type) LPAREN (value_stat (COMMA value_stat)*)? RPAREN {pin=1}
+
+// op 类型的运算，编号越大，优先级越低
+
+// 双目运算
+op_8 ::= COND_OR
+op_8_stat ::= value_factor op_8_suffix op_8_suffix_ex*
+op_8_suffix ::= op_8 (value_factor | op_2_value) op_8_suffix_ee*
+op_8_suffix_ee ::= op_3_suffix | op_4_suffix | op_5_suffix | op_6_suffix | op_7_suffix
+op_8_suffix_ex ::= op_8_suffix
+
+op_7 ::= COND_AND
+op_7_stat ::= value_factor op_7_suffix op_7_suffix_ex*
+op_7_suffix ::= op_7 (value_factor | op_2_value) op_7_suffix_ee*
+op_7_suffix_ee ::= op_3_suffix | op_4_suffix | op_5_suffix | op_6_suffix
+op_7_suffix_ex ::= op_7_suffix | op_8_suffix
+
+op_6 ::= LESS | LESS_OR_EQUAL | GREATER | GREATER_OR_EQUAL | EQ | NOT_EQ
+op_6_stat ::= value_factor op_6_suffix op_6_suffix_ex*
+op_6_suffix ::= op_6 (value_factor | op_2_value) op_6_suffix_ee*
+op_6_suffix_ee ::= op_3_suffix | op_4_suffix | op_5_suffix
+op_6_suffix_ex ::= op_6_suffix | op_7_suffix | op_8_suffix
+
+op_5 ::= CONCAT
+op_5_stat ::= value_factor op_5_suffix op_5_suffix_ex*
+op_5_suffix ::= op_5 (value_factor | op_2_value) op_5_suffix_ee*
+op_5_suffix_ee ::= op_3_suffix | op_4_suffix
+op_5_suffix_ex ::= op_5_suffix | op_6_suffix | op_7_suffix | op_8_suffix
+
+op_4 ::= PLUS | MINUS
+op_4_stat ::= value_factor op_4_suffix op_4_suffix_ex*
+op_4_suffix ::= op_4 (value_factor | op_2_value) op_4_suffix_ee*
+op_4_suffix_ee ::= op_3_suffix
+op_4_suffix_ex ::= op_4_suffix | op_5_suffix | op_6_suffix | op_7_suffix | op_8_suffix
+
+op_3 ::= MUL | QUOTIENT | REMAINDER
+op_3_stat ::= value_factor op_3_suffix op_3_suffix_ex*
+op_3_suffix ::= op_3 (value_factor | op_2_value)
+op_3_suffix_ex ::= op_3_suffix | op_4_suffix | op_5_suffix | op_6_suffix | op_7_suffix | op_8_suffix
+
+// 单目运算
+op_2 ::= NOT | MINUS
+op_2_stat ::= op_2_value op_2_suffix_ex*
+op_2_value ::= op_2 value_factor
+op_2_suffix_ex ::= op_3_suffix | op_4_suffix | op_5_suffix | op_6_suffix | op_7_suffix | op_8_suffix
+
+// 优先级1 前缀自加，前缀自减 从右到左
+op_1 ::= PLUS_PLUS | MINUS_MINUS
+op_1_expr ::= op_1 value_stat SEMI {pin=1}
+
+// 值
+value_stat_paren ::= LPAREN value_stat RPAREN
+value_factor ::= value_stat_paren | const_value | property_value
+
+// 静态值
+const_value ::= true | false | STRING_CONTENT | DIGIT_CONTENT | null
+// 属性
+property_value ::= (property_value_custom_type | property_value_this_type) property_value_suffix*
+property_value_custom_type ::= ID_CONTENT {mixin="plugin.psi.impl.ALittlePropertyValueCustomTypeElementImpl"
+                                          implements="plugin.psi.ALittlePropertyValueCustomTypeElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+property_value_this_type ::= this {mixin="plugin.psi.impl.ALittlePropertyValueThisTypeElementImpl"
+                                  implements="plugin.psi.ALittlePropertyValueThisTypeElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+property_value_suffix ::= property_value_dot_id | property_value_brack_value_stat | property_value_method_call_stat
+property_value_dot_id ::= DOT property_value_dot_id_name
+property_value_dot_id_name ::= ID_CONTENT {mixin="plugin.psi.impl.ALittlePropertyValueDotIdNameElementImpl"
+                                          implements="plugin.psi.ALittlePropertyValueDotIdNameElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
+property_value_brack_value_stat ::= LBRACK value_stat RBRACK {mixin="plugin.psi.impl.ALittlePropertyValueBrackValueStatElementImpl"
+                                                             implements="plugin.psi.ALittlePropertyValueBrackValueStatElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]} {pin=1}
+property_value_method_call_stat ::= LPAREN (value_stat (COMMA value_stat)*)? RPAREN {mixin="plugin.psi.impl.ALittlePropertyValueMethodCallStatElementImpl"
+                                                                                    implements="plugin.psi.ALittlePropertyValueMethodCallStatElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]} {pin=1}
+property_value_expr ::= property_value SEMI

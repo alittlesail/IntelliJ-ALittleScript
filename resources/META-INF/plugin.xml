@@ -1,0 +1,76 @@
+<idea-plugin>
+  <id>as.alittleide.com</id>
+  <name>ALittleScript</name>
+  <version>1.0</version>
+  <vendor email="757609414@qq.com" url="http://alittleide.com">ALittle</vendor>
+
+  <description><![CDATA[
+    Both typed and dynamic languages<br>
+    Auto Generate:
+    <ul>
+        <li> Lua 5.1 </li>
+    </ul>
+    Features:
+    <ul>
+        <li>class, struct, enum, extends</li>
+        <li>Lua 5.1 support</li>
+        <li>Syntax highlighting</li>
+        <li>Code completion</li>
+        <li>Find usages</li>
+        <li>Go to definition</li>
+        <li>Go to symbol</li>
+        <li>Go to class</li>
+        <li>Parameter name hints</li>
+        <li>Comment based type/class annotation</li>
+        <li>Structure view</li>
+        <li>Comment in/out</li>
+        <li>Method override line marker</li>
+        <li>Lua Standard Library/API</li>
+    </ul>
+    <p>中国朋友可以加QQ群629311504交流及反馈BUG</p>
+    ]]></description>
+
+  <change-notes><![CDATA[
+    Both typed and dynamic languages<br>
+    Auto Generate:
+    <ul>
+        <li> Lua 5.1 </li>
+    </ul>
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.lang</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <fileTypeFactory implementation="plugin.ALittleFileTypeFactory"/>
+    <lang.parserDefinition language="ALittle" implementationClass="plugin.ALittleParserDefinition"/>
+    <lang.syntaxHighlighterFactory language="ALittle" implementationClass="plugin.ALittleSyntaxHighlighterFactory"/>
+    <!-- <lang.formatter language="ALittle" implementationClass="plugin.format.ALittleFormattingModelBuilder" /> -->
+    <annotator language="ALittle" implementationClass="plugin.ALittleAnnotator"/>
+    <completion.contributor language="ALittle" implementationClass="plugin.ALittleCompletionContributor"/>
+    <problemFileHighlightFilter implementation="plugin.ALittleProblemFileHighlightFilter"/>
+    <!-- <codeStyleSettingsProvider implementation="plugin.format.ALittleCodeStyleSettingsProvider"/>-->
+  </extensions>
+
+  <application-components>
+    <component>
+      <implementation-class>plugin.ALittleInitComponent</implementation-class>
+    </component>
+  </application-components>
+  <actions>
+    <action id="ALittleGenerateLua" class="plugin.action.ALittleGenerateLuaAction" text="ALittleGenerateLua"
+            description="generate lua script">
+      <add-to-group group-id="BuildMenu" anchor="first"/>
+    </action>
+    <action class="plugin.action.CreateALittleFileAction"
+            text="ALittle File"
+            id="CreateALittleFile">
+      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
+    </action>
+  </actions>
+</idea-plugin>
