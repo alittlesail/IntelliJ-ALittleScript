@@ -31,6 +31,66 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
         return guess_list.get(0);
     }
 
+    public PsiElement guessTypeForSetter() {
+        List<PsiElement> guess_list = new ArrayList<>();
+
+        ResolveResult[] result_list = multiResolve(false);
+        for (ResolveResult result : result_list) {
+            PsiElement element = result.getElement();
+
+            if (element instanceof ALittleMethodNameDec) {
+                PsiElement parent = element.getParent();
+
+                List<ALittleAllType> all_type_list = new ArrayList<>();
+
+                if (parent instanceof ALittleClassSetterDec) {
+                    ALittleClassSetterDec method_dec = (ALittleClassSetterDec) parent;
+                    ALittleMethodParamOneDec param_one_dec = method_dec.getMethodParamOneDec();
+                    if (param_one_dec != null) all_type_list.add(param_one_dec.getMethodParamTypeDec().getAllType());
+                }
+
+                for (ALittleAllType all_type : all_type_list) {
+                    PsiElement guess_type = ALittleUtil.guessType(all_type);
+                    if (guess_type != null) {
+                        return guess_type;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public PsiElement guessTypeForGetter() {
+        List<PsiElement> guess_list = new ArrayList<>();
+
+        ResolveResult[] result_list = multiResolve(false);
+        for (ResolveResult result : result_list) {
+            PsiElement element = result.getElement();
+
+            if (element instanceof ALittleMethodNameDec) {
+                PsiElement parent = element.getParent();
+
+                List<ALittleAllType> all_type_list = new ArrayList<>();
+
+                if (parent instanceof ALittleClassGetterDec) {
+                    ALittleClassGetterDec method_dec = (ALittleClassGetterDec) parent;
+                    ALittleMethodReturnTypeDec return_type_dec = method_dec.getMethodReturnTypeDec();
+                    if (return_type_dec != null) all_type_list.add(return_type_dec.getAllType());
+                }
+
+                for (ALittleAllType all_type : all_type_list) {
+                    PsiElement guess_type = ALittleUtil.guessType(all_type);
+                    if (guess_type != null) {
+                        return guess_type;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     @NotNull
     public List<PsiElement> guessTypes() {
         List<PsiElement> guess_list = new ArrayList<>();

@@ -1,19 +1,19 @@
 <idea-plugin>
   <id>as.alittleide.com</id>
   <name>ALittleScript</name>
-  <version>1.0</version>
-  <vendor email="757609414@qq.com" url="http://alittleide.com">ALittle</vendor>
+  <version>1.1</version>
+  <vendor email="757609414@qq.com" url="https://github.com/alittlesail/ALittleScript">ALittle</vendor>
 
   <description><![CDATA[
     Both typed and dynamic languages<br>
     Auto Generate:
     <ul>
-        <li> Lua 5.1 </li>
+        <li> LuaJIT 5.1 </li>
     </ul>
     Features:
     <ul>
         <li>class, struct, enum, extends</li>
-        <li>Lua 5.1 support</li>
+        <li>LuaJIT 5.1 support</li>
         <li>Syntax highlighting</li>
         <li>Code completion</li>
         <li>Find usages</li>
@@ -34,7 +34,7 @@
     Both typed and dynamic languages<br>
     Auto Generate:
     <ul>
-        <li> Lua 5.1 </li>
+        <li> LuaJIT 5.1 </li>
     </ul>
     ]]>
   </change-notes>

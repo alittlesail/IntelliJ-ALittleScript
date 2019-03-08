@@ -34,6 +34,9 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
 
     @NotNull
     public List<PsiElement> guessTypes() {
+        m_getter_list = null;
+        m_setter_list = null;
+
         List<PsiElement> guess_list = new ArrayList<>();
 
         ResolveResult[] result_list = multiResolve(false);
@@ -67,9 +70,19 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
                     }
                 }
                 if (is_getter) {
-                    guess = ((ALittleMethodNameDec)element).guessType();
+                    ALittleMethodNameDec dec = (ALittleMethodNameDec)element;
+                    PsiReference[] references = dec.getReferences();
+                    if (references != null && references.length > 0) {
+                        ALittleMethodNameDecReference reference = (ALittleMethodNameDecReference)references[0];
+                        guess = reference.guessTypeForGetter();
+                    }
                 } else if (is_setter) {
-                    guess = ((ALittleMethodNameDec)element).guessType();
+                    ALittleMethodNameDec dec = (ALittleMethodNameDec)element;
+                    PsiReference[] references = dec.getReferences();
+                    if (references != null && references.length > 0) {
+                        ALittleMethodNameDecReference reference = (ALittleMethodNameDecReference)references[0];
+                        guess = reference.guessTypeForSetter();
+                    }
                 } else {
                     guess = element;
                 }
@@ -87,6 +100,7 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
         }
 
         m_getter_list = null;
+        m_setter_list = null;
         return guess_list;
     }
 
