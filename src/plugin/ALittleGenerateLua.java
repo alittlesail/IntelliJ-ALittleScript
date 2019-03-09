@@ -1,20 +1,10 @@
 package plugin;
 
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndexFacade;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.indexing.FileBasedIndex;
-import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
 
 import java.io.File;
@@ -23,8 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 public class ALittleGenerateLua {
@@ -120,7 +108,8 @@ public class ALittleGenerateLua {
             // 如果模块名是引擎库，那么需要做特殊处理
             if (module_name.equals("AEngine")) {
                 if (!rel_path.startsWith("src/ALittle/Engine")) {
-                    return "当前文件不需要生成:" + file_path;
+                    // 这个目录下不需要生成lua
+                    return null;
                 }
                 // AEngine的工程文件在：集成开发环境安装目录/Module/ALittleIDE/Other/AEngine/AEngine.iml
                 // 目标的目录是是在：集成开发环境安装目录/Engine

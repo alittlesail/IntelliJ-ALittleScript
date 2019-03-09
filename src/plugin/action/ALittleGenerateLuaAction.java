@@ -3,6 +3,7 @@ package plugin.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -74,22 +75,26 @@ public class ALittleGenerateLuaAction extends AnAction {
                 FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, ALittleFileType.INSTANCE,
                         GlobalSearchScope.allScope(project));
 
-        System.out.println("执行开始");
+        Messages.showMessageDialog(project, "开始执行lua代码生成", "提示", Messages.getInformationIcon());
+
+        String error = null;
         for (VirtualFile virtualFile : virtualFiles) {
             PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
             if (!(file instanceof ALittleFile)) continue;
             ALittleFile alittleFile = (ALittleFile)file;
 
             ALittleGenerateLua lua = new ALittleGenerateLua();
-            String error = lua.GenerateLua(alittleFile, true);
-            if (error == null) {
-                System.out.println(alittleFile.getName() + ":代码生成成功");
-            } else {
-                System.out.println(alittleFile.getName() + ":代码生成失败:" + error);
+            error = lua.GenerateLua(alittleFile, true);
+            if (error != null) {
+                error = alittleFile.getName() + ":代码生成失败:" + error;
+                break;
             }
         }
 
-
-        System.out.println("执行完毕");
+        if (error != null) {
+            Messages.showMessageDialog(project, error, "错误", Messages.getErrorIcon());
+        } else {
+            Messages.showMessageDialog(project, "lua代码生成成功", "提示", Messages.getInformationIcon());
+        }
     }
 }
