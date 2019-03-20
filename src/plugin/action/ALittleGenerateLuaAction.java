@@ -2,9 +2,12 @@ package plugin.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.FileIndex;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
@@ -19,7 +22,7 @@ import java.util.Collection;
 
 public class ALittleGenerateLuaAction extends AnAction {
     // 删除文件夹
-    public static void delFolder(String folderPath) {
+    private static void delFolder(String folderPath) {
         try {
             delAllFile(folderPath); //删除完里面所有内容
             File myFilePath = new File(folderPath);
@@ -31,33 +34,29 @@ public class ALittleGenerateLuaAction extends AnAction {
 
     //删除指定文件夹下所有文件
     //param path 文件夹完整绝对路径
-    public static boolean delAllFile(String path) {
+    private static void delAllFile(String path) {
         File file = new File(path);
-        if (!file.exists()) {
-            return false;
-        }
-        if (!file.isDirectory()) {
-            return false;
-        }
+        if (!file.exists()) return;
+        if (!file.isDirectory()) return;
+
         String[] tempList = file.list();
-        File temp = null;
-        boolean flag = false;
-        for (int i = 0; i < tempList.length; i++) {
+        if (tempList == null) return;
+
+        File temp;
+        for (String file_name : tempList) {
             if (path.endsWith(File.separator)) {
-                temp = new File(path + tempList[i]);
+                temp = new File(path + file_name);
             } else {
-                temp = new File(path + File.separator + tempList[i]);
+                temp = new File(path + File.separator + file_name);
             }
             if (temp.isFile()) {
                 temp.delete();
             }
             if (temp.isDirectory()) {
-                delAllFile(path + "/" + tempList[i]);//先删除文件夹里面的文件
-                delFolder(path + "/" + tempList[i]);//再删除空文件夹
-                flag = true;
+                delAllFile(path + "/" + file_name);//先删除文件夹里面的文件
+                delFolder(path + "/" + file_name);//再删除空文件夹
             }
         }
-        return flag;
     }
 
     @Override
@@ -71,9 +70,7 @@ public class ALittleGenerateLuaAction extends AnAction {
         File root_file_path = new File(root_path);
         root_file_path.mkdirs();
 
-        Collection<VirtualFile> virtualFiles =
-                FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, ALittleFileType.INSTANCE,
-                        GlobalSearchScope.allScope(project));
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(project));
 
         Messages.showMessageDialog(project, "开始执行lua代码生成", "提示", Messages.getInformationIcon());
 

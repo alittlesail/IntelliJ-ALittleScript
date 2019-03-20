@@ -73,7 +73,7 @@ public class ALittleParserDefinition implements ParserDefinition {
         return new ALittleFile(viewProvider);
     }
 
-    public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
+    public SpaceRequirements spaceExistenceTypeBetweenTokens(ASTNode left, ASTNode right) {
         return SpaceRequirements.MAY;
     }
 

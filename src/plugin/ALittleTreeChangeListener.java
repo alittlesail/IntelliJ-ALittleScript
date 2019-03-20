@@ -306,9 +306,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         m_instance_map = new HashMap<>();
 
         // 遍历所有文件，预加载所有内容
-        Collection<VirtualFile> virtualFiles =
-                FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, ALittleFileType.INSTANCE,
-                        GlobalSearchScope.allScope(m_project));
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(m_project));
 
         for (VirtualFile virtualFile : virtualFiles) {
             PsiFile file = PsiManager.getInstance(m_project).findFile(virtualFile);
