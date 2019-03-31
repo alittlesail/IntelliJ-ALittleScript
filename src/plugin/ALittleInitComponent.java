@@ -8,6 +8,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -86,6 +87,17 @@ public class ALittleInitComponent implements BaseComponent {
                             if (!(file instanceof ALittleFile)) continue;
 
                             ALittleTreeChangeListener.handleFileDelete(project, (ALittleFile)file);
+                        }
+                    }
+
+                    @Override
+                    public void fileCreated(@NotNull VirtualFileEvent event) {
+                        Project[] myProject = ProjectManager.getInstance().getOpenProjects();
+                        for (Project project : myProject) {
+                            PsiFile file = PsiManager.getInstance(project).findFile(event.getFile());
+                            if (!(file instanceof ALittleFile)) continue;
+
+                            ALittleTreeChangeListener.handleFileCreated(project, (ALittleFile)file);
                         }
                     }
         });

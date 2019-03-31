@@ -165,6 +165,20 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
     }
 
+    public static void handleFileCreated(Project project, ALittleFile alittleFile) {
+        ALittleTreeChangeListener listener = s_map.get(project);
+        if (listener == null) return;
+
+        List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
+        for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
+
+            ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
+            if (namespace_name_dec == null) continue;
+
+            listener.addNamespaceName(namespace_name_dec.getText(), namespace_name_dec);
+        }
+    }
+
     private Project m_project;
     private class Data
     {
