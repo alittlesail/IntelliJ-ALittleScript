@@ -1,0 +1,74 @@
+
+namespace lua;
+
+class math
+{
+    // Returns the absolute value of x.
+    public static abs(x:double) : double { }
+    // Returns the arc cosine of x (in radians).
+    public static acos(x:double) : double { }
+    // Returns the arc sine of x (in radians).
+    public static asin(x:double) : double { }
+    // Returns the arc tangent of x (in radians).
+    public static atan(x:double) : double { }
+    // Returns the arc tangent of y/x (in radians),
+    // but uses the signs of both parameters to find the quadrant of the result.
+    // (It also handles correctly the case of x being zero.)
+    public static atan2(y:double, x:double) : double { }
+
+    // Returns the smallest integer larger than or equal to x.
+    public static ceil(x:double) : double {}
+    // Returns the cosine of x (assumed to be in radians).
+    public static cos(x:double) : double { }
+    // Returns the hyperbolic cosine of x.
+    public static cosh(x:double) : double { }
+    // Returns the angle x (given in radians) in degrees.
+    public static deg(x:double) : double { }
+    // Returns the value ex.
+    public static exp(x:double) : double { }
+
+    // Returns the largest integer smaller than or equal to x.
+    public static floor(x:double) : double { }
+    // Returns the remainder of the division of x by y that rounds the quotient towards zero.
+    public static fmod(x:double, y:double) : double { }
+    // Returns m and e such that x = m2e, e is an integer and the absolute value of m is in the range [0.5, 1) (or zero when x is zero).
+    public static frexp(x:double) : double { }
+    // Returns m2e (e should be an integer).
+    public static ldexp(m:double, e:double) : double { }
+    // Returns the natural logarithm of x.
+    public static log(x:double) : double { }
+    // Returns the base-10 logarithm of x.
+    public static log10(x:double) : double { }
+
+    // Returns the maximum value among its arguments.
+    public static max(x1:double, x2:double) : double {}
+    // Returns the minimum value among its arguments.
+    public static min(x1:double, x2:double) : double {}
+    // Returns two numbers, the integral part of x and the fractional part of x.
+    public static modf(x:double) : double {}
+
+    // Returns xy. (You can also use the expression x^y to compute this value.)
+    public static pow(x:double, y:double) : double { }
+    // Returns the angle x (given in degrees) in radians.
+    public static rad(x:double) : double { }
+    // This function is an interface to the simple pseudo-random generator function rand provided by ANSI C.
+    // (No guarantees can be given for its statistical properties.)
+    //
+    // When called without arguments, returns a uniform pseudo-random real number in the range [0,1).
+    // When called with an integer number m, math.random returns a uniform pseudo-random integer in the range [1, m].
+    // When called with two integer numbers m and n, math.random returns a uniform pseudo-random integer in the range [m, n].
+    public static random(min:double, max:double) : double {}
+    // Sets x as the "seed" for the pseudo-random generator: equal seeds produce equal sequences of numbers.
+    public static randomseed(value:int) {}
+
+    // Returns the sine of x (assumed to be in radians).
+    public static sin(x:double) : double {}
+    // Returns the hyperbolic sine of x.
+    public static sinh(x:double) : double {}
+    // Returns the square root of x. (You can also use the expression x^0.5 to compute this value.)
+    public static sqrt(x:double) : double {}
+    // Returns the tangent of x (assumed to be in radians).
+    public static tan(x:double) : double {}
+    // Returns the hyperbolic tangent of x.
+    public static tanh(x:double) : double {}
+}

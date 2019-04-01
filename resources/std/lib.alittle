@@ -1,0 +1,60 @@
+
+namespace lua;
+
+// Issues an error when the value of its argument v is false (i.e., nil or false);
+// otherwise, returns all its arguments. message is an error message; when absent, it defaults to "assertion failed!"
+public static assert(condition:any, msg:string) {}
+
+// Returns the type of its only argument, coded as a string.
+// The possible results of this function are
+//    "nil" (a string, not the value nil), "number", "string", "boolean", "table", "function", "thread", and "userdata".
+public static type(object:any) : string {}
+
+// This function is a generic interface to the garbage collector.
+// It performs different functions according to its first argument, opt:
+
+// "collect": performs a full garbage-collection cycle. This is the default option.
+// "stop": stops the garbage collector.
+// "restart": restarts the garbage collector.
+// "count": returns the total memory in use by Lua (in Kbytes).
+// "step": performs a garbage-collection step.
+//     The step "size" is controlled by arg (larger values mean more steps) in a non-specified way.
+//     If you want to control the step size you must experimentally tune the value of arg.
+//     Returns true if the step finished a collection cycle.
+// "setpause": sets arg as the new value for the pause of the collector (see §2.10).
+//     Returns the previous value for pause.
+// "setstepmul": sets arg as the new value for the step multiplier of the collector (see §2.10).
+//     Returns the previous value for step.
+public static collectgarbage(cmd:string) {}
+
+// A global variable (not a function) that holds the global environment (that is, _G._G = _G).
+// Lua itself does not use this variable;
+// changing its value does not affect any environment, nor vice-versa. (Use setfenv to change environments.)
+class G {}
+protected instance _G:G = new G();
+
+// Calls function f with the given arguments in protected mode.
+// This means that any error inside f is not propagated;
+// instead, pcall catches the error and returns a status code.
+// Its first result is the status code (a boolean), which is true if the call succeeds without errors.
+// In such case, pcall also returns all results from the call, after this first result.
+// In case of any error, pcall returns false plus the error message.
+public static pcall(func:any, arg1:any, arg2:any, arg3:any, arg4:any, arg5:any) : bool, any, any, any, any, any {}
+
+// Receives an argument of any type and converts it to a string in a reasonable format.
+// For complete control of how numbers are converted, use string.format.
+// If the metatable of e has a "__tostring" field, then tostring calls the corresponding value with e as argument,
+// and uses the result of the call as its result.
+public static tostring(value:any) : string {}
+
+// Tries to convert its argument to a number.
+// If the argument is already a number or a string convertible to a number, then tonumber returns this number;
+// otherwise, it returns nil.
+//
+// An optional argument specifies the base to interpret the numeral.
+// The base may be any integer between 2 and 36, inclusive.
+// In bases above 10, the letter 'A' (in either upper or lower case) represents 10,
+// 'B' represents 11, and so forth, with 'Z' representing 35. In base 10 (the default),
+// the number can have a decimal part, as well as an optional exponent part (see §2.1).
+// In other bases, only unsigned integers are accepted.
+public static tonumber(value:any) : double {}
