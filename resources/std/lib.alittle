@@ -1,6 +1,9 @@
 
 namespace lua;
 
+// require a script
+public static require(path:string) {}
+
 // Issues an error when the value of its argument v is false (i.e., nil or false);
 // otherwise, returns all its arguments. message is an error message; when absent, it defaults to "assertion failed!"
 public static assert(condition:any, msg:string) {}

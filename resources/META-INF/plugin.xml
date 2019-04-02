@@ -54,6 +54,7 @@
     <annotator language="ALittle" implementationClass="plugin.ALittleAnnotator"/>
     <completion.contributor language="ALittle" implementationClass="plugin.ALittleCompletionContributor"/>
     <problemFileHighlightFilter implementation="plugin.ALittleProblemFileHighlightFilter"/>
+    <additionalLibraryRootsProvider implementation="plugin.StdLibraryProvider"/>
     <!-- <codeStyleSettingsProvider implementation="plugin.format.ALittleCodeStyleSettingsProvider"/>-->
   </extensions>
 

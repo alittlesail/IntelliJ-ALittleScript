@@ -1,16 +1,22 @@
 package plugin;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.SyntheticLibrary;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.PathUtil;
 import com.intellij.util.SmartList;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.*;
 
 public class ALittleTreeChangeListener implements PsiTreeChangeListener {
@@ -322,6 +328,24 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         // 遍历所有文件，预加载所有内容
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(m_project));
 
+        // 加载标准库
+        String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
+        VirtualFile dir = null;
+        try {
+            if (jarPath.endsWith(".jar"))
+                dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
+            else
+                dir = VfsUtil.findFileByIoFile(new File(jarPath +"/std"), true);
+
+            if (dir != null) {
+                VirtualFile[] file_list = dir.getChildren();
+                if (file_list != null)
+                    virtualFiles.addAll(Arrays.asList(file_list));
+            }
+        } catch (MalformedURLException e) {
+        }
+
+        // 加载所有代码文件
         for (VirtualFile virtualFile : virtualFiles) {
             PsiFile file = PsiManager.getInstance(m_project).findFile(virtualFile);
             if (!(file instanceof ALittleFile)) continue;
@@ -333,6 +357,36 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                 if (namespace_name_dec == null) continue;
 
                 addNamespaceName(namespace_name_dec.getText(), namespace_name_dec);
+            }
+        }
+    }
+
+    public static void addStdLibrary(Project project)
+    {
+        String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
+        VirtualFile dir = null;
+
+        try {
+            if (jarPath.endsWith(".jar"))
+                dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
+            else
+                dir = VfsUtil.findFileByIoFile(new File(jarPath +"/std"), true);
+        } catch (MalformedURLException e) {
+
+        }
+
+        if (dir != null)
+        {
+            VirtualFile[] file_list = dir.getChildren();
+            if (file_list != null)
+            {
+                for (VirtualFile file : file_list)
+                {
+                    PsiFile psifile = PsiManager.getInstance(project).findFile(file);
+                    if (!(psifile instanceof ALittleFile)) continue;
+
+                    handleFileCreated(project, (ALittleFile) psifile);
+                }
             }
         }
     }

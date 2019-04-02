@@ -2,22 +2,60 @@ package plugin;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.FileIndexFacade;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.PathUtil;
+import com.intellij.util.io.URLUtil;
 import plugin.psi.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ALittleGenerateLua {
     String m_error = "";
     String m_namespace_name = "";
+
+    private void copyStdLibrary(String module_base_path) {
+        File file = new File(module_base_path + "/Script/std");
+        if (file.exists()) return;
+        boolean result = file.mkdirs();
+
+        // 适配代码
+        String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
+        VirtualFile dir = null;
+        try {
+            if (jarPath.endsWith(".jar"))
+                dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "adapter/Lua"));
+            else
+                dir = VfsUtil.findFileByIoFile(new File(jarPath +"/adapter/Lua"), true);
+
+            if (dir != null) {
+                VirtualFile[] file_list = dir.getChildren();
+                if (file_list != null)
+                {
+                    for (VirtualFile virtualFile : file_list)
+                    {
+                        FileOutputStream file_out = new FileOutputStream(new File(module_base_path + "/Script/std/" + virtualFile.getName()));
+                        file_out.write(virtualFile.contentsToByteArray());
+                        file_out.close();
+                    }
+                }
+            }
+        } catch (MalformedURLException e1) {
+        } catch (FileNotFoundException e2) {
+        } catch (IOException e2) {
+        }
+    }
 
     private PsiErrorElement checkErrorElement(PsiElement element, boolean full_check) {
         for(PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
@@ -132,6 +170,9 @@ public class ALittleGenerateLua {
             FileOutputStream file_out = new FileOutputStream(new File(full_path));
             file_out.write(content.getBytes(StandardCharsets.UTF_8));
             file_out.close();
+
+            // 复制标准库
+            copyStdLibrary(module_base_path);
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
             return "代码写入文件时失败";
