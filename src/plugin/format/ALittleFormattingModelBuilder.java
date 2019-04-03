@@ -8,15 +8,28 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.ALittleLanguage;
+import plugin.psi.ALittleTypes;
+
 public class ALittleFormattingModelBuilder implements FormattingModelBuilder {
     @NotNull
     @Override
     public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
-        return new ALittleFormattingModel(
+        return FormattingModelProvider.createFormattingModelForPsiFile(
                 element.getContainingFile(),
-                settings,
-                new ALittleBlock(element.getNode(), null, null, settings)
-        );
+                new ALittleBlock(element.getNode(),
+                        Wrap.createWrap(WrapType.NONE, false),
+                        Alignment.createAlignment(),
+                        createSpaceBuilder(settings)),
+                settings);
+    }
+
+    // 这个是处理非行开头部分的代码空格
+    private static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
+        // 这里用来添加空格
+        return new SpacingBuilder(settings, ALittleLanguage.INSTANCE)
+                .before(ALittleTypes.RBRACE).spaces(1)
+                .before(ALittleTypes.LBRACE).spaces(1);
     }
 
     @Nullable

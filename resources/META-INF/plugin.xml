@@ -50,12 +50,11 @@
     <fileTypeFactory implementation="plugin.ALittleFileTypeFactory"/>
     <lang.parserDefinition language="ALittle" implementationClass="plugin.ALittleParserDefinition"/>
     <lang.syntaxHighlighterFactory language="ALittle" implementationClass="plugin.ALittleSyntaxHighlighterFactory"/>
-    <!-- <lang.formatter language="ALittle" implementationClass="plugin.format.ALittleFormattingModelBuilder" /> -->
+    <lang.formatter language="ALittle" implementationClass="plugin.format.ALittleFormattingModelBuilder" />
     <annotator language="ALittle" implementationClass="plugin.ALittleAnnotator"/>
     <completion.contributor language="ALittle" implementationClass="plugin.ALittleCompletionContributor"/>
     <problemFileHighlightFilter implementation="plugin.ALittleProblemFileHighlightFilter"/>
     <additionalLibraryRootsProvider implementation="plugin.StdLibraryProvider"/>
-    <!-- <codeStyleSettingsProvider implementation="plugin.format.ALittleCodeStyleSettingsProvider"/>-->
   </extensions>
 
   <application-components>
