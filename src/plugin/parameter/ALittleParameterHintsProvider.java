@@ -1,4 +1,4 @@
-package plugin;
+package plugin.parameter;
 
 import com.intellij.codeInsight.hints.HintInfo;
 import com.intellij.codeInsight.hints.InlayInfo;
@@ -20,7 +20,7 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
     @Override
     public List<InlayInfo> getParameterHints(PsiElement psiElement) {
         List<InlayInfo> result = new ArrayList<>();
-        while (true) {
+        do {
             if (!(psiElement instanceof ALittlePropertyValueMethodCallStat))
                 break;
 
@@ -110,8 +110,7 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                 result.add(new InlayInfo(name, value_stat.getNode().getStartOffset()));
             }
 
-            break;
-        }
+        } while (false);
 
         return result;
     }
