@@ -20,6 +20,10 @@ public class ALittleTypedHandler extends TypedHandlerDelegate {
             if (c == '{' || c == '}') {
                 int offset = editor.getCaretModel().getOffset();
                 if (offset > 0) {
+                    if (c == '{') {
+                        editor.getDocument().insertString(offset, "}");
+                        editor.getCaretModel().moveToOffset(offset);
+                    }
                     CodeStyleManager style_mgr = CodeStyleManager.getInstance(project);
                     PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
                     style_mgr.adjustLineIndent(file, new TextRange(offset - 1, offset));
