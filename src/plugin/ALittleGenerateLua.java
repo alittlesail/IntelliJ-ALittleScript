@@ -26,14 +26,15 @@ public class ALittleGenerateLua {
     String m_namespace_name = "";
 
     private void copyStdLibrary(String module_base_path) {
-        File file = new File(module_base_path + "/Script/std");
-        if (file.exists()) return;
-        boolean result = file.mkdirs();
-
-        // 适配代码
-        String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
-        VirtualFile dir = null;
         try {
+            File file = new File(module_base_path + "/std");
+            if (file.exists()) return;
+            boolean result = file.mkdirs();
+
+            // 适配代码
+            String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
+            VirtualFile dir = null;
+
             if (jarPath.endsWith(".jar"))
                 dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "adapter/Lua"));
             else
@@ -45,15 +46,18 @@ public class ALittleGenerateLua {
                 {
                     for (VirtualFile virtualFile : file_list)
                     {
-                        FileOutputStream file_out = new FileOutputStream(new File(module_base_path + "/Script/std/" + virtualFile.getName()));
+                        FileOutputStream file_out = new FileOutputStream(new File(module_base_path + "/std/" + virtualFile.getName()));
                         file_out.write(virtualFile.contentsToByteArray());
                         file_out.close();
                     }
                 }
             }
-        } catch (MalformedURLException e1) {
-        } catch (FileNotFoundException e2) {
-        } catch (IOException e2) {
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -143,15 +147,18 @@ public class ALittleGenerateLua {
             }
             String rel_path = file_path.substring(module_base_path.length());
 
+            String std_path = "Script";
+
             // 如果模块名是引擎库，那么需要做特殊处理
             if (module_name.equals("AEngine")) {
-                if (!rel_path.startsWith("src/ALittle/Engine")) {
+                if (!rel_path.startsWith("src/Engine")) {
                     // 这个目录下不需要生成lua
                     return null;
                 }
                 // AEngine的工程文件在：集成开发环境安装目录/Module/ALittleIDE/Other/AEngine/AEngine.iml
                 // 目标的目录是是在：集成开发环境安装目录/Engine
-                rel_path = "../../../../Engine" + rel_path.substring("src/ALittle/Engine".length());
+                rel_path = "../../../../Engine" + rel_path.substring("src/Engine".length());
+                std_path = "../../../../Engine";
             } else {
                 if (rel_path.startsWith("src")) {
                     rel_path = "Script" + rel_path.substring("src".length());
@@ -172,12 +179,12 @@ public class ALittleGenerateLua {
             file_out.close();
 
             // 复制标准库
-            copyStdLibrary(module_base_path);
-        } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
+            copyStdLibrary(module_base_path + std_path);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
             return "代码写入文件时失败";
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
             return "代码写入文件时失败";
         }
 
@@ -1687,7 +1694,11 @@ public class ALittleGenerateLua {
         }
         m_namespace_name = name_dec.getIdContent().getText();
 
-        StringBuilder content = new StringBuilder("\nmodule(\"" + m_namespace_name + "\", package.seeall)\n\n");
+        StringBuilder content = null;
+        if (m_namespace_name.equals("lua"))
+            content = new StringBuilder("\n");
+        else
+            content = new StringBuilder("\nmodule(\"" + m_namespace_name + "\", package.seeall)\n\n");
 
         PsiElement[] child_list = root.getChildren();
         for (PsiElement child : child_list) {
