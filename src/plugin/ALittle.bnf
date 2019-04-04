@@ -145,7 +145,7 @@ struct_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructVarNameD
                                    implements="plugin.psi.ALittleStructVarNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 
 // 枚举描述
-enum_dec ::= access_modifier? enum enum_name_dec LBRACE (enum_var_dec (COMMA enum_var_dec)* COMMA?)? RBRACE
+enum_dec ::= access_modifier? enum enum_name_dec LBRACE (enum_var_dec (COMMA enum_var_dec)* COMMA?)? RBRACE {pin=2}
 enum_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleEnumNameDecElementImpl"
                              implements="plugin.psi.ALittleEnumNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 enum_var_dec ::= enum_var_name_dec (ASSIGN enum_var_value_dec)? {pin=1}
@@ -170,7 +170,9 @@ all_expr ::= var_assign_expr |
             property_value_expr
 
 // for 流程控制
-for_expr ::= for LPAREN (for_step_condition | for_in_condition) RPAREN (LBRACE all_expr* RBRACE | all_expr) {pin=1}
+for_expr ::= for private_for_condition (private_for_body | all_expr) {pin=1}
+private private_for_condition ::= LPAREN (for_step_condition | for_in_condition) RPAREN {pin=1}
+private private_for_body ::= LBRACE all_expr* RBRACE {pin=1}
 
 for_step_condition ::= for_start_stat COMMA for_end_stat COMMA for_step_stat
 for_start_stat ::= for_pair_dec ASSIGN value_stat {pin=2}
@@ -181,18 +183,27 @@ for_in_condition ::= for_pair_dec (COMMA for_pair_dec)* in value_stat {pin=2}
 for_pair_dec ::= var_assign_name_dec COLON all_type
 
 // while 流程控制
-while_expr ::= while LPAREN value_stat RPAREN (LBRACE all_expr* RBRACE | all_expr) {pin=1}
+while_expr ::= while private_while_condition (private_while_body | all_expr) {pin=1}
+private private_while_condition ::= LPAREN value_stat RPAREN {pin=1}
+private private_while_body ::= LBRACE all_expr* RBRACE {pin=1}
 
 // do while 流程控制
-do_while_expr ::= do LBRACE all_expr* RBRACE while LPAREN value_stat RPAREN SEMI {pin=1}
+do_while_expr ::= do private_do_while_body while private_do_while_condition SEMI {pin=1}
+private private_do_while_condition ::= LPAREN value_stat RPAREN {pin=1}
+private private_do_while_body ::= LBRACE all_expr* RBRACE {pin=1}
 
 // if else 流程控制
-if_expr ::= if LPAREN value_stat RPAREN (LBRACE all_expr* RBRACE | all_expr) else_if_expr* else_expr? {pin=1}
-else_expr ::= else (LBRACE all_expr* RBRACE | all_expr) {pin=1}
-else_if_expr ::= elseif LPAREN value_stat RPAREN (LBRACE all_expr* RBRACE | all_expr) {pin=1}
+if_expr ::= if private_if_condition (private_if_body | all_expr) else_if_expr* else_expr? {pin=1}
+private private_if_condition ::= LPAREN value_stat RPAREN {pin=1}
+private private_if_body ::= LBRACE all_expr* RBRACE {pin=1}
+else_expr ::= else (private_else_body | all_expr) {pin=1}
+private private_else_body ::= LBRACE all_expr* RBRACE {pin=1}
+else_if_expr ::= elseif private_else_if_condition (private_else_if_body | all_expr) {pin=1}
+private private_else_if_condition ::= LPAREN value_stat RPAREN {pin=1}
+private private_else_if_body ::= LBRACE all_expr* RBRACE {pin=1}
 
 // 表达式包装 比如 { 表达式列表 }
-wrap_expr ::= LBRACE all_expr* RBRACE
+wrap_expr ::= LBRACE all_expr* RBRACE {pin=1}
 
 // return
 return_expr ::= return (value_stat (COMMA value_stat)*)? SEMI {pin=1}
@@ -201,8 +212,11 @@ return_expr ::= return (value_stat (COMMA value_stat)*)? SEMI {pin=1}
 flow_expr ::= break SEMI {pin=1}
 
 // 定义语句
-var_assign_expr ::= var var_assign_pair_dec (COMMA var_assign_pair_dec)* (ASSIGN value_stat)? SEMI {pin=1}
-var_assign_pair_dec ::= var_assign_name_dec COLON all_type
+var_assign_expr ::= var var_assign_pair_dec private_COMMA_var_assign_pair_dec* private_ASSIGN_value_stat? SEMI {pin=1}
+private private_ASSIGN_value_stat ::= ASSIGN value_stat {pin=1}
+private private_COMMA_var_assign_pair_dec ::= COMMA var_assign_pair_dec {pin=1}
+var_assign_pair_dec ::= var_assign_name_dec private_COLON_all_type
+private private_COLON_all_type ::= COLON all_type {pin=1}
 var_assign_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleVarAssignNameDecElementImpl"
                                    implements="plugin.psi.ALittleVarAssignNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 // 所有类型

@@ -10,7 +10,7 @@ public interface ALittleEnumDec extends PsiElement {
   @Nullable
   ALittleAccessModifier getAccessModifier();
 
-  @NotNull
+  @Nullable
   ALittleEnumNameDec getEnumNameDec();
 
   @NotNull

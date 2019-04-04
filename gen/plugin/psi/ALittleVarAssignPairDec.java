@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface ALittleVarAssignPairDec extends PsiElement {
 
-  @NotNull
+  @Nullable
   ALittleAllType getAllType();
 
   @NotNull

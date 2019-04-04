@@ -33,9 +33,9 @@ public class ALittleEnumDecImpl extends ASTWrapperPsiElement implements ALittleE
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittleEnumNameDec getEnumNameDec() {
-    return findNotNullChildByClass(ALittleEnumNameDec.class);
+    return findChildByClass(ALittleEnumNameDec.class);
   }
 
   @Override
