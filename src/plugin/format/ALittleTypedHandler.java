@@ -25,6 +25,13 @@ public class ALittleTypedHandler extends TypedHandlerDelegate {
                     style_mgr.adjustLineIndent(file, new TextRange(offset - 1, offset));
                     return Result.STOP;
                 }
+            } else if (c == '(') {
+                int offset = editor.getCaretModel().getOffset();
+                if (offset > 0) {
+                    editor.getDocument().insertString(offset, ")");
+                    editor.getCaretModel().moveToOffset(offset);
+                    return Result.STOP;
+                }
             }
         }
         return super.charTyped(c, project, editor, file);
