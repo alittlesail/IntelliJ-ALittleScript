@@ -68,7 +68,9 @@ public class ALittleBlock extends AbstractBlock {
         if (element instanceof ALittleAllExpr)
             return Indent.getNormalIndent();
 
-        // System.out.println("element:" + element);
+        if (type == ALittleTypes.COMMENT)
+            return Indent.getContinuationIndent();
+
         return Indent.getNoneIndent();
     }
 

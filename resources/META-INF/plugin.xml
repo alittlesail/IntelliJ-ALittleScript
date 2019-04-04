@@ -56,6 +56,7 @@
     <problemFileHighlightFilter implementation="plugin.ALittleProblemFileHighlightFilter"/>
     <additionalLibraryRootsProvider implementation="plugin.StdLibraryProvider"/>
     <typedHandler implementation="plugin.format.ALittleTypedHandler"/>
+    <codeInsight.parameterNameHints language="ALittle" implementationClass="plugin.ALittleParameterHintsProvider"/>
   </extensions>
 
   <application-components>
