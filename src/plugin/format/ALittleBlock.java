@@ -87,7 +87,8 @@ public class ALittleBlock extends AbstractBlock {
             || element instanceof ALittleElseIfExpr
             || element instanceof ALittleElseExpr
             || element instanceof ALittleForExpr
-            || element instanceof ALittleWhileExpr)
+            || element instanceof ALittleWhileExpr
+            || element instanceof ALittleWrapExpr)
             return new ChildAttributes(Indent.getNormalIndent(), null);
 
         return new ChildAttributes(Indent.getNoneIndent(), null);

@@ -55,6 +55,7 @@
     <completion.contributor language="ALittle" implementationClass="plugin.ALittleCompletionContributor"/>
     <problemFileHighlightFilter implementation="plugin.ALittleProblemFileHighlightFilter"/>
     <additionalLibraryRootsProvider implementation="plugin.StdLibraryProvider"/>
+    <typedHandler implementation="plugin.format.ALittleTypedHandler"/>
   </extensions>
 
   <application-components>
