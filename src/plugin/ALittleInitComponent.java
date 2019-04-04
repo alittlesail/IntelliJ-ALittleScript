@@ -83,10 +83,25 @@ public class ALittleInitComponent implements BaseComponent {
                     public void beforeFileDeletion(@NotNull VirtualFileEvent event) {
                         Project[] myProject = ProjectManager.getInstance().getOpenProjects();
                         for (Project project : myProject) {
-                            PsiFile file = PsiManager.getInstance(project).findFile(event.getFile());
-                            if (!(file instanceof ALittleFile)) continue;
+                            // 如果是文件夹
+                            if (event.getFile().isDirectory())
+                            {
+                                VirtualFile[] file_list = event.getFile().getChildren();
+                                if (file_list != null) {
+                                    for (VirtualFile file : file_list) {
+                                        PsiFile psi_file = PsiManager.getInstance(project).findFile(file);
+                                        if (!(psi_file instanceof ALittleFile)) continue;
 
-                            ALittleTreeChangeListener.handleFileDelete(project, (ALittleFile)file);
+                                        ALittleTreeChangeListener.handleFileDelete(project, (ALittleFile)psi_file);
+                                    }
+                                }
+                            // 如果是文件
+                            } else {
+                                PsiFile file = PsiManager.getInstance(project).findFile(event.getFile());
+                                if (!(file instanceof ALittleFile)) continue;
+
+                                ALittleTreeChangeListener.handleFileDelete(project, (ALittleFile)file);
+                            }
                         }
                     }
 
@@ -94,10 +109,25 @@ public class ALittleInitComponent implements BaseComponent {
                     public void fileCreated(@NotNull VirtualFileEvent event) {
                         Project[] myProject = ProjectManager.getInstance().getOpenProjects();
                         for (Project project : myProject) {
-                            PsiFile file = PsiManager.getInstance(project).findFile(event.getFile());
-                            if (!(file instanceof ALittleFile)) continue;
+                            // 如果是文件夹
+                            if (event.getFile().isDirectory())
+                            {
+                                VirtualFile[] file_list = event.getFile().getChildren();
+                                if (file_list != null) {
+                                    for (VirtualFile file : file_list) {
+                                        PsiFile psi_file = PsiManager.getInstance(project).findFile(file);
+                                        if (!(psi_file instanceof ALittleFile)) continue;
 
-                            ALittleTreeChangeListener.handleFileCreated(project, (ALittleFile)file);
+                                        ALittleTreeChangeListener.handleFileCreated(project, (ALittleFile)psi_file);
+                                    }
+                                }
+                                // 如果是文件
+                            } else {
+                                PsiFile file = PsiManager.getInstance(project).findFile(event.getFile());
+                                if (!(file instanceof ALittleFile)) continue;
+
+                                ALittleTreeChangeListener.handleFileCreated(project, (ALittleFile)file);
+                            }
                         }
                     }
         });
