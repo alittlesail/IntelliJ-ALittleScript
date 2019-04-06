@@ -61,6 +61,24 @@ function Bind(func, ...)
     return object
 end
 
+-- 使用协程的方式执行，调用之后不会有任何返回值
+function CoBind(func, ...)
+    -- 委托对象
+    local object = {}
+    -- 保存func
+    object._func = func
+    -- 保存参数列表
+    object._arg = { ... }
+    -- 保存参数个数
+    object._arg_count = select("#", ...)
+    -- 使用协程调用
+    object._use_coroutine = true
+    -- 委托对象的metatable
+    setmetatable(object, __functor_mt)
+    -- 返回委托对象
+    return object
+end
+
 -- 以协程方式调用函数
 function CoInvoke(func, ...)
     local co = coroutine.create(func)
