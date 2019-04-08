@@ -68,8 +68,11 @@ public class ALittleBlock extends AbstractBlock {
         if (element instanceof ALittleAllExpr)
             return Indent.getNormalIndent();
 
-        if (type == ALittleTypes.COMMENT)
-            return Indent.getContinuationIndent();
+        if (type == ALittleTypes.COMMENT) {
+            if (parent instanceof ALittleFile || parent instanceof ALittleNamespaceDec)
+                return Indent.getNoneIndent();
+            return Indent.getNormalIndent();
+        }
 
         return Indent.getNoneIndent();
     }
