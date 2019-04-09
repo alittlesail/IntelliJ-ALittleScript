@@ -1140,15 +1140,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // var_assign_name_dec COLON all_type
+  // var_assign_name_dec private_COLON_all_type
   public static boolean for_pair_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "for_pair_dec")) return false;
     if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = var_assign_name_dec(b, l + 1);
-    r = r && consumeToken(b, COLON);
-    r = r && all_type(b, l + 1);
+    r = r && private_COLON_all_type(b, l + 1);
     exit_section_(b, m, FOR_PAIR_DEC, r);
     return r;
   }

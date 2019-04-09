@@ -217,6 +217,12 @@ function IsClass(object)
     return object.__class ~= nil    
 end
 
+-- 获取类名
+function GetClassName(object)
+    if (not IsClass(object)) return null end
+    return object.__class.__name
+end
+
 -- 创建一张空表
 function CreateTable()
     return {}

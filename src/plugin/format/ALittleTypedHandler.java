@@ -33,9 +33,14 @@ public class ALittleTypedHandler extends TypedHandlerDelegate {
             } else if (c == '(') {
                 int offset = editor.getCaretModel().getOffset();
                 if (offset > 0) {
-                    editor.getDocument().insertString(offset, ")");
-                    editor.getCaretModel().moveToOffset(offset);
-                    return Result.STOP;
+                    String nextChar = null;
+                    if (offset + 1 < editor.getDocument().getTextLength())
+                        nextChar = editor.getDocument().getText(new TextRange(offset, offset + 1));
+                    if (nextChar == null || nextChar.equals("\n")) {
+                        editor.getDocument().insertString(offset, ")");
+                        editor.getCaretModel().moveToOffset(offset);
+                        return Result.STOP;
+                    }
                 }
             } else if (c == '"') {
                 int offset = editor.getCaretModel().getOffset();
@@ -65,8 +70,10 @@ public class ALittleTypedHandler extends TypedHandlerDelegate {
             if (c == '}') {
                 int offset = editor.getCaretModel().getOffset();
                 if (offset > 0) {
-                    String nextChar = editor.getDocument().getText(new TextRange(offset, offset + 1));
-                    if (nextChar.equals("}")) {
+                    String nextChar = null;
+                    if (offset + 1 < editor.getDocument().getTextLength())
+                        nextChar = editor.getDocument().getText(new TextRange(offset, offset + 1));
+                    if (nextChar != null && nextChar.equals("}")) {
                         editor.getCaretModel().moveToOffset(offset + 1);
                         return Result.STOP;
                     }
@@ -74,8 +81,10 @@ public class ALittleTypedHandler extends TypedHandlerDelegate {
             } else if (c == ')') {
                 int offset = editor.getCaretModel().getOffset();
                 if (offset > 0) {
-                    String nextChar = editor.getDocument().getText(new TextRange(offset, offset + 1));
-                    if (nextChar.equals(")")) {
+                    String nextChar = null;
+                    if (offset + 1 < editor.getDocument().getTextLength())
+                        nextChar = editor.getDocument().getText(new TextRange(offset, offset + 1));
+                    if (nextChar != null && nextChar.equals(")")) {
                         editor.getCaretModel().moveToOffset(offset + 1);
                         return Result.STOP;
                     }
@@ -83,8 +92,10 @@ public class ALittleTypedHandler extends TypedHandlerDelegate {
             } else if (c == '"') {
                 int offset = editor.getCaretModel().getOffset();
                 if (offset > 0) {
-                    String nextChar = editor.getDocument().getText(new TextRange(offset, offset + 1));
-                    if (nextChar.equals("\"")) {
+                    String nextChar = null;
+                    if (offset + 1 < editor.getDocument().getTextLength())
+                        nextChar = editor.getDocument().getText(new TextRange(offset, offset + 1));
+                    if (nextChar != null && nextChar.equals("\"")) {
                         editor.getCaretModel().moveToOffset(offset + 1);
                         return Result.STOP;
                     }

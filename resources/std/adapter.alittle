@@ -10,6 +10,9 @@ public static CreateTable() : any {}
 // 是否是类
 public static IsClass(table:any) : bool {}
 
+// 获取类名
+public static GetClassName(object:any) {}
+
 // 是否是某个类
 public static InstanceOf(table:any, clazz:any) : bool {}
 
