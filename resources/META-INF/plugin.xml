@@ -66,6 +66,10 @@
     </component>
   </application-components>
   <actions>
+    <action id="ALittleGenerateJavaScript" class="plugin.action.ALittleGenerateJavaScriptAction" text="ALittleGenerateJavaScript"
+            description="generate javascript">
+      <add-to-group group-id="BuildMenu" anchor="first"/>
+    </action>
     <action id="ALittleGenerateLua" class="plugin.action.ALittleGenerateLuaAction" text="ALittleGenerateLua"
             description="generate lua script">
       <add-to-group group-id="BuildMenu" anchor="first"/>

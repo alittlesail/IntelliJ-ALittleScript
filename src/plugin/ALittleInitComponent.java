@@ -42,9 +42,17 @@ public class ALittleInitComponent implements BaseComponent {
                                 ALittleGenerateLua lua = new ALittleGenerateLua();
                                 String error = lua.GenerateLua((ALittleFile) psiFile, false);
                                 if (error == null) {
-                                    System.out.println(psiFile.getName() + ":代码生成成功");
+                                    System.out.println(psiFile.getName() + ":生成lua代码成功");
                                 } else {
-                                    System.out.println(psiFile.getName() + ":代码生成失败:" + error);
+                                    System.out.println(psiFile.getName() + ":生成lua代码失败:" + error);
+                                }
+
+                                ALittleGenerateJavaScript js = new ALittleGenerateJavaScript();
+                                error = js.GenerateJavaScript((ALittleFile) psiFile, false);
+                                if (error == null) {
+                                    System.out.println(psiFile.getName() + ":生成javascript代码成功");
+                                } else {
+                                    System.out.println(psiFile.getName() + ":生成javascript代码失败:" + error);
                                 }
                                 break;
                             }

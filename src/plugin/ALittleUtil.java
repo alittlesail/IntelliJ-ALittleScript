@@ -1616,14 +1616,4 @@ public class ALittleUtil {
         error_element_list.add(src_right);
         return false;
     }
-
-    @Nullable
-    public static ASTNode getPrevSiblingSkipWhiteSpacesAndComments(@Nullable ASTNode sibling) {
-        if (sibling == null) return null;
-        ASTNode result = sibling.getTreePrev();
-        while (result != null && result.getPsi() instanceof PsiWhiteSpace) {
-            result = result.getTreePrev();
-        }
-        return result;
-    }
 }

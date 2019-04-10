@@ -6,10 +6,12 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
 import plugin.psi.*;
+import plugin.reference.ALittlePropertyValueCustomTypeReference;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,10 +20,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class ALittleGenerateLua {
+public class ALittleGenerateJavaScript {
     String m_error = "";
     String m_namespace_name = "";
 
@@ -36,9 +37,9 @@ public class ALittleGenerateLua {
             VirtualFile dir = null;
 
             if (jarPath.endsWith(".jar"))
-                dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "adapter/Lua"));
+                dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "adapter/JavaScript"));
             else
-                dir = VfsUtil.findFileByIoFile(new File(jarPath +"/adapter/Lua"), true);
+                dir = VfsUtil.findFileByIoFile(new File(jarPath +"/adapter/JavaScript"), true);
 
             if (dir != null) {
                 VirtualFile[] file_list = dir.getChildren();
@@ -110,7 +111,7 @@ public class ALittleGenerateLua {
         return null;
     }
 
-    public String GenerateLua(ALittleFile alittleFile, boolean full_check) {
+    public String GenerateJavaScript(ALittleFile alittleFile, boolean full_check) {
         // 获取语法错误
         PsiErrorElement error = checkErrorElement(alittleFile, full_check);
         if (error != null) {
@@ -147,7 +148,7 @@ public class ALittleGenerateLua {
             }
             String rel_path = file_path.substring(module_base_path.length());
 
-            String std_path = "Script";
+            String std_path = "JavaScript";
 
             // 如果模块名是引擎库，那么需要做特殊处理
             if (module_name.equals("AEngine")) {
@@ -161,7 +162,7 @@ public class ALittleGenerateLua {
                 std_path = "../../../../Engine";
             } else {
                 if (rel_path.startsWith("src")) {
-                    rel_path = "Script" + rel_path.substring("src".length());
+                    rel_path = "JavaScript" + rel_path.substring("src".length());
                 } else {
                     return "不支持该目录下的文件生成:" + file_path;
                 }
@@ -170,7 +171,7 @@ public class ALittleGenerateLua {
             if (!rel_path.endsWith(ext)) {
                 return "要生成的代码文件后缀名必须是alittle:" + file_path;
             }
-            rel_path = rel_path.substring(0, rel_path.length() - ext.length()) + "lua";
+            rel_path = rel_path.substring(0, rel_path.length() - ext.length()) + "js";
             String full_path = module_base_path + rel_path;
             File file = new File(full_path);
             boolean result = file.getParentFile().mkdirs();
@@ -197,11 +198,11 @@ public class ALittleGenerateLua {
         if (generic_type != null) {
             // 如果是Map，那么直接返回{}
             ALittleGenericMapType map_type = generic_type.getGenericMapType();
-            if (map_type != null) return "{}";
+            if (map_type != null) return "new Map()";
 
             // 如果是List，那么直接返回{}
             ALittleGenericListType list_type = generic_type.getGenericListType();
-            if (list_type != null) return "{}";
+            if (list_type != null) return "[]";
 
             ALittleGenericFunctorType functor_type = generic_type.getGenericFunctorType();
             if (functor_type != null) {
@@ -220,10 +221,12 @@ public class ALittleGenerateLua {
             // 如果是类名
             } else if (guess_type instanceof ALittleClassDec) {
                 // 如果是类名
-                String content = "";
+                String content = "new ";
                 ALittleCustomTypeNamespaceNameDec namespace_name_dec = custom_type.getCustomTypeNamespaceNameDec();
                 if (namespace_name_dec != null)
-                    content = namespace_name_dec.getIdContent().getText() + ".";
+                    content += namespace_name_dec.getIdContent().getText() + ".";
+                else
+                    content += m_namespace_name + ".";
                 content += custom_type.getCustomTypeNameDec().getIdContent().getText() + "(";
 
                 List<String> param_list = new ArrayList<>();
@@ -246,9 +249,6 @@ public class ALittleGenerateLua {
 
     private String GenerateOp8Suffix(ALittleOp8Suffix suffix) {
         String op_string = suffix.getOp8().getText();
-        if (op_string.equals("||")) {
-            op_string = "or";
-        }
 
         String value_factor_result = null;
         if (suffix.getValueFactor() != null) {
@@ -392,9 +392,6 @@ public class ALittleGenerateLua {
 
     private String GenerateOp6Suffix(ALittleOp6Suffix suffix) {
         String op_string = suffix.getOp6().getText();
-        if (op_string.equals("!=")) {
-            op_string = "~=";
-        }
 
         String value_factor_result = null;
         if (suffix.getValueFactor() != null) {
@@ -465,6 +462,7 @@ public class ALittleGenerateLua {
 
     private String GenerateOp5Suffix(ALittleOp5Suffix suffix) {
         String op_string = suffix.getOp5().getText();
+        op_string = "+";
 
         String value_factor_result = null;
         if (suffix.getValueFactor() != null) {
@@ -772,20 +770,14 @@ public class ALittleGenerateLua {
     }
 
     private String GenerateConstValue(ALittleConstValue const_value) {
-        String content = "";
-        String const_value_string = const_value.getText();
-        if (const_value_string.equals("null"))
-            content += "nil";
-        else
-            content += const_value_string;
-        return content;
+        return const_value.getText();
     }
 
     private String GeneratePropertyValue(ALittlePropertyValue prop_value) {
         StringBuilder content = new StringBuilder();
 
-        // 用来标记第一个变量是不是lua命名域
-        boolean is_lua_namespace = false;
+        // 用来标记第一个变量是不是javascript命名域
+        boolean is_javascript_namespace = false;
 
         // 通用类型的类型猜测
         PsiElement custom_guess_type = null;
@@ -796,15 +788,32 @@ public class ALittleGenerateLua {
         if (custom_type != null) {
             String custom_type_content = custom_type.getText();
             custom_guess_type = custom_type.guessType();
-            if (custom_guess_type instanceof ALittleNamespaceNameDec && custom_type_content.equals("lua"))
-                is_lua_namespace = true;
+            if (custom_guess_type instanceof ALittleNamespaceNameDec) {
+                if (custom_type_content.equals("javascript")) {
+                    is_javascript_namespace = true;
+                }
+            } else {
+                PsiReference[] references = custom_type.getReferences();
+                if (references != null && references.length > 0 && references[0] instanceof ALittlePropertyValueCustomTypeReference) {
+                    ALittlePropertyValueCustomTypeReference ref = (ALittlePropertyValueCustomTypeReference)references[0];
+                    PsiElement resolve = ref.resolve();
+                    if (resolve instanceof ALittleInstanceNameDec) {
+                        // 如果这个单例是公共的，那么就不添加
+                        ALittleInstanceNameDec instance_name_dec = (ALittleInstanceNameDec)resolve;
+                        ALittleInstanceDec instance_dec = (ALittleInstanceDec)instance_name_dec.getParent();
+                        ALittleAccessModifier access_modifier = instance_dec.getAccessModifier();
+                        if (access_modifier == null || !access_modifier.getText().equals("public"))
+                            custom_type_content = m_namespace_name + "." + custom_type_content;
+                    }
+                }
+            }
 
-            // 如果是lua命名域，那么就忽略
-            if (!is_lua_namespace)
+            // 如果是javascript命名域，那么就忽略
+            if (!is_javascript_namespace)
                 content.append(custom_type_content);
         // 如果是this，那么就变为self
         } else if (this_type != null) {
-            content.append("self");
+            content.append("this");
         }
 
         // 后面跟着后缀属性
@@ -831,7 +840,7 @@ public class ALittleGenerateLua {
                 }
 
                 // 如果是lua命名域下的，判断当前后缀的类型。决定使用.还是:
-                if (!is_lua_namespace)
+                if (!is_javascript_namespace)
                 {
                     String split = ".";
 
@@ -865,7 +874,7 @@ public class ALittleGenerateLua {
 
                                 // 只要不是类名，那么肯定就是类实例对象，就是用语法糖
                                 if (!(pre_guess instanceof ALittleClassNameDec))
-                                    split = ":";
+                                    split = ".";
                             }
                         // setter和getter需要特殊处理
                         } else if (method_name_dec.getParent() instanceof ALittleClassSetterDec
@@ -908,12 +917,12 @@ public class ALittleGenerateLua {
                 String name_content = dot_id.getPropertyValueDotIdName().getIdContent().getText();
                 // 因为lua中自带的string模块名和关键字string一样，所以把lua自动的改成String（大些开头）
                 // 然后再翻译的时候，把String改成string
-                if (is_lua_namespace && name_content.equals("String"))
+                if (is_javascript_namespace && name_content.equals("String"))
                     name_content = "string";
                 content.append(name_content);
 
                 // 置为false，表示不是命名域
-                is_lua_namespace = false;
+                is_javascript_namespace = false;
                 continue;
             }
 
@@ -981,22 +990,42 @@ public class ALittleGenerateLua {
             return null;
         }
 
-        String content = pre_tab + "local ";
+        String content = "";
 
         List<String> name_list = new ArrayList<>();
         for (ALittleVarAssignPairDec pair_dec : pair_dec_list) {
             name_list.add(pair_dec.getVarAssignNameDec().getIdContent().getText());
         }
-        content += String.join(", ", name_list);
 
         ALittleValueStat value_stat = root.getValueStat();
-        if (value_stat == null)
-            return content + "\n";
+        if (value_stat == null) {
+            for (int i = 0; i < name_list.size(); ++i) {
+                content += pre_tab + "var " + name_list.get(i) + " = null;\n";
+            }
+            return content;
+        }
 
         String value_stat_result = GenerateValueStat(value_stat);
         if (value_stat_result == null) return null;
 
-        return content + " = " + value_stat_result + "\n";
+        List<PsiElement> list = ALittleUtil.guessTypeForMethodCall(value_stat);
+        boolean is_multiply_return = list != null && list.size() > 1;
+
+        if (is_multiply_return) {
+            content = pre_tab + "var temp = " + value_stat_result + ";\n";
+            for (int i = 0; i < name_list.size(); ++i) {
+                content += pre_tab + "var " + name_list.get(i) + " = temp[" + i + "];\n";
+            }
+        } else {
+            for (int i = 0; i < name_list.size(); ++i) {
+                if (i == 0)
+                    content += pre_tab + "var " + name_list.get(i) + " = " + value_stat_result + ";\n";
+                else
+                    content += pre_tab + "var " + name_list.get(i) + " = null;\n";
+            }
+        }
+
+        return content;
     }
 
     private String GenerateOpAssignExpr(ALittleOpAssignExpr root, String pre_tab) {
@@ -1008,17 +1037,38 @@ public class ALittleGenerateLua {
             content_list.add(prop_value_result);
         }
 
-        String prop_value_result = String.join(", ", content_list);
-
         ALittleOpAssign op_assign = root.getOpAssign();
         ALittleValueStat value_stat = root.getValueStat();
-        if (op_assign == null || value_stat == null) return pre_tab + prop_value_result + "\n";
+        if (op_assign == null || value_stat == null) {
+            String content = "";
+            for (int i = 0; i < content_list.size(); ++i) {
+                content += pre_tab + content_list.get(i) + ";\n";
+            }
+            return content;
+        }
 
         String value_stat_result = GenerateValueStat(value_stat);
         if (value_stat_result == null) return null;
 
-        if (op_assign.getText().equals("="))
-            return pre_tab + prop_value_result + " = " + value_stat_result + "\n";
+        if (op_assign.getText().equals("=")) {
+            List<PsiElement> list = ALittleUtil.guessTypeForMethodCall(value_stat);
+            boolean is_multiply_return = list != null && list.size() > 1;
+            String content = "";
+            if (is_multiply_return) {
+                content = pre_tab + "var temp = " + value_stat_result + ";\n";
+                for (int i = 0; i < content_list.size(); ++i) {
+                    content += pre_tab + content_list.get(i) + " = temp[" + i + "];\n";
+                }
+            } else {
+                for (int i = 0; i < content_list.size(); ++i) {
+                    if (i == 0)
+                        content += pre_tab + content_list.get(i) + " = " + value_stat_result + ";\n";
+                    else
+                        content += pre_tab + content_list.get(i) + " = null;\n";
+                }
+            }
+            return content;
+        }
 
         String op_assign_string = op_assign.getText();
 
@@ -1036,8 +1086,7 @@ public class ALittleGenerateLua {
             case "*=":
             case "/=":
             case "%=":
-                String op_string = op_assign_string.substring(0, 1);
-                content = pre_tab + prop_value_result + " = " + prop_value_result + " " + op_string + " (" + value_stat_result + ")\n";
+                content = pre_tab + content_list.get(0) + " " + op_assign_string + " " + value_stat_result + "\n";
                 break;
             default:
                 m_error = "未知的赋值操作类型:" + op_assign_string;
@@ -1048,7 +1097,9 @@ public class ALittleGenerateLua {
 
     private String GenerateElseExpr(ALittleElseExpr root, String pre_tab) {
         StringBuilder content = new StringBuilder(pre_tab);
-        content.append("else\n");
+        content.append("else\n")
+                .append(pre_tab)
+                .append("{\n");
         List<ALittleAllExpr> all_expr_list = root.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
             String result = GenerateAllExpr(all_expr, pre_tab + "\t");
@@ -1068,10 +1119,11 @@ public class ALittleGenerateLua {
         if (value_stat_result == null) return null;
 
         StringBuilder content = new StringBuilder(pre_tab);
-        content.append("elseif")
-                .append(" ")
+        content.append("else if (")
                 .append(value_stat_result)
-                .append(" then\n");
+                .append(")\n")
+                .append(pre_tab)
+                .append("{\n");
 
         List<ALittleAllExpr> all_expr_list = root.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
@@ -1092,10 +1144,11 @@ public class ALittleGenerateLua {
         if (value_stat_result == null) return null;
 
         StringBuilder content = new StringBuilder(pre_tab);
-        content.append("if")
-                .append(" ")
+        content.append("if (")
                 .append(value_stat_result)
-                .append(" then\n");
+                .append(")\n")
+                .append(pre_tab)
+                .append("{\n");
 
         List<ALittleAllExpr> all_expr_list = root.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
@@ -1117,7 +1170,7 @@ public class ALittleGenerateLua {
             if (result == null) return null;
             content.append(result);
         }
-        content.append(pre_tab).append("end\n");
+        content.append(pre_tab).append("}\n");
         return content.toString();
     }
 
@@ -1139,26 +1192,32 @@ public class ALittleGenerateLua {
 
             String start_var_name = for_start_stat.getForPairDec().getVarAssignNameDec().getIdContent().getText();
 
-            content.append("for ")
+            content.append("for (var ")
                     .append(start_var_name)
                     .append(" = ")
                     .append(start_value_stat_result)
-                    .append(", ");
+                    .append("; ");
 
             ALittleForEndStat for_end_stat = for_step_condition.getForEndStat();
 
             ALittleValueStat end_value_stat = for_end_stat.getValueStat();
             String end_value_stat_result = GenerateValueStat(end_value_stat);
             if (end_value_stat_result == null) return null;
-            content.append(end_value_stat_result);
+            content.append(start_var_name).append(" <= ");
+            content.append(end_value_stat_result).append("; ");
 
             ALittleForStepStat for_step_stat = for_step_condition.getForStepStat();
             ALittleValueStat step_value_stat = for_step_stat.getValueStat();
             String step_value_stat_result = GenerateValueStat(step_value_stat);
             if (step_value_stat_result == null) return null;
-            content.append(", ").append(step_value_stat_result);
+            if (step_value_stat_result.equals("1"))
+                content.append("++").append(start_var_name);
+            else
+                content.append(start_var_name).append(" += ").append(step_value_stat_result);
 
-            content.append(" do\n");
+            content.append(")\n")
+                    .append(pre_tab)
+                    .append("{\n");
         } else if (for_in_condition != null) {
             ALittleValueStat value_stat = for_in_condition.getValueStat();
             if (value_stat == null) {
@@ -1209,7 +1268,7 @@ public class ALittleGenerateLua {
             content.append(result);
         }
 
-        content.append(pre_tab).append("end\n");
+        content.append(pre_tab).append("}\n");
         return content.toString();
     }
 
@@ -1282,7 +1341,10 @@ public class ALittleGenerateLua {
         if (!content_list.isEmpty())
             value_stat_result = " " + String.join(", ", content_list);
 
-        return pre_tab + "return" + value_stat_result + "\n";
+        if (content_list.size() < 2)
+            return pre_tab + "return" + value_stat_result + ";\n";
+        else
+            return pre_tab + "return [" + value_stat_result + "];\n";
     }
 
     private String GenerateFlowExpr(ALittleFlowExpr root, String pre_tab) {
@@ -1353,6 +1415,7 @@ public class ALittleGenerateLua {
 
         StringBuilder content = new StringBuilder();
         content.append(pre_tab)
+                .append(m_namespace_name + ".")
                 .append(name_dec.getIdContent().getText())
                 .append(" = {\n");
 
@@ -1385,7 +1448,7 @@ public class ALittleGenerateLua {
             content.append(pre_tab)
                     .append("\t")
                     .append(var_name_dec.getIdContent().getText())
-                    .append(" = ")
+                    .append(" : ")
                     .append(enum_string)
                     .append(",\n");
         }
@@ -1403,27 +1466,27 @@ public class ALittleGenerateLua {
         }
 
         //类声明//////////////////////////////////////////////////////////////////////////////////////////
-        String class_name = name_dec.getIdContent().getText();
-        StringBuilder content = new StringBuilder(pre_tab + class_name);
+        StringBuilder content = new StringBuilder(pre_tab);
 
-        String namespace_pre = "ALittle.";
-        if (m_namespace_name.equals("ALittle")) namespace_pre = "";
+        String class_name = name_dec.getIdContent().getText();
 
         ALittleClassExtendsNameDec extends_name_dec = root.getClassExtendsNameDec();
         ALittleClassExtendsNamespaceNameDec extends_namespace_name_dec = root.getClassExtendsNamespaceNameDec();
-        String extends_name = "";
-        if (extends_namespace_name_dec != null) {
-            extends_name += extends_namespace_name_dec.getText() + ".";
-        }
+        String extends_name = "null";
         if (extends_name_dec != null) {
+            extends_name = "";
+            if (extends_namespace_name_dec != null) {
+                extends_name += extends_namespace_name_dec.getText() + ".";
+            } else {
+                extends_name += m_namespace_name + ".";
+            }
             extends_name += extends_name_dec.getText();
-        }
-        if (extends_name.equals("")) {
-            extends_name = "nil";
+            extends_name = "\"" + extends_name + "\"";
         }
 
-        content.append(" = ").append(namespace_pre).append("Class(").append(extends_name).append(", \"").append(class_name).append("\")\n\n");
+        content.append("ALittle.ClassEx(\"").append(m_namespace_name).append(".").append(class_name).append("\", ").append(extends_name).append(",\n{\n");
 
+        pre_tab += "\t";
         //构建构造函数//////////////////////////////////////////////////////////////////////////////////////////
         String ctor_param_list = "";
         List<ALittleClassCtorDec> ctor_dec_list = root.getClassCtorDecList();
@@ -1445,9 +1508,9 @@ public class ALittleGenerateLua {
             }
             ctor_param_list = String.join(", ", param_name_list);
             content.append(pre_tab)
-                    .append("function ")
-                    .append(class_name)
-                    .append(":Ctor(").append(ctor_param_list).append(")\n");
+                    .append("Ctor : function(").append(ctor_param_list).append(")\n")
+                    .append(pre_tab)
+                    .append("{\n");
 
             ALittleMethodBodyDec body_dec = ctor_dec.getMethodBodyDec();
             if (body_dec != null) {
@@ -1458,7 +1521,7 @@ public class ALittleGenerateLua {
                     content.append(result);
                 }
             }
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("},\n");
         }
         //构建getter函数///////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassGetterDec> class_getter_dec_list = root.getClassGetterDecList();
@@ -1469,11 +1532,11 @@ public class ALittleGenerateLua {
                 return null;
             }
             content.append(pre_tab)
-                    .append("function ")
-                    .append(class_name)
-                    .append(".__getter:")
+                    .append("get ")
                     .append(class_method_name_dec.getIdContent().getText())
-                    .append("()\n");
+                    .append("()\n")
+                    .append(pre_tab)
+                    .append("{\n");
 
             ALittleMethodBodyDec class_method_body_dec = class_getter_dec.getMethodBodyDec();
             if (class_method_body_dec == null) {
@@ -1486,7 +1549,7 @@ public class ALittleGenerateLua {
                 if (result == null) return null;
                 content.append(result);
             }
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("},\n");
         }
         //构建setter函数///////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassSetterDec> class_setter_dec_list = root.getClassSetterDecList();
@@ -1503,13 +1566,13 @@ public class ALittleGenerateLua {
             }
             ALittleMethodParamNameDec param_name_dec = param_dec.getMethodParamNameDec();
             content.append(pre_tab)
-                    .append("function ")
-                    .append(class_name)
-                    .append(".__setter:")
+                    .append("set ")
                     .append(class_method_name_dec.getIdContent().getText())
                     .append("(")
                     .append(param_name_dec.getIdContent().getText())
-                    .append(")\n");
+                    .append(")\n")
+                    .append(pre_tab)
+                    .append("{\n");
 
             ALittleMethodBodyDec class_method_body_dec = class_setter_dec.getMethodBodyDec();
             if (class_method_body_dec == null) {
@@ -1522,7 +1585,7 @@ public class ALittleGenerateLua {
                 if (result == null) return null;
                 content.append(result);
             }
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("},\n");
         }
         //构建成员函数//////////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassMethodDec> class_method_dec_list = root.getClassMethodDecList();
@@ -1544,13 +1607,13 @@ public class ALittleGenerateLua {
             }
             String method_param_list = String.join(", ", param_name_list);
             content.append(pre_tab)
-                    .append("function ")
-                    .append(class_name)
-                    .append(":")
                     .append(class_method_name_dec.getText())
+                    .append(" : function")
                     .append("(")
                     .append(method_param_list)
-                    .append(")\n");
+                    .append(")\n")
+                    .append(pre_tab)
+                    .append("{\n");
 
             ALittleMethodBodyDec class_method_body_dec = class_method_dec.getMethodBodyDec();
             if (class_method_body_dec == null) {
@@ -1563,8 +1626,11 @@ public class ALittleGenerateLua {
                 if (result == null) return null;
                 content.append(result);
             }
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("},\n");
         }
+        content.append("},\n");
+        content.append("{\n");
+
         //构建静态函数//////////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassStaticDec> class_static_dec_list = root.getClassStaticDecList();
         for (ALittleClassStaticDec class_static_dec : class_static_dec_list) {
@@ -1585,13 +1651,12 @@ public class ALittleGenerateLua {
 
             String method_param_list = String.join(", ", param_name_list);
             content.append(pre_tab)
-                    .append("function ")
-                    .append(class_name)
-                    .append(".")
                     .append(class_method_name_dec.getText())
-                    .append("(")
+                    .append(" : function(")
                     .append(method_param_list)
-                    .append(")\n");
+                    .append(")\n")
+                    .append(pre_tab)
+                    .append("{\n");
 
             ALittleMethodBodyDec class_method_body_dec = class_static_dec.getMethodBodyDec();
             if (class_method_body_dec == null) {
@@ -1604,10 +1669,10 @@ public class ALittleGenerateLua {
                 if (result == null) return null;
                 content.append(result);
             }
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("},\n");
         }
-        ////////////////////////////////////////////////////////////////////////////////////////////
 
+        content.append("});\n\n");
         return content.toString();
     }
 
@@ -1623,14 +1688,19 @@ public class ALittleGenerateLua {
         ALittleInstanceClassNameDec class_name_dec = root.getInstanceClassNameDec();
         if (class_name_dec != null) {
             content.append(pre_tab);
+            content.append("ALittle.Instance(\"");
+            content.append(m_namespace_name).append(".");
+            content.append(class_name_dec.getIdContent().getText()).append("\", function(class_object) { ");
 
             ALittleAccessModifier access_modifier_dec = root.getAccessModifier();
             if (access_modifier_dec != null && access_modifier_dec.getText().equals("public")) {
-                content.append("_G.");
+                content.append("window.");
+            } else {
+                content.append(m_namespace_name).append(".");
             }
+            content.append(name_dec.getIdContent().getText()).append(" = new class_object(");
 
-            content.append(name_dec.getIdContent().getText()).append(" = ");
-            content.append(class_name_dec.getIdContent().getText()).append("(");
+
             List<String> param_list = new ArrayList<>();
             List<ALittleValueStat> value_stat_list = root.getValueStatList();
             for (ALittleValueStat value_stat_dec : value_stat_list) {
@@ -1639,7 +1709,7 @@ public class ALittleGenerateLua {
                 param_list.add(result);
             }
             content.append(String.join(", ", param_list));
-            content.append(")\n");
+            content.append("); });\n");
         }
         return content.toString();
     }
@@ -1666,11 +1736,15 @@ public class ALittleGenerateLua {
         StringBuilder content = new StringBuilder();
         String method_param_list = String.join(", ", param_name_list);
         content.append(pre_tab)
-                .append("function ")
+                .append(m_namespace_name)
+                .append(".")
                 .append(method_name)
+                .append(" = function")
                 .append("(")
                 .append(method_param_list)
-                .append(")\n");
+                .append(")\n")
+                .append(pre_tab)
+                .append("{\n");
 
         ALittleMethodBodyDec class_method_body_dec = root.getMethodBodyDec();
         if (class_method_body_dec == null) {
@@ -1683,7 +1757,7 @@ public class ALittleGenerateLua {
             if (result == null) return null;
             content.append(result);
         }
-        content.append(pre_tab).append("end\n\n");
+        content.append(pre_tab).append("}\n\n");
 
         return content.toString();
     }
@@ -1696,11 +1770,7 @@ public class ALittleGenerateLua {
         }
         m_namespace_name = name_dec.getIdContent().getText();
 
-        StringBuilder content = null;
-        if (m_namespace_name.equals("lua"))
-            content = new StringBuilder("\n");
-        else
-            content = new StringBuilder("\nmodule(\"" + m_namespace_name + "\", package.seeall)\n\n");
+        StringBuilder content = new StringBuilder("\nif (typeof " + m_namespace_name + " == \"undefined\") " + m_namespace_name + " = {};\n\n");
 
         PsiElement[] child_list = root.getChildren();
         for (PsiElement child : child_list) {
