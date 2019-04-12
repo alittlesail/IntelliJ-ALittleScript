@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>as.alittleide.com</id>
   <name>ALittleScript</name>
-  <version>1.4</version>
+  <version>1.5</version>
   <vendor email="757609414@qq.com" url="https://github.com/alittlesail/ALittleScript">ALittle</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,7 @@
     Auto Generate:
     <ul>
         <li> LuaJIT 5.1 </li>
+        <li> JavaScript </li>
     </ul>
     Features:
     <ul>
@@ -35,6 +36,7 @@
     Auto Generate:
     <ul>
         <li> LuaJIT 5.1 </li>
+        <li> JavaScript </li>
     </ul>
     ]]>
   </change-notes>
