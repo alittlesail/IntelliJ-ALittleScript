@@ -133,7 +133,8 @@ public class ALittleGenerateJavaScript {
             FileIndexFacade facade = FileIndexFacade.getInstance(alittleFile.getProject());
             Module module = facade.getModuleForFile(alittleFile.getVirtualFile());
             if (module == null) {
-                return "facade.getModuleForFile(alittleFile.getVirtualFile())调用失败";
+                // 不是模块目录下的，不能生成文件
+                return null;
             }
             String module_name = module.getName();
             String module_file_path = module.getModuleFilePath();
@@ -158,8 +159,8 @@ public class ALittleGenerateJavaScript {
                 }
                 // AEngine的工程文件在：集成开发环境安装目录/Module/ALittleIDE/Other/AEngine/AEngine.iml
                 // 目标的目录是是在：集成开发环境安装目录/Engine
-                rel_path = "../../../../Engine" + rel_path.substring("src/Engine".length());
-                std_path = "../../../../Engine";
+                rel_path = "../../../../JEngine" + rel_path.substring("src/Engine".length());
+                std_path = "../../../../JEngine";
             } else {
                 if (rel_path.startsWith("src")) {
                     rel_path = "JavaScript" + rel_path.substring("src".length());
@@ -759,7 +760,7 @@ public class ALittleGenerateJavaScript {
 
         ALittlePropertyValue prop_value = value_factor.getPropertyValue();
         if (prop_value != null) {
-            return GeneratePropertyValue(prop_value);
+            return GeneratePropertyValue(prop_value, false, null);
         }
 
         ALittleValueStatParen value_stat_paren = value_factor.getValueStatParen();
@@ -780,7 +781,7 @@ public class ALittleGenerateJavaScript {
         return value;
     }
 
-    private String GeneratePropertyValue(ALittlePropertyValue prop_value) {
+    private String GeneratePropertyValue(ALittlePropertyValue prop_value, boolean left_of_assign, List<String> out) {
         StringBuilder content = new StringBuilder();
 
         // 用来标记第一个变量是不是javascript命名域
@@ -811,6 +812,8 @@ public class ALittleGenerateJavaScript {
                         ALittleAccessModifier access_modifier = instance_dec.getAccessModifier();
                         if (access_modifier == null || !access_modifier.getText().equals("public"))
                             custom_type_content = m_namespace_name + "." + custom_type_content;
+                    } else if (resolve instanceof ALittleMethodNameDec) {
+                        // 如果是全局函数，那么
                     }
                 }
             }
@@ -938,7 +941,13 @@ public class ALittleGenerateJavaScript {
                 ALittleValueStat value_stat = brack_value_stat.getValueStat();
                 String value_stat_result = GenerateValueStat(value_stat);
                 if (value_stat_result == null) return null;
-                content.append("[").append(value_stat_result).append("]");
+
+                if (next_suffix == null && left_of_assign && out != null) {
+                    content.append(".set(").append(value_stat_result).append(", ");
+                    out.add(content.toString());
+                } else {
+                    content.append(".get(").append(value_stat_result).append(")");
+                }
                 continue;
             }
 
@@ -963,9 +972,9 @@ public class ALittleGenerateJavaScript {
     }
 
     private String GeneratePropertyValueExpr(ALittlePropertyValueExpr root, String pre_tab) {
-        String prop_value_result = GeneratePropertyValue(root.getPropertyValue());
+        String prop_value_result = GeneratePropertyValue(root.getPropertyValue(), false, null);
         if (prop_value_result == null) return null;
-        return pre_tab + prop_value_result + "\n";
+        return pre_tab + prop_value_result + ";\n";
     }
 
     private String GenerateOp1Expr(ALittleOp1Expr root, String pre_tab) {
@@ -1007,7 +1016,7 @@ public class ALittleGenerateJavaScript {
         ALittleValueStat value_stat = root.getValueStat();
         if (value_stat == null) {
             for (int i = 0; i < name_list.size(); ++i) {
-                content += pre_tab + "let " + name_list.get(i) + " = null;\n";
+                content += pre_tab + "let " + name_list.get(i) + " = undefined;\n";
             }
             return content;
         }
@@ -1019,13 +1028,17 @@ public class ALittleGenerateJavaScript {
         boolean is_multiply_return = list != null && list.size() > 1;
 
         if (is_multiply_return) {
-            content = pre_tab + "let [" + String.join(", ", name_list) + "] = " + value_stat_result + ";\n";
+            List<String> new_name_list = new ArrayList<>();
+            for (String name : name_list) {
+                new_name_list.add(name + "=undefined");
+            }
+            content = pre_tab + "let [" + String.join(", ", new_name_list) + "] = " + value_stat_result + ";\n";
         } else {
             for (int i = 0; i < name_list.size(); ++i) {
                 if (i == 0)
                     content += pre_tab + "let " + name_list.get(i) + " = " + value_stat_result + ";\n";
                 else
-                    content += pre_tab + "let " + name_list.get(i) + " = null;\n";
+                    content += pre_tab + "let " + name_list.get(i) + " = undefined;\n";
             }
         }
 
@@ -1033,16 +1046,27 @@ public class ALittleGenerateJavaScript {
     }
 
     private String GenerateOpAssignExpr(ALittleOpAssignExpr root, String pre_tab) {
-        List<ALittlePropertyValue> prop_value_list = root.getPropertyValueList();
-        List<String> content_list = new ArrayList<>();
-        for (ALittlePropertyValue prop_value : prop_value_list) {
-            String prop_value_result = GeneratePropertyValue(prop_value);
-            if (prop_value_result == null) return null;
-            content_list.add(prop_value_result);
-        }
 
         ALittleOpAssign op_assign = root.getOpAssign();
         ALittleValueStat value_stat = root.getValueStat();
+
+        List<ALittlePropertyValue> prop_value_list = root.getPropertyValueList();
+        List<String> content_list = new ArrayList<>();
+        List<List<String>> out_list = new ArrayList<>();
+        for (ALittlePropertyValue prop_value : prop_value_list) {
+            List<String> out = null;
+            String prop_value_result = null;
+            if (op_assign != null && value_stat != null) {
+                out = new ArrayList<>();
+                prop_value_result = GeneratePropertyValue(prop_value, true, out);
+            } else {
+                prop_value_result = GeneratePropertyValue(prop_value, false, null);
+            }
+            if (prop_value_result == null) return null;
+            content_list.add(prop_value_result);
+            out_list.add(out);
+        }
+
         if (op_assign == null || value_stat == null) {
             String content = "";
             for (int i = 0; i < content_list.size(); ++i) {
@@ -1051,24 +1075,64 @@ public class ALittleGenerateJavaScript {
             return content;
         }
 
+        boolean has_brack = false;
+        for (List<String> out : out_list) {
+            if (out == null) continue;
+            if (out.isEmpty()) continue;
+            has_brack = true;
+        }
+
         String value_stat_result = GenerateValueStat(value_stat);
         if (value_stat_result == null) return null;
 
         if (op_assign.getText().equals("=")) {
             List<PsiElement> list = ALittleUtil.guessTypeForMethodCall(value_stat);
             boolean is_multiply_return = list != null && list.size() > 1;
-            String content = "";
-            if (is_multiply_return) {
-                content = pre_tab + "let [" + String.join(", ", content_list) + "] = " + value_stat_result + ";\n";
-            } else {
-                for (int i = 0; i < content_list.size(); ++i) {
-                    if (i == 0)
-                        content += pre_tab + content_list.get(i) + " = " + value_stat_result + ";\n";
-                    else
-                        content += pre_tab + content_list.get(i) + " = null;\n";
+
+            if (has_brack == false) {
+                String content = "";
+                if (is_multiply_return) {
+                    content = pre_tab + "let [" + String.join(", ", content_list) + "] = " + value_stat_result + ";\n";
+                } else {
+                    for (int i = 0; i < content_list.size(); ++i) {
+                        if (i == 0)
+                            content += pre_tab + content_list.get(i) + " = " + value_stat_result + ";\n";
+                        else
+                            content += pre_tab + content_list.get(i) + " = undefined;\n";
+                    }
                 }
+                return content;
+            } else {
+                String content = "";
+                if (is_multiply_return) {
+                    content = pre_tab + "let temp = " + value_stat_result + ";\n";
+                    for (int i = 0; i < content_list.size(); ++i) {
+                        List<String> out = out_list.get(i);
+                        if (out != null && out.size() > 0) {
+                            content = pre_tab + content_list.get(i) + "temp[" + i + "]);\n";
+                        } else {
+                            content = pre_tab + content_list.get(i) + " = temp[" + i + "];\n";
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < content_list.size(); ++i) {
+                        List<String> out = out_list.get(i);
+                        if (i == 0) {
+                            if (out != null && out.size() > 0)
+                                content += pre_tab + content_list.get(i) + value_stat_result + ");\n";
+                            else
+                                content += pre_tab + content_list.get(i) + " = " + value_stat_result + ";\n";
+                        } else {
+                            if (out != null && out.size() > 0)
+                                content += pre_tab + content_list.get(i) + "undefined);\n";
+                            else
+                                content += pre_tab + content_list.get(i) + " = undefined;\n";
+                        }
+                    }
+                }
+
+                return content;
             }
-            return content;
         }
 
         String op_assign_string = op_assign.getText();

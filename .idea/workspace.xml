@@ -17,8 +17,17 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1000">
-              <caret line="428" column="52" lean-forward="true" selection-start-line="428" selection-start-column="52" selection-end-line="428" selection-end-column="52" />
+            <state relative-caret-position="420">
+              <caret line="804" column="99" lean-forward="true" selection-start-line="804" selection-start-column="99" selection-end-line="804" selection-end-column="99" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/plugin/action/ALittleGenerateLuaAction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="527">
+              <caret line="82" column="22" selection-start-line="82" selection-start-column="19" selection-end-line="82" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -36,9 +45,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>super_class_name</find>
-      <find>class_name</find>
-      <find>Spl</find>
       <find>ClassEx</find>
       <find>suffix</find>
       <find>guessTypes(</find>
@@ -61,11 +67,14 @@
       <find>else if</find>
       <find>is_mu</find>
       <find>Brack</find>
-      <find>GeneratePropertyValue</find>
       <find>OpAss</find>
-      <find>OpAssign</find>
       <find>var</find>
       <find>const</find>
+      <find>GeneratePropertyValue</find>
+      <find>null</find>
+      <find>facade.getModuleForFile(alittleFile.getVirtualFile())</find>
+      <find>OpAssign</find>
+      <find>Gen</find>
     </findStrings>
     <replaceStrings>
       <replace>expr_dec</replace>
@@ -110,6 +119,7 @@
       <dir>D:\Users\IGG\Desktop\Test\Client\Win32\bin\Module\ALittleScript\Other\ALittleScript\src</dir>
       <dir>D:\ALittleScript\trunk\src\plugin\reference</dir>
       <dir>D:\Software\ALittleScript\trunk\src</dir>
+      <dir>D:\ALittleScript\trunk\src</dir>
     </dirStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -161,10 +171,10 @@
         <option value="$PROJECT_DIR$/src/plugin/action/ALittleGenerateJavaScriptAction.java" />
         <option value="$PROJECT_DIR$/resources/META-INF/plugin.xml" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleInitComponent.java" />
-        <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleUtil.java" />
         <option value="$PROJECT_DIR$/resources/adapter/Javascript/List.js.alittle" />
         <option value="$PROJECT_DIR$/resources/adapter/Javascript/Class.js" />
+        <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java" />
       </list>
     </option>
@@ -382,7 +392,7 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1988273" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1988273" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -479,13 +489,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/codeInsight/hints/InlayParameterHintsProvider.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="70">
-          <caret line="18" column="17" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/codeInsight/hints/InlayInfo.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
@@ -724,13 +727,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/action/ALittleGenerateLuaAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
-          <caret line="73" lean-forward="true" selection-start-line="73" selection-end-line="73" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittleTreeChangeListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
@@ -756,13 +752,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="227">
           <caret line="183" column="105" lean-forward="true" selection-start-line="183" selection-start-column="58" selection-end-line="183" selection-end-column="105" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="1615" column="31" lean-forward="true" selection-start-line="1615" selection-start-column="31" selection-end-line="1615" selection-end-column="31" />
         </state>
       </provider>
     </entry>
@@ -802,10 +791,31 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/resources/std/package.alittle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="51" lean-forward="true" selection-start-line="11" selection-start-column="51" selection-end-line="11" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2784">
+          <caret line="126" column="44" lean-forward="true" selection-start-line="126" selection-start-column="44" selection-end-line="126" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/action/ALittleGenerateLuaAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="82" column="22" selection-start-line="82" selection-start-column="19" selection-end-line="82" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1000">
-          <caret line="428" column="52" lean-forward="true" selection-start-line="428" selection-start-column="52" selection-end-line="428" selection-end-column="52" />
+        <state relative-caret-position="420">
+          <caret line="804" column="99" lean-forward="true" selection-start-line="804" selection-start-column="99" selection-end-line="804" selection-end-column="99" />
         </state>
       </provider>
     </entry>

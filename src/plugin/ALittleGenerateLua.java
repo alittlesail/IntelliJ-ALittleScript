@@ -132,7 +132,8 @@ public class ALittleGenerateLua {
             FileIndexFacade facade = FileIndexFacade.getInstance(alittleFile.getProject());
             Module module = facade.getModuleForFile(alittleFile.getVirtualFile());
             if (module == null) {
-                return "facade.getModuleForFile(alittleFile.getVirtualFile())调用失败";
+                // 不是模块目录下的，不能生成文件
+                return null;
             }
             String module_name = module.getName();
             String module_file_path = module.getModuleFilePath();
