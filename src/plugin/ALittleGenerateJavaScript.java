@@ -202,7 +202,7 @@ public class ALittleGenerateJavaScript {
 
             // 如果是List，那么直接返回{}
             ALittleGenericListType list_type = generic_type.getGenericListType();
-            if (list_type != null) return "[]";
+            if (list_type != null) return "new List()";
 
             ALittleGenericFunctorType functor_type = generic_type.getGenericFunctorType();
             if (functor_type != null) {
@@ -320,7 +320,7 @@ public class ALittleGenerateJavaScript {
     private String GenerateOp7Suffix(ALittleOp7Suffix suffix) {
         String op_string = suffix.getOp7().getText();
         if (op_string.equals("&&")) {
-            op_string = "and";
+            op_string = "&&";
         }
 
         String value_factor_result = null;
@@ -392,6 +392,10 @@ public class ALittleGenerateJavaScript {
 
     private String GenerateOp6Suffix(ALittleOp6Suffix suffix) {
         String op_string = suffix.getOp6().getText();
+        if (op_string.equals("=="))
+            op_string = "===";
+        else if (op_string.equals("!=="))
+            op_string = "!==";
 
         String value_factor_result = null;
         if (suffix.getValueFactor() != null) {
@@ -690,7 +694,7 @@ public class ALittleGenerateJavaScript {
         if (value_stat_result == null) return null;
         String op_string = op_2_value.getOp2().getText();
         if (op_string.equals("!")) {
-            content += "not " + value_stat_result;
+            content += "!" + value_stat_result;
         } else if (op_string.equals("-")) {
             content += "-" + value_stat_result;
         } else {
@@ -770,7 +774,10 @@ public class ALittleGenerateJavaScript {
     }
 
     private String GenerateConstValue(ALittleConstValue const_value) {
-        return const_value.getText();
+        String value = const_value.getText();
+        if (value.equals("null"))
+            value = "undefined";
+        return value;
     }
 
     private String GeneratePropertyValue(ALittlePropertyValue prop_value) {
@@ -974,10 +981,10 @@ public class ALittleGenerateJavaScript {
 
         String op_1_string = op_1.getText();
         if (op_1_string.equals("++"))
-            return pre_tab + value_stat_result + " = " + value_stat_result + " + 1\n";
+            return pre_tab + "++" + value_stat_result + ";\n";
 
         if (op_1_string.equals("--"))
-            return pre_tab + value_stat_result + " = " + value_stat_result + " - 1\n";
+            return pre_tab + "--" + value_stat_result + ";\n";
 
         m_error = "GenerateOp1Expr未知类型:" + op_1_string;
         return null;
@@ -1000,7 +1007,7 @@ public class ALittleGenerateJavaScript {
         ALittleValueStat value_stat = root.getValueStat();
         if (value_stat == null) {
             for (int i = 0; i < name_list.size(); ++i) {
-                content += pre_tab + "var " + name_list.get(i) + " = null;\n";
+                content += pre_tab + "let " + name_list.get(i) + " = null;\n";
             }
             return content;
         }
@@ -1012,16 +1019,13 @@ public class ALittleGenerateJavaScript {
         boolean is_multiply_return = list != null && list.size() > 1;
 
         if (is_multiply_return) {
-            content = pre_tab + "var temp = " + value_stat_result + ";\n";
-            for (int i = 0; i < name_list.size(); ++i) {
-                content += pre_tab + "var " + name_list.get(i) + " = temp[" + i + "];\n";
-            }
+            content = pre_tab + "let [" + String.join(", ", name_list) + "] = " + value_stat_result + ";\n";
         } else {
             for (int i = 0; i < name_list.size(); ++i) {
                 if (i == 0)
-                    content += pre_tab + "var " + name_list.get(i) + " = " + value_stat_result + ";\n";
+                    content += pre_tab + "let " + name_list.get(i) + " = " + value_stat_result + ";\n";
                 else
-                    content += pre_tab + "var " + name_list.get(i) + " = null;\n";
+                    content += pre_tab + "let " + name_list.get(i) + " = null;\n";
             }
         }
 
@@ -1055,10 +1059,7 @@ public class ALittleGenerateJavaScript {
             boolean is_multiply_return = list != null && list.size() > 1;
             String content = "";
             if (is_multiply_return) {
-                content = pre_tab + "var temp = " + value_stat_result + ";\n";
-                for (int i = 0; i < content_list.size(); ++i) {
-                    content += pre_tab + content_list.get(i) + " = temp[" + i + "];\n";
-                }
+                content = pre_tab + "let [" + String.join(", ", content_list) + "] = " + value_stat_result + ";\n";
             } else {
                 for (int i = 0; i < content_list.size(); ++i) {
                     if (i == 0)
@@ -1106,6 +1107,8 @@ public class ALittleGenerateJavaScript {
             if (result == null) return null;
             content.append(result);
         }
+        content.append(pre_tab)
+                .append("}\n");
         return content.toString();
     }
 
@@ -1131,6 +1134,9 @@ public class ALittleGenerateJavaScript {
             if (result == null) return null;
             content.append(result);
         }
+
+        content.append(pre_tab)
+               .append("}\n");
         return content.toString();
     }
 
@@ -1156,6 +1162,7 @@ public class ALittleGenerateJavaScript {
             if (result == null) return null;
             content.append(result);
         }
+        content.append(pre_tab).append("}\n");
 
         List<ALittleElseIfExpr> else_if_expr_list = root.getElseIfExprList();
         for (ALittleElseIfExpr else_if_expr : else_if_expr_list) {
@@ -1170,7 +1177,6 @@ public class ALittleGenerateJavaScript {
             if (result == null) return null;
             content.append(result);
         }
-        content.append(pre_tab).append("}\n");
         return content.toString();
     }
 
@@ -1192,7 +1198,7 @@ public class ALittleGenerateJavaScript {
 
             String start_var_name = for_start_stat.getForPairDec().getVarAssignNameDec().getIdContent().getText();
 
-            content.append("for (var ")
+            content.append("for (let ")
                     .append(start_var_name)
                     .append(" = ")
                     .append(start_value_stat_result)
@@ -1242,19 +1248,31 @@ public class ALittleGenerateJavaScript {
 
             // 如果foreach的参数数量不为2，那么就不用pair_type
             if (pair_type.isEmpty()) {
-                content.append("for ")
+                content.append("for (let [")
                         .append(String.join(", ", pair_string_list))
-                        .append(" in ")
+                        .append("] of ")
                         .append(value_stat_result)
-                        .append(" do\n");
+                        .append(")\n")
+                        .append(pre_tab)
+                        .append("{\n");
             } else {
-                content.append("for ")
-                        .append(String.join(", ", pair_string_list))
-                        .append(" in ")
-                        .append(pair_type)
-                        .append("(")
-                        .append(value_stat_result)
-                        .append(") do\n");
+                if (pair_type.equals("pairs")) {
+                    content.append("for (let [")
+                            .append(String.join(", ", pair_string_list))
+                            .append("] of ")
+                            .append(value_stat_result)
+                            .append(") {\n")
+                            .append(pre_tab)
+                            .append("{\n");
+                } else {
+                    content.append("for (let [")
+                            .append(String.join(", ", pair_string_list))
+                            .append("] of ")
+                            .append(value_stat_result)
+                            .append(") {\n")
+                            .append(pre_tab)
+                            .append("{\n");
+                }
             }
         } else {
             m_error = "for(?) 无效的for语句:" + root.getText();
@@ -1281,14 +1299,15 @@ public class ALittleGenerateJavaScript {
         String value_stat_result = GenerateValueStat(value_stat);
         if (value_stat_result == null) return null;
 
-        StringBuilder content = new StringBuilder(pre_tab + "while " + value_stat_result + " do\n");
+        StringBuilder content = new StringBuilder(pre_tab + "while (" + value_stat_result + ")\n");
+        content.append(pre_tab + "{\n");
         List<ALittleAllExpr> all_expr_list = root.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
             String result = GenerateAllExpr(all_expr, pre_tab + "\t");
             if (result == null) return null;
             content.append(result);
         }
-        content.append(pre_tab).append("end\n");
+        content.append(pre_tab).append("}\n");
         return content.toString();
     }
 
@@ -1301,7 +1320,7 @@ public class ALittleGenerateJavaScript {
         String value_stat_result = GenerateValueStat(value_stat);
         if (value_stat_result == null) return null;
 
-        StringBuilder content = new StringBuilder(pre_tab + "repeat\n");
+        StringBuilder content = new StringBuilder(pre_tab + "do {\n");
         List<ALittleAllExpr> all_expr_list = root_expr.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
             String result = GenerateAllExpr(all_expr, pre_tab + "\t");
@@ -1309,22 +1328,22 @@ public class ALittleGenerateJavaScript {
             content.append(result);
         }
         content.append(pre_tab)
-                .append("until not(")
+                .append("} while(")
                 .append(value_stat_result)
-                .append(")\n");
+                .append(");\n");
 
         return content.toString();
     }
 
     private String GenerateWrapExpr(ALittleWrapExpr root_expr, String pre_tab) {
-        StringBuilder content = new StringBuilder(pre_tab + "do\n");
+        StringBuilder content = new StringBuilder(pre_tab + "{\n");
         List<ALittleAllExpr> all_expr_list = root_expr.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
             String result = GenerateAllExpr(all_expr, pre_tab + "\t");
             if (result == null) return null;
             content.append(result);
         }
-        content.append(pre_tab + "end\n");
+        content.append(pre_tab + "}\n");
 
         return content.toString();
     }
@@ -1350,7 +1369,7 @@ public class ALittleGenerateJavaScript {
     private String GenerateFlowExpr(ALittleFlowExpr root, String pre_tab) {
         String content = root.getText();
         if (content.startsWith("break"))
-            return pre_tab + "break\n";
+            return pre_tab + "break;\n";
 
         m_error = "未知的操作语句:" + content;
         return null;
@@ -1453,7 +1472,7 @@ public class ALittleGenerateJavaScript {
                     .append(",\n");
         }
 
-        content.append(pre_tab).append("}\n\n");
+        content.append(pre_tab).append("};\n\n");
 
         return content.toString();
     }

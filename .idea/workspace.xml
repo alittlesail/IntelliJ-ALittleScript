@@ -17,48 +17,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="378">
-              <caret line="1270" column="41" selection-start-line="1270" selection-start-column="41" selection-end-line="1270" selection-end-column="41" />
-              <folding>
-                <element signature="e#32468#32469#0" expanded="true" />
-                <element signature="e#32512#32513#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleInstanceDec.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="10" column="23" selection-start-line="10" selection-start-column="2" selection-end-line="10" selection-end-column="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCustomTypeReference.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1485">
-              <caret line="35" column="27" lean-forward="true" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="27" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="82" column="17" selection-start-line="82" selection-end-line="82" selection-end-column="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/resources/adapter/Javascript/Class.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="508">
-              <caret line="252" column="46" lean-forward="true" selection-start-line="252" selection-start-column="46" selection-end-line="252" selection-end-column="46" />
+            <state relative-caret-position="1000">
+              <caret line="428" column="52" lean-forward="true" selection-start-line="428" selection-start-column="52" selection-end-line="428" selection-end-column="52" />
             </state>
           </provider>
         </entry>
@@ -69,21 +29,13 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Action" />
-        <option value="NewALittle" />
         <option value="Class" />
+        <option value="NewALittle" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>copyStdLibrary</find>
-      <find>package</find>
-      <find>COLON</find>
-      <find>getText</find>
-      <find>namespace</find>
-      <find>Script</find>
-      <find>ALittle.</find>
-      <find>TODO</find>
       <find>super_class_name</find>
       <find>class_name</find>
       <find>Spl</find>
@@ -106,6 +58,14 @@
       <find>op</find>
       <find>ALittlePropertyValueCustomType</find>
       <find>{}</find>
+      <find>else if</find>
+      <find>is_mu</find>
+      <find>Brack</find>
+      <find>GeneratePropertyValue</find>
+      <find>OpAss</find>
+      <find>OpAssign</find>
+      <find>var</find>
+      <find>const</find>
     </findStrings>
     <replaceStrings>
       <replace>expr_dec</replace>
@@ -155,7 +115,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleClassExtendsNamespaceNameDecReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleClassNameDecReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleNamespaceNameDecReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittleVarAssignNameDecElementImpl.java" />
@@ -203,8 +162,9 @@
         <option value="$PROJECT_DIR$/resources/META-INF/plugin.xml" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleInitComponent.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java" />
-        <option value="$PROJECT_DIR$/resources/adapter/Javascript/Class.js" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleUtil.java" />
+        <option value="$PROJECT_DIR$/resources/adapter/Javascript/List.js.alittle" />
+        <option value="$PROJECT_DIR$/resources/adapter/Javascript/Class.js" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java" />
       </list>
     </option>
@@ -233,6 +193,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -321,7 +282,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -422,7 +382,7 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.31769723" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1988273" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -519,16 +479,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/plugin/format/ALittleFormattingModelBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="26" lean-forward="true" selection-start-line="23" selection-start-column="26" selection-end-line="23" selection-end-column="26" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/codeInsight/hints/InlayParameterHintsProvider.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="70">
@@ -823,24 +773,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/resources/adapter/Javascript/Class.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="508">
-          <caret line="252" column="46" lean-forward="true" selection-start-line="252" selection-start-column="46" selection-end-line="252" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/adapter/Javascript/List.js.alittle" />
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCustomTypeReference.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1485">
-          <caret line="35" column="27" lean-forward="true" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="82" column="17" selection-start-line="82" selection-end-line="82" selection-end-column="17" />
+        <state relative-caret-position="15">
+          <caret line="35" column="27" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="27" />
         </state>
       </provider>
     </entry>
@@ -851,14 +788,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/resources/adapter/Javascript/Class.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-375">
+          <caret line="270" column="29" lean-forward="true" selection-start-line="270" selection-start-column="29" selection-end-line="270" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="585">
+          <caret line="269" column="62" lean-forward="true" selection-start-line="269" selection-start-column="62" selection-end-line="269" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="1270" column="41" selection-start-line="1270" selection-start-column="41" selection-end-line="1270" selection-end-column="41" />
-          <folding>
-            <element signature="e#32468#32469#0" expanded="true" />
-            <element signature="e#32512#32513#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="1000">
+          <caret line="428" column="52" lean-forward="true" selection-start-line="428" selection-start-column="52" selection-end-line="428" selection-end-column="52" />
         </state>
       </provider>
     </entry>

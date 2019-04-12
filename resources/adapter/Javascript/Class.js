@@ -254,3 +254,70 @@ ALittle.SetWeak = function(object, key, value)
 {
 
 }
+
+// 构建List类
+function List()
+{
+	this._data = [];
+}
+
+List.prototype.set = function(index, value)
+{
+	this._data[index] = value;
+}
+
+List.prototype.get = function(index)
+{
+	return this._data[index];
+}
+
+List.prototype[Symbol.iterator] = function()
+{
+	var i = 0;
+	var object = this;
+	return {
+		next : function()
+		{
+			++ i;
+			var value = object._data[i];
+			return {
+				done : value == null || value == undefined,
+				value : [i, value]
+			}
+		}
+	}
+}
+
+
+// 构建List类
+function List()
+{
+	this._data = [];
+}
+
+List.prototype.set = function(index, value)
+{
+	this._data[index] = value;
+}
+
+List.prototype.get = function(index)
+{
+	return this._data[index];
+}
+
+List.prototype[Symbol.iterator] = function()
+{
+	var i = 0;
+	var object = this;
+	return {
+		next : function()
+		{
+			++ i;
+			var value = object._data[i];
+			return {
+				done : value == null || value == undefined,
+				value : [i, value]
+			}
+		}
+	}
+}
