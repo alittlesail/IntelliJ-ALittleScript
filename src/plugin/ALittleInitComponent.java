@@ -47,13 +47,13 @@ public class ALittleInitComponent implements BaseComponent {
                                     System.out.println(psiFile.getName() + ":生成lua代码失败:" + error);
                                 }
 
-                                ALittleGenerateJavaScript js = new ALittleGenerateJavaScript();
-                                error = js.GenerateJavaScript((ALittleFile) psiFile, false);
-                                if (error == null) {
-                                    System.out.println(psiFile.getName() + ":生成javascript代码成功");
-                                } else {
-                                    System.out.println(psiFile.getName() + ":生成javascript代码失败:" + error);
-                                }
+                                // ALittleGenerateJavaScript js = new ALittleGenerateJavaScript();
+                                // error = js.GenerateJavaScript((ALittleFile) psiFile, false);
+                                // if (error == null) {
+                                //     System.out.println(psiFile.getName() + ":生成javascript代码成功");
+                                // } else {
+                                //     System.out.println(psiFile.getName() + ":生成javascript代码失败:" + error);
+                                // }
                                 break;
                             }
                         }
