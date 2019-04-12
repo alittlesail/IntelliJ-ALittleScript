@@ -813,7 +813,10 @@ public class ALittleGenerateJavaScript {
                         if (access_modifier == null || !access_modifier.getText().equals("public"))
                             custom_type_content = m_namespace_name + "." + custom_type_content;
                     } else if (resolve instanceof ALittleMethodNameDec) {
-                        // 如果是全局函数，那么
+                        // 如果是全局函数，那么要带上前缀
+                        ALittleMethodNameDec method_name_dec = (ALittleMethodNameDec)resolve;
+                        if (method_name_dec.getParent() instanceof ALittleGlobalMethodDec)
+                            custom_type_content = m_namespace_name + "." + custom_type_content;
                     }
                 }
             }
