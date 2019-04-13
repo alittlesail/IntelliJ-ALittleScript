@@ -9,7 +9,7 @@
     Auto Generate:
     <ul>
         <li> LuaJIT 5.1 </li>
-        <li> JavaScript </li>
+        <li> JavaScript ES7 </li>
     </ul>
     Features:
     <ul>
@@ -30,7 +30,7 @@
     <ul>
         <li>ALittle across Standard Library/API</li>
         <li>LuaJIT 5.1 Standard Library/API</li>
-        <li>JavaScript Standard Library/API</li>
+        <li>JavaScript ES7 Standard Library/API</li>
     </ul>
     <p>中国朋友可以加QQ群629311504交流及反馈BUG</p>
     ]]></description>
