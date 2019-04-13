@@ -7,10 +7,10 @@ else if (typeof(Object.defineProperty) != "function")
 
 ALittle.ClassCtor = function(object, child_class, args)
 {
-	var super_class = child_class.__super;
+	let super_class = child_class.__super;
 	if (super_class) ALittle.ClassCtor(object, super_class, args);
 
-	var ctor = child_class.Ctor;
+	let ctor = child_class.Ctor;
 	if (ctor) ctor.apply(object, args);
 }
 
@@ -29,11 +29,11 @@ ALittle.__instance_map = {}
 ALittle.ClassEx = function(class_name, super_class_name, child_class_prop, static_function_prop)
 {
 	// 根据类名获取类所在的包
-	var class_name_list = class_name.split(".");
-	var package_object = window;
-	for (var i = 0; i < class_name_list.length - 1; ++i)
+	let class_name_list = class_name.split(".");
+	let package_object = window;
+	for (let i = 0; i < class_name_list.length - 1; ++i)
 	{
-		var sub_package_object = package_object[class_name_list[i]];
+		let sub_package_object = package_object[class_name_list[i]];
 		if (!sub_package_object)
 		{
 			sub_package_object = {};
@@ -43,12 +43,12 @@ ALittle.ClassEx = function(class_name, super_class_name, child_class_prop, stati
 	}
 
 	// 根据父类名获取类对象
-	var super_class_object = null;
+	let super_class_object = null;
 	if (super_class_name)
 	{
 		super_class_object = window;
-		var super_class_name_list = super_class_name.split(".");
-		for (var i = 0; i < super_class_name_list.length; ++i)
+		let super_class_name_list = super_class_name.split(".");
+		for (let i = 0; i < super_class_name_list.length; ++i)
 		{
 			super_class_object = super_class_object[super_class_name_list[i]];
 			if (!super_class_object) { super_class_object = null; break; }
@@ -58,14 +58,14 @@ ALittle.ClassEx = function(class_name, super_class_name, child_class_prop, stati
 	// 如果有填写父类，并且父类不存在，那么就延迟调用
 	if (super_class_name && !super_class_object)
 	{
-		var map = ALittle.__classex_map[super_class_name];
+		let map = ALittle.__classex_map[super_class_name];
 		if (!map)
 		{
 			map = {}
 			ALittle.__classex_map[super_class_name] = map;
 		}
 
-		var info = map[class_name];
+		let info = map[class_name];
 		if (!info)
 		{
 			info = {};
@@ -81,25 +81,25 @@ ALittle.ClassEx = function(class_name, super_class_name, child_class_prop, stati
 	else
 	{
 	    // 构建类对象
-		var class_object = ALittle.Class(super_class_object, child_class_prop, static_function_prop, class_name);
+		let class_object = ALittle.Class(super_class_object, child_class_prop, static_function_prop, class_name);
 		package_object[class_name_list[class_name_list.length-1]] = class_object;
 
 		// 构建单例
-		var list = ALittle.__instance_map[class_name];
+		let list = ALittle.__instance_map[class_name];
 		if (list)
 		{
-			for (var callback in list)
+			for (let callback in list)
 			    callback(class_object);
 			delete ALittle.__instance_map[class_name];
 		}
 
         // 处理集成他的类
-		var map = ALittle.__classex_map[class_name];
+		let map = ALittle.__classex_map[class_name];
 		if (map)
 		{
-			for (var name in map)
+			for (let name in map)
 			{
-				var info = map[name];
+				let info = map[name];
 				ALittle.ClassEx(info.class_name, info.super_class_name, info.child_class_prop, info.callback);
 			}
 			delete ALittle.__classex_map[class_name];
@@ -110,10 +110,10 @@ ALittle.ClassEx = function(class_name, super_class_name, child_class_prop, stati
 ALittle.Class = function(super_class, child_class_prop, static_function_prop, class_name)
 {
 	// 创建类对象
-	var child_class = {};
+	let child_class = {};
 
-	var setter_map = {};
-	var getter_map = {};
+	let setter_map = {};
+	let getter_map = {};
 
 	console.assert(typeof super_class != "undefined", "父类不存在，是不是父类没有加载进来, class_name:" + String(class_name));
 
@@ -127,13 +127,13 @@ ALittle.Class = function(super_class, child_class_prop, static_function_prop, cl
 		child_class.__name = class_name;
 
 		// 遍历所有父类的属性和函数
-		for (var name in super_class)
+		for (let name in super_class)
 		{
 			// 除了构造函数和super_class的父类对象不需要复制，其他都要复制
 			if (name != "Ctor" && name != "__super" && name != "__getter" && name != "__setter")
 			{
 				// 复制对应的setter，getter函数
-				var info = Object.getOwnPropertyDescriptor(super_class, name);
+				let info = Object.getOwnPropertyDescriptor(super_class, name);
 				if (info.set || info.get) Object.defineProperty(child_class, name, info);
 
 				if (info.set) setter_map[name] = info.set;
@@ -147,10 +147,10 @@ ALittle.Class = function(super_class, child_class_prop, static_function_prop, cl
 	}
 
 	// 同理复制当前的属性和函数
-	for (var name in child_class_prop)
+	for (let name in child_class_prop)
 	{
 		// 复制对应的setter，getter函数
-		var info = Object.getOwnPropertyDescriptor(child_class_prop, name);
+		let info = Object.getOwnPropertyDescriptor(child_class_prop, name);
 		if (!info.get && !info.set)
 		{
 			child_class[name] = child_class_prop[name];
@@ -190,7 +190,7 @@ ALittle.Class = function(super_class, child_class_prop, static_function_prop, cl
 	}
 	class_func.prototype = child_class;
 
-	for (var name in static_function_prop)
+	for (let name in static_function_prop)
 	    class_func[name] = static_function_prop[name];
 
 	return class_func;
@@ -199,9 +199,9 @@ ALittle.Class = function(super_class, child_class_prop, static_function_prop, cl
 ALittle.Instance = function(class_name, callback)
 {
     // 查找对象
-    var class_object = window;
-    var class_name_list = class_name.split(".");
-    for (var i = 0; i < class_name_list.length; ++i)
+    let class_object = window;
+    let class_name_list = class_name.split(".");
+    for (let i = 0; i < class_name_list.length; ++i)
     {
         class_object = class_object[class_name_list[i]];
         if (!class_object) { class_object = null; break; }
@@ -211,7 +211,7 @@ ALittle.Instance = function(class_name, callback)
     if (class_object) { callback(class_object); return; }
 
     // 添加到列表中
-    var list = ALittle.__instance_map[class_name];
+    let list = ALittle.__instance_map[class_name];
     if (!list)
     {
         list = [];
@@ -249,10 +249,9 @@ ALittle.CreateTable = function()
     return new Map();
 }
 
-// 设置弱引用
+// 设置弱引用 (JavaScript不支持这个函数)
 ALittle.SetWeak = function(object, key, value)
 {
-
 }
 
 // 构建List类
@@ -273,13 +272,13 @@ List.prototype.get = function(index)
 
 List.prototype[Symbol.iterator] = function()
 {
-	var i = 0;
-	var object = this;
+	let i = 0;
+	let object = this;
 	return {
 		next : function()
 		{
 			++ i;
-			var value = object._data[i];
+			let value = object._data[i];
 			return {
 				done : value == null || value == undefined,
 				value : [i, value]
@@ -307,13 +306,13 @@ List.prototype.get = function(index)
 
 List.prototype[Symbol.iterator] = function()
 {
-	var i = 0;
-	var object = this;
+	let i = 0;
+	let object = this;
 	return {
 		next : function()
 		{
 			++ i;
-			var value = object._data[i];
+			let value = object._data[i];
 			return {
 				done : value == null || value == undefined,
 				value : [i, value]

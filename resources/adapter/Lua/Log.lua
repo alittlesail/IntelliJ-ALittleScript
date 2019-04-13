@@ -8,6 +8,13 @@ function SetLogCallback(func)
     log = func
 end
 
+LogLevel =
+{
+    INFO = 0,
+    WARN = 1,
+    ERROR = 2,
+}
+
 -- 日志函数
 function Log(...)
     -- 创建列表

@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>as.alittleide.com</id>
   <name>ALittleScript</name>
-  <version>1.5</version>
+  <version>1.6</version>
   <vendor email="757609414@qq.com" url="https://github.com/alittlesail/ALittleScript">ALittle</vendor>
 
   <description><![CDATA[
@@ -14,7 +14,6 @@
     Features:
     <ul>
         <li>class, struct, enum, extends</li>
-        <li>LuaJIT 5.1 support</li>
         <li>Syntax highlighting</li>
         <li>Code completion</li>
         <li>Find usages</li>
@@ -26,7 +25,12 @@
         <li>Structure view</li>
         <li>Comment in/out</li>
         <li>Method override line marker</li>
-        <li>Lua Standard Library/API</li>
+    </ul>
+    Library:
+    <ul>
+        <li>ALittle across Standard Library/API</li>
+        <li>LuaJIT 5.1 Standard Library/API</li>
+        <li>JavaScript Standard Library/API</li>
     </ul>
     <p>中国朋友可以加QQ群629311504交流及反馈BUG</p>
     ]]></description>
