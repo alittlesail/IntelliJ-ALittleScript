@@ -121,7 +121,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         return result;
     }
 
-    public static List<ALittleInstanceNameDec> findInstanceNameDecList(Project project, String src_namespace, String src_name) {
+    public static List<ALittleInstanceNameDec> findInstanceNameDecList(Project project, String src_namespace, String src_name, boolean find_in_global) {
         List<ALittleInstanceNameDec> result = new ArrayList<>();
 
         ALittleTreeChangeListener listener = s_map.get(project);
@@ -144,14 +144,16 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         if (!result.isEmpty()) return result;
 
         // 从全局找
-        if (src_name.isEmpty()) {
-            for (Map.Entry<String, Set<ALittleInstanceNameDec>> entry : listener.m_instance_map.entrySet()) {
-                result.addAll(entry.getValue());
+        if (find_in_global) {
+            if (src_name.isEmpty()) {
+                for (Map.Entry<String, Set<ALittleInstanceNameDec>> entry : listener.m_instance_map.entrySet()) {
+                    result.addAll(entry.getValue());
+                }
+            } else {
+                Set<ALittleInstanceNameDec> set = listener.m_instance_map.get(src_name);
+                if (set != null)
+                    result.addAll(set);
             }
-        } else {
-            Set<ALittleInstanceNameDec> set = listener.m_instance_map.get(src_name);
-            if (set != null)
-                result.addAll(set);
         }
 
         return result;
@@ -331,16 +333,17 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         // 加载标准库
         String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
         VirtualFile dir = null;
+
         try {
             if (jarPath.endsWith(".jar"))
                 dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
             else
-                dir = VfsUtil.findFileByIoFile(new File(jarPath +"/std"), true);
+                dir = VfsUtil.findFileByIoFile(new File(jarPath + "/std"), true);
 
             if (dir != null) {
-                VirtualFile[] file_list = dir.getChildren();
-                if (file_list != null)
-                    virtualFiles.addAll(Arrays.asList(file_list));
+                for (VirtualFile child_dir : dir.getChildren()) {
+                    virtualFiles.addAll(Arrays.asList(child_dir.getChildren()));
+                }
             }
         } catch (MalformedURLException e) {
         }
@@ -350,43 +353,13 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
             PsiFile file = PsiManager.getInstance(m_project).findFile(virtualFile);
             if (!(file instanceof ALittleFile)) continue;
 
-            List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList((ALittleFile)file, ALittleNamespaceDec.class);
+            List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList(file, ALittleNamespaceDec.class);
             for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
 
                 ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
                 if (namespace_name_dec == null) continue;
 
                 addNamespaceName(namespace_name_dec.getText(), namespace_name_dec);
-            }
-        }
-    }
-
-    public static void addStdLibrary(Project project)
-    {
-        String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
-        VirtualFile dir = null;
-
-        try {
-            if (jarPath.endsWith(".jar"))
-                dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
-            else
-                dir = VfsUtil.findFileByIoFile(new File(jarPath +"/std"), true);
-        } catch (MalformedURLException e) {
-
-        }
-
-        if (dir != null)
-        {
-            VirtualFile[] file_list = dir.getChildren();
-            if (file_list != null)
-            {
-                for (VirtualFile file : file_list)
-                {
-                    PsiFile psifile = PsiManager.getInstance(project).findFile(file);
-                    if (!(psifile instanceof ALittleFile)) continue;
-
-                    handleFileCreated(project, (ALittleFile) psifile);
-                }
             }
         }
     }

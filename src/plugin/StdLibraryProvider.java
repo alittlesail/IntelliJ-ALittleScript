@@ -16,11 +16,14 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 public class StdLibraryProvider extends AdditionalLibraryRootsProvider {
     @Override
     @NotNull
     public Collection<SyntheticLibrary> getAdditionalProjectLibraries(@NotNull Project project) {
+        ArrayList<SyntheticLibrary> result = new ArrayList<>();
+
         String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
         VirtualFile dir = null;
 
@@ -28,19 +31,19 @@ public class StdLibraryProvider extends AdditionalLibraryRootsProvider {
             if (jarPath.endsWith(".jar"))
                 dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
             else
-                dir = VfsUtil.findFileByIoFile(new File(jarPath +"/std"), true);
+                dir = VfsUtil.findFileByIoFile(new File(jarPath + "/std"), true);
+
+            if (dir != null) {
+                for (VirtualFile child_dir : dir.getChildren()) {
+                    result.add(new StdLibrary(child_dir));
+                }
+            }
         } catch (MalformedURLException e) {
 
         }
 
-        ArrayList<SyntheticLibrary> result = new ArrayList<>();
-        if (dir != null) {
-            result.add(new StdLibrary(dir));
-        }
-
         return result;
     }
-
 
     class StdLibrary extends SyntheticLibrary implements ItemPresentation
     {
@@ -69,12 +72,12 @@ public class StdLibraryProvider extends AdditionalLibraryRootsProvider {
         }
 
         @Override
-        public String getLocationString() { return "Lua std library"; }
+        public String getLocationString() { return ""; }
 
         @Override
         public Icon getIcon(boolean var1) { return ALittleIcons.FILE; }
 
         @Override
-        public String getPresentableText() { return "std"; }
+        public String getPresentableText() { return m_root.getName(); }
     }
 }

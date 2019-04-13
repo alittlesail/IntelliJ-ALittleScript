@@ -152,7 +152,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
         }
         // 处理单例
         {
-            List<ALittleInstanceNameDec> dec_list = ALittleTreeChangeListener.findInstanceNameDecList(project, m_src_namespace, m_key);
+            List<ALittleInstanceNameDec> dec_list = ALittleTreeChangeListener.findInstanceNameDecList(project, m_src_namespace, m_key, true);
             if (!dec_list.isEmpty()) results.clear();
             for (ALittleInstanceNameDec dec : dec_list) {
                 results.add(new PsiElementResolveResult(dec));
@@ -245,7 +245,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
         }
         // 处理单例
         {
-            List<ALittleInstanceNameDec> dec_list = ALittleTreeChangeListener.findInstanceNameDecList(project, m_src_namespace, "");
+            List<ALittleInstanceNameDec> dec_list = ALittleTreeChangeListener.findInstanceNameDecList(project, m_src_namespace, "", true);
             for (ALittleInstanceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.FILE).

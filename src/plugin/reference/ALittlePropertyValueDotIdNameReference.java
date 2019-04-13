@@ -231,7 +231,7 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
                 results.add(new PsiElementResolveResult(struct_name_dec));
             }
             // 所有单例
-            List<ALittleInstanceNameDec> instance_name_dec_list = ALittleTreeChangeListener.findInstanceNameDecList(myElement.getProject(), src_namespace, m_key);
+            List<ALittleInstanceNameDec> instance_name_dec_list = ALittleTreeChangeListener.findInstanceNameDecList(myElement.getProject(), src_namespace, m_key, false);
             for (ALittleInstanceNameDec instance_name_dec : instance_name_dec_list) {
                 results.add(new PsiElementResolveResult(instance_name_dec));
             }
@@ -412,7 +412,7 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
                         withTypeText(struct_name_dec.getContainingFile().getName()));
             }
             // 所有单例
-            List<ALittleInstanceNameDec> instance_name_dec_list = ALittleTreeChangeListener.findInstanceNameDecList(myElement.getProject(), src_namespace, "");
+            List<ALittleInstanceNameDec> instance_name_dec_list = ALittleTreeChangeListener.findInstanceNameDecList(myElement.getProject(), src_namespace, "", false);
             for (ALittleInstanceNameDec instance_name_dec : instance_name_dec_list) {
                 variants.add(LookupElementBuilder.create(instance_name_dec.getText()).
                         withIcon(ALittleIcons.FILE).
