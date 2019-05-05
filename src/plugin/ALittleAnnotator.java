@@ -99,6 +99,67 @@ public class ALittleAnnotator implements Annotator {
         return error;
     }
 
+    public static String CheckErrorForStruct(@NotNull PsiElement element, AnnotationHolder holder, List<PsiElement> guess_list) {
+        String error = null;
+
+        // 结构体类型错误检查
+        if (element instanceof ALittleCustomType) {
+            do {
+                ALittleCustomType custom_type = (ALittleCustomType) element;
+                if (!(element.getParent() instanceof ALittleStructProtocolDec)) break;
+                ALittleStructProtocolDec protocol_dec = (ALittleStructProtocolDec) element.getParent();
+                ALittleStructDec struct_dec = (ALittleStructDec) protocol_dec.getParent();
+                ALittleStructNameDec name_dec = struct_dec.getStructNameDec();
+                if (name_dec == null) {
+                    error = "没有定义协议名";
+                    break;
+                }
+
+                PsiElement guess_type = custom_type.getCustomTypeNameDec().guessType();
+                if (!(guess_type instanceof ALittleEnumDec)) {
+                    error = "struct的(XXX)内必须使用enum";
+                    break;
+                }
+                ALittleEnumDec enum_dec = (ALittleEnumDec) guess_type;
+                if (enum_dec.getEnumProtocolDec() == null) {
+                    error = "struct的(XXX)内必须使用带protocol的enum";
+                    break;
+                }
+
+                String message_name = name_dec.getText();
+                // 协议ID
+                List<Integer> result = new ArrayList<>();
+                if (!ALittleUtil.getEnumVarValue(enum_dec, "_" + message_name, result) || result.isEmpty())
+                {
+                    error = "找不到协议ID:_" + message_name;
+                    break;
+                }
+            } while (false);
+            // 枚举类型字段名不能重复
+        } else if (element instanceof ALittleStructVarNameDec) {
+            ALittleStructVarNameDec dec = (ALittleStructVarNameDec)element;
+            String cur_name = dec.getIdContent().getText();
+            ALittleStructVarDec var_dec = (ALittleStructVarDec)element.getParent();
+            ALittleStructDec struct_dec = (ALittleStructDec)var_dec.getParent();
+            List<ALittleStructVarDec> var_dec_list = struct_dec.getStructVarDecList();
+            int count = 0;
+            for (ALittleStructVarDec var : var_dec_list) {
+                String name = var.getStructVarNameDec().getIdContent().getText();
+                if (name.equals(cur_name)) {
+                    ++ count;
+                    if (count >= 2) break;
+                }
+            }
+            if (count >= 2) error = "枚举字段名重复";
+        }
+
+        if (error != null && holder != null && element != null) {
+            holder.createErrorAnnotation(element, error);
+        }
+
+        return error;
+    }
+
     public static String CheckErrorForEnum(@NotNull PsiElement element, AnnotationHolder holder, List<PsiElement> guess_list) {
         String error = null;
 
@@ -1095,6 +1156,9 @@ public class ALittleAnnotator implements Annotator {
         // 枚举类型错误检查
         CheckErrorForEnum(element, holder, guess_list);
 
+        // 结构体类型错误检查
+        CheckErrorForStruct(element, holder, guess_list);
+
         // return语句返回的内容和函数定义的返回值相符
         CheckErrorForReturn(element, holder, guess_list);
 
@@ -1104,7 +1168,7 @@ public class ALittleAnnotator implements Annotator {
         // 赋值语句左右两方那个的类型检查
         CheckErrorForOpAssign(element, holder, guess_list);
 
-        // if elseif while dowhile 条件表达式检查
+        // if elseif while do while 条件表达式检查
         CheckErrorForIfAndElseIfAndWhileAndDoWhile(element, holder, guess_list);
 
         // for语句内部局部变量的类型

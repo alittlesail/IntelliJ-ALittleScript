@@ -1,20 +1,10 @@
 package plugin;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.markup.TextAttributes;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.PsiWhiteSpace;
-import com.intellij.psi.search.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.indexing.FileBasedIndex;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallStatReference;
 
@@ -1701,13 +1691,48 @@ public class ALittleUtil {
 
         // 协议ID
         List<Integer> result = new ArrayList<>();
-        if (!ALittleUtil.getEnumVarValue(enum_dec, message_name, result))
+        if (!ALittleUtil.getEnumVarValue(enum_dec, "_" + message_name, result) || result.isEmpty())
         {
-            error.add(root.getText() + "找不到协议ID");
+            error.add(root.getText() + "找不到协议ID:_" + message_name);
             return null;
         }
 
+        String json = "{";
+            json += "\"id\":" + result.get(0) + ",";
+            json += "\"name\":\"" + message_name + "\",";
+            json += "\"var_name_list\":[";
+                List<String> var_name_list = new ArrayList<>();
+                for (ALittleStructVarDec var_dec : root.getStructVarDecList()) {
+                    var_name_list.add("\"" + var_dec.getStructVarNameDec().getText() + "\"");
+                }
+                json += String.join(",", var_name_list);
+            json += "],";
+            json += "\"var_type_list\":[";
+                List<String> var_type_list = new ArrayList<>();
+                for (ALittleStructVarDec var_dec : root.getStructVarDecList()) {
+                    ALittleAllType all_type = var_dec.getAllType();
+                    if (all_type == null)
+                    {
+                        error.add(var_dec.getText() + "没有定义字段类型");
+                        return null;
+                    }
+                    String var_type = all_type.getText();
+                    // 把空格替换掉
+                    var_type = var_type.replace(" ", "");
+                    // 不能支持任何any字段
+                    if (var_type.equals("any")
+                        || var_type.contains("<any")
+                        || var_type.contains("any>"))
+                    {
+                        error.add(var_dec.getText() + "协议不支持any类型");
+                        return null;
+                    }
+                    var_type_list.add("\"" + var_type + "\"");
+                }
+                json += String.join(",", var_type_list);
+            json += "]";
+        json += "}";
 
-        return "";
+        return json;
     }
 }

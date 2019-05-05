@@ -24,6 +24,7 @@ import java.util.List;
 public class ALittleGenerateLua {
     String m_error = "";
     String m_namespace_name = "";
+    List<String> m_protocol_list;
 
     private void copyStdLibrary(String module_base_path) {
         try {
@@ -77,6 +78,9 @@ public class ALittleGenerateLua {
                 // 枚举类型错误检查
                 ALittleAnnotator.CheckErrorForEnum(element, null, guess_list);
 
+                // 结构体类型错误检查
+                ALittleAnnotator.CheckErrorForStruct(element, null, guess_list);
+
                 // return语句返回的内容和函数定义的返回值相符
                 ALittleAnnotator.CheckErrorForReturn(element, null, guess_list);
 
@@ -116,6 +120,7 @@ public class ALittleGenerateLua {
         if (error != null) {
             return "有语法错误:" + error.getErrorDescription();
         }
+        m_protocol_list = new ArrayList<>();
 
         List<ALittleNamespaceDec> namespace_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
         if (namespace_list.isEmpty()) {
@@ -126,6 +131,10 @@ public class ALittleGenerateLua {
         }
         String content = GenerateNamespace(namespace_list.get(0));
         if (content == null) return m_error;
+
+        String protocol_content = null;
+        if (!m_protocol_list.isEmpty())
+            protocol_content = "[" + String.join(",", m_protocol_list) + "]";
 
         // 保存到文件
         try {
@@ -146,38 +155,54 @@ public class ALittleGenerateLua {
             if (!file_path.startsWith(module_base_path)) {
                 return "当前文件不在模块路径下:" + file_path;
             }
-            String rel_path = file_path.substring(module_base_path.length());
+            String lua_rel_path = file_path.substring(module_base_path.length());
+            String protocol_rel_path = file_path.substring(module_base_path.length());
 
             String std_path = "Script";
 
             // 如果模块名是引擎库，那么需要做特殊处理
             if (module_name.equals("AEngine")) {
-                if (!rel_path.startsWith("src/Engine")) {
+                if (!lua_rel_path.startsWith("src/Engine")) {
                     // 这个目录下不需要生成lua
                     return null;
                 }
                 // AEngine的工程文件在：集成开发环境安装目录/Module/ALittleIDE/Other/AEngine/AEngine.iml
                 // 目标的目录是是在：集成开发环境安装目录/Engine
-                rel_path = "../../../../Engine" + rel_path.substring("src/Engine".length());
+                lua_rel_path = "../../../../Engine" + lua_rel_path.substring("src/Engine".length());
+                protocol_rel_path = null;
                 std_path = "../../../../Engine";
             } else {
-                if (rel_path.startsWith("src")) {
-                    rel_path = "Script" + rel_path.substring("src".length());
+                if (lua_rel_path.startsWith("src")) {
+                    lua_rel_path = "Script" + lua_rel_path.substring("src".length());
+                    protocol_rel_path = "Protocol" + protocol_rel_path.substring("src".length());
                 } else {
                     return "不支持该目录下的文件生成:" + file_path;
                 }
             }
             String ext = "alittle";
-            if (!rel_path.endsWith(ext)) {
+            if (!lua_rel_path.endsWith(ext)) {
                 return "要生成的代码文件后缀名必须是alittle:" + file_path;
             }
-            rel_path = rel_path.substring(0, rel_path.length() - ext.length()) + "lua";
-            String full_path = module_base_path + rel_path;
-            File file = new File(full_path);
+            lua_rel_path = lua_rel_path.substring(0, lua_rel_path.length() - ext.length()) + "lua";
+            if (protocol_rel_path != null)
+                protocol_rel_path = protocol_rel_path.substring(0, protocol_rel_path.length() - ext.length()) + "json";
+            String lua_full_path = module_base_path + lua_rel_path;
+
+            File file = new File(lua_full_path);
             boolean result = file.getParentFile().mkdirs();
-            FileOutputStream file_out = new FileOutputStream(new File(full_path));
+            FileOutputStream file_out = new FileOutputStream(new File(lua_full_path));
             file_out.write(content.getBytes(StandardCharsets.UTF_8));
             file_out.close();
+
+            if (protocol_content != null && protocol_rel_path != null)
+            {
+                String protocol_full_path = module_base_path + protocol_rel_path;
+                file = new File(protocol_full_path);
+                result = file.getParentFile().mkdirs();
+                file_out = new FileOutputStream(new File(protocol_full_path));
+                file_out.write(protocol_content.getBytes(StandardCharsets.UTF_8));
+                file_out.close();
+            }
 
             // 复制标准库
             copyStdLibrary(module_base_path + std_path);
@@ -1717,8 +1742,13 @@ public class ALittleGenerateLua {
             if (child instanceof ALittleStructDec) {
                 List<String> error = new ArrayList<>();
                 String result = ALittleUtil.GenerateStruct((ALittleStructDec) child, "", error);
-                if (result == null) return null;
-                content.append(result);
+                if (result == null)
+                {
+                    if (!error.isEmpty()) m_error = error.get(0);
+                    return null;
+                }
+                if (!result.isEmpty())
+                    m_protocol_list.add(result);
             // 处理enum
             } else if (child instanceof ALittleEnumDec) {
                 String result = GenerateEnum((ALittleEnumDec) child, "");
