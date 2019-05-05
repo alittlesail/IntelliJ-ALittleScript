@@ -33,6 +33,7 @@ public interface ALittleTypes {
   IElementType ELSE_IF_EXPR = new ALittleElementType("ELSE_IF_EXPR");
   IElementType ENUM_DEC = new ALittleElementType("ENUM_DEC");
   IElementType ENUM_NAME_DEC = new ALittleElementType("ENUM_NAME_DEC");
+  IElementType ENUM_PROTOCOL_DEC = new ALittleElementType("ENUM_PROTOCOL_DEC");
   IElementType ENUM_VAR_DEC = new ALittleElementType("ENUM_VAR_DEC");
   IElementType ENUM_VAR_NAME_DEC = new ALittleElementType("ENUM_VAR_NAME_DEC");
   IElementType ENUM_VAR_VALUE_DEC = new ALittleElementType("ENUM_VAR_VALUE_DEC");
@@ -118,6 +119,7 @@ public interface ALittleTypes {
   IElementType STRUCT_EXTENDS_NAMESPACE_NAME_DEC = new ALittleElementType("STRUCT_EXTENDS_NAMESPACE_NAME_DEC");
   IElementType STRUCT_EXTENDS_NAME_DEC = new ALittleElementType("STRUCT_EXTENDS_NAME_DEC");
   IElementType STRUCT_NAME_DEC = new ALittleElementType("STRUCT_NAME_DEC");
+  IElementType STRUCT_PROTOCOL_DEC = new ALittleElementType("STRUCT_PROTOCOL_DEC");
   IElementType STRUCT_VAR_DEC = new ALittleElementType("STRUCT_VAR_DEC");
   IElementType STRUCT_VAR_NAME_DEC = new ALittleElementType("STRUCT_VAR_NAME_DEC");
   IElementType VALUE_FACTOR = new ALittleElementType("VALUE_FACTOR");
@@ -192,6 +194,7 @@ public interface ALittleTypes {
   IElementType PLUS_PLUS = new ALittleTokenType("++");
   IElementType PRIVATE = new ALittleTokenType("private");
   IElementType PROTECTED = new ALittleTokenType("protected");
+  IElementType PROTOCOL = new ALittleTokenType("protocol");
   IElementType PUBLIC = new ALittleTokenType("public");
   IElementType QUOTE = new ALittleTokenType("\"");
   IElementType QUOTIENT = new ALittleTokenType("/");
@@ -294,6 +297,9 @@ public interface ALittleTypes {
       }
       else if (type == ENUM_NAME_DEC) {
         return new ALittleEnumNameDecImpl(node);
+      }
+      else if (type == ENUM_PROTOCOL_DEC) {
+        return new ALittleEnumProtocolDecImpl(node);
       }
       else if (type == ENUM_VAR_DEC) {
         return new ALittleEnumVarDecImpl(node);
@@ -549,6 +555,9 @@ public interface ALittleTypes {
       }
       else if (type == STRUCT_NAME_DEC) {
         return new ALittleStructNameDecImpl(node);
+      }
+      else if (type == STRUCT_PROTOCOL_DEC) {
+        return new ALittleStructProtocolDecImpl(node);
       }
       else if (type == STRUCT_VAR_DEC) {
         return new ALittleStructVarDecImpl(node);

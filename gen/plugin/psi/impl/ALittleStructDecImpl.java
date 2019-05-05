@@ -51,6 +51,12 @@ public class ALittleStructDecImpl extends ASTWrapperPsiElement implements ALittl
   }
 
   @Override
+  @Nullable
+  public ALittleStructProtocolDec getStructProtocolDec() {
+    return findChildByClass(ALittleStructProtocolDec.class);
+  }
+
+  @Override
   @NotNull
   public List<ALittleStructVarDec> getStructVarDecList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleStructVarDec.class);

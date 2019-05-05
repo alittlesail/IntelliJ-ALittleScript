@@ -19,6 +19,9 @@ public interface ALittleStructDec extends PsiElement {
   @NotNull
   ALittleStructNameDec getStructNameDec();
 
+  @Nullable
+  ALittleStructProtocolDec getStructProtocolDec();
+
   @NotNull
   List<ALittleStructVarDec> getStructVarDecList();
 

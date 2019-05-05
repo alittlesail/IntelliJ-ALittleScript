@@ -1350,7 +1350,15 @@ public class ALittleGenerateLua {
     }
 
     private String GenerateEnum(ALittleEnumDec root, String pre_tab) {
+        // 如果带有协议标志的，那么就不生成
+        if (root.getEnumProtocolDec() != null) return "";
+
         ALittleEnumNameDec name_dec = root.getEnumNameDec();
+        if (name_dec == null)
+        {
+            m_error = root.getText() + "没有定义枚举名";
+            return null;
+        }
 
         StringBuilder content = new StringBuilder();
         content.append(pre_tab)
@@ -1705,8 +1713,12 @@ public class ALittleGenerateLua {
 
         PsiElement[] child_list = root.getChildren();
         for (PsiElement child : child_list) {
-            // 不处理struct，代码生成了没什么意义
+            // 处理结构体
             if (child instanceof ALittleStructDec) {
+                List<String> error = new ArrayList<>();
+                String result = ALittleUtil.GenerateStruct((ALittleStructDec) child, "", error);
+                if (result == null) return null;
+                content.append(result);
             // 处理enum
             } else if (child instanceof ALittleEnumDec) {
                 String result = GenerateEnum((ALittleEnumDec) child, "");

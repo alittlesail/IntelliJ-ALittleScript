@@ -13,6 +13,9 @@ public interface ALittleEnumDec extends PsiElement {
   @Nullable
   ALittleEnumNameDec getEnumNameDec();
 
+  @Nullable
+  ALittleEnumProtocolDec getEnumProtocolDec();
+
   @NotNull
   List<ALittleEnumVarDec> getEnumVarDecList();
 

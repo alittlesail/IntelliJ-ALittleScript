@@ -39,6 +39,12 @@ public class ALittleEnumDecImpl extends ASTWrapperPsiElement implements ALittleE
   }
 
   @Override
+  @Nullable
+  public ALittleEnumProtocolDec getEnumProtocolDec() {
+    return findChildByClass(ALittleEnumProtocolDec.class);
+  }
+
+  @Override
   @NotNull
   public List<ALittleEnumVarDec> getEnumVarDecList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleEnumVarDec.class);

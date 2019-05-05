@@ -69,6 +69,45 @@ public class ALittleUtil {
         }
     }
 
+    // 根据枚举字段名，获取对应的值
+    public static boolean getEnumVarValue(ALittleEnumDec enum_dec, String var_name, @NotNull List<Integer> result) {
+        if (enum_dec == null) return false;
+
+        List<ALittleEnumVarDec> var_dec_list = enum_dec.getEnumVarDecList();
+        int enum_value = -1;
+        for (ALittleEnumVarDec var_dec : var_dec_list) {
+            ALittleEnumVarNameDec var_name_dec = var_dec.getEnumVarNameDec();
+            ALittleEnumVarValueDec var_value_dec = var_dec.getEnumVarValueDec();
+            if (var_value_dec == null) {
+                ++enum_value;
+                if (var_name_dec.getIdContent().getText().equals(var_name))
+                {
+                    result.add(enum_value);
+                    return true;
+                }
+            } else {
+                if (var_value_dec.getDigitContent() != null) {
+                    String value = var_value_dec.getDigitContent().getText();
+                    if (!isInt(value)) {
+                        return false;
+                    }
+                    String number_content = var_value_dec.getText();
+                    if (number_content.startsWith("0x"))
+                        enum_value = Integer.parseInt(number_content.substring(2), 16);
+                    else
+                        enum_value = Integer.parseInt(number_content);
+
+                    if (var_name_dec.getIdContent().getText().equals(var_name))
+                    {
+                        result.add(enum_value);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     // 查找所有的函数名节点对象
     private static void findMethodNameDecList(Project project, String src_namespace, String src_class, String src_method, @NotNull List<ALittleMethodNameDec> result, int deep)
     {        // 这个用于跳出无限递归
@@ -711,6 +750,16 @@ public class ALittleUtil {
             ALittleEnumVarNameDec name_dec = (ALittleEnumVarNameDec)element;
             ALittleEnumVarDec dec = (ALittleEnumVarDec)name_dec.getParent();
             ALittleEnumVarValueDec value_dec = dec.getEnumVarValueDec();
+
+            // 如果枚举带有protocol定义，那么就返回错误信息
+            ALittleEnumDec enum_dec = (ALittleEnumDec)dec.getParent();
+            if (enum_dec.getEnumProtocolDec() != null)
+            {
+                error_content_list.add("不能使用带protocol定义的enum的字段");
+                error_element_list.add(src);
+                return null;
+            }
+
             if (value_dec != null)
             {
                 if (value_dec.getDigitContent() != null) return "int";
@@ -1615,5 +1664,50 @@ public class ALittleUtil {
         error_content_list.add("要求是" + left_name + ",不能是:" + right_name);
         error_element_list.add(src_right);
         return false;
+    }
+
+    public static String GenerateStruct(ALittleStructDec root, String pre_tab, @NotNull List<String> error) {
+        ALittleStructProtocolDec protocol_dec = root.getStructProtocolDec();
+        // 如果没有带协议标志，那么就不需要生成协议
+        if (protocol_dec == null) return "";
+
+        ALittleCustomType custom_type = protocol_dec.getCustomType();
+        if (custom_type == null)
+        {
+            error.add(root.getText() + "没有定义协议枚举");
+            return null;
+        }
+        PsiElement guess_type = custom_type.getCustomTypeNameDec().guessType();
+        if (!(guess_type instanceof ALittleEnumDec))
+        {
+            error.add(root.getText() + "struct的(XXX)内必须使用enum");
+            return null;
+        }
+        ALittleEnumDec enum_dec = (ALittleEnumDec)guess_type;
+        if (enum_dec.getEnumProtocolDec() == null)
+        {
+            error.add(root.getText() + "struct的(XXX)内必须使用带protocol的enum");
+            return null;
+        }
+
+        // 协议名
+        ALittleStructNameDec name_dec = root.getStructNameDec();
+        if (name_dec == null)
+        {
+            error.add(root.getText() + "没有定义协议名");
+            return null;
+        }
+        String message_name = name_dec.getIdContent().getText();
+
+        // 协议ID
+        List<Integer> result = new ArrayList<>();
+        if (!ALittleUtil.getEnumVarValue(enum_dec, message_name, result))
+        {
+            error.add(root.getText() + "找不到协议ID");
+            return null;
+        }
+
+
+        return "";
     }
 }

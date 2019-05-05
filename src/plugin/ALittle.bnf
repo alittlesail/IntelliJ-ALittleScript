@@ -130,9 +130,9 @@ class_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleClassVarNameDec
 // 全局函数
 global_method_dec ::= access_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=2}
 
-
 // 结构体
-struct_dec ::= access_modifier? struct struct_name_dec (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec)? LBRACE (struct_var_dec)* RBRACE
+struct_dec ::= access_modifier? struct struct_name_dec (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec)? struct_protocol_dec? LBRACE (struct_var_dec)* RBRACE
+struct_protocol_dec ::= LPAREN custom_type RPAREN {pin=1}
 struct_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructNameDecElementImpl"
                                implements="plugin.psi.ALittleStructNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 struct_extends_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructExtendsNameDecElementImpl"
@@ -145,7 +145,8 @@ struct_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructVarNameD
                                    implements="plugin.psi.ALittleStructVarNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 
 // 枚举描述
-enum_dec ::= access_modifier? enum enum_name_dec LBRACE (enum_var_dec (COMMA enum_var_dec)* COMMA?)? RBRACE {pin=2}
+enum_dec ::= access_modifier? enum enum_name_dec enum_protocol_dec? LBRACE (enum_var_dec (COMMA enum_var_dec)* COMMA?)? RBRACE {pin=2}
+enum_protocol_dec ::= LPAREN protocol RPAREN {pin=1}
 enum_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleEnumNameDecElementImpl"
                              implements="plugin.psi.ALittleEnumNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 enum_var_dec ::= enum_var_name_dec (ASSIGN enum_var_value_dec)? {pin=1}

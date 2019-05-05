@@ -107,6 +107,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitEnumNameDecElement(o);
   }
 
+  public void visitEnumProtocolDec(@NotNull ALittleEnumProtocolDec o) {
+    visitPsiElement(o);
+  }
+
   public void visitEnumVarDec(@NotNull ALittleEnumVarDec o) {
     visitPsiElement(o);
   }
@@ -445,6 +449,10 @@ public class ALittleVisitor extends PsiElementVisitor {
 
   public void visitStructNameDec(@NotNull ALittleStructNameDec o) {
     visitStructNameDecElement(o);
+  }
+
+  public void visitStructProtocolDec(@NotNull ALittleStructProtocolDec o) {
+    visitPsiElement(o);
   }
 
   public void visitStructVarDec(@NotNull ALittleStructVarDec o) {
