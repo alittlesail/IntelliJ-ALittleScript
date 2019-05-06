@@ -79,13 +79,13 @@ public class _ALittleLexer implements FlexLexer {
     "\1\73\7\5\1\74\5\5\1\75\1\5\1\76\1\77"+
     "\2\5\1\100\1\5\1\101\3\5\1\102\1\103\1\104"+
     "\10\5\1\105\1\106\1\5\1\107\2\5\1\110\2\5"+
-    "\1\111\12\5\1\112\1\5\1\113\1\5\1\114\1\115"+
-    "\3\5\1\116\1\117\1\120\1\121\3\5\1\122\1\5"+
-    "\1\123\1\124\2\5\1\125\3\5\1\126\2\5\1\127"+
-    "\1\130\1\131\1\132";
+    "\1\111\10\5\1\112\1\5\1\113\1\5\1\114\1\5"+
+    "\1\115\1\116\3\5\1\117\1\120\1\121\1\122\2\5"+
+    "\1\123\1\5\1\124\1\125\2\5\1\126\2\5\1\127"+
+    "\2\5\1\130\1\131\1\132";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[206];
+    int [] result = new int[203];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -131,14 +131,14 @@ public class _ALittleLexer implements FlexLexer {
     "\0\u175a\0\u1797\0\u17d4\0\u1811\0\u184e\0\u188b\0\u18c8\0\u1905"+
     "\0\u1942\0\u0131\0\u0131\0\u197f\0\u0131\0\u19bc\0\u19f9\0\u0131"+
     "\0\u1a36\0\u1a73\0\u0131\0\u1ab0\0\u1aed\0\u1b2a\0\u1b67\0\u1ba4"+
-    "\0\u1be1\0\u1c1e\0\u1c5b\0\u1c98\0\u1cd5\0\u0131\0\u1d12\0\u0131"+
-    "\0\u1d4f\0\u0131\0\u0131\0\u1d8c\0\u1dc9\0\u1e06\0\u0131\0\u0131"+
-    "\0\u0131\0\u0131\0\u1e43\0\u1e80\0\u1ebd\0\u0131\0\u1efa\0\u0131"+
-    "\0\u0131\0\u1f37\0\u1f74\0\u0131\0\u1fb1\0\u1fee\0\u202b\0\u0131"+
-    "\0\u2068\0\u20a5\0\u0131\0\u0131\0\u0131\0\u0131";
+    "\0\u1be1\0\u1c1e\0\u1c5b\0\u0131\0\u1c98\0\u0131\0\u1cd5\0\u0131"+
+    "\0\u1d12\0\u0131\0\u0131\0\u1d4f\0\u1d8c\0\u1dc9\0\u0131\0\u0131"+
+    "\0\u0131\0\u0131\0\u1e06\0\u1e43\0\u0131\0\u1e80\0\u0131\0\u0131"+
+    "\0\u1ebd\0\u1efa\0\u0131\0\u1f37\0\u1f74\0\u0131\0\u1fb1\0\u1fee"+
+    "\0\u0131\0\u0131\0\u0131";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[206];
+    int [] result = new int[203];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -277,26 +277,23 @@ public class _ALittleLexer implements FlexLexer {
     "\21\6\5\0\4\6\4\0\1\6\25\0\10\6\1\273"+
     "\21\6\5\0\4\6\4\0\1\6\25\0\6\6\1\274"+
     "\23\6\5\0\4\6\4\0\1\6\25\0\6\6\1\275"+
-    "\23\6\5\0\4\6\4\0\1\6\25\0\6\6\1\276"+
-    "\23\6\5\0\4\6\4\0\1\6\25\0\1\277\31\6"+
-    "\5\0\4\6\4\0\1\6\25\0\1\300\31\6\5\0"+
-    "\4\6\4\0\1\6\25\0\3\6\1\301\26\6\5\0"+
-    "\4\6\4\0\1\6\25\0\14\6\1\302\15\6\5\0"+
-    "\4\6\4\0\1\6\25\0\1\6\1\303\30\6\5\0"+
-    "\4\6\4\0\1\6\25\0\3\6\1\304\26\6\5\0"+
-    "\4\6\4\0\1\6\25\0\10\6\1\305\21\6\5\0"+
-    "\4\6\4\0\1\6\25\0\14\6\1\306\15\6\5\0"+
+    "\23\6\5\0\4\6\4\0\1\6\25\0\1\276\31\6"+
+    "\5\0\4\6\4\0\1\6\25\0\1\277\31\6\5\0"+
+    "\4\6\4\0\1\6\25\0\3\6\1\300\26\6\5\0"+
+    "\4\6\4\0\1\6\25\0\14\6\1\301\15\6\5\0"+
+    "\4\6\4\0\1\6\25\0\1\6\1\302\30\6\5\0"+
+    "\4\6\4\0\1\6\25\0\3\6\1\303\26\6\5\0"+
+    "\4\6\4\0\1\6\25\0\10\6\1\304\21\6\5\0"+
+    "\4\6\4\0\1\6\25\0\6\6\1\305\23\6\5\0"+
+    "\4\6\4\0\1\6\25\0\15\6\1\306\14\6\5\0"+
     "\4\6\4\0\1\6\25\0\6\6\1\307\23\6\5\0"+
-    "\4\6\4\0\1\6\25\0\15\6\1\310\14\6\5\0"+
-    "\4\6\4\0\1\6\25\0\6\6\1\311\23\6\5\0"+
+    "\4\6\4\0\1\6\25\0\3\6\1\310\26\6\5\0"+
+    "\4\6\4\0\1\6\25\0\3\6\1\311\26\6\5\0"+
     "\4\6\4\0\1\6\25\0\3\6\1\312\26\6\5\0"+
-    "\4\6\4\0\1\6\25\0\12\6\1\313\17\6\5\0"+
-    "\4\6\4\0\1\6\25\0\3\6\1\314\26\6\5\0"+
-    "\4\6\4\0\1\6\25\0\3\6\1\315\26\6\5\0"+
-    "\4\6\4\0\1\6\25\0\23\6\1\316\6\6";
+    "\4\6\4\0\1\6\25\0\23\6\1\313\6\6";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[8418];
+    int [] result = new int[8235];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -336,10 +333,10 @@ public class _ALittleLexer implements FlexLexer {
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
     "\1\0\1\11\7\1\1\11\1\1\11\11\6\1\1\11"+
     "\31\1\1\11\1\0\1\1\1\11\1\0\1\11\3\0"+
-    "\13\11\1\1\4\11\37\1\2\11\140\1";
+    "\13\11\1\1\4\11\37\1\2\11\135\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[206];
+    int [] result = new int[203];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -1010,72 +1007,72 @@ public class _ALittleLexer implements FlexLexer {
             // fall through
           case 163: break;
           case 74: 
-            { return CLASS;
+            { return PROTO;
             } 
             // fall through
           case 164: break;
           case 75: 
-            { return WHILE;
+            { return CLASS;
             } 
             // fall through
           case 165: break;
           case 76: 
-            { return FALSE;
+            { return WHILE;
             } 
             // fall through
           case 166: break;
           case 77: 
-            { return BREAK;
+            { return FALSE;
             } 
             // fall through
           case 167: break;
           case 78: 
-            { return ELSEIF;
+            { return BREAK;
             } 
             // fall through
           case 168: break;
           case 79: 
-            { return STATIC;
+            { return ELSEIF;
             } 
             // fall through
           case 169: break;
           case 80: 
-            { return STRING;
+            { return STATIC;
             } 
             // fall through
           case 170: break;
           case 81: 
-            { return STRUCT;
+            { return STRING;
             } 
             // fall through
           case 171: break;
           case 82: 
-            { return PUBLIC;
+            { return STRUCT;
             } 
             // fall through
           case 172: break;
           case 83: 
-            { return RETURN;
+            { return PUBLIC;
             } 
             // fall through
           case 173: break;
           case 84: 
-            { return DOUBLE;
+            { return RETURN;
             } 
             // fall through
           case 174: break;
           case 85: 
-            { return PRIVATE;
+            { return DOUBLE;
             } 
             // fall through
           case 175: break;
           case 86: 
-            { return FUNCTOR;
+            { return PRIVATE;
             } 
             // fall through
           case 176: break;
           case 87: 
-            { return PROTOCOL;
+            { return FUNCTOR;
             } 
             // fall through
           case 177: break;

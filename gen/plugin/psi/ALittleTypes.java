@@ -194,7 +194,7 @@ public interface ALittleTypes {
   IElementType PLUS_PLUS = new ALittleTokenType("++");
   IElementType PRIVATE = new ALittleTokenType("private");
   IElementType PROTECTED = new ALittleTokenType("protected");
-  IElementType PROTOCOL = new ALittleTokenType("protocol");
+  IElementType PROTO = new ALittleTokenType("proto");
   IElementType PUBLIC = new ALittleTokenType("public");
   IElementType QUOTE = new ALittleTokenType("\"");
   IElementType QUOTIENT = new ALittleTokenType("/");

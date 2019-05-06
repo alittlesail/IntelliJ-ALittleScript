@@ -146,7 +146,7 @@ struct_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructVarNameD
 
 // 枚举描述
 enum_dec ::= access_modifier? enum_protocol_dec? enum enum_name_dec LBRACE (enum_var_dec (COMMA enum_var_dec)* COMMA?)? RBRACE {pin=3}
-enum_protocol_dec ::= protocol
+enum_protocol_dec ::= proto
 enum_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleEnumNameDecElementImpl"
                              implements="plugin.psi.ALittleEnumNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 enum_var_dec ::= enum_var_name_dec (ASSIGN enum_var_value_dec)? {pin=1}

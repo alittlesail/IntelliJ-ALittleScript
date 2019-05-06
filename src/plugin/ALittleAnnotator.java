@@ -151,6 +151,35 @@ public class ALittleAnnotator implements Annotator {
                 }
             }
             if (count >= 2) error = "枚举字段名重复";
+        } else if (element instanceof ALittleAllType) {
+            ALittleAllType all_type = (ALittleAllType)element;
+            do
+            {
+                if (!(all_type.getParent() instanceof ALittleStructVarDec))
+                    break;
+                ALittleStructVarDec var_dec = (ALittleStructVarDec)element.getParent();
+                ALittleStructDec struct_dec = (ALittleStructDec)var_dec.getParent();
+                if (struct_dec.getStructProtocolDec() == null) break;
+
+                ALittleStructNameDec name_dec = struct_dec.getStructNameDec();
+                if (name_dec == null) {
+                    error = "没有定义协议名";
+                    break;
+                }
+
+                String message_name = name_dec.getText();
+
+                String type = all_type.getText();
+                type = type.replace(" ", "");
+                if (type.equals("any")
+                    || type.contains("<any")
+                    || type.contains("any>"))
+                {
+                    error = "协议字段不支持any类型:" + message_name;
+                    break;
+                }
+
+            } while (false);
         }
 
         if (error != null && holder != null && element != null) {

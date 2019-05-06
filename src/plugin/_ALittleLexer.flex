@@ -93,7 +93,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "static"              { return STATIC; }
   "struct"              { return STRUCT; }
   "enum"                { return ENUM; }
-  "protocol"            { return PROTOCOL; }
+  "proto"               { return PROTO; }
   "public"              { return PUBLIC; }
   "private"             { return PRIVATE; }
   "protected"           { return PROTECTED; }
