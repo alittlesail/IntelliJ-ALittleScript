@@ -167,6 +167,7 @@ public interface ALittleTypes {
   IElementType GET = new ALittleTokenType("get");
   IElementType GREATER = new ALittleTokenType(">");
   IElementType GREATER_OR_EQUAL = new ALittleTokenType(">=");
+  IElementType I64 = new ALittleTokenType("I64");
   IElementType ID_CONTENT = new ALittleTokenType("ID_CONTENT");
   IElementType IF = new ALittleTokenType("if");
   IElementType IN = new ALittleTokenType("in");

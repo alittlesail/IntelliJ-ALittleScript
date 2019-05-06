@@ -238,7 +238,7 @@ generic_functor_param_type ::= all_type (COMMA all_type)*
 generic_functor_return_type ::=  COLON all_type (COMMA all_type)*
 
 // 基本类型
-primitive_type ::= bool | double | int | any | string {mixin="plugin.psi.impl.ALittlePrimitiveTypeElementImpl"
+primitive_type ::= bool | double | int | I64 | any | string {mixin="plugin.psi.impl.ALittlePrimitiveTypeElementImpl"
                                                       implements="plugin.psi.ALittlePrimitiveTypeElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 
 //运算符，值越低，优先级越高///////////////////////////////////////////////////////////////////

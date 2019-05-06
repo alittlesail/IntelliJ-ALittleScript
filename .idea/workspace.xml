@@ -13,7 +13,53 @@
     <option name="isMigrated" value="true" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/plugin/ALittleParserDefinition.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="480">
+              <caret line="40" column="12" lean-forward="true" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="12" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/plugin/_ALittleLexer.flex">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="480">
+              <caret line="39" column="42" lean-forward="true" selection-start-line="39" selection-start-column="42" selection-end-line="39" selection-end-column="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="393">
+              <caret line="247" column="47" selection-start-line="247" selection-start-column="47" selection-end-line="247" selection-end-column="47" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="313">
+              <caret line="474" column="70" lean-forward="true" selection-start-line="474" selection-start-column="70" selection-end-line="474" selection-end-column="70" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="388">
+              <caret line="1620" column="9" lean-forward="true" selection-start-line="1620" selection-start-column="9" selection-end-line="1620" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -26,9 +72,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Assign</find>
-      <find>ALittleCustomTypeNamespaceNameDec</find>
-      <find>op</find>
       <find>ALittlePropertyValueCustomType</find>
       <find>{}</find>
       <find>else if</find>
@@ -56,6 +99,9 @@
       <find>Struct</find>
       <find>GenerateLua</find>
       <find>Script</find>
+      <find>int</find>
+      <find>Op</find>
+      <find>&quot;int&quot;</find>
     </findStrings>
     <replaceStrings>
       <replace>all_expr</replace>
@@ -106,9 +152,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/resources/std/Lua/table.alittle" />
-        <option value="$PROJECT_DIR$/resources/std/Lua/bit.alittle" />
-        <option value="$PROJECT_DIR$/resources/std/coroutine.alittle" />
         <option value="$PROJECT_DIR$/resources/std/math.alittle" />
         <option value="$PROJECT_DIR$/resources/std/os.alittle" />
         <option value="$PROJECT_DIR$/resources/std/package.alittle" />
@@ -149,14 +192,17 @@
         <option value="$PROJECT_DIR$/resources/std/ALittle/Bind.alittle" />
         <option value="$PROJECT_DIR$/resources/adapter/Javascript/Class.js" />
         <option value="$PROJECT_DIR$/resources/adapter/Javascript/Bind.js" />
-        <option value="$PROJECT_DIR$/src/plugin/ALittleUtil.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java" />
-        <option value="$PROJECT_DIR$/src/plugin/ALittleAnnotator.java" />
-        <option value="$PROJECT_DIR$/src/plugin/ALittle.bnf" />
-        <option value="$PROJECT_DIR$/src/plugin/ALittleParserDefinition.java" />
         <option value="$PROJECT_DIR$/resources/META-INF/plugin.xml" />
         <option value="$PROJECT_DIR$/src/plugin/action/ALittleGenerateLuaAction.java" />
+        <option value="$PROJECT_DIR$/src/plugin/ALittleParserDefinition.java" />
+        <option value="$PROJECT_DIR$/src/plugin/ALittleAnnotator.java" />
+        <option value="$PROJECT_DIR$/src/plugin/ALittleCompletionContributor.java" />
+        <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittleEnumVarNameDecElementImpl.java" />
+        <option value="$PROJECT_DIR$/src/plugin/ALittle.bnf" />
+        <option value="$PROJECT_DIR$/src/plugin/ALittleUtil.java" />
+        <option value="$PROJECT_DIR$/src/plugin/reference/ALittlePrimitiveTypeReference.java" />
       </list>
     </option>
   </component>
@@ -184,8 +230,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -212,6 +256,8 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -222,7 +268,7 @@
     <property name="$PROJECT_DIR$/src/ALittle.g4::/output-dir" value="D:\ALittle2\Client\Win32\bin\Module\ALittleScript\Other\ALittleScript\src" />
     <property name="$PROJECT_DIR$/src/ALittle.g4::/package" value="antlr" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553049610453" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/plugin" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.33989638" />
@@ -312,6 +358,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20522387" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -608,13 +655,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="441">
-          <caret line="148" column="27" selection-start-line="148" selection-start-column="27" selection-end-line="148" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gen/plugin/_ALittleLexer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="201">
@@ -622,38 +662,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/_ALittleLexer.flex">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="27" column="28" lean-forward="true" selection-start-line="27" selection-start-column="28" selection-end-line="27" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/resources/META-INF/plugin.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
           <caret line="19" column="33" lean-forward="true" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="1682" column="14" lean-forward="true" selection-start-line="1682" selection-start-column="14" selection-end-line="1682" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="373">
-          <caret line="192" column="28" selection-start-line="192" selection-start-column="28" selection-end-line="192" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleParserDefinition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="23" column="30" selection-start-line="23" selection-start-column="30" selection-end-line="23" selection-end-column="30" />
         </state>
       </provider>
     </entry>
@@ -682,6 +694,41 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="358">
           <caret line="110" column="29" lean-forward="true" selection-start-line="110" selection-start-column="29" selection-end-line="110" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleParserDefinition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="40" column="12" lean-forward="true" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/_ALittleLexer.flex">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="39" column="42" lean-forward="true" selection-start-line="39" selection-start-column="42" selection-end-line="39" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="393">
+          <caret line="247" column="47" selection-start-line="247" selection-start-column="47" selection-end-line="247" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="474" column="70" lean-forward="true" selection-start-line="474" selection-start-column="70" selection-end-line="474" selection-end-column="70" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="388">
+          <caret line="1620" column="9" lean-forward="true" selection-start-line="1620" selection-start-column="9" selection-end-line="1620" selection-end-column="9" />
         </state>
       </provider>
     </entry>

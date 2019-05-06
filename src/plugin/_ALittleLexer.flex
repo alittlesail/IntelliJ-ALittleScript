@@ -113,6 +113,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "bool"                { return BOOL; }
   "double"              { return DOUBLE; }
   "int"                 { return INT; }
+  "I64"                 { return I64; }
   "any"                 { return ANY; }
   "string"              { return STRING; }
   "true"                { return TRUE; }

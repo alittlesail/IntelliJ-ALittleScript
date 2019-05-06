@@ -57,6 +57,7 @@ public class ALittlePrimitiveTypeReference extends PsiReferenceBase<PsiElement> 
     public Object[] getVariants() {
         List<LookupElement> variants = new ArrayList<>();
         variants.add(LookupElementBuilder.create("int"));
+        variants.add(LookupElementBuilder.create("I64"));
         variants.add(LookupElementBuilder.create("double"));
         variants.add(LookupElementBuilder.create("bool"));
         variants.add(LookupElementBuilder.create("string"));

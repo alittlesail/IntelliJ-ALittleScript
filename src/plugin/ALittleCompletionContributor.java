@@ -11,7 +11,7 @@ import plugin.psi.*;
 public class ALittleCompletionContributor extends CompletionContributor {
 
     static String[] KEYWORD_LIST = new String[] {
-            "int","double","bool","string","void","var","List","Map"
+            "int","I64","double","bool","string","void","var","List","Map"
             ,"namespace","class","struct","enum"
             ,"for","do","while","break","return"
             ,"get","set","fun","static","Ctor","Functor"

@@ -2210,7 +2210,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // bool | double | int | any | string
+  // bool | double | int | I64 | any | string
   public static boolean primitive_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "primitive_type")) return false;
     boolean r;
@@ -2218,6 +2218,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, BOOL);
     if (!r) r = consumeToken(b, DOUBLE);
     if (!r) r = consumeToken(b, INT);
+    if (!r) r = consumeToken(b, I64);
     if (!r) r = consumeToken(b, ANY);
     if (!r) r = consumeToken(b, STRING);
     exit_section_(b, l, m, r, false, null);

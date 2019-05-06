@@ -4,14 +4,11 @@ import com.intellij.execution.process.ConsoleHighlighter;
 import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lang.annotation.*;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueBrackValueStatReference;
 import plugin.reference.ALittlePropertyValueMethodCallStatReference;
-import plugin.reference.ALittleReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -550,8 +547,10 @@ public class ALittleAnnotator implements Annotator {
                 if (step_expr.getForStartStat() == null) break;
 
                 ALittleAllType all_type = step_expr.getForStartStat().getForPairDec().getAllType();
-                if (all_type.getPrimitiveType() == null || !all_type.getPrimitiveType().getText().equals("int")) {
-                    error = "这个变量必须是int类型";
+                if (all_type.getPrimitiveType() == null
+                    || (!all_type.getPrimitiveType().getText().equals("int")
+                    && !all_type.getPrimitiveType().getText().equals("I64"))) {
+                    error = "这个变量必须是int或I64类型";
                     element = step_expr.getForStartStat().getForPairDec().getVarAssignNameDec();
                     break;
                 }
@@ -574,8 +573,8 @@ public class ALittleAnnotator implements Annotator {
                     break;
                 }
 
-                if (!guess_string.equals("int") && !guess_string.equals("double") && !guess_string.equals("any")) {
-                    error = "等号右边的表达式类型必须是int,double,any, 不能是:" + guess_string;
+                if (!guess_string.equals("int") && !guess_string.equals("I64") && !guess_string.equals("double") && !guess_string.equals("any")) {
+                    error = "等号右边的表达式类型必须是int,I64,double,any, 不能是:" + guess_string;
                     element = value_stat;
                     break;
                 }
@@ -600,8 +599,8 @@ public class ALittleAnnotator implements Annotator {
                     break;
                 }
 
-                if (!guess_string.equals("int") && !guess_string.equals("double") && !guess_string.equals("any")) {
-                    error = "结束表达式类型必须是int,double,any, 不能是:" + guess_string;
+                if (!guess_string.equals("int") && !guess_string.equals("I64") && !guess_string.equals("double") && !guess_string.equals("any")) {
+                    error = "结束表达式类型必须是int,I64,double,any, 不能是:" + guess_string;
                     element = value_stat;
                     break;
                 }
@@ -626,8 +625,8 @@ public class ALittleAnnotator implements Annotator {
                     break;
                 }
 
-                if (!guess_string.equals("int") && !guess_string.equals("double") && !guess_string.equals("any")) {
-                    error = "步长表达式类型必须是int,double,any, 不能是:" + guess_string;
+                if (!guess_string.equals("int") && !guess_string.equals("I64") && !guess_string.equals("double") && !guess_string.equals("any")) {
+                    error = "步长表达式类型必须是int,I64,double,any, 不能是:" + guess_string;
                     element = value_stat;
                     break;
                 }
@@ -656,8 +655,10 @@ public class ALittleAnnotator implements Annotator {
                         break;
                     }
                     ALittleAllType all_type = pair_dec_list.get(0).getAllType();
-                    if (all_type.getPrimitiveType() == null || !all_type.getPrimitiveType().getText().equals("int")) {
-                        error = "这个变量必须是int类型";
+                    if (all_type.getPrimitiveType() == null
+                        || (!all_type.getPrimitiveType().getText().equals("int")
+                        && !all_type.getPrimitiveType().getText().equals("I64"))) {
+                        error = "这个变量必须是int或I64类型";
                         element = all_type;
                         break;
                     }
@@ -762,7 +763,7 @@ public class ALittleAnnotator implements Annotator {
                 break;
             }
             ALittleGenericType generic_type = (ALittleGenericType) pre_type;
-            // 如果是列表那么value_stat必须是一个int，double，any
+            // 如果是列表那么value_stat必须是一个int，I64，double，any
             if (generic_type.getGenericListType() != null) {
                 List<String> error_content_list = new ArrayList<>();
                 List<PsiElement> error_element_list = new ArrayList<>();
@@ -779,8 +780,8 @@ public class ALittleAnnotator implements Annotator {
                     break;
                 }
 
-                if (!guess_string.equals("int") && !guess_string.equals("double") && !guess_string.equals("any")) {
-                    error = "步长表达式类型必须是int,double,any, 不能是:" + guess_string;
+                if (!guess_string.equals("int") && !guess_string.equals("I64") && !guess_string.equals("double") && !guess_string.equals("any")) {
+                    error = "步长表达式类型必须是int,I64,double,any, 不能是:" + guess_string;
                     element = value_stat;
                     break;
                 }

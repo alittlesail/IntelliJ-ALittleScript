@@ -971,8 +971,8 @@ public class ALittleUtil {
         if (op_string.equals("==") || op_string.equals("!=")) {
             return op_6_suffix;
         } else {
-            if (left_guess_type_name.equals("int") || left_guess_type_name.equals("double")) {
-                if (right_guess_type_name.equals("int") || right_guess_type_name.equals("double")) {
+            if (left_guess_type_name.equals("int") || left_guess_type_name.equals("I64") || left_guess_type_name.equals("double")) {
+                if (right_guess_type_name.equals("int") || right_guess_type_name.equals("I64") || right_guess_type_name.equals("double")) {
                     return op_6_suffix;
                 }
 
@@ -1052,14 +1052,14 @@ public class ALittleUtil {
         if (right_guess_type_name.equals("any")) return right_guess;
 
 
-        boolean left_check = left_guess_type_name.equals("int") || left_guess_type_name.equals("double") ||  left_guess_type_name.equals("string");
+        boolean left_check = left_guess_type_name.equals("int") || left_guess_type_name.equals("I64") || left_guess_type_name.equals("double") ||  left_guess_type_name.equals("string");
         if (!left_check) {
             error_content_list.add(op_string + "运算符左边必须是int,double,string,any类型.不能是:" + left_guess_type_name);
             error_element_list.add(left_src);
             return null;
         }
 
-        boolean right_check = right_guess_type_name.equals("int") || right_guess_type_name.equals("double") ||  right_guess_type_name.equals("string");
+        boolean right_check = right_guess_type_name.equals("int") || right_guess_type_name.equals("I64") || right_guess_type_name.equals("double") ||  right_guess_type_name.equals("string");
         if (!right_check) {
             error_content_list.add(op_string + "运算符右边必须是int,double,string,any类型.不能是:" + right_guess_type_name);
             error_element_list.add(right_src);
@@ -1121,8 +1121,8 @@ public class ALittleUtil {
         if (left_guess_type_name.equals("any")) return left_guess;
         if (right_guess_type_name.equals("any")) return right_guess;
 
-        if (left_guess_type_name.equals("int")) {
-            if (right_guess_type_name.equals("int")) {
+        if (left_guess_type_name.equals("int") || left_guess_type_name.equals("I64")) {
+            if (right_guess_type_name.equals("int") || right_guess_type_name.equals("I64")) {
                 return left_guess;
             } else if (right_guess_type_name.equals("double")) {
                 return right_guess;
@@ -1134,7 +1134,7 @@ public class ALittleUtil {
         }
 
         if (left_guess_type_name.equals("double")) {
-            if (right_guess_type_name.equals("int")) {
+            if (right_guess_type_name.equals("int") || right_guess_type_name.equals("I64")) {
                 return left_guess;
             } else if (right_guess_type_name.equals("double")) {
                 return right_guess;
@@ -1214,8 +1214,8 @@ public class ALittleUtil {
         if (left_guess_type_name.equals("any")) return left_guess;
         if (right_guess_type_name.equals("any")) return right_guess;
 
-        if (left_guess_type_name.equals("int")) {
-            if (right_guess_type_name.equals("int")) {
+        if (left_guess_type_name.equals("int") || left_guess_type_name.equals("I64")) {
+            if (right_guess_type_name.equals("int") || right_guess_type_name.equals("I64")) {
                 // 这个是特殊的
                 if (op_string.equals("/")) {
                     return op_3_suffix;
@@ -1231,7 +1231,7 @@ public class ALittleUtil {
         }
 
         if (left_guess_type_name.equals("double")) {
-            if (right_guess_type_name.equals("int")) {
+            if (right_guess_type_name.equals("int") || right_guess_type_name.equals("I64")) {
                 return left_guess;
             } else if (right_guess_type_name.equals("double")) {
                 return right_guess;
@@ -1494,7 +1494,7 @@ public class ALittleUtil {
             }
             // guess_type必须是数字
         } else if (op_2.equals("-")) {
-            if (!guess_string.equals("int") && !guess_string.equals("double") && !guess_string.equals("any")) {
+            if (!guess_string.equals("int") && !guess_string.equals("I64") && !guess_string.equals("double") && !guess_string.equals("any")) {
                 error_content_list.add("-运算符右边必须是int,double,any类型.不能是:" + guess_string);
                 error_element_list.add(value_factor);
                 return null;
@@ -1606,8 +1606,8 @@ public class ALittleUtil {
             return false;
         }
 
-        if (left_name.equals("int") || left_name.equals("double")) {
-            if (right_name.equals("int") || right_name.equals("double")) return true;
+        if (left_name.equals("int") || left_name.equals("I64") || left_name.equals("double")) {
+            if (right_name.equals("int") || right_name.equals("I64") || right_name.equals("double")) return true;
             error_content_list.add("要求是int,double,不能是:" + right_name);
             error_element_list.add(src_right);
             return false;
