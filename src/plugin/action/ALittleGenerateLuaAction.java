@@ -70,6 +70,12 @@ public class ALittleGenerateLuaAction extends AnAction {
         File root_file_path = new File(root_path);
         root_file_path.mkdirs();
 
+        // 删除根目录并重新创建
+        root_path = project.getBasePath() + "/Protocol";
+        delFolder(root_path);
+        root_file_path = new File(root_path);
+        root_file_path.mkdirs();
+
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(project));
 
         Messages.showMessageDialog(project, "开始执行lua代码生成", "提示", Messages.getInformationIcon());
