@@ -57,6 +57,12 @@ public class ALittleNamespaceDecImpl extends ASTWrapperPsiElement implements ALi
   }
 
   @Override
+  @Nullable
+  public ALittleNamespaceRegisterDec getNamespaceRegisterDec() {
+    return findChildByClass(ALittleNamespaceRegisterDec.class);
+  }
+
+  @Override
   @NotNull
   public List<ALittleStructDec> getStructDecList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleStructDec.class);

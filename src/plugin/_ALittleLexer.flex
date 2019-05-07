@@ -83,6 +83,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "\""                  { return QUOTE; }
   "\\"                  { return BACK; }
   "namespace"           { return NAMESPACE; }
+  "register"            { return REGISTER; }
   "instance"            { return INSTANCE; }
   "new"                 { return NEW; }
   "class"               { return CLASS; }

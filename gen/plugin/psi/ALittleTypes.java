@@ -66,6 +66,7 @@ public interface ALittleTypes {
   IElementType METHOD_RETURN_TYPE_DEC = new ALittleElementType("METHOD_RETURN_TYPE_DEC");
   IElementType NAMESPACE_DEC = new ALittleElementType("NAMESPACE_DEC");
   IElementType NAMESPACE_NAME_DEC = new ALittleElementType("NAMESPACE_NAME_DEC");
+  IElementType NAMESPACE_REGISTER_DEC = new ALittleElementType("NAMESPACE_REGISTER_DEC");
   IElementType OP_1 = new ALittleElementType("OP_1");
   IElementType OP_1_EXPR = new ALittleElementType("OP_1_EXPR");
   IElementType OP_2 = new ALittleElementType("OP_2");
@@ -202,6 +203,7 @@ public interface ALittleTypes {
   IElementType QUOTIENT_ASSIGN = new ALittleTokenType("/=");
   IElementType RBRACE = new ALittleTokenType("}");
   IElementType RBRACK = new ALittleTokenType("]");
+  IElementType REGISTER = new ALittleTokenType("register");
   IElementType REMAINDER = new ALittleTokenType("%");
   IElementType REMAINDER_ASSIGN = new ALittleTokenType("%=");
   IElementType RETURN = new ALittleTokenType("return");
@@ -397,6 +399,9 @@ public interface ALittleTypes {
       }
       else if (type == NAMESPACE_NAME_DEC) {
         return new ALittleNamespaceNameDecImpl(node);
+      }
+      else if (type == NAMESPACE_REGISTER_DEC) {
+        return new ALittleNamespaceRegisterDecImpl(node);
       }
       else if (type == OP_1) {
         return new ALittleOp1Impl(node);

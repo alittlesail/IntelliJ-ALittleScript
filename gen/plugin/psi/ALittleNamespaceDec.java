@@ -22,6 +22,9 @@ public interface ALittleNamespaceDec extends PsiElement {
   @Nullable
   ALittleNamespaceNameDec getNamespaceNameDec();
 
+  @Nullable
+  ALittleNamespaceRegisterDec getNamespaceRegisterDec();
+
   @NotNull
   List<ALittleStructDec> getStructDecList();
 

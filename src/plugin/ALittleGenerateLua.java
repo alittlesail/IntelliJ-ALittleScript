@@ -129,7 +129,13 @@ public class ALittleGenerateLua {
         if (namespace_list.size() > 1) {
             return "代码生成失败 每个文件只有有一个命名域";
         }
-        String content = GenerateNamespace(namespace_list.get(0));
+        // 如果命名域有register标记，那么就不需要生成
+        ALittleNamespaceDec namespace_dec = namespace_list.get(0);
+        if (namespace_dec.getNamespaceRegisterDec() != null) {
+            return null;
+        }
+
+        String content = GenerateNamespace(namespace_dec);
         if (content == null) return m_error;
 
         String protocol_content = null;
@@ -160,25 +166,22 @@ public class ALittleGenerateLua {
 
             String std_path = "Script";
 
+            if (!lua_rel_path.startsWith("src")) {
+                return "不支持该目录下的文件生成:" + file_path;
+            }
+
             // 如果模块名是引擎库，那么需要做特殊处理
             if (module_name.equals("AEngine")) {
-                if (!lua_rel_path.startsWith("src/Engine")) {
-                    // 这个目录下不需要生成lua
-                    return null;
-                }
                 // AEngine的工程文件在：集成开发环境安装目录/Module/ALittleIDE/Other/AEngine/AEngine.iml
                 // 目标的目录是是在：集成开发环境安装目录/Engine
-                lua_rel_path = "../../../../Engine" + lua_rel_path.substring("src/Engine".length());
+                lua_rel_path = "../../../../Engine" + lua_rel_path.substring("src".length());
                 protocol_rel_path = null;
                 std_path = "../../../../Engine";
             } else {
-                if (lua_rel_path.startsWith("src")) {
-                    lua_rel_path = "Script" + lua_rel_path.substring("src".length());
-                    protocol_rel_path = "Protocol" + protocol_rel_path.substring("src".length());
-                } else {
-                    return "不支持该目录下的文件生成:" + file_path;
-                }
+                lua_rel_path = "Script" + lua_rel_path.substring("src".length());
+                protocol_rel_path = "Protocol" + protocol_rel_path.substring("src".length());
             }
+
             String ext = "alittle";
             if (!lua_rel_path.endsWith(ext)) {
                 return "要生成的代码文件后缀名必须是alittle:" + file_path;

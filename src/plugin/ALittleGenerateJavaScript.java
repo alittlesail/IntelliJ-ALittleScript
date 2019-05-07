@@ -130,7 +130,12 @@ public class ALittleGenerateJavaScript {
         if (namespace_list.size() > 1) {
             return "代码生成失败 每个文件只有有一个命名域";
         }
-        String content = GenerateNamespace(namespace_list.get(0));
+        // 如果命名域有register标记，那么就不需要生成
+        ALittleNamespaceDec namespace_dec = namespace_list.get(0);
+        if (namespace_dec.getNamespaceRegisterDec() != null) {
+            return null;
+        }
+        String content = GenerateNamespace(namespace_dec);
         if (content == null) return m_error;
 
         String protocol_content = null;
@@ -156,38 +161,35 @@ public class ALittleGenerateJavaScript {
             if (!file_path.startsWith(module_base_path)) {
                 return "当前文件不在模块路径下:" + file_path;
             }
-            String rel_path = file_path.substring(module_base_path.length());
+            String js_rel_path = file_path.substring(module_base_path.length());
             String protocol_rel_path = file_path.substring(module_base_path.length());
 
             String std_path = "JavaScript";
 
+            if (!js_rel_path.startsWith("src")) {
+                return "不支持该目录下的文件生成:" + file_path;
+            }
+
             // 如果模块名是引擎库，那么需要做特殊处理
             if (module_name.equals("AEngine")) {
-                if (!rel_path.startsWith("src/Engine")) {
-                    // 这个目录下不需要生成lua
-                    return null;
-                }
                 // AEngine的工程文件在：集成开发环境安装目录/Module/ALittleIDE/Other/AEngine/AEngine.iml
                 // 目标的目录是是在：集成开发环境安装目录/Engine
-                rel_path = "../../../../JEngine" + rel_path.substring("src/Engine".length());
+                js_rel_path = "../../../../JEngine" + js_rel_path.substring("src".length());
                 protocol_rel_path = null;
                 std_path = "../../../../JEngine";
             } else {
-                if (rel_path.startsWith("src")) {
-                    rel_path = "JavaScript" + rel_path.substring("src".length());
-                    protocol_rel_path = "Protocol" + protocol_rel_path.substring("src".length());
-                } else {
-                    return "不支持该目录下的文件生成:" + file_path;
-                }
+                js_rel_path = "JavaScript" + js_rel_path.substring("src".length());
+                protocol_rel_path = "Protocol" + protocol_rel_path.substring("src".length());
             }
+
             String ext = "alittle";
-            if (!rel_path.endsWith(ext)) {
+            if (!js_rel_path.endsWith(ext)) {
                 return "要生成的代码文件后缀名必须是alittle:" + file_path;
             }
-            rel_path = rel_path.substring(0, rel_path.length() - ext.length()) + "js";
+            js_rel_path = js_rel_path.substring(0, js_rel_path.length() - ext.length()) + "js";
             if (protocol_rel_path != null)
                 protocol_rel_path = protocol_rel_path.substring(0, protocol_rel_path.length() - ext.length()) + "json";
-            String full_path = module_base_path + rel_path;
+            String full_path = module_base_path + js_rel_path;
             File file = new File(full_path);
             boolean result = file.getParentFile().mkdirs();
             FileOutputStream file_out = new FileOutputStream(new File(full_path));

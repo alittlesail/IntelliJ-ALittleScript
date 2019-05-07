@@ -1367,35 +1367,43 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // namespace namespace_name_dec SEMI (global_method_dec | class_dec | enum_dec | struct_dec | instance_dec)*
+  // namespace_register_dec? namespace namespace_name_dec SEMI (global_method_dec | class_dec | enum_dec | struct_dec | instance_dec)*
   public static boolean namespace_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "namespace_dec")) return false;
-    if (!nextTokenIs(b, NAMESPACE)) return false;
+    if (!nextTokenIs(b, "<namespace dec>", NAMESPACE, REGISTER)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, NAMESPACE_DEC, null);
-    r = consumeToken(b, NAMESPACE);
-    p = r; // pin = 1
+    Marker m = enter_section_(b, l, _NONE_, NAMESPACE_DEC, "<namespace dec>");
+    r = namespace_dec_0(b, l + 1);
+    r = r && consumeToken(b, NAMESPACE);
+    p = r; // pin = 2
     r = r && report_error_(b, namespace_name_dec(b, l + 1));
     r = p && report_error_(b, consumeToken(b, SEMI)) && r;
-    r = p && namespace_dec_3(b, l + 1) && r;
+    r = p && namespace_dec_4(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
+  // namespace_register_dec?
+  private static boolean namespace_dec_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "namespace_dec_0")) return false;
+    namespace_register_dec(b, l + 1);
+    return true;
+  }
+
   // (global_method_dec | class_dec | enum_dec | struct_dec | instance_dec)*
-  private static boolean namespace_dec_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "namespace_dec_3")) return false;
+  private static boolean namespace_dec_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "namespace_dec_4")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!namespace_dec_3_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "namespace_dec_3", c)) break;
+      if (!namespace_dec_4_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "namespace_dec_4", c)) break;
     }
     return true;
   }
 
   // global_method_dec | class_dec | enum_dec | struct_dec | instance_dec
-  private static boolean namespace_dec_3_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "namespace_dec_3_0")) return false;
+  private static boolean namespace_dec_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "namespace_dec_4_0")) return false;
     boolean r;
     r = global_method_dec(b, l + 1);
     if (!r) r = class_dec(b, l + 1);
@@ -1414,6 +1422,18 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, ID_CONTENT);
     exit_section_(b, m, NAMESPACE_NAME_DEC, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // register
+  public static boolean namespace_register_dec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "namespace_register_dec")) return false;
+    if (!nextTokenIs(b, REGISTER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, REGISTER);
+    exit_section_(b, m, NAMESPACE_REGISTER_DEC, r);
     return r;
   }
 

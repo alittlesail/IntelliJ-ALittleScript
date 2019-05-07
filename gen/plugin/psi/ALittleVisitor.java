@@ -239,6 +239,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitNamespaceNameDecElement(o);
   }
 
+  public void visitNamespaceRegisterDec(@NotNull ALittleNamespaceRegisterDec o) {
+    visitPsiElement(o);
+  }
+
   public void visitOp1(@NotNull ALittleOp1 o) {
     visitPsiElement(o);
   }

@@ -74,7 +74,8 @@
 alittleFile ::= namespace_dec?
 
 // 命名域
-namespace_dec ::= namespace namespace_name_dec SEMI (global_method_dec | class_dec | enum_dec | struct_dec | instance_dec)* {pin=1}
+namespace_dec ::= namespace_register_dec? namespace namespace_name_dec SEMI (global_method_dec | class_dec | enum_dec | struct_dec | instance_dec)* {pin=2}
+namespace_register_dec ::= register
 namespace_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleNamespaceNameDecElementImpl"
                                     implements="plugin.psi.ALittleNamespaceNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 
