@@ -61,3 +61,17 @@ public static tostring(value:any) : string {}
 // the number can have a decimal part, as well as an optional exponent part (see §2.1).
 // In other bases, only unsigned integers are accepted.
 public static tonumber(value:any) : double {}
+
+// Allows a program to traverse all fields of a table.
+// Its first argument is a table and its second argument is an index in this table.
+// next returns the next index of the table and its associated value.
+// When called with nil as its second argument, next returns an initial index and its associated value.
+// When called with the last index, or with nil in an empty table, next returns nil.
+// If the second argument is absent, then it is interpreted as nil.
+// In particular, you can use next(t) to check whether a table is empty.
+
+// The order in which the indices are enumerated is not specified, even for numeric indices.
+// (To traverse a table in numeric order, use a numerical for or the ipairs function.)
+// The behavior of next is undefined if, during the traversal, you assign any value to a non-existent field in the table.
+// You may however modify existing fields. In particular, you may clear existing fields.
+public static next(value:any) : any {}
