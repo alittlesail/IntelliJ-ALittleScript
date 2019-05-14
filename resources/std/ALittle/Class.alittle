@@ -9,7 +9,7 @@ public static GetClassName(object:any) {}
 // 是否是某个类
 public static InstanceOf(table:any, clazz:any) : bool {}
 
-// 把表设置成弱引用
+// 把表设置成弱引用，目前对lua有效，对javascript无效
 public static SetWeak(table:any, key:bool, value:bool) { }
 
 // 创建一张表

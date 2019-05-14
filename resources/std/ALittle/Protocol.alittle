@@ -1,0 +1,7 @@
+namespace ALittle;
+
+struct ResultJson
+{
+    result:bool;
+    reason:string;
+}
