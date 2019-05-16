@@ -1,13 +1,23 @@
 namespace ALittle;
 
 // 是否是类
-public static IsClass(table:any) : bool {}
+public static IsClass(object:any) : bool {}
+
+// 创建对象
+public static NewObject(clazz:any) : any {}
 
 // 获取类名
-public static GetClassName(object:any) {}
+public static GetClassName(object:any) : string {}
+
+// 获取类
+public static GetClass(object:any) : any {}
+// 获取类的getter函数名称集合
+public static GetClassGetter(clazz:any) : List<string> {}
+// 获取类的setter函数名称集合
+public static GetClassSetter(clazz:any) : List<string> {}
 
 // 是否是某个类
-public static InstanceOf(table:any, clazz:any) : bool {}
+public static InstanceOf(object:any, clazz:any) : bool {}
 
 // 把表设置成弱引用，目前对lua有效，对javascript无效
 public static SetWeak(table:any, key:bool, value:bool) { }

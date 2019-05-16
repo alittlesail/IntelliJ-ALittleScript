@@ -236,11 +236,39 @@ ALittle.IsClass = function(object)
     return object.__class != null && object.__class != undefined;
 }
 
+// 创建对象
+ALittle.NewObject = function(clazz)
+{
+    return new clazz;
+}
+
 // 获取类名
 ALittle.GetClassName = function(object)
 {
     if (!ALittle.IsClass(object)) return null;
     return object.__class.__name;
+}
+
+// 获取类
+ALittle.GetClass = function(object)
+{
+    return object.__class;
+}
+// 获取类的getter集合
+ALittle.GetClassGetter = function(clazz)
+{
+    let list = [];
+    for (let name in clazz.__getter)
+        list.push(name);
+    return list;
+}
+// 获取类的setter集合
+ALittle.GetClassSetter = function(clazz)
+{
+    let list = [];
+    for (let name in clazz.__setter)
+        list.push(name);
+    return list;
 }
 
 // 创建一张空表

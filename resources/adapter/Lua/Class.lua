@@ -217,10 +217,40 @@ function IsClass(object)
     return object.__class ~= nil    
 end
 
+-- 创建对象
+function NewObject(clazz)
+    return clazz();
+end
+
 -- 获取类名
 function GetClassName(object)
     if (not IsClass(object)) return null end
     return object.__class.__name
+end
+
+// 获取类
+function GetClass(object)
+    return object.__class;
+end
+// 获取类的getter集合
+function GetClassGetter(clazz)
+    local list = {};
+    local count = 0;
+    for k, v in pairs(clazz.__getter) do
+        count = count + 1;
+        list[count] = k;
+    end
+    return list;
+end
+// 获取类的setter集合
+function GetClassSetter(clazz)
+    local list = {};
+    local count = 0;
+    for k, v in pairs(clazz.__setter) do
+        count = count + 1;
+        list[count] = k;
+    end
+    return list;
 end
 
 -- 创建一张空表
