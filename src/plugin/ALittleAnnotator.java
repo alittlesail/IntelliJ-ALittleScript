@@ -141,13 +141,16 @@ public class ALittleAnnotator implements Annotator {
             List<ALittleStructVarDec> var_dec_list = struct_dec.getStructVarDecList();
             int count = 0;
             for (ALittleStructVarDec var : var_dec_list) {
-                String name = var.getStructVarNameDec().getIdContent().getText();
-                if (name.equals(cur_name)) {
-                    ++ count;
-                    if (count >= 2) break;
+                ALittleStructVarNameDec var_name_dec = var.getStructVarNameDec();
+                if (var_name_dec != null) {
+                    String name = var_name_dec.getIdContent().getText();
+                    if (name.equals(cur_name)) {
+                        ++ count;
+                        if (count >= 2) break;
+                    }
                 }
             }
-            if (count >= 2) error = "枚举字段名重复";
+            if (count >= 2) error = "结构体字段名重复";
         } else if (element instanceof ALittleAllType) {
             ALittleAllType all_type = (ALittleAllType)element;
             do

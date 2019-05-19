@@ -6,7 +6,7 @@ class Package
     // A table used by require to control which modules are already loaded.
     // When you require a module modname and package.loaded[modname] is not false,
     // require simply returns the value stored there.
-    public loaded:Map<string, any>;
+    public Map<string, any> loaded;
 }
 
 protected instance package:Package = new Package();

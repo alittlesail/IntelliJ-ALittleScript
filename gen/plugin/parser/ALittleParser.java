@@ -388,16 +388,15 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? class_var_name_dec COLON all_type SEMI
+  // access_modifier? all_type class_var_name_dec SEMI
   public static boolean class_var_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_var_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_VAR_DEC, "<class var dec>");
     r = class_var_dec_0(b, l + 1);
-    r = r && class_var_name_dec(b, l + 1);
+    r = r && all_type(b, l + 1);
     p = r; // pin = 2
-    r = r && report_error_(b, consumeToken(b, COLON));
-    r = p && report_error_(b, all_type(b, l + 1)) && r;
+    r = r && report_error_(b, class_var_name_dec(b, l + 1));
     r = p && consumeToken(b, SEMI) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -1295,17 +1294,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // method_param_name_dec COLON method_param_type_dec
+  // method_param_type_dec method_param_name_dec
   public static boolean method_param_one_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "method_param_one_dec")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = method_param_name_dec(b, l + 1);
-    r = r && consumeToken(b, COLON);
-    r = r && method_param_type_dec(b, l + 1);
-    exit_section_(b, m, METHOD_PARAM_ONE_DEC, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, METHOD_PARAM_ONE_DEC, "<method param one dec>");
+    r = method_param_type_dec(b, l + 1);
+    p = r; // pin = 1
+    r = r && method_param_name_dec(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -2763,7 +2761,43 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? struct struct_name_dec (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec)? struct_protocol_dec? LBRACE (struct_var_dec)* RBRACE
+  // LBRACE (struct_var_dec)* RBRACE
+  static boolean struct_body_dec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_body_dec")) return false;
+    if (!nextTokenIs(b, LBRACE)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, LBRACE);
+    p = r; // pin = 1
+    r = r && report_error_(b, struct_body_dec_1(b, l + 1));
+    r = p && consumeToken(b, RBRACE) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (struct_var_dec)*
+  private static boolean struct_body_dec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_body_dec_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!struct_body_dec_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "struct_body_dec_1", c)) break;
+    }
+    return true;
+  }
+
+  // (struct_var_dec)
+  private static boolean struct_body_dec_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_body_dec_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = struct_var_dec(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // access_modifier? struct struct_name_dec (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec)? struct_protocol_dec? struct_body_dec
   public static boolean struct_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "struct_dec")) return false;
     boolean r;
@@ -2773,9 +2807,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = r && struct_name_dec(b, l + 1);
     r = r && struct_dec_3(b, l + 1);
     r = r && struct_dec_4(b, l + 1);
-    r = r && consumeToken(b, LBRACE);
-    r = r && struct_dec_6(b, l + 1);
-    r = r && consumeToken(b, RBRACE);
+    r = r && struct_body_dec(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -2831,27 +2863,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (struct_var_dec)*
-  private static boolean struct_dec_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_dec_6")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!struct_dec_6_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "struct_dec_6", c)) break;
-    }
-    return true;
-  }
-
-  // (struct_var_dec)
-  private static boolean struct_dec_6_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_dec_6_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = struct_var_dec(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
   /* ********************************************************** */
   // ID_CONTENT
   public static boolean struct_extends_name_dec(PsiBuilder b, int l) {
@@ -2904,16 +2915,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // struct_var_name_dec COLON all_type SEMI
+  // all_type struct_var_name_dec SEMI
   public static boolean struct_var_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "struct_var_dec")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, STRUCT_VAR_DEC, null);
-    r = struct_var_name_dec(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, STRUCT_VAR_DEC, "<struct var dec>");
+    r = all_type(b, l + 1);
     p = r; // pin = 1
-    r = r && report_error_(b, consumeToken(b, COLON));
-    r = p && report_error_(b, all_type(b, l + 1)) && r;
+    r = r && report_error_(b, struct_var_name_dec(b, l + 1));
     r = p && consumeToken(b, SEMI) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;

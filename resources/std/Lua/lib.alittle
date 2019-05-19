@@ -2,16 +2,16 @@
 namespace lua;
 
 // require a script
-public static require(path:string) {}
+public static require(string path) {}
 
 // Issues an error when the value of its argument v is false (i.e., nil or false);
 // otherwise, returns all its arguments. message is an error message; when absent, it defaults to "assertion failed!"
-public static assert(condition:any, msg:string) {}
+public static assert(any condition, string msg) {}
 
 // Returns the type of its only argument, coded as a string.
 // The possible results of this function are
 //    "nil" (a string, not the value nil), "number", "string", "boolean", "table", "function", "thread", and "userdata".
-public static type(object:any) : string {}
+public static type(any object) : string {}
 
 // This function is a generic interface to the garbage collector.
 // It performs different functions according to its first argument, opt:
@@ -28,7 +28,7 @@ public static type(object:any) : string {}
 //     Returns the previous value for pause.
 // "setstepmul": sets arg as the new value for the step multiplier of the collector (see §2.10).
 //     Returns the previous value for step.
-public static collectgarbage(cmd:string) {}
+public static collectgarbage(string cmd) {}
 
 // A global variable (not a function) that holds the global environment (that is, _G._G = _G).
 // Lua itself does not use this variable;
@@ -42,13 +42,13 @@ protected instance _G:G = new G();
 // Its first result is the status code (a boolean), which is true if the call succeeds without errors.
 // In such case, pcall also returns all results from the call, after this first result.
 // In case of any error, pcall returns false plus the error message.
-public static pcall(func:any, arg1:any, arg2:any, arg3:any, arg4:any, arg5:any) : bool, any, any, any, any, any {}
+public static pcall(any func, any arg1, any arg2, any arg3, any arg4, any arg5) : bool, any, any, any, any, any {}
 
 // Receives an argument of any type and converts it to a string in a reasonable format.
 // For complete control of how numbers are converted, use string.format.
 // If the metatable of e has a "__tostring" field, then tostring calls the corresponding value with e as argument,
 // and uses the result of the call as its result.
-public static tostring(value:any) : string {}
+public static tostring(any value) : string {}
 
 // Tries to convert its argument to a number.
 // If the argument is already a number or a string convertible to a number, then tonumber returns this number;
@@ -60,7 +60,7 @@ public static tostring(value:any) : string {}
 // 'B' represents 11, and so forth, with 'Z' representing 35. In base 10 (the default),
 // the number can have a decimal part, as well as an optional exponent part (see §2.1).
 // In other bases, only unsigned integers are accepted.
-public static tonumber(value:any) : double {}
+public static tonumber(any value) : double {}
 
 // Allows a program to traverse all fields of a table.
 // Its first argument is a table and its second argument is an index in this table.
@@ -74,4 +74,4 @@ public static tonumber(value:any) : double {}
 // (To traverse a table in numeric order, use a numerical for or the ipairs function.)
 // The behavior of next is undefined if, during the traversal, you assign any value to a non-existent field in the table.
 // You may however modify existing fields. In particular, you may clear existing fields.
-public static next(value:any) : any {}
+public static next(any value) : any {}

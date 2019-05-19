@@ -1,26 +1,26 @@
 namespace ALittle;
 
 // 是否是类
-public static IsClass(object:any) : bool {}
+public static IsClass(any object) : bool {}
 
 // 创建对象
-public static NewObject(clazz:any) : any {}
+public static NewObject(any clazz) : any {}
 
 // 获取类名
-public static GetClassName(object:any) : string {}
+public static GetClassName(any object) : string {}
 
 // 获取类
-public static GetClass(object:any) : any {}
+public static GetClass(any object) : any {}
 // 获取类的getter函数名称集合
-public static GetClassGetter(clazz:any) : List<string> {}
+public static GetClassGetter(any clazz) : List<string> {}
 // 获取类的setter函数名称集合
-public static GetClassSetter(clazz:any) : List<string> {}
+public static GetClassSetter(any clazz) : List<string> {}
 
 // 是否是某个类
-public static InstanceOf(object:any, clazz:any) : bool {}
+public static InstanceOf(any object, any clazz) : bool {}
 
 // 把表设置成弱引用，目前对lua有效，对javascript无效
-public static SetWeak(table:any, key:bool, value:bool) { }
+public static SetWeak(any table, bool key, bool value) { }
 
 // 创建一张表
 public static CreateTable() : any {}

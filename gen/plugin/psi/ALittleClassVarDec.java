@@ -10,10 +10,10 @@ public interface ALittleClassVarDec extends PsiElement {
   @Nullable
   ALittleAccessModifier getAccessModifier();
 
-  @Nullable
+  @NotNull
   ALittleAllType getAllType();
 
-  @NotNull
+  @Nullable
   ALittleClassVarNameDec getClassVarNameDec();
 
 }

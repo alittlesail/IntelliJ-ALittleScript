@@ -2,6 +2,6 @@ namespace ALittle;
 
 struct ResultJson
 {
-    result:bool;
-    reason:string;
+    bool result;
+    string reason;
 }

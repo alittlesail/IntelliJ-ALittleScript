@@ -63,7 +63,7 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                 }
                 ALittleClassSetterDec dec = (ALittleClassSetterDec)method_dec;
                 ALittleMethodParamOneDec one_dec = dec.getMethodParamOneDec();
-                if (one_dec != null) {
+                if (one_dec != null && one_dec.getMethodParamNameDec() != null) {
                     param_name_list.add(one_dec.getMethodParamNameDec().getText());
                 }
             } else if (method_dec instanceof ALittleClassMethodDec) {
@@ -79,7 +79,8 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                 if (param_dec != null) {
                     List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
                     for (ALittleMethodParamOneDec one_dec : one_dec_list) {
-                        param_name_list.add(one_dec.getMethodParamNameDec().getText());
+                        if (one_dec.getMethodParamNameDec() != null)
+                            param_name_list.add(one_dec.getMethodParamNameDec().getText());
                     }
                 }
             } else if (method_dec instanceof ALittleClassStaticDec) {
@@ -88,7 +89,8 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                 if (param_dec != null) {
                     List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
                     for (ALittleMethodParamOneDec one_dec : one_dec_list) {
-                        param_name_list.add(one_dec.getMethodParamNameDec().getText());
+                        if (one_dec.getMethodParamNameDec() != null)
+                            param_name_list.add(one_dec.getMethodParamNameDec().getText());
                     }
                 }
             } else if (method_dec instanceof ALittleGlobalMethodDec) {
@@ -97,7 +99,8 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                 if (param_dec != null) {
                     List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
                     for (ALittleMethodParamOneDec one_dec : one_dec_list) {
-                        param_name_list.add(one_dec.getMethodParamNameDec().getText());
+                        if (one_dec.getMethodParamNameDec() != null)
+                            param_name_list.add(one_dec.getMethodParamNameDec().getText());
                     }
                 }
             }

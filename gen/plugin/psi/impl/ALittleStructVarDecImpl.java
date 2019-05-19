@@ -27,15 +27,15 @@ public class ALittleStructVarDecImpl extends ASTWrapperPsiElement implements ALi
   }
 
   @Override
-  @Nullable
+  @NotNull
   public ALittleAllType getAllType() {
-    return findChildByClass(ALittleAllType.class);
+    return findNotNullChildByClass(ALittleAllType.class);
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittleStructVarNameDec getStructVarNameDec() {
-    return findNotNullChildByClass(ALittleStructVarNameDec.class);
+    return findChildByClass(ALittleStructVarNameDec.class);
   }
 
 }

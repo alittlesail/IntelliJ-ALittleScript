@@ -8,7 +8,7 @@ enum LogLevel
     WARN = 1,
     ERROR = 2,
 }
-public static SetLogCallback(func:Functor<(string, int)>) {}
-public static Log(arg1:any, arg2:any, arg3:any, arg4:any, arg5:any, arg6:any) { }
-public static Warn(arg1:any, arg2:any, arg3:any) { }
-public static Error(arg1:any, arg2:any, arg3:any) { }
+public static SetLogCallback(Functor<(string, int)> func) {}
+public static Log(any arg1, any arg2, any arg3, any arg4, any arg5, any arg6) { }
+public static Warn(any arg1, any arg2, any arg3) { }
+public static Error(any arg1, any arg2, any arg3) { }

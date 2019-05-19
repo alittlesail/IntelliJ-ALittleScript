@@ -5,7 +5,7 @@ class coroutine
 {
     // Creates a new coroutine, with body f. f must be a Lua function.
     // Returns this new coroutine, an object with type "thread".
-    public static create(func:any) : any {}
+    public static create(any func) : any {}
 
     // Starts or continues the execution of coroutine co.
     // The first time you resume a coroutine, it starts running its body.
@@ -16,7 +16,7 @@ class coroutine
     // resume returns true plus any values passed to yield (if the coroutine yields)
     //    or any values returned by the body function (if the coroutine terminates).
     // If there is any error, resume returns false plus the error message.
-    public static resume(co:any, arg1:any, arg2:any, arg3:any, arg4:any, arg5:any) : bool, string {}
+    public static resume(any co, any arg1, any arg2, any arg3, any arg4, any arg5) : bool, string {}
 
     // Returns the running coroutine, or nil when called by the main thread.
     public static running() : any {}
@@ -26,13 +26,13 @@ class coroutine
     // "suspended", if the coroutine is suspended in a call to yield, or if it has not started running yet;
     // "normal" if the coroutine is active but not running (that is, it has resumed another coroutine);
     // "dead" if the coroutine has finished its body function, or if it has stopped with an error.
-    public static status(co:any) : string {}
+    public static status(any co) : string {}
 
     // Creates a new coroutine, with body f. f must be a Lua function.
     // Returns a function that resumes the coroutine each time it is called.
     // Any arguments passed to the function behave as the extra arguments to resume.
     // Returns the same values returned by resume, except the first boolean. In case of error, propagates the error.
-    public static wrap(func:any) : any {}
+    public static wrap(any func) : any {}
 
     // Suspends the execution of the calling coroutine.
     // Any arguments to yield are passed as extra results to resume.

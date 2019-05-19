@@ -61,8 +61,8 @@ public class ALittleBlock extends AbstractBlock {
             || element instanceof ALittleClassVarDec)
             return Indent.getNormalIndent();
 
-        if (element instanceof ALittleStructVarNameDec
-            || element instanceof ALittleEnumVarNameDec)
+        if (element instanceof ALittleStructVarDec
+            || element instanceof ALittleEnumVarDec)
             return Indent.getNormalIndent();
 
         if (element instanceof ALittleAllExpr)

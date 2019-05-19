@@ -42,8 +42,10 @@ public class ALittleUtil {
         List<ALittleStructVarDec> struct_var_dec_list = struct_dec.getStructVarDecList();
         for (ALittleStructVarDec struct_var_dec : struct_var_dec_list) {
             ALittleStructVarNameDec var_name_dec = struct_var_dec.getStructVarNameDec();
-            if (src_name.isEmpty() || var_name_dec.getIdContent().getText().equals(src_name))
-                result.add(var_name_dec);
+            if (var_name_dec != null) {
+                if (src_name.isEmpty() || var_name_dec.getIdContent().getText().equals(src_name))
+                    result.add(var_name_dec);
+            }
         }
     }
 
@@ -195,8 +197,10 @@ public class ALittleUtil {
         List<ALittleClassVarDec> class_var_dec_list = class_dec.getClassVarDecList();
         for (ALittleClassVarDec class_var_dec : class_var_dec_list) {
             ALittleClassVarNameDec var_name_dec = class_var_dec.getClassVarNameDec();
-            if (src_name.isEmpty() || var_name_dec.getIdContent().getText().equals(src_name))
-                result.add(var_name_dec);
+            if (var_name_dec != null) {
+                if (src_name.isEmpty() || var_name_dec.getIdContent().getText().equals(src_name))
+                    result.add(var_name_dec);
+            }
         }
     }
 
@@ -401,8 +405,10 @@ public class ALittleUtil {
         List<ALittleMethodParamNameDec> result = new ArrayList<>();
         for (ALittleMethodParamOneDec one_dec : param_one_dec_list) {
             ALittleMethodParamNameDec name_dec = one_dec.getMethodParamNameDec();
-            if (src_name.isEmpty() || name_dec.getIdContent().getText().equals(src_name))
-                result.add(name_dec);
+            if (name_dec != null) {
+                if (src_name.isEmpty() || name_dec.getIdContent().getText().equals(src_name))
+                    result.add(name_dec);
+            }
         }
         return result;
     }

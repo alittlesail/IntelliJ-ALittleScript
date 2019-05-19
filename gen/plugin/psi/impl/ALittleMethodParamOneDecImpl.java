@@ -27,9 +27,9 @@ public class ALittleMethodParamOneDecImpl extends ASTWrapperPsiElement implement
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittleMethodParamNameDec getMethodParamNameDec() {
-    return findNotNullChildByClass(ALittleMethodParamNameDec.class);
+    return findChildByClass(ALittleMethodParamNameDec.class);
   }
 
   @Override

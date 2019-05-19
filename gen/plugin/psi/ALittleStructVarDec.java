@@ -7,10 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public interface ALittleStructVarDec extends PsiElement {
 
-  @Nullable
+  @NotNull
   ALittleAllType getAllType();
 
-  @NotNull
+  @Nullable
   ALittleStructVarNameDec getStructVarNameDec();
 
 }

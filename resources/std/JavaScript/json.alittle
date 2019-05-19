@@ -2,6 +2,6 @@ namespace javascript;
 
 class JSON
 {
-    public static parse(content:string) : any {}
-    public static stringify(object:any) : string {}
+    public static parse(string content) : any {}
+    public static stringify(any object) : string {}
 }

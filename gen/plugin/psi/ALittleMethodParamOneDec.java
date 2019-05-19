@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface ALittleMethodParamOneDec extends PsiElement {
 
-  @NotNull
+  @Nullable
   ALittleMethodParamNameDec getMethodParamNameDec();
 
   @NotNull

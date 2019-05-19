@@ -103,7 +103,7 @@ method_param_type_dec ::= all_type
 method_param_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleMethodParamNameDecElementImpl"
                                             implements="plugin.psi.ALittleMethodParamNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 // 函数参数部分
-method_param_one_dec ::= method_param_name_dec COLON method_param_type_dec
+method_param_one_dec ::= method_param_type_dec method_param_name_dec {pin=1}
 method_param_dec ::= LPAREN (method_param_one_dec (COMMA method_param_one_dec)*)? RPAREN {pin=1}
 // 函数体部分
 method_body_dec ::= LBRACE all_expr* RBRACE {pin=1}
@@ -125,14 +125,15 @@ class_method_dec ::= access_modifier? fun method_name_dec method_param_dec metho
 // 类静态函数定义
 class_static_dec ::= access_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=2}
 // 类成员变量定义
-class_var_dec ::= access_modifier? class_var_name_dec COLON all_type SEMI {pin=2}
+class_var_dec ::= access_modifier? all_type class_var_name_dec SEMI {pin=2}
 class_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleClassVarNameDecElementImpl"
                                   implements="plugin.psi.ALittleClassVarNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 // 全局函数
 global_method_dec ::= access_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=2}
 
 // 结构体
-struct_dec ::= access_modifier? struct struct_name_dec (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec)? struct_protocol_dec? LBRACE (struct_var_dec)* RBRACE
+struct_dec ::= access_modifier? struct struct_name_dec (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec)? struct_protocol_dec? struct_body_dec
+private struct_body_dec ::= LBRACE (struct_var_dec)* RBRACE {pin=1}
 struct_protocol_dec ::= LPAREN custom_type RPAREN {pin=1}
 struct_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructNameDecElementImpl"
                                implements="plugin.psi.ALittleStructNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
@@ -141,7 +142,7 @@ struct_extends_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructExte
 struct_extends_namespace_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructExtendsNamespaceNameDecElementImpl"
                                                                                implements="plugin.psi.ALittleStructExtendsNamespaceNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 
-struct_var_dec ::= struct_var_name_dec COLON all_type SEMI {pin=1}
+struct_var_dec ::= all_type struct_var_name_dec SEMI {pin=1}
 struct_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleStructVarNameDecElementImpl"
                                    implements="plugin.psi.ALittleStructVarNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 

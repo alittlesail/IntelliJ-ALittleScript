@@ -33,15 +33,15 @@ public class ALittleClassVarDecImpl extends ASTWrapperPsiElement implements ALit
   }
 
   @Override
-  @Nullable
+  @NotNull
   public ALittleAllType getAllType() {
-    return findChildByClass(ALittleAllType.class);
+    return findNotNullChildByClass(ALittleAllType.class);
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittleClassVarNameDec getClassVarNameDec() {
-    return findNotNullChildByClass(ALittleClassVarNameDec.class);
+    return findChildByClass(ALittleClassVarNameDec.class);
   }
 
 }
