@@ -457,17 +457,21 @@ public class ALittleUtil {
                 ALittleForStartStat start_stat = step_condition.getForStartStat();
                 if (start_stat != null) {
                     ALittleVarAssignNameDec var_assign_name_dec = start_stat.getForPairDec().getVarAssignNameDec();
-                    String name = var_assign_name_dec.getIdContent().getText();
-                    if (src_name.isEmpty() || name.equals(src_name))
-                        var_dec_list.add(var_assign_name_dec);
+                    if (var_assign_name_dec != null) {
+                        String name = var_assign_name_dec.getIdContent().getText();
+                        if (src_name.isEmpty() || name.equals(src_name))
+                            var_dec_list.add(var_assign_name_dec);
+                    }
                 }
             } else if (in_condition != null) {
                 List<ALittleForPairDec> pair_dec_list = in_condition.getForPairDecList();
                 for (ALittleForPairDec pair_dec : pair_dec_list) {
                     ALittleVarAssignNameDec var_assign_name_dec = pair_dec.getVarAssignNameDec();
-                    String name = var_assign_name_dec.getIdContent().getText();
-                    if (src_name.isEmpty() || name.equals(src_name))
-                        var_dec_list.add(var_assign_name_dec);
+                    if (var_assign_name_dec != null) {
+                        String name = var_assign_name_dec.getIdContent().getText();
+                        if (src_name.isEmpty() || name.equals(src_name))
+                            var_dec_list.add(var_assign_name_dec);
+                    }
                 }
             }
         } else if (parent instanceof ALittleWhileExpr) {

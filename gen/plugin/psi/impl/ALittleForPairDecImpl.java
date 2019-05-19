@@ -27,15 +27,15 @@ public class ALittleForPairDecImpl extends ASTWrapperPsiElement implements ALitt
   }
 
   @Override
-  @Nullable
+  @NotNull
   public ALittleAllType getAllType() {
-    return findChildByClass(ALittleAllType.class);
+    return findNotNullChildByClass(ALittleAllType.class);
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittleVarAssignNameDec getVarAssignNameDec() {
-    return findNotNullChildByClass(ALittleVarAssignNameDec.class);
+    return findChildByClass(ALittleVarAssignNameDec.class);
   }
 
 }

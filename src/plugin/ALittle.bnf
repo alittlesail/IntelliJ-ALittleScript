@@ -183,7 +183,7 @@ for_end_stat ::= value_stat
 for_step_stat ::= value_stat
 
 for_in_condition ::= for_pair_dec (COMMA for_pair_dec)* in value_stat {pin=2}
-for_pair_dec ::= var_assign_name_dec private_COLON_all_type
+for_pair_dec ::= all_type var_assign_name_dec {pin=1}
 
 // while 流程控制
 while_expr ::= while private_while_condition (private_while_body | all_expr) {pin=1}

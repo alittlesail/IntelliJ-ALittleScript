@@ -768,9 +768,8 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   // for_pair_dec (COMMA for_pair_dec)* in value_stat
   public static boolean for_in_condition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "for_in_condition")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, FOR_IN_CONDITION, null);
+    Marker m = enter_section_(b, l, _NONE_, FOR_IN_CONDITION, "<for in condition>");
     r = for_pair_dec(b, l + 1);
     r = r && for_in_condition_1(b, l + 1);
     p = r; // pin = 2
@@ -803,25 +802,24 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // var_assign_name_dec private_COLON_all_type
+  // all_type var_assign_name_dec
   public static boolean for_pair_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "for_pair_dec")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = var_assign_name_dec(b, l + 1);
-    r = r && private_COLON_all_type(b, l + 1);
-    exit_section_(b, m, FOR_PAIR_DEC, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, FOR_PAIR_DEC, "<for pair dec>");
+    r = all_type(b, l + 1);
+    p = r; // pin = 1
+    r = r && var_assign_name_dec(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
   // for_pair_dec ASSIGN value_stat
   public static boolean for_start_stat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "for_start_stat")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, FOR_START_STAT, null);
+    Marker m = enter_section_(b, l, _NONE_, FOR_START_STAT, "<for start stat>");
     r = for_pair_dec(b, l + 1);
     r = r && consumeToken(b, ASSIGN);
     p = r; // pin = 2
@@ -834,15 +832,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   // for_start_stat COMMA for_end_stat COMMA for_step_stat
   public static boolean for_step_condition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "for_step_condition")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, FOR_STEP_CONDITION, "<for step condition>");
     r = for_start_stat(b, l + 1);
     r = r && consumeToken(b, COMMA);
     r = r && for_end_stat(b, l + 1);
     r = r && consumeToken(b, COMMA);
     r = r && for_step_stat(b, l + 1);
-    exit_section_(b, m, FOR_STEP_CONDITION, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
