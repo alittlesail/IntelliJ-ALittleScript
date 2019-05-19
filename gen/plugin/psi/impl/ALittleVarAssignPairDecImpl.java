@@ -27,9 +27,9 @@ public class ALittleVarAssignPairDecImpl extends ASTWrapperPsiElement implements
   }
 
   @Override
-  @Nullable
+  @NotNull
   public ALittleAllType getAllType() {
-    return findChildByClass(ALittleAllType.class);
+    return findNotNullChildByClass(ALittleAllType.class);
   }
 
   @Override

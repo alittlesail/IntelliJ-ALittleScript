@@ -32,33 +32,27 @@ public class ALittleVarAssignNameDecImpl extends ALittleVarAssignNameDecElementI
     return findNotNullChildByType(ID_CONTENT);
   }
 
-  @Override
   public PsiElement guessType() {
     return ALittlePsiImplUtil.guessType(this);
   }
 
-  @Override
   @NotNull
   public List<PsiElement> guessTypes() {
     return ALittlePsiImplUtil.guessTypes(this);
   }
 
-  @Override
   public PsiReference[] getReferences() {
     return ALittlePsiImplUtil.getReferences(this);
   }
 
-  @Override
   public String getName() {
     return ALittlePsiImplUtil.getName(this);
   }
 
-  @Override
   public PsiElement setName(String new_name) {
     return ALittlePsiImplUtil.setName(this, new_name);
   }
 
-  @Override
   public PsiElement getNameIdentifier() {
     return ALittlePsiImplUtil.getNameIdentifier(this);
   }

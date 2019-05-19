@@ -107,7 +107,6 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "elseif"              { return ELSEIF; }
   "return"              { return RETURN; }
   "break"               { return BREAK; }
-  "var"                 { return VAR; }
   "Map"                 { return MAP; }
   "List"                { return LIST; }
   "Functor"             { return FUNCTOR; }

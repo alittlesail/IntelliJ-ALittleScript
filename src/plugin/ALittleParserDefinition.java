@@ -26,7 +26,7 @@ public class ALittleParserDefinition implements ParserDefinition {
             ALittleTypes.IF, ALittleTypes.ELSE, ALittleTypes.ELSEIF, ALittleTypes.DO, ALittleTypes.WHILE, ALittleTypes.FOR,
             ALittleTypes.IN, ALittleTypes.LIST, ALittleTypes.MAP,
             ALittleTypes.NEW, ALittleTypes.RETURN, ALittleTypes.REGISTER, ALittleTypes.NAMESPACE, ALittleTypes.THIS, ALittleTypes.FUNCTOR,
-            ALittleTypes.GET, ALittleTypes.SET, ALittleTypes.FUN, ALittleTypes.VAR, ALittleTypes.COMMA);
+            ALittleTypes.GET, ALittleTypes.SET, ALittleTypes.FUN, ALittleTypes.COMMA);
 
     public static final TokenSet SYMBOL_SET = TokenSet.create(ALittleTypes.APOS, ALittleTypes.ASSIGN, ALittleTypes.BACK, ALittleTypes.BIT_AND, ALittleTypes.BIT_AND_ASSIGN,
             ALittleTypes.BIT_NOT, ALittleTypes.BIT_OR, ALittleTypes.BIT_OR_ASSIGN, ALittleTypes.BIT_XOR,

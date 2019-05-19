@@ -511,9 +511,11 @@ public class ALittleUtil {
             List<ALittleVarAssignPairDec> var_assign_pair_dec_list = var_assign_expr.getVarAssignPairDecList();
             for (ALittleVarAssignPairDec var_assign_pair_dec : var_assign_pair_dec_list) {
                 ALittleVarAssignNameDec var_assign_name_dec = var_assign_pair_dec.getVarAssignNameDec();
-                String name = var_assign_name_dec.getIdContent().getText();
-                if (src_name.isEmpty() || name.equals(src_name))
-                    var_dec_list.add(var_assign_name_dec);
+                if (var_assign_name_dec != null) {
+                    String name = var_assign_name_dec.getIdContent().getText();
+                    if (src_name.isEmpty() || name.equals(src_name))
+                        var_dec_list.add(var_assign_name_dec);
+                }
             }
         }
     }

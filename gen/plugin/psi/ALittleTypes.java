@@ -220,7 +220,6 @@ public interface ALittleTypes {
   IElementType STRUCT = new ALittleTokenType("struct");
   IElementType THIS = new ALittleTokenType("this");
   IElementType TRUE = new ALittleTokenType("true");
-  IElementType VAR = new ALittleTokenType("var");
   IElementType WHILE = new ALittleTokenType("while");
 
   class Factory {

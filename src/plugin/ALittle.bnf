@@ -215,11 +215,10 @@ return_expr ::= return (value_stat (COMMA value_stat)*)? SEMI {pin=1}
 flow_expr ::= break SEMI {pin=1}
 
 // 定义语句
-var_assign_expr ::= var var_assign_pair_dec private_COMMA_var_assign_pair_dec* private_ASSIGN_value_stat? SEMI {pin=1}
+var_assign_expr ::= var_assign_pair_dec private_COMMA_var_assign_pair_dec* private_ASSIGN_value_stat? SEMI {pin=1}
 private private_ASSIGN_value_stat ::= ASSIGN value_stat {pin=1}
 private private_COMMA_var_assign_pair_dec ::= COMMA var_assign_pair_dec {pin=1}
-var_assign_pair_dec ::= var_assign_name_dec private_COLON_all_type
-private private_COLON_all_type ::= COLON all_type {pin=1}
+var_assign_pair_dec ::= all_type var_assign_name_dec {pin=2}
 var_assign_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleVarAssignNameDecElementImpl"
                                    implements="plugin.psi.ALittleVarAssignNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 // 所有类型
@@ -247,7 +246,8 @@ primitive_type ::= bool | double | int | I64 | any | string {mixin="plugin.psi.i
 
 // 赋值
 op_assign ::= ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | QUOTIENT_ASSIGN | REMAINDER_ASSIGN
-op_assign_expr ::= property_value ((COMMA property_value)* op_assign value_stat)? SEMI {pin=1}
+op_assign_expr ::= property_value ((COMMA property_value)* private_OP_ASSIGN_value_stat)? SEMI {pin=1}
+private private_OP_ASSIGN_value_stat ::= op_assign value_stat {pin=1}
 
 // 值
 value_stat ::= op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor
