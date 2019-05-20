@@ -7,8 +7,11 @@ import com.intellij.psi.PsiElement;
 
 public interface ALittleForPairDec extends PsiElement {
 
-  @NotNull
+  @Nullable
   ALittleAllType getAllType();
+
+  @Nullable
+  ALittleAutoType getAutoType();
 
   @Nullable
   ALittleVarAssignNameDec getVarAssignNameDec();

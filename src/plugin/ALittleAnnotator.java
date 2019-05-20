@@ -662,13 +662,16 @@ public class ALittleAnnotator implements Annotator {
                         break;
                     }
                     ALittleAllType all_type = pair_dec_list.get(0).getAllType();
-                    if (all_type.getPrimitiveType() == null
+                    if (all_type == null || all_type.getPrimitiveType() == null
                         || (!all_type.getPrimitiveType().getText().equals("int")
                         && !all_type.getPrimitiveType().getText().equals("I64"))) {
                         error = "这个变量必须是int或I64类型";
                         element = all_type;
                         break;
                     }
+
+                    if (pair_dec_list.get(1).getAutoType() != null) break;
+
                     all_type = pair_dec_list.get(1).getAllType();
                     PsiElement pair_guess_type = ALittleUtil.guessType(all_type);
                     if (pair_guess_type == null) {
@@ -701,6 +704,8 @@ public class ALittleAnnotator implements Annotator {
                         break;
                     }
 
+                    if (pair_dec_list.get(0).getAutoType() != null) break;
+
                     ALittleAllType all_type = pair_dec_list.get(0).getAllType();
                     PsiElement pair_guess_type = ALittleUtil.guessType(all_type);
                     if (pair_guess_type == null) {
@@ -717,6 +722,8 @@ public class ALittleAnnotator implements Annotator {
                         if (!error_element_list.isEmpty()) element = error_element_list.get(0);
                         break;
                     }
+
+                    if (pair_dec_list.get(1).getAutoType() != null) break;
 
                     all_type = pair_dec_list.get(1).getAllType();
                     pair_guess_type = ALittleUtil.guessType(all_type);

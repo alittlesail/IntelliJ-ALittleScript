@@ -814,16 +814,25 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // all_type var_assign_name_dec
+  // (auto_type | all_type) var_assign_name_dec
   public static boolean for_pair_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "for_pair_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, FOR_PAIR_DEC, "<for pair dec>");
-    r = all_type(b, l + 1);
+    r = for_pair_dec_0(b, l + 1);
     p = r; // pin = 1
     r = r && var_assign_name_dec(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // auto_type | all_type
+  private static boolean for_pair_dec_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "for_pair_dec_0")) return false;
+    boolean r;
+    r = auto_type(b, l + 1);
+    if (!r) r = all_type(b, l + 1);
+    return r;
   }
 
   /* ********************************************************** */

@@ -70,6 +70,7 @@ public class ALittleVarAssignNameDecReference extends PsiReferenceBase<PsiElemen
         } else if (parent instanceof ALittleForPairDec) {
             ALittleForPairDec pair_dec = (ALittleForPairDec)parent;
             all_type = pair_dec.getAllType();
+            auto_type = pair_dec.getAutoType();
         }
         if (all_type != null) {
             if (all_type.getPrimitiveType() != null) {

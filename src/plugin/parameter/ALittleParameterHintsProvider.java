@@ -121,15 +121,23 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                 ALittleAutoType auto_type = (ALittleAutoType)psiElement;
                 PsiElement guess_type = auto_type.guessType();
                 if (guess_type == null) break;
-                if (!(auto_type.getParent() instanceof ALittleVarAssignPairDec)) break;
+                if (auto_type.getParent() instanceof ALittleVarAssignPairDec) {
+                    ALittleVarAssignPairDec dec = (ALittleVarAssignPairDec) auto_type.getParent();
+                    ALittleVarAssignNameDec name_dec = dec.getVarAssignNameDec();
+                    if (name_dec == null) break;
 
-                ALittleVarAssignPairDec dec = (ALittleVarAssignPairDec)auto_type.getParent();
-                ALittleVarAssignNameDec name_dec = dec.getVarAssignNameDec();
-                if (name_dec == null) break;
+                    String name = ALittleUtil.guessTypeString(guess_type, guess_type, new ArrayList<>(), new ArrayList<>());
+                    if (name == null) break;
+                    result.add(new InlayInfo(name, name_dec.getNode().getStartOffset()));
+                } else if (auto_type.getParent() instanceof  ALittleForPairDec) {
+                    ALittleForPairDec dec = (ALittleForPairDec) auto_type.getParent();
+                    ALittleVarAssignNameDec name_dec = dec.getVarAssignNameDec();
+                    if (name_dec == null) break;
 
-                String name = ALittleUtil.guessTypeString(guess_type, guess_type, new ArrayList<>(), new ArrayList<>());
-                if (name == null) break;
-                result.add(new InlayInfo(name, name_dec.getNode().getStartOffset()));
+                    String name = ALittleUtil.guessTypeString(guess_type, guess_type, new ArrayList<>(), new ArrayList<>());
+                    if (name == null) break;
+                    result.add(new InlayInfo(name, name_dec.getNode().getStartOffset()));
+                }
 
             } while (false);
         }
