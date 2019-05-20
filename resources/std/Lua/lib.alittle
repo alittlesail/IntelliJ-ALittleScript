@@ -34,7 +34,7 @@ public static collectgarbage(string cmd) {}
 // Lua itself does not use this variable;
 // changing its value does not affect any environment, nor vice-versa. (Use setfenv to change environments.)
 class G {}
-protected instance _G:G = new G();
+protected instance G _G = new G();
 
 // Calls function f with the given arguments in protected mode.
 // This means that any error inside f is not propagated;

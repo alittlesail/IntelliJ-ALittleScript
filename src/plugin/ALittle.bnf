@@ -80,7 +80,7 @@ namespace_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleNamespaceNameDe
                                     implements="plugin.psi.ALittleNamespaceNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 
 // 单例定义
-instance_dec ::= access_modifier? instance instance_name_dec COLON all_type (ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN)? SEMI {pin=2}
+instance_dec ::= access_modifier? instance all_type instance_name_dec (ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN)? SEMI {pin=2}
 instance_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleInstanceNameDecElementImpl"
                                  implements="plugin.psi.ALittleInstanceNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 
@@ -218,7 +218,7 @@ flow_expr ::= break SEMI {pin=1}
 var_assign_expr ::= var_assign_pair_dec private_COMMA_var_assign_pair_dec* private_ASSIGN_value_stat? SEMI {pin=1}
 private private_ASSIGN_value_stat ::= ASSIGN value_stat {pin=1}
 private private_COMMA_var_assign_pair_dec ::= COMMA var_assign_pair_dec {pin=1}
-var_assign_pair_dec ::= all_type var_assign_name_dec {pin=2}
+var_assign_pair_dec ::= (auto_type | all_type) var_assign_name_dec {pin=2}
 var_assign_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleVarAssignNameDecElementImpl"
                                    implements="plugin.psi.ALittleVarAssignNameDecElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 // 所有类型
@@ -241,7 +241,9 @@ generic_functor_return_type ::=  COLON all_type (COMMA all_type)*
 // 基本类型
 primitive_type ::= bool | double | int | I64 | any | string {mixin="plugin.psi.impl.ALittlePrimitiveTypeElementImpl"
                                                       implements="plugin.psi.ALittlePrimitiveTypeElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
-
+// 推导类型
+auto_type ::= auto {mixin="plugin.psi.impl.ALittleAutoTypeElementImpl"
+                    implements="plugin.psi.ALittleAutoTypeElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 //运算符，值越低，优先级越高///////////////////////////////////////////////////////////////////
 
 // 赋值

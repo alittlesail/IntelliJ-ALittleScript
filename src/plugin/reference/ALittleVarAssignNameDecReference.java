@@ -40,6 +40,10 @@ public class ALittleVarAssignNameDecReference extends PsiReferenceBase<PsiElemen
 
             if (element instanceof ALittlePrimitiveType) {
                 guess_list.add(element);
+            } else if (element instanceof ALittleAutoType) {
+                ALittleAutoType dec = (ALittleAutoType) element;
+                PsiElement guess = dec.guessType();
+                if (guess != null) guess_list.add(guess);
             } else if (element instanceof ALittleGenericType) {
                 guess_list.add(element);
             } else if (element instanceof ALittleCustomTypeNameDec) {
@@ -57,10 +61,12 @@ public class ALittleVarAssignNameDecReference extends PsiReferenceBase<PsiElemen
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> results = new ArrayList<>();
         ALittleAllType all_type = null;
+        ALittleAutoType auto_type = null;
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleVarAssignPairDec) {
             ALittleVarAssignPairDec var_assign_pair = (ALittleVarAssignPairDec)myElement.getParent();
             all_type = var_assign_pair.getAllType();
+            auto_type = var_assign_pair.getAutoType();
         } else if (parent instanceof ALittleForPairDec) {
             ALittleForPairDec pair_dec = (ALittleForPairDec)parent;
             all_type = pair_dec.getAllType();
@@ -73,6 +79,9 @@ public class ALittleVarAssignNameDecReference extends PsiReferenceBase<PsiElemen
             } else if (all_type.getCustomType() != null) {
                 results.add(new PsiElementResolveResult(all_type.getCustomType().getCustomTypeNameDec()));
             }
+        }
+        if (auto_type != null) {
+            results.add(new PsiElementResolveResult(auto_type));
         }
         return results.toArray(new ResolveResult[results.size()]);
     }

@@ -19,6 +19,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitAutoType(@NotNull ALittleAutoType o) {
+    visitAutoTypeElement(o);
+  }
+
   public void visitClassAccessModifier(@NotNull ALittleClassAccessModifier o) {
     visitPsiElement(o);
   }
@@ -496,6 +500,10 @@ public class ALittleVisitor extends PsiElementVisitor {
   }
 
   public void visitWrapExpr(@NotNull ALittleWrapExpr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitAutoTypeElement(@NotNull ALittleAutoTypeElement o) {
     visitPsiElement(o);
   }
 

@@ -116,6 +116,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "I64"                 { return I64; }
   "any"                 { return ANY; }
   "string"              { return STRING; }
+  "auto"                { return AUTO; }
   "true"                { return TRUE; }
   "false"               { return FALSE; }
   "null"                { return NULL; }

@@ -366,6 +366,8 @@ public class ALittleAnnotator implements Annotator {
                 if (method_call_guess_list != null) {
                     for (int i = 0; i < pair_dec_list.size(); ++i) {
                         ALittleVarAssignPairDec pair_dec = pair_dec_list.get(i);
+                        if (pair_dec.getAllType() == null) continue;
+
                         PsiElement pair_guess_type = ALittleUtil.guessType(pair_dec.getAllType());
                         if (pair_guess_type == null) {
                             error = "等号左边所在的第" + (i + 1) + "个变量是未知类型";
@@ -403,16 +405,18 @@ public class ALittleAnnotator implements Annotator {
                     if (!error_content_list.isEmpty()) error += ":" + error_content_list.get(0);
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
                 } else {
-                    PsiElement pair_guess_type = ALittleUtil.guessType(pair_dec.getAllType());
-                    if (pair_guess_type == null) {
-                        error = "等号左边的变量是未知类型";
-                    } else {
-                        boolean result = ALittleUtil.guessSoftTypeEqual(pair_dec, pair_guess_type, value_stat, value_stat_guess_type
-                                , error_content_list, error_element_list);
-                        if (!result) {
-                            error = "等号左边的变量和表达式的类型不同";
-                            if (!error_content_list.isEmpty()) error += ":" + error_content_list.get(0);
-                            if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                    if (pair_dec.getAllType() != null) {
+                        PsiElement pair_guess_type = ALittleUtil.guessType(pair_dec.getAllType());
+                        if (pair_guess_type == null) {
+                            error = "等号左边的变量是未知类型";
+                        } else {
+                            boolean result = ALittleUtil.guessSoftTypeEqual(pair_dec, pair_guess_type, value_stat, value_stat_guess_type
+                                    , error_content_list, error_element_list);
+                            if (!result) {
+                                error = "等号左边的变量和表达式的类型不同";
+                                if (!error_content_list.isEmpty()) error += ":" + error_content_list.get(0);
+                                if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                            }
                         }
                     }
                 }

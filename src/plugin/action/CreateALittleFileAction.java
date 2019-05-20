@@ -7,10 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import plugin.ALittleIcons;
 
-/**
- *
- * Created by tangzx on 2016/12/24.
- */
 public class CreateALittleFileAction extends CreateFileFromTemplateAction implements DumbAware {
     private static final String CREATE_LUA_FILE = "New ALittle File";
 

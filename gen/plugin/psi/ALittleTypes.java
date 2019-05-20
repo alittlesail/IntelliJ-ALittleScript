@@ -11,6 +11,7 @@ public interface ALittleTypes {
   IElementType ACCESS_MODIFIER = new ALittleElementType("ACCESS_MODIFIER");
   IElementType ALL_EXPR = new ALittleElementType("ALL_EXPR");
   IElementType ALL_TYPE = new ALittleElementType("ALL_TYPE");
+  IElementType AUTO_TYPE = new ALittleElementType("AUTO_TYPE");
   IElementType CLASS_ACCESS_MODIFIER = new ALittleElementType("CLASS_ACCESS_MODIFIER");
   IElementType CLASS_CTOR_DEC = new ALittleElementType("CLASS_CTOR_DEC");
   IElementType CLASS_DEC = new ALittleElementType("CLASS_DEC");
@@ -135,6 +136,7 @@ public interface ALittleTypes {
   IElementType ANY = new ALittleTokenType("any");
   IElementType APOS = new ALittleTokenType("'");
   IElementType ASSIGN = new ALittleTokenType("=");
+  IElementType AUTO = new ALittleTokenType("auto");
   IElementType BACK = new ALittleTokenType("\\");
   IElementType BIT_AND = new ALittleTokenType("&");
   IElementType BIT_AND_ASSIGN = new ALittleTokenType("&=");
@@ -233,6 +235,9 @@ public interface ALittleTypes {
       }
       else if (type == ALL_TYPE) {
         return new ALittleAllTypeImpl(node);
+      }
+      else if (type == AUTO_TYPE) {
+        return new ALittleAutoTypeImpl(node);
       }
       else if (type == CLASS_ACCESS_MODIFIER) {
         return new ALittleClassAccessModifierImpl(node);

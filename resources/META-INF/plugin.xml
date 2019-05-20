@@ -85,5 +85,10 @@
             id="CreateALittleFile">
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
     </action>
+    <action class="plugin.action.CreateTutorialFileAction"
+            text="ALittle Tutorial File"
+            id="CreateTutorialFile">
+      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
+    </action>
   </actions>
 </idea-plugin>

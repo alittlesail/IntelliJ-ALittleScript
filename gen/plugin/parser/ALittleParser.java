@@ -6,6 +6,7 @@ import com.intellij.lang.PsiBuilder.Marker;
 import static plugin.psi.ALittleTypes.*;
 import static plugin.parser.ALittleParserUtil.*;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.IFileElementType;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
@@ -23,377 +24,11 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, null);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == ACCESS_MODIFIER) {
-      r = access_modifier(b, 0);
-    }
-    else if (t == ALL_EXPR) {
-      r = all_expr(b, 0);
-    }
-    else if (t == ALL_TYPE) {
-      r = all_type(b, 0);
-    }
-    else if (t == CLASS_ACCESS_MODIFIER) {
-      r = class_access_modifier(b, 0);
-    }
-    else if (t == CLASS_CTOR_DEC) {
-      r = class_ctor_dec(b, 0);
-    }
-    else if (t == CLASS_DEC) {
-      r = class_dec(b, 0);
-    }
-    else if (t == CLASS_EXTENDS_ACCESS_MODIFIER) {
-      r = class_extends_access_modifier(b, 0);
-    }
-    else if (t == CLASS_EXTENDS_NAME_DEC) {
-      r = class_extends_name_dec(b, 0);
-    }
-    else if (t == CLASS_EXTENDS_NAMESPACE_NAME_DEC) {
-      r = class_extends_namespace_name_dec(b, 0);
-    }
-    else if (t == CLASS_GETTER_DEC) {
-      r = class_getter_dec(b, 0);
-    }
-    else if (t == CLASS_METHOD_DEC) {
-      r = class_method_dec(b, 0);
-    }
-    else if (t == CLASS_NAME_DEC) {
-      r = class_name_dec(b, 0);
-    }
-    else if (t == CLASS_SETTER_DEC) {
-      r = class_setter_dec(b, 0);
-    }
-    else if (t == CLASS_STATIC_DEC) {
-      r = class_static_dec(b, 0);
-    }
-    else if (t == CLASS_VAR_DEC) {
-      r = class_var_dec(b, 0);
-    }
-    else if (t == CLASS_VAR_NAME_DEC) {
-      r = class_var_name_dec(b, 0);
-    }
-    else if (t == CONST_VALUE) {
-      r = const_value(b, 0);
-    }
-    else if (t == CUSTOM_TYPE) {
-      r = custom_type(b, 0);
-    }
-    else if (t == CUSTOM_TYPE_NAME_DEC) {
-      r = custom_type_name_dec(b, 0);
-    }
-    else if (t == CUSTOM_TYPE_NAMESPACE_NAME_DEC) {
-      r = custom_type_namespace_name_dec(b, 0);
-    }
-    else if (t == DO_WHILE_EXPR) {
-      r = do_while_expr(b, 0);
-    }
-    else if (t == ELSE_EXPR) {
-      r = else_expr(b, 0);
-    }
-    else if (t == ELSE_IF_EXPR) {
-      r = else_if_expr(b, 0);
-    }
-    else if (t == ENUM_DEC) {
-      r = enum_dec(b, 0);
-    }
-    else if (t == ENUM_NAME_DEC) {
-      r = enum_name_dec(b, 0);
-    }
-    else if (t == ENUM_PROTOCOL_DEC) {
-      r = enum_protocol_dec(b, 0);
-    }
-    else if (t == ENUM_VAR_DEC) {
-      r = enum_var_dec(b, 0);
-    }
-    else if (t == ENUM_VAR_NAME_DEC) {
-      r = enum_var_name_dec(b, 0);
-    }
-    else if (t == ENUM_VAR_VALUE_DEC) {
-      r = enum_var_value_dec(b, 0);
-    }
-    else if (t == FLOW_EXPR) {
-      r = flow_expr(b, 0);
-    }
-    else if (t == FOR_END_STAT) {
-      r = for_end_stat(b, 0);
-    }
-    else if (t == FOR_EXPR) {
-      r = for_expr(b, 0);
-    }
-    else if (t == FOR_IN_CONDITION) {
-      r = for_in_condition(b, 0);
-    }
-    else if (t == FOR_PAIR_DEC) {
-      r = for_pair_dec(b, 0);
-    }
-    else if (t == FOR_START_STAT) {
-      r = for_start_stat(b, 0);
-    }
-    else if (t == FOR_STEP_CONDITION) {
-      r = for_step_condition(b, 0);
-    }
-    else if (t == FOR_STEP_STAT) {
-      r = for_step_stat(b, 0);
-    }
-    else if (t == GENERIC_FUNCTOR_PARAM_TYPE) {
-      r = generic_functor_param_type(b, 0);
-    }
-    else if (t == GENERIC_FUNCTOR_RETURN_TYPE) {
-      r = generic_functor_return_type(b, 0);
-    }
-    else if (t == GENERIC_FUNCTOR_TYPE) {
-      r = generic_functor_type(b, 0);
-    }
-    else if (t == GENERIC_LIST_TYPE) {
-      r = generic_list_type(b, 0);
-    }
-    else if (t == GENERIC_MAP_TYPE) {
-      r = generic_map_type(b, 0);
-    }
-    else if (t == GENERIC_TYPE) {
-      r = generic_type(b, 0);
-    }
-    else if (t == GLOBAL_METHOD_DEC) {
-      r = global_method_dec(b, 0);
-    }
-    else if (t == IF_EXPR) {
-      r = if_expr(b, 0);
-    }
-    else if (t == INSTANCE_CLASS_NAME_DEC) {
-      r = instance_class_name_dec(b, 0);
-    }
-    else if (t == INSTANCE_DEC) {
-      r = instance_dec(b, 0);
-    }
-    else if (t == INSTANCE_NAME_DEC) {
-      r = instance_name_dec(b, 0);
-    }
-    else if (t == METHOD_BODY_DEC) {
-      r = method_body_dec(b, 0);
-    }
-    else if (t == METHOD_NAME_DEC) {
-      r = method_name_dec(b, 0);
-    }
-    else if (t == METHOD_PARAM_DEC) {
-      r = method_param_dec(b, 0);
-    }
-    else if (t == METHOD_PARAM_NAME_DEC) {
-      r = method_param_name_dec(b, 0);
-    }
-    else if (t == METHOD_PARAM_ONE_DEC) {
-      r = method_param_one_dec(b, 0);
-    }
-    else if (t == METHOD_PARAM_TYPE_DEC) {
-      r = method_param_type_dec(b, 0);
-    }
-    else if (t == METHOD_RETURN_DEC) {
-      r = method_return_dec(b, 0);
-    }
-    else if (t == METHOD_RETURN_TYPE_DEC) {
-      r = method_return_type_dec(b, 0);
-    }
-    else if (t == NAMESPACE_DEC) {
-      r = namespace_dec(b, 0);
-    }
-    else if (t == NAMESPACE_NAME_DEC) {
-      r = namespace_name_dec(b, 0);
-    }
-    else if (t == NAMESPACE_REGISTER_DEC) {
-      r = namespace_register_dec(b, 0);
-    }
-    else if (t == OP_1) {
-      r = op_1(b, 0);
-    }
-    else if (t == OP_1_EXPR) {
-      r = op_1_expr(b, 0);
-    }
-    else if (t == OP_2) {
-      r = op_2(b, 0);
-    }
-    else if (t == OP_2_STAT) {
-      r = op_2_stat(b, 0);
-    }
-    else if (t == OP_2_SUFFIX_EX) {
-      r = op_2_suffix_ex(b, 0);
-    }
-    else if (t == OP_2_VALUE) {
-      r = op_2_value(b, 0);
-    }
-    else if (t == OP_3) {
-      r = op_3(b, 0);
-    }
-    else if (t == OP_3_STAT) {
-      r = op_3_stat(b, 0);
-    }
-    else if (t == OP_3_SUFFIX) {
-      r = op_3_suffix(b, 0);
-    }
-    else if (t == OP_3_SUFFIX_EX) {
-      r = op_3_suffix_ex(b, 0);
-    }
-    else if (t == OP_4) {
-      r = op_4(b, 0);
-    }
-    else if (t == OP_4_STAT) {
-      r = op_4_stat(b, 0);
-    }
-    else if (t == OP_4_SUFFIX) {
-      r = op_4_suffix(b, 0);
-    }
-    else if (t == OP_4_SUFFIX_EE) {
-      r = op_4_suffix_ee(b, 0);
-    }
-    else if (t == OP_4_SUFFIX_EX) {
-      r = op_4_suffix_ex(b, 0);
-    }
-    else if (t == OP_5) {
-      r = op_5(b, 0);
-    }
-    else if (t == OP_5_STAT) {
-      r = op_5_stat(b, 0);
-    }
-    else if (t == OP_5_SUFFIX) {
-      r = op_5_suffix(b, 0);
-    }
-    else if (t == OP_5_SUFFIX_EE) {
-      r = op_5_suffix_ee(b, 0);
-    }
-    else if (t == OP_5_SUFFIX_EX) {
-      r = op_5_suffix_ex(b, 0);
-    }
-    else if (t == OP_6) {
-      r = op_6(b, 0);
-    }
-    else if (t == OP_6_STAT) {
-      r = op_6_stat(b, 0);
-    }
-    else if (t == OP_6_SUFFIX) {
-      r = op_6_suffix(b, 0);
-    }
-    else if (t == OP_6_SUFFIX_EE) {
-      r = op_6_suffix_ee(b, 0);
-    }
-    else if (t == OP_6_SUFFIX_EX) {
-      r = op_6_suffix_ex(b, 0);
-    }
-    else if (t == OP_7) {
-      r = op_7(b, 0);
-    }
-    else if (t == OP_7_STAT) {
-      r = op_7_stat(b, 0);
-    }
-    else if (t == OP_7_SUFFIX) {
-      r = op_7_suffix(b, 0);
-    }
-    else if (t == OP_7_SUFFIX_EE) {
-      r = op_7_suffix_ee(b, 0);
-    }
-    else if (t == OP_7_SUFFIX_EX) {
-      r = op_7_suffix_ex(b, 0);
-    }
-    else if (t == OP_8) {
-      r = op_8(b, 0);
-    }
-    else if (t == OP_8_STAT) {
-      r = op_8_stat(b, 0);
-    }
-    else if (t == OP_8_SUFFIX) {
-      r = op_8_suffix(b, 0);
-    }
-    else if (t == OP_8_SUFFIX_EE) {
-      r = op_8_suffix_ee(b, 0);
-    }
-    else if (t == OP_8_SUFFIX_EX) {
-      r = op_8_suffix_ex(b, 0);
-    }
-    else if (t == OP_ASSIGN) {
-      r = op_assign(b, 0);
-    }
-    else if (t == OP_ASSIGN_EXPR) {
-      r = op_assign_expr(b, 0);
-    }
-    else if (t == OP_NEW_STAT) {
-      r = op_new_stat(b, 0);
-    }
-    else if (t == PRIMITIVE_TYPE) {
-      r = primitive_type(b, 0);
-    }
-    else if (t == PROPERTY_VALUE) {
-      r = property_value(b, 0);
-    }
-    else if (t == PROPERTY_VALUE_BRACK_VALUE_STAT) {
-      r = property_value_brack_value_stat(b, 0);
-    }
-    else if (t == PROPERTY_VALUE_CUSTOM_TYPE) {
-      r = property_value_custom_type(b, 0);
-    }
-    else if (t == PROPERTY_VALUE_DOT_ID) {
-      r = property_value_dot_id(b, 0);
-    }
-    else if (t == PROPERTY_VALUE_DOT_ID_NAME) {
-      r = property_value_dot_id_name(b, 0);
-    }
-    else if (t == PROPERTY_VALUE_EXPR) {
-      r = property_value_expr(b, 0);
-    }
-    else if (t == PROPERTY_VALUE_METHOD_CALL_STAT) {
-      r = property_value_method_call_stat(b, 0);
-    }
-    else if (t == PROPERTY_VALUE_SUFFIX) {
-      r = property_value_suffix(b, 0);
-    }
-    else if (t == PROPERTY_VALUE_THIS_TYPE) {
-      r = property_value_this_type(b, 0);
-    }
-    else if (t == RETURN_EXPR) {
-      r = return_expr(b, 0);
-    }
-    else if (t == STRUCT_DEC) {
-      r = struct_dec(b, 0);
-    }
-    else if (t == STRUCT_EXTENDS_NAME_DEC) {
-      r = struct_extends_name_dec(b, 0);
-    }
-    else if (t == STRUCT_EXTENDS_NAMESPACE_NAME_DEC) {
-      r = struct_extends_namespace_name_dec(b, 0);
-    }
-    else if (t == STRUCT_NAME_DEC) {
-      r = struct_name_dec(b, 0);
-    }
-    else if (t == STRUCT_PROTOCOL_DEC) {
-      r = struct_protocol_dec(b, 0);
-    }
-    else if (t == STRUCT_VAR_DEC) {
-      r = struct_var_dec(b, 0);
-    }
-    else if (t == STRUCT_VAR_NAME_DEC) {
-      r = struct_var_name_dec(b, 0);
-    }
-    else if (t == VALUE_FACTOR) {
-      r = value_factor(b, 0);
-    }
-    else if (t == VALUE_STAT) {
-      r = value_stat(b, 0);
-    }
-    else if (t == VALUE_STAT_PAREN) {
-      r = value_stat_paren(b, 0);
-    }
-    else if (t == VAR_ASSIGN_EXPR) {
-      r = var_assign_expr(b, 0);
-    }
-    else if (t == VAR_ASSIGN_NAME_DEC) {
-      r = var_assign_name_dec(b, 0);
-    }
-    else if (t == VAR_ASSIGN_PAIR_DEC) {
-      r = var_assign_pair_dec(b, 0);
-    }
-    else if (t == WHILE_EXPR) {
-      r = while_expr(b, 0);
-    }
-    else if (t == WRAP_EXPR) {
-      r = wrap_expr(b, 0);
+    if (t instanceof IFileElementType) {
+      r = parse_root_(t, b, 0);
     }
     else {
-      r = parse_root_(t, b, 0);
+      r = false;
     }
     exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
   }
@@ -464,6 +99,18 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = generic_type(b, l + 1);
     if (!r) r = custom_type(b, l + 1);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // auto
+  public static boolean auto_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "auto_type")) return false;
+    if (!nextTokenIs(b, AUTO)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, AUTO);
+    exit_section_(b, m, AUTO_TYPE, r);
     return r;
   }
 
@@ -1453,7 +1100,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? instance instance_name_dec COLON all_type (ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN)? SEMI
+  // access_modifier? instance all_type instance_name_dec (ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN)? SEMI
   public static boolean instance_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "instance_dec")) return false;
     boolean r, p;
@@ -1461,10 +1108,9 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = instance_dec_0(b, l + 1);
     r = r && consumeToken(b, INSTANCE);
     p = r; // pin = 2
-    r = r && report_error_(b, instance_name_dec(b, l + 1));
-    r = p && report_error_(b, consumeToken(b, COLON)) && r;
-    r = p && report_error_(b, all_type(b, l + 1)) && r;
-    r = p && report_error_(b, instance_dec_5(b, l + 1)) && r;
+    r = r && report_error_(b, all_type(b, l + 1));
+    r = p && report_error_(b, instance_name_dec(b, l + 1)) && r;
+    r = p && report_error_(b, instance_dec_4(b, l + 1)) && r;
     r = p && consumeToken(b, SEMI) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -1478,58 +1124,58 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   // (ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN)?
-  private static boolean instance_dec_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "instance_dec_5")) return false;
-    instance_dec_5_0(b, l + 1);
+  private static boolean instance_dec_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "instance_dec_4")) return false;
+    instance_dec_4_0(b, l + 1);
     return true;
   }
 
   // ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN
-  private static boolean instance_dec_5_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "instance_dec_5_0")) return false;
+  private static boolean instance_dec_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "instance_dec_4_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, ASSIGN, NEW);
     r = r && instance_class_name_dec(b, l + 1);
     r = r && consumeToken(b, LPAREN);
-    r = r && instance_dec_5_0_4(b, l + 1);
+    r = r && instance_dec_4_0_4(b, l + 1);
     r = r && consumeToken(b, RPAREN);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // (value_stat (COMMA value_stat)*)?
-  private static boolean instance_dec_5_0_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "instance_dec_5_0_4")) return false;
-    instance_dec_5_0_4_0(b, l + 1);
+  private static boolean instance_dec_4_0_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "instance_dec_4_0_4")) return false;
+    instance_dec_4_0_4_0(b, l + 1);
     return true;
   }
 
   // value_stat (COMMA value_stat)*
-  private static boolean instance_dec_5_0_4_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "instance_dec_5_0_4_0")) return false;
+  private static boolean instance_dec_4_0_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "instance_dec_4_0_4_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = value_stat(b, l + 1);
-    r = r && instance_dec_5_0_4_0_1(b, l + 1);
+    r = r && instance_dec_4_0_4_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // (COMMA value_stat)*
-  private static boolean instance_dec_5_0_4_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "instance_dec_5_0_4_0_1")) return false;
+  private static boolean instance_dec_4_0_4_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "instance_dec_4_0_4_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!instance_dec_5_0_4_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "instance_dec_5_0_4_0_1", c)) break;
+      if (!instance_dec_4_0_4_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "instance_dec_4_0_4_0_1", c)) break;
     }
     return true;
   }
 
   // COMMA value_stat
-  private static boolean instance_dec_5_0_4_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "instance_dec_5_0_4_0_1_0")) return false;
+  private static boolean instance_dec_4_0_4_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "instance_dec_4_0_4_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
@@ -3392,14 +3038,23 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // all_type var_assign_name_dec
+  // (auto_type | all_type) var_assign_name_dec
   public static boolean var_assign_pair_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "var_assign_pair_dec")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, VAR_ASSIGN_PAIR_DEC, "<var assign pair dec>");
-    r = all_type(b, l + 1);
+    r = var_assign_pair_dec_0(b, l + 1);
     r = r && var_assign_name_dec(b, l + 1);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // auto_type | all_type
+  private static boolean var_assign_pair_dec_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "var_assign_pair_dec_0")) return false;
+    boolean r;
+    r = auto_type(b, l + 1);
+    if (!r) r = all_type(b, l + 1);
     return r;
   }
 
