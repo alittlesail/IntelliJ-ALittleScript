@@ -1099,6 +1099,57 @@ public class ALittleAnnotator implements Annotator {
         return error;
     }
 
+
+    public static String CheckErrorForOpNewList(@NotNull PsiElement element, AnnotationHolder holder, List<PsiElement> guess_list) {
+        String error = null;
+
+        if  (element instanceof ALittleOpNewList) {
+            ALittleOpNewList op_new_list = (ALittleOpNewList) element;
+
+            List<ALittleValueStat> value_stat_list = op_new_list.getValueStatList();
+            do {
+                if (value_stat_list.isEmpty()) {
+                    error = "这种方式不能内有元素，请使用new List的方式";
+                    break;
+                }
+
+                // 列表里面的所有元素的类型必须和第一个元素一致
+                String value_stat_first = "";
+                {
+                    List<String> error_content_list = new ArrayList<>();
+                    List<PsiElement> error_element_list = new ArrayList<>();
+                    value_stat_first = ALittleUtil.guessTypeString(value_stat_list.get(0), value_stat_list.get(0), error_content_list, error_element_list);
+                    if (value_stat_first == null) {
+                        if (!error_content_list.isEmpty()) error = error_content_list.get(0);
+                        if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                        break;
+                    }
+                }
+
+                for (int i = 1; i < value_stat_list.size(); ++i) {
+                    List<String> error_content_list = new ArrayList<>();
+                    List<PsiElement> error_element_list = new ArrayList<>();
+                    String value_stat_string = ALittleUtil.guessTypeString(value_stat_list.get(i), value_stat_list.get(i), error_content_list, error_element_list);
+                    if (value_stat_string == null) {
+                        if (!error_content_list.isEmpty()) error = error_content_list.get(0);
+                        if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                        break;
+                    }
+                    if (!value_stat_first.equals(value_stat_string)) {
+                        error = "列表内的元素类型，必须和第一个元素类型一致";
+                        break;
+                    }
+                }
+            } while (false);
+        }
+
+        if (error != null && holder != null && element != null) {
+            holder.createErrorAnnotation(element, error);
+        }
+
+        return error;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void ColorAnnotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder, List<PsiElement> guess_list) {
@@ -1226,6 +1277,9 @@ public class ALittleAnnotator implements Annotator {
 
         // 检查new表达式的参数
         CheckErrorForOpNewStat(element, holder, guess_list);
+
+        // 检查便捷List表达式
+        CheckErrorForOpNewList(element, holder, guess_list);
 
         // 给元素上色
         ColorAnnotate(element, holder, guess_list);

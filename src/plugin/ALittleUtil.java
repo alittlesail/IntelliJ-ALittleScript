@@ -771,6 +771,20 @@ public class ALittleUtil {
             return "any";
         } else if (element instanceof ALittleMethodNameDec) {
             return "any";   // 这里本来构建一个Functor回去，但是为了减弱检查，就返回any类型
+        } else if (element instanceof ALittleOpNewList) {
+            ALittleOpNewList op_new_list = (ALittleOpNewList)element;
+            List<ALittleValueStat> value_stat_list = op_new_list.getValueStatList();
+            if (value_stat_list.isEmpty()) return "List<any>";
+            String guess_string = guessTypeString(element, value_stat_list.get(0), error_content_list, error_element_list);
+            if (guess_string == null) return null;
+
+            return "List<" + guess_string + ">";
+        } else if (element instanceof ALittleValueStat) {
+            ALittleValueStat value_stat = (ALittleValueStat)element;
+            PsiElement guess_type = guessSoftType(src, value_stat, error_content_list, error_element_list);
+            if (guess_type == null) return null;
+
+            return guessTypeString(src, guess_type, error_content_list, error_element_list);
         }
 
         error_content_list.add("未知的表达式");
@@ -1569,6 +1583,8 @@ public class ALittleUtil {
             error_content_list.add("未知的表达式");
             error_element_list.add(value_stat.getOpNewStat());
             return null;
+        } else if (value_stat.getOpNewList() != null) {
+            return value_stat.getOpNewList();
         } else if (value_stat.getValueFactor() != null) {
             ALittleValueFactor value = value_stat.getValueFactor();
             return guessSoftType(value, value, error_content_list, error_element_list);

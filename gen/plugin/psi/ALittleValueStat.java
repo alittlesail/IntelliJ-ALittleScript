@@ -29,6 +29,9 @@ public interface ALittleValueStat extends PsiElement {
   ALittleOp8Stat getOp8Stat();
 
   @Nullable
+  ALittleOpNewList getOpNewList();
+
+  @Nullable
   ALittleOpNewStat getOpNewStat();
 
   @Nullable

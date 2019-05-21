@@ -252,10 +252,13 @@ op_assign_expr ::= property_value ((COMMA property_value)* private_OP_ASSIGN_val
 private private_OP_ASSIGN_value_stat ::= op_assign value_stat {pin=1}
 
 // 值
-value_stat ::= op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor
+value_stat ::= op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor | op_new_list
 
 // new
 op_new_stat ::= new (custom_type | generic_type) LPAREN (value_stat (COMMA value_stat)*)? RPAREN {pin=1}
+
+// list 快捷表达式
+op_new_list ::= LBRACK (value_stat (COMMA value_stat)*)? RBRACK {pin=1}
 
 // op 类型的运算，编号越大，优先级越低
 

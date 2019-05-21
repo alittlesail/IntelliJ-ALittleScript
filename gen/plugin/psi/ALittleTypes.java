@@ -105,6 +105,7 @@ public interface ALittleTypes {
   IElementType OP_8_SUFFIX_EX = new ALittleElementType("OP_8_SUFFIX_EX");
   IElementType OP_ASSIGN = new ALittleElementType("OP_ASSIGN");
   IElementType OP_ASSIGN_EXPR = new ALittleElementType("OP_ASSIGN_EXPR");
+  IElementType OP_NEW_LIST = new ALittleElementType("OP_NEW_LIST");
   IElementType OP_NEW_STAT = new ALittleElementType("OP_NEW_STAT");
   IElementType PRIMITIVE_TYPE = new ALittleElementType("PRIMITIVE_TYPE");
   IElementType PROPERTY_VALUE = new ALittleElementType("PROPERTY_VALUE");
@@ -517,6 +518,9 @@ public interface ALittleTypes {
       }
       else if (type == OP_ASSIGN_EXPR) {
         return new ALittleOpAssignExprImpl(node);
+      }
+      else if (type == OP_NEW_LIST) {
+        return new ALittleOpNewListImpl(node);
       }
       else if (type == OP_NEW_STAT) {
         return new ALittleOpNewStatImpl(node);

@@ -104,6 +104,9 @@ public class ALittleGenerateLua {
 
                 // 检查new表达式的参数
                 ALittleAnnotator.CheckErrorForOpNewStat(element, null, guess_list);
+
+                // 检查便捷List表达式
+                ALittleAnnotator.CheckErrorForOpNewList(element, null, guess_list);
             }
 
             PsiErrorElement error = checkErrorElement(child, full_check);
@@ -218,6 +221,21 @@ public class ALittleGenerateLua {
         }
 
         return null;
+    }
+
+    private String GenerateOpNewList(ALittleOpNewList op_new_list) {
+        List<ALittleValueStat> value_stat_list = op_new_list.getValueStatList();
+
+        String content = "{";
+        List<String> param_list = new ArrayList<>();
+        for (ALittleValueStat value_stat : value_stat_list) {
+            String result = GenerateValueStat(value_stat);
+            if (result == null) return null;
+            param_list.add(result);
+        }
+        content += String.join(", ", param_list);
+        content += "}";
+        return content;
     }
 
     private String GenerateOpNewStat(ALittleOpNewStat op_new_stat) {
@@ -774,6 +792,9 @@ public class ALittleGenerateLua {
 
         ALittleOpNewStat op_new_stat = root_stat.getOpNewStat();
         if (op_new_stat != null) return GenerateOpNewStat(op_new_stat);
+
+        ALittleOpNewList op_new_list = root_stat.getOpNewList();
+        if (op_new_list != null) return GenerateOpNewList(op_new_list);
 
         return "";
     }

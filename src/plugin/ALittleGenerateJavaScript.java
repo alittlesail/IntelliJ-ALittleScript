@@ -105,6 +105,9 @@ public class ALittleGenerateJavaScript {
 
                 // 检查new表达式的参数
                 ALittleAnnotator.CheckErrorForOpNewStat(element, null, guess_list);
+
+                // 检查便捷List表达式
+                ALittleAnnotator.CheckErrorForOpNewList(element, null, guess_list);
             }
 
             PsiErrorElement error = checkErrorElement(child, full_check);
@@ -217,6 +220,22 @@ public class ALittleGenerateJavaScript {
         }
 
         return null;
+    }
+
+    private String GenerateOpNewList(ALittleOpNewList op_new_list) {
+        List<ALittleValueStat> value_stat_list = op_new_list.getValueStatList();
+
+        String content = "new List([";
+        List<String> param_list = new ArrayList<>();
+        param_list.add("0");    // 第0个元素加一个字符串，让后面的值下标偏移一位
+        for (ALittleValueStat value_stat : value_stat_list) {
+            String result = GenerateValueStat(value_stat);
+            if (result == null) return null;
+            param_list.add(result);
+        }
+        content += String.join(", ", param_list);
+        content += "])";
+        return content;
     }
 
     private String GenerateOpNewStat(ALittleOpNewStat op_new_stat) {
@@ -774,6 +793,9 @@ public class ALittleGenerateJavaScript {
 
         ALittleOpNewStat op_new_stat = root_stat.getOpNewStat();
         if (op_new_stat != null) return GenerateOpNewStat(op_new_stat);
+
+        ALittleOpNewList op_new_list = root_stat.getOpNewList();
+        if (op_new_list != null) return GenerateOpNewList(op_new_list);
 
         return "";
     }

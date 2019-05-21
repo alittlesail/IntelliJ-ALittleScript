@@ -395,6 +395,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitOpNewList(@NotNull ALittleOpNewList o) {
+    visitPsiElement(o);
+  }
+
   public void visitOpNewStat(@NotNull ALittleOpNewStat o) {
     visitPsiElement(o);
   }

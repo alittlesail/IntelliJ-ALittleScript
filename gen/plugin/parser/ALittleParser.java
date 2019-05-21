@@ -2178,6 +2178,61 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // LBRACK (value_stat (COMMA value_stat)*)? RBRACK
+  public static boolean op_new_list(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "op_new_list")) return false;
+    if (!nextTokenIs(b, LBRACK)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, OP_NEW_LIST, null);
+    r = consumeToken(b, LBRACK);
+    p = r; // pin = 1
+    r = r && report_error_(b, op_new_list_1(b, l + 1));
+    r = p && consumeToken(b, RBRACK) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (value_stat (COMMA value_stat)*)?
+  private static boolean op_new_list_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "op_new_list_1")) return false;
+    op_new_list_1_0(b, l + 1);
+    return true;
+  }
+
+  // value_stat (COMMA value_stat)*
+  private static boolean op_new_list_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "op_new_list_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = value_stat(b, l + 1);
+    r = r && op_new_list_1_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (COMMA value_stat)*
+  private static boolean op_new_list_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "op_new_list_1_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!op_new_list_1_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "op_new_list_1_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // COMMA value_stat
+  private static boolean op_new_list_1_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "op_new_list_1_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && value_stat(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // new (custom_type | generic_type) LPAREN (value_stat (COMMA value_stat)*)? RPAREN
   public static boolean op_new_stat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "op_new_stat")) return false;
@@ -2969,7 +3024,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor
+  // op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor | op_new_list
   public static boolean value_stat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "value_stat")) return false;
     boolean r;
@@ -2983,6 +3038,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = op_7_stat(b, l + 1);
     if (!r) r = op_8_stat(b, l + 1);
     if (!r) r = value_factor(b, l + 1);
+    if (!r) r = op_new_list(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
