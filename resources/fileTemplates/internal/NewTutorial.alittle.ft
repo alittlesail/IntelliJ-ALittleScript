@@ -1,0 +1,193 @@
+// 【命名域】
+// 1. 每个文件开头必须定义一个命名域
+// 2. 定义一个名称为ALittle的命名域
+//    案例：
+//    namespace ALittle;
+// 3. 如果该命名域下的代码不需要生产目标代码，那么可以加一个register作为修饰
+//    应用场景：一般目标语言是脚本语言，而宿主语言（比如C++）会向脚本语言注册一些接口
+//            而这些接口必须使用ALittle语言重新定义一遍，然后才能在其他ALittle代码中使用
+//    案例：
+//    register namespace ALittle;
+
+register namespace ALittle;
+
+// 【结构体】
+struct DataA
+{
+    bool result;
+    string reason;
+}
+
+// 【结构体继承】
+struct DataB : DataA
+{
+    string account_id;
+}
+
+// 【枚举】
+enum EnumA
+{
+    NONE = 1,
+    BEGIN = "123",
+    END,
+    COUNT = 4,
+}
+
+// 【类】
+class TestA
+{
+    // 成员变量定义，在没有赋值的情况下，所有的成员变量的值都是null
+    private bool _bool_m;       // 定义一个布尔类型的成员变量
+    private int _int_m;         // 定义一个整型类型的成员变量
+    private I64 _I64_m;         // 定义一个64位整型的成员变量
+    private double _double_m;   // 定义一个双精度浮点数类型的成员变量
+    private string _string_m;    // 定义一个字符串类型的成员变量
+    private List<string> _list_m;    // 定义个数组，元素是int类型。  List的下标和lua一样，从1开始
+    private Map<string, int> _map_m; // 定义一个映射表，键是int类型，值是string类型
+    private Map<string, Map<int, string>> _complex_m; // 嵌套的Map
+    private DataB _struct_b;
+
+    // 【构造函数】
+    // 构造函数只能有一个，函数名固定为Ctor
+    // 这个构造函数定义了一个参数，类型是int，参数名为v
+    public Ctor(int v)
+    {
+        // 初始化
+        this._bool_m = false;
+        this._int_m = 10;
+        this._I64_m = 11;
+        this._double_m = 10.5;
+        this._string_m = "this is a string";
+        this._list_m = new List<string>();
+        this._list_m = ["123", "546"];
+        this._map_m = new Map<string, int>();
+        this._struct_b = new DataB();
+
+        // 结构体填充
+        this._struct_b.result = false;
+        this._struct_b.reason = "";
+        this._struct_b.account_id = EnumA.BEGIN;
+
+        // 赋值表达是类型推导
+        auto auto_a = this._bool_m;
+        auto auto_b = this._list_m;
+        auto auto_c = this._list_m[1];
+        auto auto_d = this._map_m;
+        auto auto_e = this._map_m["test"];
+
+        // for循环的类型推导
+        // 对于List遍历index的变量类型必须是int或者I64 不能使用auto
+        for (int index, auto c in this._list_m)
+        {
+
+        }
+
+        // 对map遍历，使用类型推导
+        for (auto key, auto c in this._map_m)
+        {
+
+        }
+
+        // List添加一个元素
+        lua.table.insert(this._list_m, 1, "this is a string");
+        // List移除一个元素
+        lua.table.remove(this._list_m, 1);
+        // 第一种 遍历List
+        for (int index = 1, lua.table.maxn(this._list_m), 1)
+        {
+            string value = this._list_m[index];
+        }
+        // 第二种 遍历List
+        for (int index, string value in this._list_m)
+        {
+            // 禁止在遍历List的时候对List进行添加或者移除的操作
+            // 否则遍历会出现不可预知的情况
+            // lua.table.remove(this._list_m, 1);
+
+        }
+
+        // Map添加一个键值对
+        this._map_m["test"] = 10;
+        // Map移除一个键值对
+        this._map_m["test"] = null;
+        // 遍历Map
+        for (string key, int value in this._map_m)
+        {
+            // 禁止在遍历Map的时候对Map进行添加或者移除操作
+            // 否则遍历会出现不可预知的情况
+            // this._map_m["test"] = null;
+        }
+    }
+
+    // 【成员函数】
+    // 成员函数以fun关键字开始，MemberFunction1是函数名，a和b是参数
+    // 这个函数没有返回值
+    public fun MemberFunction1(int a, bool b)
+    {
+
+    }
+
+    // 这个函数只有一个返回值，返回值类型为bool
+    public fun MemberFunction2(string a) : bool
+    {
+        return false;
+    }
+
+    // 这个函数有多个返回值，返回值类型为int, bool
+    public fun MemberFunction2(string a) : int, bool
+    {
+        return 0, false;
+    }
+
+    // 【静态函数】
+    // 静态函数是以static关键字开始
+    public static StaticFunction(double a) : bool
+    {
+        return false;
+    }
+
+    // 【setter函数】
+    // setter函数是以set关键字开始，有且只有一个参数，并且没有返回值
+    public set SetterFunction(bool v)
+    {
+        this._bool_m = v;
+    }
+
+    // 【getter函数】
+    // getter函数是以get关键字开始，没有参数，并且有且只有一个参数
+    public get GetterFunction() : bool
+    {
+        return this._bool_m;
+    }
+}
+
+// 【类继承】
+class TestB : TestA
+{
+    // 子类的构造函数的参数个数以及类型必须和父类的一致
+    public Ctor(int v)
+    {
+        this._bool_m = false;    // 子类可以使用父类的成员变量
+
+        this.MemberFunction1(10, false);            // 子类可以使用父类的成员函数
+        bool result = this.GetterFunction;    // 子类可以使用父类的getter函数
+        this.SetterFunction = result;                // 子类可以使用父类的setter函数
+
+        auto b_inst = new TestB();
+        auto cast_inst = cast<TestA>(b_inst);
+    }
+}
+
+// 【静态函数】
+// 静态函是直接放在命名域下定义，以static关键字开始
+public static StaticFunction(int param, string value) : bool
+{
+    return false;
+}
+
+// 【单例】
+// 单例的关键字是instance
+// public 修饰单例，那么单例将注册在全局，比如lua中的_G，全局可直接使用
+// protected 修饰单例，那么单例将注册在命名域下，本命名域下可以直接使用，其他命名域需要带上命名域前缀
+// private 修饰单例，那么单例将注册在命名域下，并且本文件蔡可以使用
+public instance TestB g_TestBInst = new TestB(10);
