@@ -28,6 +28,12 @@ public class ALittlePropertyValueImpl extends ASTWrapperPsiElement implements AL
 
   @Override
   @Nullable
+  public ALittlePropertyValueCastType getPropertyValueCastType() {
+    return findChildByClass(ALittlePropertyValueCastType.class);
+  }
+
+  @Override
+  @Nullable
   public ALittlePropertyValueCustomType getPropertyValueCustomType() {
     return findChildByClass(ALittlePropertyValueCustomType.class);
   }

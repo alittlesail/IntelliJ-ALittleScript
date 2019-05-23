@@ -56,26 +56,15 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "-="                  { return MINUS_ASSIGN; }
   "-"                   { return MINUS; }
   "||"                  { return COND_OR; }
-  "|="                  { return BIT_OR_ASSIGN; }
   "&&"                  { return COND_AND; }
-  "&="                  { return BIT_AND_ASSIGN; }
-  "&"                   { return BIT_AND; }
-  "|"                   { return BIT_OR; }
-  "~"                   { return BIT_NOT; }
-  "<<="                 { return SHIFT_LEFT_ASSIGN; }
-  "<<"                  { return SHIFT_LEFT; }
   "<="                  { return LESS_OR_EQUAL; }
   "<"                   { return LESS; }
-  "^="                  { return BIT_XOR_ASSIGN; }
-  "^"                   { return BIT_XOR; }
   "*="                  { return MUL_ASSIGN; }
   "*"                   { return MUL; }
   "/="                  { return QUOTIENT_ASSIGN; }
   "/"                   { return QUOTIENT; }
   "%="                  { return REMAINDER_ASSIGN; }
   "%"                   { return REMAINDER; }
-  ">>="                 { return SHIFT_RIGHT_ASSIGN; }
-  ">>"                  { return SHIFT_RIGHT; }
   ">="                  { return GREATER_OR_EQUAL; }
   ">"                   { return GREATER; }
   "."                   { return DOT; }
@@ -120,6 +109,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "true"                { return TRUE; }
   "false"               { return FALSE; }
   "null"                { return NULL; }
+  "cast"                { return CAST; }
   "this"                { return THIS; }
 
   {WHITE_SPACE}         { return WHITE_SPACE; }

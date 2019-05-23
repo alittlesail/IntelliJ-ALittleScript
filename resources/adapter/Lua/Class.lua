@@ -218,8 +218,8 @@ function IsClass(object)
 end
 
 -- 创建对象
-function NewObject(clazz)
-    return clazz();
+function NewObject(clazz, ...)
+    return clazz(...);
 end
 
 -- 获取类名
@@ -264,4 +264,9 @@ function SetWeak(object, key, value)
     if key then mode = "k" end
     if value then mode = mode.."v" end
     setmetatable(object, { __mode = mode })
+end
+
+-- 表尾部添加元素
+function ListPush(object, value)
+    table.insert(object, value)
 end

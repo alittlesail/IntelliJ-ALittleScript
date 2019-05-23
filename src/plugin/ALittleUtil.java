@@ -606,6 +606,8 @@ public class ALittleUtil {
         if (suffix_list.isEmpty()) {
             if (property_value.getPropertyValueThisType() != null) {
                 return property_value.getPropertyValueThisType().guessType();
+            } else if (property_value.getPropertyValueCastType() != null) {
+                return property_value.getPropertyValueCastType().guessType();
             } else if (property_value.getPropertyValueCustomType() != null) {
                 return property_value.getPropertyValueCustomType().guessType();
             }

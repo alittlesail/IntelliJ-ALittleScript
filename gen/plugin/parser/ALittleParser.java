@@ -2126,7 +2126,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   // property_value ((COMMA property_value)* private_OP_ASSIGN_value_stat)? SEMI
   public static boolean op_assign_expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "op_assign_expr")) return false;
-    if (!nextTokenIs(b, "<op assign expr>", ID_CONTENT, THIS)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, OP_ASSIGN_EXPR, "<op assign expr>");
     r = property_value(b, l + 1);
@@ -2596,10 +2595,9 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (property_value_custom_type | property_value_this_type) property_value_suffix*
+  // (property_value_custom_type | property_value_this_type | property_value_cast_type) property_value_suffix*
   public static boolean property_value(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "property_value")) return false;
-    if (!nextTokenIs(b, "<property value>", ID_CONTENT, THIS)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE, "<property value>");
     r = property_value_0(b, l + 1);
@@ -2608,12 +2606,13 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // property_value_custom_type | property_value_this_type
+  // property_value_custom_type | property_value_this_type | property_value_cast_type
   private static boolean property_value_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "property_value_0")) return false;
     boolean r;
     r = property_value_custom_type(b, l + 1);
     if (!r) r = property_value_this_type(b, l + 1);
+    if (!r) r = property_value_cast_type(b, l + 1);
     return r;
   }
 
@@ -2639,6 +2638,22 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = r && value_stat(b, l + 1);
     r = r && consumeToken(b, RBRACK);
     exit_section_(b, m, PROPERTY_VALUE_BRACK_VALUE_STAT, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // cast LESS all_type GREATER LPAREN value_factor RPAREN
+  public static boolean property_value_cast_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "property_value_cast_type")) return false;
+    if (!nextTokenIs(b, CAST)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, CAST, LESS);
+    r = r && all_type(b, l + 1);
+    r = r && consumeTokens(b, 0, GREATER, LPAREN);
+    r = r && value_factor(b, l + 1);
+    r = r && consumeToken(b, RPAREN);
+    exit_section_(b, m, PROPERTY_VALUE_CAST_TYPE, r);
     return r;
   }
 
@@ -2683,7 +2698,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   // property_value SEMI
   public static boolean property_value_expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "property_value_expr")) return false;
-    if (!nextTokenIs(b, "<property value expr>", ID_CONTENT, THIS)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_EXPR, "<property value expr>");
     r = property_value(b, l + 1);

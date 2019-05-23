@@ -39,6 +39,9 @@ public class ALittlePropertyValueMethodCallStatReference extends PsiReferenceBas
         if (pre_property_value == null) {
             pre_property_value = property_value.getPropertyValueThisType();
         }
+        if (pre_property_value == null) {
+            pre_property_value = property_value.getPropertyValueCastType();
+        }
 
         int index = -1;
         for (int i = 0; i < suffix_list.size(); ++i) {
@@ -67,6 +70,8 @@ public class ALittlePropertyValueMethodCallStatReference extends PsiReferenceBas
             pre_type = ((ALittlePropertyValueCustomType) pre_property_value).guessType();
         } else if (pre_property_value instanceof ALittlePropertyValueThisType) {
             pre_type = ((ALittlePropertyValueThisType) pre_property_value).guessType();
+        } else if (pre_property_value instanceof ALittlePropertyValueCastType) {
+            pre_type = ((ALittlePropertyValueCastType) pre_property_value).guessType();
         } else if (pre_property_value instanceof  ALittlePropertyValueDotId) {
             ALittlePropertyValueDotIdName dot_id_name = ((ALittlePropertyValueDotId) pre_property_value).getPropertyValueDotIdName();
             pre_type = dot_id_name.guessType();
@@ -88,6 +93,9 @@ public class ALittlePropertyValueMethodCallStatReference extends PsiReferenceBas
         PsiElement pre_property_value = property_value.getPropertyValueCustomType();
         if (pre_property_value == null) {
             pre_property_value = property_value.getPropertyValueThisType();
+        }
+        if (pre_property_value == null) {
+            pre_property_value = property_value.getPropertyValueCastType();
         }
 
         for (ALittlePropertyValueSuffix suffix : suffix_list) {
@@ -111,6 +119,8 @@ public class ALittlePropertyValueMethodCallStatReference extends PsiReferenceBas
             pre_type = ((ALittlePropertyValueCustomType) pre_property_value).guessType();
         } else if (pre_property_value instanceof ALittlePropertyValueThisType) {
             pre_type = ((ALittlePropertyValueThisType) pre_property_value).guessType();
+        } else if (pre_property_value instanceof ALittlePropertyValueCastType) {
+            pre_type = ((ALittlePropertyValueCastType) pre_property_value).guessType();
         } else if (pre_property_value instanceof  ALittlePropertyValueDotId) {
             ALittlePropertyValueDotIdName dot_id_name = ((ALittlePropertyValueDotId) pre_property_value).getPropertyValueDotIdName();
             pre_type = dot_id_name.guessType();

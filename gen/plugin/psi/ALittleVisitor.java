@@ -415,6 +415,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPropertyValueBrackValueStatElement(o);
   }
 
+  public void visitPropertyValueCastType(@NotNull ALittlePropertyValueCastType o) {
+    visitPropertyValueCastTypeElement(o);
+  }
+
   public void visitPropertyValueCustomType(@NotNull ALittlePropertyValueCustomType o) {
     visitPropertyValueCustomTypeElement(o);
   }
@@ -568,6 +572,10 @@ public class ALittleVisitor extends PsiElementVisitor {
   }
 
   public void visitPropertyValueBrackValueStatElement(@NotNull ALittlePropertyValueBrackValueStatElement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPropertyValueCastTypeElement(@NotNull ALittlePropertyValueCastTypeElement o) {
     visitPsiElement(o);
   }
 

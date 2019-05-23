@@ -110,6 +110,7 @@ public interface ALittleTypes {
   IElementType PRIMITIVE_TYPE = new ALittleElementType("PRIMITIVE_TYPE");
   IElementType PROPERTY_VALUE = new ALittleElementType("PROPERTY_VALUE");
   IElementType PROPERTY_VALUE_BRACK_VALUE_STAT = new ALittleElementType("PROPERTY_VALUE_BRACK_VALUE_STAT");
+  IElementType PROPERTY_VALUE_CAST_TYPE = new ALittleElementType("PROPERTY_VALUE_CAST_TYPE");
   IElementType PROPERTY_VALUE_CUSTOM_TYPE = new ALittleElementType("PROPERTY_VALUE_CUSTOM_TYPE");
   IElementType PROPERTY_VALUE_DOT_ID = new ALittleElementType("PROPERTY_VALUE_DOT_ID");
   IElementType PROPERTY_VALUE_DOT_ID_NAME = new ALittleElementType("PROPERTY_VALUE_DOT_ID_NAME");
@@ -139,15 +140,9 @@ public interface ALittleTypes {
   IElementType ASSIGN = new ALittleTokenType("=");
   IElementType AUTO = new ALittleTokenType("auto");
   IElementType BACK = new ALittleTokenType("\\");
-  IElementType BIT_AND = new ALittleTokenType("&");
-  IElementType BIT_AND_ASSIGN = new ALittleTokenType("&=");
-  IElementType BIT_NOT = new ALittleTokenType("~");
-  IElementType BIT_OR = new ALittleTokenType("|");
-  IElementType BIT_OR_ASSIGN = new ALittleTokenType("|=");
-  IElementType BIT_XOR = new ALittleTokenType("^");
-  IElementType BIT_XOR_ASSIGN = new ALittleTokenType("^=");
   IElementType BOOL = new ALittleTokenType("bool");
   IElementType BREAK = new ALittleTokenType("break");
+  IElementType CAST = new ALittleTokenType("cast");
   IElementType CLASS = new ALittleTokenType("class");
   IElementType COLON = new ALittleTokenType(":");
   IElementType COMMA = new ALittleTokenType(",");
@@ -213,10 +208,6 @@ public interface ALittleTypes {
   IElementType RPAREN = new ALittleTokenType(")");
   IElementType SEMI = new ALittleTokenType(";");
   IElementType SET = new ALittleTokenType("set");
-  IElementType SHIFT_LEFT = new ALittleTokenType("<<");
-  IElementType SHIFT_LEFT_ASSIGN = new ALittleTokenType("<<=");
-  IElementType SHIFT_RIGHT = new ALittleTokenType(">>");
-  IElementType SHIFT_RIGHT_ASSIGN = new ALittleTokenType(">>=");
   IElementType STATIC = new ALittleTokenType("static");
   IElementType STRING = new ALittleTokenType("string");
   IElementType STRING_CONTENT = new ALittleTokenType("STRING_CONTENT");
@@ -533,6 +524,9 @@ public interface ALittleTypes {
       }
       else if (type == PROPERTY_VALUE_BRACK_VALUE_STAT) {
         return new ALittlePropertyValueBrackValueStatImpl(node);
+      }
+      else if (type == PROPERTY_VALUE_CAST_TYPE) {
+        return new ALittlePropertyValueCastTypeImpl(node);
       }
       else if (type == PROPERTY_VALUE_CUSTOM_TYPE) {
         return new ALittlePropertyValueCustomTypeImpl(node);

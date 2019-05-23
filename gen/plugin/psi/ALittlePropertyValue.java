@@ -8,6 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface ALittlePropertyValue extends PsiElement {
 
   @Nullable
+  ALittlePropertyValueCastType getPropertyValueCastType();
+
+  @Nullable
   ALittlePropertyValueCustomType getPropertyValueCustomType();
 
   @NotNull

@@ -32,6 +32,7 @@ public class ALittleReferenceFactory {
         if (element instanceof ALittlePrimitiveType) return new ALittlePrimitiveTypeReference(element, new TextRange(0, element.getText().length()));
         if (element instanceof ALittleAutoType) return new ALittleAutoTypeReference(element, new TextRange(0, element.getText().length()));
         if (element instanceof ALittlePropertyValueThisType) return new ALittlePropertyValueThisTypeReference(element, new TextRange(0, element.getText().length()));
+        if (element instanceof ALittlePropertyValueCastType) return new ALittlePropertyValueCastTypeReference(element, new TextRange(0, element.getText().length()));
         if (element instanceof ALittlePropertyValueMethodCallStat) return new ALittlePropertyValueMethodCallStatReference(element, new TextRange(0, element.getText().length()));
         if (element instanceof ALittlePropertyValueBrackValueStat) return new ALittlePropertyValueBrackValueStatReference(element, new TextRange(0, element.getText().length()));
 

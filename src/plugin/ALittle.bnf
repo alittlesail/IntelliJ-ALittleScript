@@ -36,26 +36,15 @@
       MINUS_ASSIGN         =  '-='
       MINUS                =  '-'
       COND_OR              =  '||'
-      BIT_OR_ASSIGN        =  '|='
       COND_AND             =  '&&'
-      BIT_AND_ASSIGN       =  '&='
-      BIT_AND              =  '&'
-      BIT_OR               =  '|'
-      BIT_NOT              =  '~'
-      SHIFT_LEFT_ASSIGN    =  '<<='
-      SHIFT_LEFT           =  '<<'
       LESS_OR_EQUAL        =  '<='
       LESS                 =  '<'
-      BIT_XOR_ASSIGN       =  '^='
-      BIT_XOR              =  '^'
       MUL_ASSIGN           =  '*='
       MUL                  =  '*'
       QUOTIENT_ASSIGN      =  '/='
       QUOTIENT             =  '/'
       REMAINDER_ASSIGN     =  '%='
       REMAINDER            =  '%'
-      SHIFT_RIGHT_ASSIGN   =  '>>='
-      SHIFT_RIGHT          =  '>>'
       GREATER_OR_EQUAL     =  '>='
       GREATER              =  '>'
       DOT                  =  '.'
@@ -315,7 +304,9 @@ value_factor ::= value_stat_paren | const_value | property_value
 // 静态值
 const_value ::= true | false | STRING_CONTENT | DIGIT_CONTENT | null
 // 属性
-property_value ::= (property_value_custom_type | property_value_this_type) property_value_suffix*
+property_value ::= (property_value_custom_type | property_value_this_type | property_value_cast_type) property_value_suffix*
+property_value_cast_type ::= cast LESS all_type GREATER LPAREN value_factor RPAREN {mixin="plugin.psi.impl.ALittlePropertyValueCastTypeElementImpl"
+                                                                                    implements="plugin.psi.ALittlePropertyValueCastTypeElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 property_value_custom_type ::= ID_CONTENT {mixin="plugin.psi.impl.ALittlePropertyValueCustomTypeElementImpl"
                                           implements="plugin.psi.ALittlePropertyValueCustomTypeElement" methods=[guessType guessTypes getReferences getName setName getNameIdentifier]}
 property_value_this_type ::= this {mixin="plugin.psi.impl.ALittlePropertyValueThisTypeElementImpl"

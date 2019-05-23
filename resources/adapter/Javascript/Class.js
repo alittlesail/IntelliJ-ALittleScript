@@ -237,9 +237,9 @@ ALittle.IsClass = function(object)
 }
 
 // 创建对象
-ALittle.NewObject = function(clazz)
+ALittle.NewObject = function(clazz, ...)
 {
-    return new clazz;
+    return new clazz(...);
 }
 
 // 获取类名
@@ -282,11 +282,17 @@ ALittle.SetWeak = function(object, key, value)
 {
 }
 
+// 表尾部添加元素
+ALittle.ListPush = function(object, value)
+{
+    object._data.push(value);
+}
+
 // 构建List类
 function List(data)
 {
     if (data) this._data = data;
-    else this._data = [];
+    else this._data = ["0"];
 }
 
 List.prototype.set = function(index, value)

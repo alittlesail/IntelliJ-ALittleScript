@@ -4,7 +4,7 @@ namespace ALittle;
 public static IsClass(any object) : bool {}
 
 // 创建对象
-public static NewObject(any clazz) : any {}
+public static NewObject(any clazz, any arg1, any arg2, any arg3, any arg4, any arg5) : any {}
 
 // 获取类名
 public static GetClassName(any object) : string {}
@@ -24,3 +24,6 @@ public static SetWeak(any table, bool key, bool value) { }
 
 // 创建一张表
 public static CreateTable() : any {}
+
+// 向表的尾巴添加一个元素
+public static ListPush(any table, any object) {}

@@ -58,6 +58,8 @@ public class ALittleAnnotator implements Annotator {
             guess_list = ((ALittlePropertyValueDotIdName) element).guessTypes();
         } else if (element instanceof ALittlePropertyValueThisType) {
             guess_list = ((ALittlePropertyValueThisType) element).guessTypes();
+        } else if (element instanceof ALittlePropertyValueCastType) {
+            guess_list = ((ALittlePropertyValueCastType) element).guessTypes();
 
             // 结构体相关
         } else if (element instanceof ALittleStructExtendsNameDec) {
@@ -650,97 +652,109 @@ public class ALittleAnnotator implements Annotator {
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
                     break;
                 }
-                if (!(guess_type instanceof ALittleGenericType)) break;
 
-                ALittleGenericType generic_type = (ALittleGenericType)guess_type;
-                if (generic_type.getGenericListType() != null) {
-                    ALittleGenericListType list_type = generic_type.getGenericListType();
-                    List<ALittleForPairDec> pair_dec_list = in_expr.getForPairDecList();
-                    if (pair_dec_list.size() != 2) {
-                        error = "这里参数数量必须是2个";
-                        element = in_expr;
+                if (guess_type instanceof ALittlePrimitiveType) {
+                    ALittlePrimitiveType primitive_type = (ALittlePrimitiveType) guess_type;
+                    if (!primitive_type.getText().equals("any")) {
+                        error = "遍历对象类型必须是List,Map,any";
+                        element = value_stat;
                         break;
                     }
-                    ALittleAllType all_type = pair_dec_list.get(0).getAllType();
-                    if (all_type == null || all_type.getPrimitiveType() == null
-                        || (!all_type.getPrimitiveType().getText().equals("int")
-                        && !all_type.getPrimitiveType().getText().equals("I64"))) {
-                        error = "这个变量必须是int或I64类型";
-                        element = all_type;
-                        break;
+                } else if (guess_type instanceof ALittleGenericType) {
+                    ALittleGenericType generic_type = (ALittleGenericType) guess_type;
+                    if (generic_type.getGenericListType() != null) {
+                        ALittleGenericListType list_type = generic_type.getGenericListType();
+                        List<ALittleForPairDec> pair_dec_list = in_expr.getForPairDecList();
+                        if (pair_dec_list.size() != 2) {
+                            error = "这里参数数量必须是2个";
+                            element = in_expr;
+                            break;
+                        }
+                        ALittleAllType all_type = pair_dec_list.get(0).getAllType();
+                        if (all_type == null || all_type.getPrimitiveType() == null
+                                || (!all_type.getPrimitiveType().getText().equals("int")
+                                && !all_type.getPrimitiveType().getText().equals("I64"))) {
+                            error = "这个变量必须是int或I64类型";
+                            element = all_type;
+                            break;
+                        }
+
+                        if (pair_dec_list.get(1).getAutoType() != null) break;
+
+                        all_type = pair_dec_list.get(1).getAllType();
+                        PsiElement pair_guess_type = ALittleUtil.guessType(all_type);
+                        if (pair_guess_type == null) {
+                            error = "左边所在的第2个变量是未知类型";
+                            element = all_type;
+                            break;
+                        }
+                        PsiElement list_guess_type = ALittleUtil.guessType(list_type.getAllType());
+
+                        boolean result = ALittleUtil.guessSoftTypeEqual(value_stat, list_guess_type, pair_dec_list.get(1), pair_guess_type
+                                , error_content_list, error_element_list);
+                        if (!result) {
+                            if (!error_content_list.isEmpty()) error = error_content_list.get(0);
+                            if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                            break;
+                        }
+                    } else if (generic_type.getGenericMapType() != null) {
+                        ALittleGenericMapType map_type = generic_type.getGenericMapType();
+                        List<ALittleForPairDec> pair_dec_list = in_expr.getForPairDecList();
+                        if (pair_dec_list.size() != 2) {
+                            error = "这里参数数量必须是2个";
+                            element = in_expr;
+                            break;
+                        }
+
+                        List<ALittleAllType> all_type_list = map_type.getAllTypeList();
+                        if (all_type_list.size() != 2) {
+                            error = "Map格式错误";
+                            element = in_expr;
+                            break;
+                        }
+
+                        if (pair_dec_list.get(0).getAutoType() != null) break;
+
+                        ALittleAllType all_type = pair_dec_list.get(0).getAllType();
+                        PsiElement pair_guess_type = ALittleUtil.guessType(all_type);
+                        if (pair_guess_type == null) {
+                            error = "左边所在的第1个变量是未知类型";
+                            element = all_type;
+                            break;
+                        }
+                        PsiElement map_guess_type = ALittleUtil.guessType(all_type_list.get(0));
+
+                        boolean result = ALittleUtil.guessSoftTypeEqual(value_stat, map_guess_type, pair_dec_list.get(0), pair_guess_type
+                                , error_content_list, error_element_list);
+                        if (!result) {
+                            if (!error_content_list.isEmpty()) error = error_content_list.get(0);
+                            if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                            break;
+                        }
+
+                        if (pair_dec_list.get(1).getAutoType() != null) break;
+
+                        all_type = pair_dec_list.get(1).getAllType();
+                        pair_guess_type = ALittleUtil.guessType(all_type);
+                        if (pair_guess_type == null) {
+                            error = "左边所在的第2个变量是未知类型";
+                            element = all_type;
+                            break;
+                        }
+                        map_guess_type = ALittleUtil.guessType(all_type_list.get(1));
+
+                        result = ALittleUtil.guessSoftTypeEqual(pair_dec_list.get(1), pair_guess_type, value_stat, map_guess_type
+                                , error_content_list, error_element_list);
+                        if (!result) {
+                            if (!error_content_list.isEmpty()) error = error_content_list.get(0);
+                            if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                            break;
+                        }
                     }
-
-                    if (pair_dec_list.get(1).getAutoType() != null) break;
-
-                    all_type = pair_dec_list.get(1).getAllType();
-                    PsiElement pair_guess_type = ALittleUtil.guessType(all_type);
-                    if (pair_guess_type == null) {
-                        error = "左边所在的第2个变量是未知类型";
-                        element = all_type;
-                        break;
-                    }
-                    PsiElement list_guess_type = ALittleUtil.guessType(list_type.getAllType());
-
-                    boolean result = ALittleUtil.guessSoftTypeEqual(value_stat, list_guess_type, pair_dec_list.get(1), pair_guess_type
-                            , error_content_list, error_element_list);
-                    if (!result) {
-                        if (!error_content_list.isEmpty()) error = error_content_list.get(0);
-                        if (!error_element_list.isEmpty()) element = error_element_list.get(0);
-                        break;
-                    }
-                } else if (generic_type.getGenericMapType() != null) {
-                    ALittleGenericMapType map_type = generic_type.getGenericMapType();
-                    List<ALittleForPairDec> pair_dec_list = in_expr.getForPairDecList();
-                    if (pair_dec_list.size() != 2) {
-                        error = "这里参数数量必须是2个";
-                        element = in_expr;
-                        break;
-                    }
-
-                    List<ALittleAllType> all_type_list = map_type.getAllTypeList();
-                    if (all_type_list.size() != 2) {
-                        error = "Map格式错误";
-                        element = in_expr;
-                        break;
-                    }
-
-                    if (pair_dec_list.get(0).getAutoType() != null) break;
-
-                    ALittleAllType all_type = pair_dec_list.get(0).getAllType();
-                    PsiElement pair_guess_type = ALittleUtil.guessType(all_type);
-                    if (pair_guess_type == null) {
-                        error = "左边所在的第1个变量是未知类型";
-                        element = all_type;
-                        break;
-                    }
-                    PsiElement map_guess_type = ALittleUtil.guessType(all_type_list.get(0));
-
-                    boolean result = ALittleUtil.guessSoftTypeEqual(value_stat, map_guess_type, pair_dec_list.get(0), pair_guess_type
-                            , error_content_list, error_element_list);
-                    if (!result) {
-                        if (!error_content_list.isEmpty()) error = error_content_list.get(0);
-                        if (!error_element_list.isEmpty()) element = error_element_list.get(0);
-                        break;
-                    }
-
-                    if (pair_dec_list.get(1).getAutoType() != null) break;
-
-                    all_type = pair_dec_list.get(1).getAllType();
-                    pair_guess_type = ALittleUtil.guessType(all_type);
-                    if (pair_guess_type == null) {
-                        error = "左边所在的第2个变量是未知类型";
-                        element = all_type;
-                        break;
-                    }
-                    map_guess_type = ALittleUtil.guessType(all_type_list.get(1));
-
-                    result = ALittleUtil.guessSoftTypeEqual(pair_dec_list.get(1), pair_guess_type, value_stat, map_guess_type
-                            , error_content_list, error_element_list);
-                    if (!result) {
-                        if (!error_content_list.isEmpty()) error = error_content_list.get(0);
-                        if (!error_element_list.isEmpty()) element = error_element_list.get(0);
-                        break;
-                    }
+                } else {
+                    error = "遍历对象类型必须是List,Map,any";
+                    element = value_stat;
+                    break;
                 }
             }
         } while (false);

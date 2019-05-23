@@ -35,6 +35,9 @@ public class ALittlePropertyValueBrackValueStatReference extends PsiReferenceBas
         if (pre_property_value == null) {
             pre_property_value = property_value.getPropertyValueThisType();
         }
+        if (pre_property_value == null) {
+            pre_property_value = property_value.getPropertyValueCastType();
+        }
 
         for (ALittlePropertyValueSuffix suffix : suffix_list) {
             if (suffix.equals(property_value_suffix)) {
@@ -57,6 +60,8 @@ public class ALittlePropertyValueBrackValueStatReference extends PsiReferenceBas
             pre_type = ((ALittlePropertyValueCustomType) pre_property_value).guessType();
         } else if (pre_property_value instanceof ALittlePropertyValueThisType) {
             pre_type = ((ALittlePropertyValueThisType) pre_property_value).guessType();
+        } else if (pre_property_value instanceof ALittlePropertyValueCastType) {
+            pre_type = ((ALittlePropertyValueCastType) pre_property_value).guessType();
         } else if (pre_property_value instanceof  ALittlePropertyValueDotId) {
             ALittlePropertyValueDotIdName dot_id_name = ((ALittlePropertyValueDotId) pre_property_value).getPropertyValueDotIdName();
             pre_type = dot_id_name.guessType();

@@ -843,6 +843,7 @@ public class ALittleGenerateLua {
         // 获取开头的属性信息
         ALittlePropertyValueCustomType custom_type = prop_value.getPropertyValueCustomType();
         ALittlePropertyValueThisType this_type = prop_value.getPropertyValueThisType();
+        ALittlePropertyValueCastType cast_type = prop_value.getPropertyValueCastType();
         if (custom_type != null) {
             String custom_type_content = custom_type.getText();
             custom_guess_type = custom_type.guessType();
@@ -855,6 +856,10 @@ public class ALittleGenerateLua {
         // 如果是this，那么就变为self
         } else if (this_type != null) {
             content.append("self");
+        } else if (cast_type != null) {
+            String value = GenerateValueFactor(cast_type.getValueFactor());
+            if (value == null) return null;
+            content.append(value);
         }
 
         // 后面跟着后缀属性
