@@ -45,7 +45,7 @@ class TestA
     private List<string> _list_m;    // 定义个数组，元素是int类型。  List的下标和lua一样，从1开始
     private Map<string, int> _map_m; // 定义一个映射表，键是int类型，值是string类型
     private Map<string, Map<int, string>> _complex_m; // 嵌套的Map
-    private DataB _struct_b;
+    private DataB _struct_b;     // 定义一个结构体对象
 
     // 【构造函数】
     // 构造函数只能有一个，函数名固定为Ctor
