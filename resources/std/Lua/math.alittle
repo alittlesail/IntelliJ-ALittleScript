@@ -17,7 +17,7 @@ class math
     public static atan2(double y, double x) : double { }
 
     // Returns the smallest integer larger than or equal to x.
-    public static ceil(double x) : double {}
+    public static ceil(double x) : int {}
     // Returns the cosine of x (assumed to be in radians).
     public static cos(double x) : double { }
     // Returns the hyperbolic cosine of x.
@@ -28,7 +28,7 @@ class math
     public static exp(double x) : double { }
 
     // Returns the largest integer smaller than or equal to x.
-    public static floor(double x) : double { }
+    public static floor(double x) : int { }
     // Returns the remainder of the division of x by y that rounds the quotient towards zero.
     public static fmod(double x, double y) : double { }
     // Returns m and e such that x = m2e, e is an integer and the absolute value of m is in the range [0.5, 1) (or zero when x is zero).

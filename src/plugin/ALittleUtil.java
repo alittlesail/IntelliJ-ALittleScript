@@ -1242,7 +1242,29 @@ public class ALittleUtil {
         if (left_guess_type_name.equals("any")) return left_guess;
         if (right_guess_type_name.equals("any")) return right_guess;
 
-        if (left_guess_type_name.equals("int") || left_guess_type_name.equals("I64")) {
+        if (left_guess_type_name.equals("int")) {
+            if (right_guess_type_name.equals("int")) {
+                // 这个是特殊的
+                if (op_string.equals("/")) {
+                    return op_3_suffix;
+                }
+                return left_guess;
+            } else if (right_guess_type_name.equals("I64")) {
+                // 这个是特殊的
+                if (op_string.equals("/")) {
+                    return op_3_suffix;
+                }
+                return right_guess;
+            } else if (right_guess_type_name.equals("double")) {
+                return right_guess;
+            } else {
+                error_content_list.add(op_string + "运算符右边必须是int,double,any类型.不能是:" + right_guess_type_name);
+                error_element_list.add(right_src);
+                return null;
+            }
+        }
+
+        if (left_guess_type_name.equals("I64")) {
             if (right_guess_type_name.equals("int") || right_guess_type_name.equals("I64")) {
                 // 这个是特殊的
                 if (op_string.equals("/")) {
@@ -1636,9 +1658,44 @@ public class ALittleUtil {
             return false;
         }
 
-        if (left_name.equals("int") || left_name.equals("I64") || left_name.equals("double")) {
+        if (left_name.equals("int")) {
+            if (right_name.equals("int")) return true;
+
+            if (right_name.equals("I64"))
+            {
+                error_content_list.add("I64赋值给int，需要使用cast<int>()做强制类型转换:" + right_name);
+                error_element_list.add(src_right);
+                return false;
+            }
+
+            if (right_name.equals("double"))
+            {
+                error_content_list.add("double赋值给int，需要使用cast<int>()做强制类型转换:" + right_name);
+                error_element_list.add(src_right);
+                return false;
+            }
+            error_content_list.add("要求是int, 不能是:" + right_name);
+            error_element_list.add(src_right);
+            return false;
+        }
+
+        if (left_name.equals("I64")) {
+            if (right_name.equals("int") || right_name.equals("I64")) return true;
+
+            if (right_name.equals("double"))
+            {
+                error_content_list.add("double赋值给I64，需要使用cast<I64>()做强制类型转换:" + right_name);
+                error_element_list.add(src_right);
+                return false;
+            }
+            error_content_list.add("要求是I64, 不能是:" + right_name);
+            error_element_list.add(src_right);
+            return false;
+        }
+
+        if (left_name.equals("double")) {
             if (right_name.equals("int") || right_name.equals("I64") || right_name.equals("double")) return true;
-            error_content_list.add("要求是int,double,不能是:" + right_name);
+            error_content_list.add("要求是I64, 不能是:" + right_name);
             error_element_list.add(src_right);
             return false;
         }
