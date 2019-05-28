@@ -224,15 +224,15 @@ end
 
 -- 获取类名
 function GetClassName(object)
-    if (not IsClass(object)) return null end
+    if (not IsClass(object)) then return nil end
     return object.__class.__name
 end
 
-// 获取类
+-- 获取类
 function GetClass(object)
     return object.__class;
 end
-// 获取类的getter集合
+-- 获取类的getter集合
 function GetClassGetter(clazz)
     local list = {};
     local count = 0;
@@ -242,7 +242,7 @@ function GetClassGetter(clazz)
     end
     return list;
 end
-// 获取类的setter集合
+-- 获取类的setter集合
 function GetClassSetter(clazz)
     local list = {};
     local count = 0;
