@@ -1,5 +1,8 @@
 package plugin.action;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileTypes.FileType;
@@ -89,15 +92,13 @@ public class ALittleGenerateLuaAction extends AnAction {
             ALittleGenerateLua lua = new ALittleGenerateLua();
             error = lua.GenerateLua(alittleFile, true);
             if (error != null) {
-                error = alittleFile.getName() + ":代码生成失败:" + error;
+                Notifications.Bus.notify(new Notification("代码生成", "Lua", alittleFile.getName() + ":代码生成失败:" + error, NotificationType.INFORMATION));
                 break;
             }
         }
 
-        if (error != null) {
-            Messages.showMessageDialog(project, error, "错误", Messages.getErrorIcon());
-        } else {
-            Messages.showMessageDialog(project, "lua代码生成成功", "提示", Messages.getInformationIcon());
+        if (error == null) {
+            Notifications.Bus.notify(new Notification("代码生成", "Lua", "代码生成成功", NotificationType.INFORMATION));
         }
     }
 }

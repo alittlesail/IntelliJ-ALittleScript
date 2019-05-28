@@ -1,7 +1,10 @@
 package plugin;
 
+import com.intellij.openapi.compiler.CompilerPaths;
+import com.intellij.openapi.compiler.ex.CompilerPathsEx;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.FileIndexFacade;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -160,6 +163,16 @@ public class ALittleGenerateLua {
                 return "模块文件路径:" + module_file_path + "没有以:" + module_file_name + "结尾";
             }
             String module_base_path = module_file_path.substring(0, module_file_path.length() - module_file_name.length());
+
+            String out_path = CompilerPaths.getModuleOutputPath(module, false);
+            if (out_path == null) {
+                return "请先设置生成目录";
+            }
+            String end_path = "production/" + module_name;
+            if (out_path.endsWith(end_path)) {
+                out_path = out_path.substring(0, out_path.length() - end_path.length());
+            }
+
             String file_path = alittleFile.getVirtualFile().getPath();
             if (!file_path.startsWith(module_base_path)) {
                 return "当前文件不在模块路径下:" + file_path;
@@ -192,7 +205,7 @@ public class ALittleGenerateLua {
             lua_rel_path = lua_rel_path.substring(0, lua_rel_path.length() - ext.length()) + "lua";
             if (protocol_rel_path != null)
                 protocol_rel_path = protocol_rel_path.substring(0, protocol_rel_path.length() - ext.length()) + "json";
-            String lua_full_path = module_base_path + lua_rel_path;
+            String lua_full_path = out_path + lua_rel_path;
 
             File file = new File(lua_full_path);
             boolean result = file.getParentFile().mkdirs();
@@ -202,7 +215,7 @@ public class ALittleGenerateLua {
 
             if (protocol_content != null && protocol_rel_path != null)
             {
-                String protocol_full_path = module_base_path + protocol_rel_path;
+                String protocol_full_path = out_path + protocol_rel_path;
                 file = new File(protocol_full_path);
                 result = file.getParentFile().mkdirs();
                 file_out = new FileOutputStream(new File(protocol_full_path));
@@ -211,7 +224,7 @@ public class ALittleGenerateLua {
             }
 
             // 复制标准库
-            copyStdLibrary(module_base_path + std_path);
+            copyStdLibrary(out_path + std_path);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return "代码写入文件时失败";
