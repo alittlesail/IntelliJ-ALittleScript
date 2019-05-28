@@ -23,9 +23,12 @@ import com.intellij.psi.PsiManager;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.SendLogRunnable;
 import plugin.psi.ALittleFile;
 
 public class ALittleInitComponent implements BaseComponent {
+    private boolean USED = false;
+
     public ALittleInitComponent() {
     }
     @NotNull
@@ -50,6 +53,11 @@ public class ALittleInitComponent implements BaseComponent {
                                     System.out.println(psiFile.getName() + ":生成lua代码成功");
                                 } else {
                                     System.out.println(psiFile.getName() + ":生成lua代码失败:" + error);
+                                }
+
+                                if (!USED) {
+                                    SendLogRunnable.SendLog("fist use gen a single lua file");
+                                    USED = true;
                                 }
 
                                 // ALittleGenerateJavaScript js = new ALittleGenerateJavaScript();
@@ -144,9 +152,12 @@ public class ALittleInitComponent implements BaseComponent {
                         }
                     }
         });
+
+        SendLogRunnable.SendLog("initComponent");
     }
 
     public void disposeComponent() {
 
+        SendLogRunnable.SendLog("disposeComponent");
     }
 }

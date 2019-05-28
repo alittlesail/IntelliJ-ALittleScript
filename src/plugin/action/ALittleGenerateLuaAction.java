@@ -18,6 +18,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import plugin.ALittleFileType;
 import plugin.ALittleGenerateLua;
+import plugin.alittle.SendLogRunnable;
 import plugin.psi.ALittleFile;
 
 import java.io.File;
@@ -81,6 +82,7 @@ public class ALittleGenerateLuaAction extends AnAction {
 
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(project));
 
+        SendLogRunnable.SendLog("gen all lua file");
         Messages.showMessageDialog(project, "开始执行lua代码生成", "提示", Messages.getInformationIcon());
 
         String error = null;
