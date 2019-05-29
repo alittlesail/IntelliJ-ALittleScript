@@ -1,13 +1,17 @@
 package plugin.action;
 
+import com.intellij.bootRuntime.command.Delete;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.compiler.CompilerPaths;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndex;
+import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -63,33 +67,59 @@ public class ALittleGenerateLuaAction extends AnAction {
         }
     }
 
-    @Override
-    public void actionPerformed(AnActionEvent e) {
-        Project project = e.getProject();
-        if (project == null) return;
+    public boolean DeleteDir(Project project, VirtualFile file) {
+        FileIndexFacade facade = FileIndexFacade.getInstance(project);
+        Module module = facade.getModuleForFile(file);
+        if (module == null) return false;
+
+        String out_path = CompilerPaths.getModuleOutputPath(module, false);
+        if (out_path == null) return false;
+
+        String end_path = "production/" + module.getName();
+        if (out_path.endsWith(end_path)) {
+            out_path = out_path.substring(0, out_path.length() - end_path.length());
+        }
 
         // 删除根目录并重新创建
-        String root_path = project.getBasePath() + "/Script";
+        String root_path = out_path + "Script";
         delFolder(root_path);
         File root_file_path = new File(root_path);
         root_file_path.mkdirs();
 
         // 删除根目录并重新创建
-        root_path = project.getBasePath() + "/Protocol";
+        root_path = out_path + "Protocol";
         delFolder(root_path);
         root_file_path = new File(root_path);
         root_file_path.mkdirs();
+
+        return true;
+    }
+
+    @Override
+    public void actionPerformed(AnActionEvent e) {
+        Project project = e.getProject();
+        if (project == null) return;
 
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(project));
 
         SendLogRunnable.SendLog("gen all lua file");
         Messages.showMessageDialog(project, "开始执行lua代码生成", "提示", Messages.getInformationIcon());
 
+        boolean delete_dir = false;
+
         String error = null;
         for (VirtualFile virtualFile : virtualFiles) {
             PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
             if (!(file instanceof ALittleFile)) continue;
             ALittleFile alittleFile = (ALittleFile)file;
+
+            if (!delete_dir) {
+                if (!DeleteDir(project, virtualFile)) {
+                    error = "Script和Protocol文件夹删除失败!";
+                    break;
+                }
+                delete_dir = true;
+            }
 
             ALittleGenerateLua lua = new ALittleGenerateLua();
             error = lua.GenerateLua(alittleFile, true);

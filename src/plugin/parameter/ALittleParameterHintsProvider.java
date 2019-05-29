@@ -126,17 +126,17 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                     ALittleVarAssignNameDec name_dec = dec.getVarAssignNameDec();
                     if (name_dec == null) break;
 
-                    String name = ALittleUtil.guessTypeString(guess_type, guess_type, new ArrayList<>(), new ArrayList<>());
-                    if (name == null) break;
-                    result.add(new InlayInfo(name, name_dec.getNode().getStartOffset()));
+                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guess_type, guess_type, new ArrayList<>(), new ArrayList<>());
+                    if (guess_info == null) break;
+                    result.add(new InlayInfo(guess_info.value, name_dec.getNode().getStartOffset()));
                 } else if (auto_type.getParent() instanceof  ALittleForPairDec) {
                     ALittleForPairDec dec = (ALittleForPairDec) auto_type.getParent();
                     ALittleVarAssignNameDec name_dec = dec.getVarAssignNameDec();
                     if (name_dec == null) break;
 
-                    String name = ALittleUtil.guessTypeString(guess_type, guess_type, new ArrayList<>(), new ArrayList<>());
-                    if (name == null) break;
-                    result.add(new InlayInfo(name, name_dec.getNode().getStartOffset()));
+                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guess_type, guess_type, new ArrayList<>(), new ArrayList<>());
+                    if (guess_info == null) break;
+                    result.add(new InlayInfo(guess_info.value, name_dec.getNode().getStartOffset()));
                 }
 
             } while (false);

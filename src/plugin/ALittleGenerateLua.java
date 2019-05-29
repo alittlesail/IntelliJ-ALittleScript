@@ -190,9 +190,9 @@ public class ALittleGenerateLua {
             if (module_name.equals("AEngine")) {
                 // AEngine的工程文件在：集成开发环境安装目录/Module/ALittleIDE/Other/AEngine/AEngine.iml
                 // 目标的目录是是在：集成开发环境安装目录/Engine
-                lua_rel_path = "../../../../Engine" + lua_rel_path.substring("src".length());
+                lua_rel_path = "../../Engine" + lua_rel_path.substring("src".length());
                 protocol_rel_path = null;
-                std_path = "../../../../Engine";
+                std_path = "../../Engine";
             } else {
                 lua_rel_path = "Script" + lua_rel_path.substring("src".length());
                 protocol_rel_path = "Protocol" + protocol_rel_path.substring("src".length());

@@ -2,7 +2,10 @@ package plugin.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.compiler.CompilerPaths;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -56,6 +59,34 @@ public class ALittleGenerateJavaScriptAction extends AnAction {
         }
     }
 
+    public boolean DeleteDir(Project project, VirtualFile file) {
+        FileIndexFacade facade = FileIndexFacade.getInstance(project);
+        Module module = facade.getModuleForFile(file);
+        if (module == null) return false;
+
+        String out_path = CompilerPaths.getModuleOutputPath(module, false);
+        if (out_path == null) return false;
+
+        String end_path = "production/" + module.getName();
+        if (out_path.endsWith(end_path)) {
+            out_path = out_path.substring(0, out_path.length() - end_path.length());
+        }
+
+        // 删除根目录并重新创建
+        String root_path = out_path + "Script";
+        delFolder(root_path);
+        File root_file_path = new File(root_path);
+        root_file_path.mkdirs();
+
+        // 删除根目录并重新创建
+        root_path = out_path + "Protocol";
+        delFolder(root_path);
+        root_file_path = new File(root_path);
+        root_file_path.mkdirs();
+
+        return true;
+    }
+
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
@@ -71,11 +102,21 @@ public class ALittleGenerateJavaScriptAction extends AnAction {
 
         Messages.showMessageDialog(project, "开始执行JavaScript代码生成", "提示", Messages.getInformationIcon());
 
+        boolean delete_dir = false;
+
         String error = null;
         for (VirtualFile virtualFile : virtualFiles) {
             PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
             if (!(file instanceof ALittleFile)) continue;
             ALittleFile alittleFile = (ALittleFile)file;
+
+            if (!delete_dir) {
+                if (!DeleteDir(project, virtualFile)) {
+                    error = "Script和Protocol文件夹删除失败!";
+                    break;
+                }
+                delete_dir = true;
+            }
 
             ALittleGenerateJavaScript js = new ALittleGenerateJavaScript();
             error = js.GenerateJavaScript(alittleFile, true);
