@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>as.alittleide.com</id>
   <name>ALittleScript</name>
-  <version>1.8</version>
+  <version>1.9</version>
   <vendor email="757609414@qq.com" url="https://github.com/alittlesail/ALittleScript">ALittle</vendor>
 
   <description><![CDATA[
