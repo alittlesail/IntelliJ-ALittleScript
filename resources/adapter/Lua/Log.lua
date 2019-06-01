@@ -2,6 +2,11 @@
 ---@module ALittle
 module("ALittle", package.seeall)
 
+local table = table
+local tostring = tostring
+local select = select
+local print = print
+
 -- 设置打印的回调函数
 local log = nil
 function SetLogCallback(func)

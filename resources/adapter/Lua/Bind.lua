@@ -13,6 +13,13 @@ local func = Functor(类实例对象.成员函数, 类实例对象, 参数1, 参
 func(...)
 --]]
 
+local select = select
+local coroutine = coroutine
+local assert = assert
+local unpack = unpack
+local tostring = tostring
+local setmetatable = setmetatable
+
 local __functor_mt = {}
 -- 设置call函数。这样创建类实例对象时，可以使用A()这样的书写方式。
 __functor_mt.__call = function(caller, ...)

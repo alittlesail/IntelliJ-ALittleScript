@@ -59,6 +59,14 @@ object : 实例对象
 	-- __class : 该实例对象的类型
 --]]
 
+local setmetatable = setmetatable
+local rawget = rawget
+local rawset = rawset
+local tostring = tostring
+local pairs = pairs
+local type = type
+local table = table
+
 -- 记录所有的类模版
 local __all_class = {}
 -- 这里设置弱引用，当某些类不在被使用之后，这个地方不会持有
