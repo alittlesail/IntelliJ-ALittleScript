@@ -29,6 +29,8 @@ public class ALittleGenerateLua {
     String m_namespace_name = "";
     List<String> m_protocol_list;
 
+    boolean m_open_rawset = false;
+
     private void copyStdLibrary(String module_base_path) {
         try {
             File file = new File(module_base_path + "/std");
@@ -107,6 +109,9 @@ public class ALittleGenerateLua {
 
                 // 检查new表达式的参数
                 ALittleAnnotator.CheckErrorForOpNewStat(element, null, guess_list);
+
+                // 检查变量名
+                ALittleAnnotator.CheckErrorForName(element, null, guess_list);
 
                 // 检查便捷List表达式
                 ALittleAnnotator.CheckErrorForOpNewList(element, null, guess_list);
@@ -1085,8 +1090,18 @@ public class ALittleGenerateLua {
         String value_stat_result = GenerateValueStat(value_stat);
         if (value_stat_result == null) return null;
 
-        if (op_assign.getText().equals("="))
+        if (op_assign.getText().equals("=")) {
+            // 这里做优化
+            // 把 self._attr = value 优化为  rawset(self, "_attr", value)
+            if (m_open_rawset) {
+                String[] attr_list = prop_value_result.split("\\.");
+                if (attr_list.length == 2 && attr_list[0].equals("self")) {
+                    return pre_tab + "__rawset(self, \"" + attr_list[1] + "\", " + value_stat_result + ")\n";
+                }
+            }
+
             return pre_tab + prop_value_result + " = " + value_stat_result + "\n";
+        }
 
         String op_assign_string = op_assign.getText();
 
@@ -1525,6 +1540,11 @@ public class ALittleGenerateLua {
                     .append(class_name)
                     .append(":Ctor(").append(ctor_param_list).append(")\n");
 
+            content.append(pre_tab)
+                    .append("\t local __rawset = rawset\n");
+
+            m_open_rawset = true;
+
             ALittleMethodBodyDec body_dec = ctor_dec.getMethodBodyDec();
             if (body_dec != null) {
                 List<ALittleAllExpr> all_expr_list = body_dec.getAllExprList();
@@ -1534,6 +1554,8 @@ public class ALittleGenerateLua {
                     content.append(result);
                 }
             }
+            m_open_rawset = false;
+
             content.append(pre_tab).append("end\n\n");
         }
         //构建getter函数///////////////////////////////////////////////////////////////////////////////////////

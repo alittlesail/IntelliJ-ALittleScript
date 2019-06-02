@@ -106,6 +106,9 @@ public class ALittleGenerateJavaScript {
                 // 检查new表达式的参数
                 ALittleAnnotator.CheckErrorForOpNewStat(element, null, guess_list);
 
+                // 检查变量名
+                ALittleAnnotator.CheckErrorForName(element, null, guess_list);
+
                 // 检查便捷List表达式
                 ALittleAnnotator.CheckErrorForOpNewList(element, null, guess_list);
             }

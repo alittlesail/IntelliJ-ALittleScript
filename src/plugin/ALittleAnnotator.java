@@ -355,9 +355,9 @@ public class ALittleAnnotator implements Annotator {
 
         if (element instanceof ALittleVarAssignExpr) {
             ALittleVarAssignExpr dec = (ALittleVarAssignExpr)element;
+
             ALittleValueStat value_stat = dec.getValueStat();
             if (value_stat == null) return null;
-
             List<ALittleVarAssignPairDec> pair_dec_list = dec.getVarAssignPairDecList();
 
             boolean has_handle = false;
@@ -1113,7 +1113,6 @@ public class ALittleAnnotator implements Annotator {
         return error;
     }
 
-
     public static String CheckErrorForOpNewList(@NotNull PsiElement element, AnnotationHolder holder, List<PsiElement> guess_list) {
         String error = null;
 
@@ -1155,6 +1154,42 @@ public class ALittleAnnotator implements Annotator {
                     }
                 }
             } while (false);
+        }
+
+        if (error != null && holder != null && element != null) {
+            holder.createErrorAnnotation(element, error);
+        }
+
+        return error;
+    }
+
+    public static String CheckErrorForName(@NotNull PsiElement element, AnnotationHolder holder, List<PsiElement> guess_list) {
+        String error = null;
+
+        if  (element instanceof ALittleVarAssignNameDec) {
+            if (element.getText().startsWith("__")) {
+                error = "局部变量名不能以两个下划线开头";
+            }
+        } else if (element instanceof ALittleNamespaceNameDec) {
+            if (element.getText().startsWith("__")) {
+                error = "命名域不能以两个下划线开头";
+            }
+        } else if (element instanceof ALittleClassNameDec) {
+            if (element.getText().startsWith("__")) {
+                error = "类名不能以两个下划线开头";
+            }
+        } else if (element instanceof ALittleStructNameDec) {
+            if (element.getText().startsWith("__")) {
+                error = "结构体名不能以两个下划线开头";
+            }
+        } else if (element instanceof ALittleEnumNameDec) {
+            if (element.getText().startsWith("__")) {
+                error = "枚举名不能以两个下划线开头";
+            }
+        } else if (element instanceof ALittleInstanceNameDec) {
+            if (element.getText().startsWith("__")) {
+                error = "单例名不能以两个下划线开头";
+            }
         }
 
         if (error != null && holder != null && element != null) {
@@ -1294,6 +1329,9 @@ public class ALittleAnnotator implements Annotator {
 
         // 检查便捷List表达式
         CheckErrorForOpNewList(element, holder, guess_list);
+
+        // 检查变量名
+        CheckErrorForName(element, holder, guess_list);
 
         // 给元素上色
         ColorAnnotate(element, holder, guess_list);
