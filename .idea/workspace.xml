@@ -13,39 +13,51 @@
     <option name="isMigrated" value="true" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/plugin/format/ALittleBlock.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
+            <state relative-caret-position="60">
               <caret line="22" column="13" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="347">
-              <caret line="1098" column="109" selection-start-line="1098" selection-start-column="109" selection-end-line="1098" selection-end-column="109" />
+            <state relative-caret-position="21105">
+              <caret line="1430" selection-start-line="1430" selection-end-line="1430" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java">
+        <entry file="file://$PROJECT_DIR$/resources/META-INF/plugin.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="110" selection-start-line="110" selection-end-line="110" />
+            <state relative-caret-position="180">
+              <caret line="12" column="9" lean-forward="true" selection-start-line="12" selection-start-column="9" selection-end-line="12" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/plugin/action/ALittleGenerateLuaAction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="241">
+              <caret line="84" column="29" lean-forward="true" selection-start-line="84" selection-start-column="29" selection-end-line="84" selection-end-column="29" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
+        <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="495">
-              <caret line="1330" column="60" lean-forward="true" selection-start-line="1330" selection-start-column="60" selection-end-line="1333" selection-end-column="55" />
+            <state relative-caret-position="2595">
+              <caret line="188" column="23" selection-start-line="188" selection-start-column="23" selection-end-line="188" selection-end-column="23" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -53,7 +65,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="421">
+            <state relative-caret-position="3825">
               <caret line="315" column="41" selection-start-line="315" selection-start-column="31" selection-end-line="315" selection-end-column="41" />
               <folding>
                 <element signature="e#0#2021#0" expanded="true" />
@@ -76,10 +88,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>BIT_AND_ASSIGN</find>
-      <find>BIT_AND</find>
-      <find>BIT_OR</find>
-      <find>BIT_NOT</find>
       <find>SHIFT_LEFT</find>
       <find>BIT_XOR_ASSIGN</find>
       <find>BIT_XOR</find>
@@ -106,6 +114,10 @@
       <find>ID_CONTENT</find>
       <find>GenerateNamespace</find>
       <find>Ctor</find>
+      <find>m_open_rawset</find>
+      <find>pairs</find>
+      <find>self</find>
+      <find>this_type</find>
     </findStrings>
     <replaceStrings>
       <replace>ALittleNamespaceStat</replace>
@@ -156,7 +168,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittleEnumVarNameDecElementImpl.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittlePrimitiveTypeReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleLexerAdapter.java" />
         <option value="$PROJECT_DIR$/src/plugin/format/ALittleBlock.java" />
@@ -199,14 +210,15 @@
         <option value="$PROJECT_DIR$/src/plugin/ALittleInitComponent.java" />
         <option value="$PROJECT_DIR$/src/plugin/action/CreateTutorialFileAction.java" />
         <option value="$PROJECT_DIR$/src/plugin/GuessTypeInfo.java" />
-        <option value="$PROJECT_DIR$/src/plugin/ALittleUtil.java" />
         <option value="$PROJECT_DIR$/src/plugin/parameter/ALittleParameterHintsProvider.java" />
         <option value="$PROJECT_DIR$/src/plugin/action/ALittleGenerateJavaScriptAction.java" />
         <option value="$PROJECT_DIR$/src/plugin/action/ALittleGenerateLuaAction.java" />
-        <option value="$PROJECT_DIR$/resources/META-INF/plugin.xml" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleAnnotator.java" />
+        <option value="$PROJECT_DIR$/src/plugin/ALittleUtil.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java" />
+        <option value="$PROJECT_DIR$/resources/META-INF/plugin.xml" />
+        <option value="$PROJECT_DIR$/resources/adapter/Lua/Log.lua" />
       </list>
     </option>
   </component>
@@ -223,7 +235,7 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1936" />
@@ -234,6 +246,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -245,12 +258,6 @@
               <item name="trunk" type="b2602c69:ProjectViewProjectNode" />
               <item name="trunk" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="trunk" type="b2602c69:ProjectViewProjectNode" />
-              <item name="trunk" type="462c0819:PsiDirectoryNode" />
-              <item name="resources" type="462c0819:PsiDirectoryNode" />
-              <item name="adapter" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="trunk" type="b2602c69:ProjectViewProjectNode" />
@@ -277,13 +284,26 @@
             </path>
             <path>
               <item name="trunk" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trunk" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="plugin" type="462c0819:PsiDirectoryNode" />
+              <item name="action" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="trunk" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trunk" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="plugin" type="462c0819:PsiDirectoryNode" />
+              <item name="reference" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="trunk" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -393,7 +413,7 @@
     <frame x="-8" y="-8" width="1252" height="784" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.29045308" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.29045308" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -472,6 +492,12 @@
           <properties />
           <option name="timeStamp" value="34" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/plugin/action/ALittleGenerateLuaAction.java</url>
+          <line>78</line>
+          <properties />
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
@@ -490,7 +516,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/plugin/psi/impl/ALittlePropertyValueCastTypeElementImpl.java" />
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittleLexerAdapter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -674,13 +699,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueThisTypeReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="68" column="12" lean-forward="true" selection-start-line="68" selection-start-column="12" selection-end-line="68" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueMethodCallStatReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-800">
@@ -703,16 +721,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10455">
-          <caret line="712" column="11" selection-start-line="712" selection-start-column="11" selection-end-line="712" selection-end-column="11" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleMethodParamOneDec.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -727,31 +735,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/action/ALittleGenerateLuaAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="735">
-          <caret line="75" column="43" selection-start-line="75" selection-start-column="43" selection-end-line="75" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/adapter/Lua/Class.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3000">
-          <caret line="200" column="35" selection-start-line="200" selection-start-column="35" selection-end-line="200" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittleTreeChangeListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="675">
           <caret line="62" selection-start-line="62" selection-end-line="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/META-INF/plugin.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="29" lean-forward="true" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
         </state>
       </provider>
     </entry>
@@ -762,16 +749,54 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="477">
+          <caret line="1393" column="54" lean-forward="true" selection-start-line="1393" selection-start-column="54" selection-end-line="1393" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="1330" column="60" selection-start-line="1330" selection-start-column="60" selection-end-line="1333" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueThisTypeReference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="68" column="12" lean-forward="true" selection-start-line="68" selection-start-column="12" selection-end-line="68" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/format/ALittleBlock.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
+        <state relative-caret-position="60">
           <caret line="22" column="13" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21105">
+          <caret line="1430" selection-start-line="1430" selection-end-line="1430" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2595">
+          <caret line="188" column="23" selection-start-line="188" selection-start-column="23" selection-end-line="188" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="421">
+        <state relative-caret-position="3825">
           <caret line="315" column="41" selection-start-line="315" selection-start-column="31" selection-end-line="315" selection-end-column="41" />
           <folding>
             <element signature="e#0#2021#0" expanded="true" />
@@ -780,24 +805,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
+    <entry file="file://$PROJECT_DIR$/resources/adapter/Lua/Log.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
-          <caret line="1330" column="60" lean-forward="true" selection-start-line="1330" selection-start-column="60" selection-end-line="1333" selection-end-column="55" />
+        <state relative-caret-position="1080">
+          <caret line="72" column="17" selection-start-line="72" selection-start-column="17" selection-end-line="72" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateJavaScript.java">
+    <entry file="file://$PROJECT_DIR$/resources/adapter/Lua/Class.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="110" selection-start-line="110" selection-end-line="110" />
+        <state relative-caret-position="345">
+          <caret line="275" lean-forward="true" selection-start-line="275" selection-end-line="275" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java">
+    <entry file="file://$PROJECT_DIR$/resources/META-INF/plugin.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="347">
-          <caret line="1098" column="109" selection-start-line="1098" selection-start-column="109" selection-end-line="1098" selection-end-column="109" />
+        <state relative-caret-position="180">
+          <caret line="12" column="9" lean-forward="true" selection-start-line="12" selection-start-column="9" selection-end-line="12" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/action/ALittleGenerateLuaAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="241">
+          <caret line="84" column="29" lean-forward="true" selection-start-line="84" selection-start-column="29" selection-end-line="84" selection-end-column="29" />
         </state>
       </provider>
     </entry>

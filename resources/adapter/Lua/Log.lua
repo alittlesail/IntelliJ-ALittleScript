@@ -32,7 +32,7 @@ function Log(...)
         table.insert(new_arg, tostring(select(i, ...)))
     end
     -- 打印出来
-    if log == null then
+    if log == nil then
         print(table.concat(new_arg, "\t"))
     else
         log(table.concat(new_arg, "\t"), 0)
@@ -51,7 +51,7 @@ function Warn(...)
         table.insert(new_arg, tostring(select(i, ...)))
     end
     -- 打印出来
-    if log == null then
+    if log == nil then
         print(table.concat(new_arg, "\t"))
     else
         log(table.concat(new_arg, "\t"), 1)
@@ -70,7 +70,7 @@ function Error(...)
         table.insert(new_arg, tostring(select(i, ...)))
     end
     -- 打印出来
-    if log == null then
+    if log == nil then
         print(table.concat(new_arg, "\t"))
     else
         log(table.concat(new_arg, "\t"), 2)

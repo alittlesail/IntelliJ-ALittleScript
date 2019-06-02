@@ -1379,7 +1379,7 @@ public class ALittleGenerateJavaScript {
                         .append(pre_tab)
                         .append("{\n");
             } else {
-                if (pair_type.equals("pairs")) {
+                if (pair_type.equals("__pairs")) {
                     content.append("for (let [")
                             .append(String.join(", ", pair_string_list))
                             .append("] of ")

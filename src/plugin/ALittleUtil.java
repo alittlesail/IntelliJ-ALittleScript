@@ -668,9 +668,9 @@ public class ALittleUtil {
         if (guess_type instanceof ALittleGenericType) {
             ALittleGenericType generic_type = (ALittleGenericType)guess_type;
             if (generic_type.getGenericListType() != null)
-                return "ipairs";
+                return "__ipairs";
             else if (generic_type.getGenericMapType() != null)
-                return "pairs";
+                return "__pairs";
         }
 
         return "";

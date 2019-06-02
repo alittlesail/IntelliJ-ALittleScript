@@ -3,6 +3,7 @@ package plugin;
 import com.intellij.openapi.compiler.CompilerPaths;
 import com.intellij.openapi.compiler.ex.CompilerPathsEx;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -27,9 +28,11 @@ import java.util.List;
 public class ALittleGenerateLua {
     String m_error = "";
     String m_namespace_name = "";
+    Project m_project = null;
     List<String> m_protocol_list;
 
     boolean m_open_rawset = false;
+    int m_rawset_use_count = 0;
 
     private void copyStdLibrary(String module_base_path) {
         try {
@@ -126,6 +129,7 @@ public class ALittleGenerateLua {
     }
 
     public String GenerateLua(ALittleFile alittleFile, boolean full_check) {
+        m_project = alittleFile.getProject();
         // 获取语法错误
         PsiErrorElement error = checkErrorElement(alittleFile, full_check);
         if (error != null) {
@@ -1093,10 +1097,28 @@ public class ALittleGenerateLua {
         if (op_assign.getText().equals("=")) {
             // 这里做优化
             // 把 self._attr = value 优化为  rawset(self, "_attr", value)
-            if (m_open_rawset) {
-                String[] attr_list = prop_value_result.split("\\.");
-                if (attr_list.length == 2 && attr_list[0].equals("self")) {
-                    return pre_tab + "__rawset(self, \"" + attr_list[1] + "\", " + value_stat_result + ")\n";
+            if (m_open_rawset && prop_value_list.size() == 1) {
+                ALittlePropertyValue prop_value = prop_value_list.get(0);
+                ALittlePropertyValueThisType this_type = prop_value.getPropertyValueThisType();
+                if (this_type != null && prop_value.getPropertyValueSuffixList().size() == 1) {
+                    ALittlePropertyValueSuffix suffix = prop_value.getPropertyValueSuffixList().get(0);
+                    if (suffix.getPropertyValueDotId() != null) {
+                        ALittlePropertyValueDotId dot_id = suffix.getPropertyValueDotId();
+                        String attr_name = dot_id.getPropertyValueDotIdName().getText();
+                        PsiElement this_element = this_type.guessType();
+                        if (this_element instanceof ALittleClassDec) {
+                            List<ALittleClassVarNameDec> var_name_list = new ArrayList<>();
+                            ALittleUtil.findClassVarNameDecList(this_element.getProject()
+                                    , ALittleUtil.getNamespaceName((ALittleFile) this_element.getContainingFile())
+                                    , (ALittleClassDec) this_element
+                                    , attr_name
+                                    , var_name_list, 100);
+                            if (!var_name_list.isEmpty()) {
+                                ++m_rawset_use_count;
+                                return pre_tab + "__rawset(self, \"" + attr_name + "\", " + value_stat_result + ")\n";
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1540,22 +1562,23 @@ public class ALittleGenerateLua {
                     .append(class_name)
                     .append(":Ctor(").append(ctor_param_list).append(")\n");
 
-            content.append(pre_tab)
-                    .append("\t local __rawset = rawset\n");
-
             m_open_rawset = true;
+            m_rawset_use_count = 0;
 
             ALittleMethodBodyDec body_dec = ctor_dec.getMethodBodyDec();
+            StringBuilder all_expr_content = new StringBuilder();
             if (body_dec != null) {
                 List<ALittleAllExpr> all_expr_list = body_dec.getAllExprList();
                 for (ALittleAllExpr all_expr : all_expr_list) {
                     String result = GenerateAllExpr(all_expr, pre_tab + "\t");
                     if (result == null) return null;
-                    content.append(result);
+                    all_expr_content.append(result);
                 }
             }
+
             m_open_rawset = false;
 
+            content.append(all_expr_content);
             content.append(pre_tab).append("end\n\n");
         }
         //构建getter函数///////////////////////////////////////////////////////////////////////////////////////
@@ -1800,6 +1823,7 @@ public class ALittleGenerateLua {
         else
             content = new StringBuilder("\nmodule(\"" + m_namespace_name + "\", package.seeall)\n\n");
 
+        StringBuilder other_content = new StringBuilder();
         PsiElement[] child_list = root.getChildren();
         for (PsiElement child : child_list) {
             // 处理结构体
@@ -1817,24 +1841,32 @@ public class ALittleGenerateLua {
             } else if (child instanceof ALittleEnumDec) {
                 String result = GenerateEnum((ALittleEnumDec) child, "");
                 if (result == null) return null;
-                content.append(result);
+                other_content.append(result);
             // 处理class
             } else if (child instanceof ALittleClassDec) {
                 String result = GenerateClass((ALittleClassDec) child, "");
                 if (result == null) return null;
-                content.append(result);
+                other_content.append(result);
             // 处理instance
             } else if (child instanceof ALittleInstanceDec) {
                 String result = GenerateInstance((ALittleInstanceDec)child, "");
                 if (result == null) return null;
-                content.append(result);
+                other_content.append(result);
             // 处理全局函数
             } else if (child instanceof ALittleGlobalMethodDec) {
                 String result = GenerateGlobalMethod((ALittleGlobalMethodDec)child, "");
                 if (result == null) return null;
-                content.append(result);
+                other_content.append(result);
             }
         }
+
+        if (m_rawset_use_count > 0)
+            content.append("local __rawset = rawset\n");
+        content.append("local __pairs = pairs\n");
+        content.append("local __ipairs = ipairs\n");
+        content.append("\n");
+
+        content.append(other_content);
 
         return content.toString();
     }
