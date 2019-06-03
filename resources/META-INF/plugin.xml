@@ -64,6 +64,7 @@
     <typedHandler implementation="plugin.format.ALittleTypedHandler"/>
     <codeInsight.parameterNameHints language="ALittle" implementationClass="plugin.parameter.ALittleParameterHintsProvider"/>
     <codeInsight.parameterInfo language="ALittle" implementationClass="plugin.parameter.ALittleParameterInfoHandler"/>
+    <moduleType id="ALittle" implementationClass="plugin.module.ALittleModuleType"/>
   </extensions>
 
   <application-components>

@@ -101,7 +101,7 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
             List<ALittleClassNameDec> dec_list = ALittleTreeChangeListener.findClassNameDecList(project, m_src_namespace, "");
             for (ALittleClassNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.CLASS).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -111,7 +111,7 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
             List<ALittleStructNameDec> dec_list = ALittleTreeChangeListener.findStructNameDecList(project, m_src_namespace, "");
             for (ALittleStructNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.STRUCT).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -121,7 +121,7 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
             List<ALittleEnumNameDec> dec_list = ALittleTreeChangeListener.findEnumNameDecList(project, m_src_namespace, "");
             for (ALittleEnumNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.ENUM).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -133,7 +133,7 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
             final List<ALittleNamespaceNameDec> dec_list = ALittleTreeChangeListener.findNamespaceNameDecList(project, "");
             for (final ALittleNamespaceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.NAMESPACE).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }

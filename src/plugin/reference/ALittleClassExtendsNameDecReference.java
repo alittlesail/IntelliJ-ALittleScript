@@ -83,7 +83,7 @@ public class ALittleClassExtendsNameDecReference extends PsiReferenceBase<PsiEle
             List<ALittleClassNameDec> dec_list = ALittleTreeChangeListener.findClassNameDecList(project, m_src_namespace, "");
             for (ALittleClassNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.CLASS).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -95,7 +95,7 @@ public class ALittleClassExtendsNameDecReference extends PsiReferenceBase<PsiEle
             List<ALittleNamespaceNameDec> dec_list = ALittleTreeChangeListener.findNamespaceNameDecList(project, "");
             for (ALittleNamespaceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.NAMESPACE).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }

@@ -14,7 +14,7 @@ public class ALittleCompletionContributor extends CompletionContributor {
             "int","I64","double","bool","string","auto","List","Map"
             ,"namespace","class","struct","enum"
             ,"for","do","while","break","return"
-            ,"get","set","fun","static","Ctor","Functor"
+            ,"get","set","fun","static","Ctor","Functor","this"
             ,"public","protected","private","instance"
     };
 

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallStatReference;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -108,7 +109,7 @@ public class ALittleUtil {
     }
 
     // 查找所有的函数名节点对象
-    private static void findMethodNameDecList(Project project, String src_namespace, String src_class, String src_method, @NotNull List<ALittleMethodNameDec> result, int deep)
+    private static void findMethodNameDecList(Project project, String src_namespace, String src_class, String src_method, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep)
     {        // 这个用于跳出无限递归
         if (deep <= 0) return;
 
@@ -116,10 +117,10 @@ public class ALittleUtil {
         if (name_dec_list == null || name_dec_list.isEmpty()) return;
         ALittleClassDec class_dec = (ALittleClassDec)name_dec_list.get(0).getParent();
 
-        findMethodNameDecList(project, src_namespace, class_dec, src_method, result, deep);
+        findMethodNameDecList(project, src_namespace, class_dec, src_method, result, icon, deep);
     }
 
-    public static void findMethodNameDecList(Project project, String src_namespace, ALittleClassDec class_dec, String src_method, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecList(Project project, String src_namespace, ALittleClassDec class_dec, String src_method, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (class_dec == null) return;
@@ -130,7 +131,7 @@ public class ALittleUtil {
             ALittleClassExtendsNamespaceNameDec class_extends_namespace_name_dec = class_dec.getClassExtendsNamespaceNameDec();
             String namespace_name = src_namespace;
             if (class_extends_namespace_name_dec != null) namespace_name = class_extends_namespace_name_dec.getText();
-            findMethodNameDecList(project, namespace_name, class_extends_name_dec.getText(), src_method, result, deep - 1);
+            findMethodNameDecList(project, namespace_name, class_extends_name_dec.getText(), src_method, result, icon, deep - 1);
         }
 
         // 处理成员函数
@@ -139,6 +140,7 @@ public class ALittleUtil {
             ALittleMethodNameDec class_method_name_dec = class_method_dec.getMethodNameDec();
             if (class_method_name_dec == null) continue;
             if (src_method.isEmpty() || class_method_name_dec.getIdContent().getText().equals(src_method)) {
+                if (icon != null) icon.add(ALittleIcons.MEMBER_METHOD);
                 result.add(class_method_name_dec);
             }
         }
@@ -149,6 +151,7 @@ public class ALittleUtil {
             ALittleMethodNameDec class_getter_name_dec = class_getter_dec.getMethodNameDec();
             if (class_getter_name_dec == null) continue;
             if (src_method.isEmpty() || class_getter_name_dec.getIdContent().getText().equals(src_method)) {
+                if (icon != null) icon.add(ALittleIcons.GETTER_METHOD);
                 result.add(class_getter_name_dec);
             }
         }
@@ -159,6 +162,7 @@ public class ALittleUtil {
             ALittleMethodNameDec class_setter_name_dec = class_setter_dec.getMethodNameDec();
             if (class_setter_name_dec == null) continue;
             if (src_method.isEmpty() || class_setter_name_dec.getIdContent().getText().equals(src_method)) {
+                if (icon != null) icon.add(ALittleIcons.SETTER_METHOD);
                 result.add(class_setter_name_dec);
             }
         }
@@ -169,6 +173,7 @@ public class ALittleUtil {
             ALittleMethodNameDec class_static_name_dec = class_static_dec.getMethodNameDec();
             if (class_static_name_dec == null) continue;
             if (src_method.isEmpty() || class_static_name_dec.getIdContent().getText().equals(src_method)) {
+                if (icon != null) icon.add(ALittleIcons.STATIC_METHOD);
                 result.add(class_static_name_dec);
             }
         }

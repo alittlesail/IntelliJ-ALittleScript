@@ -12,6 +12,7 @@ import plugin.ALittleTreeChangeListener;
 import plugin.ALittleUtil;
 import plugin.psi.*;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,7 +163,7 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
         PsiElement method_dec = myElement.getParent();
         if (method_dec.getParent() instanceof ALittleClassDec) {
             ALittleClassDec class_dec = (ALittleClassDec) method_dec.getParent();
-            ALittleUtil.findMethodNameDecList(project, m_src_namespace, class_dec, m_key, dec_list, 100);
+            ALittleUtil.findMethodNameDecList(project, m_src_namespace, class_dec, m_key, dec_list, null, 100);
         } else if (method_dec.getParent() instanceof ALittleNamespaceDec) {
             dec_list = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, m_src_namespace, m_key);
         }
@@ -184,22 +185,34 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        List<ALittleMethodNameDec> dec_list = new ArrayList<>();
         PsiElement method_dec = myElement.getParent();
+        List<LookupElement> variants = new ArrayList<>();
         // 类内部的函数
         if (method_dec.getParent() instanceof ALittleClassDec) {
             ALittleClassDec class_dec = (ALittleClassDec) method_dec.getParent();
-            ALittleUtil.findMethodNameDecList(project, m_src_namespace, class_dec, "", dec_list, 100);
+
+            List<ALittleMethodNameDec> dec_list = new ArrayList<>();
+            List<Icon> icon_list = new ArrayList<>();
+            ALittleUtil.findMethodNameDecList(project, m_src_namespace, class_dec, "", dec_list, icon_list, 100);
+
+            for (int i = 0; i < dec_list.size(); ++i) {
+                ALittleMethodNameDec dec = dec_list.get(i);
+                Icon icon = null;
+                if (i < icon_list.size()) icon = icon_list.get(i);
+                variants.add(LookupElementBuilder.create(dec.getText()).
+                        withIcon(icon).
+                        withTypeText(dec.getContainingFile().getName())
+                );
+            }
         // 全局函数
         } else if (method_dec.getParent() instanceof ALittleNamespaceDec) {
-            dec_list = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, m_src_namespace, "");
-        }
-        List<LookupElement> variants = new ArrayList<>();
-        for (ALittleMethodNameDec dec : dec_list) {
-            variants.add(LookupElementBuilder.create(dec.getText()).
-                    withIcon(ALittleIcons.FILE).
-                    withTypeText(dec.getContainingFile().getName())
-            );
+            List<ALittleMethodNameDec> dec_list = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, m_src_namespace, "");
+            for (ALittleMethodNameDec dec : dec_list) {
+                variants.add(LookupElementBuilder.create(dec.getText()).
+                        withIcon(ALittleIcons.GLOBAL_METHOD).
+                        withTypeText(dec.getContainingFile().getName())
+                );
+            }
         }
         return variants.toArray();
     }

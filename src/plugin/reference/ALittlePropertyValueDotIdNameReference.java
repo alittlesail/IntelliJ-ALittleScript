@@ -12,6 +12,7 @@ import plugin.ALittleTreeChangeListener;
 import plugin.ALittleUtil;
 import plugin.psi.*;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -360,23 +361,34 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             ALittleUtil.findClassVarNameDecList(myElement.getProject(), src_namespace, class_dec, "", class_var_name_dec_list, 10);
             for (ALittleClassVarNameDec class_var_name_dec : class_var_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_var_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.PROPERTY).
                         withTypeText(class_var_name_dec.getContainingFile().getName()));
             }
 
-            List<ALittleMethodNameDec> class_method_name_dec_list = new ArrayList<>();
             // 所有setter
+            List<ALittleMethodNameDec> class_method_name_dec_list = new ArrayList<>();
             ALittleUtil.findMethodNameDecListForSetter(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
-            // 所有getter
-            ALittleUtil.findMethodNameDecListForGetter(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
-            // 所有成员函数
-            ALittleUtil.findMethodNameDecListForFun(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
-            // 过滤掉重复的函数名
-            class_method_name_dec_list = ALittleUtil.filterSameMethodName(class_method_name_dec_list);
-
             for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.SETTER_METHOD).
+                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+            }
+
+            // 所有getter
+            class_method_name_dec_list = new ArrayList<>();
+            ALittleUtil.findMethodNameDecListForGetter(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
+            for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
+                variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
+                        withIcon(ALittleIcons.GETTER_METHOD).
+                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+            }
+
+            // 所有成员函数
+            class_method_name_dec_list = new ArrayList<>();
+            ALittleUtil.findMethodNameDecListForFun(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
+            for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
+                variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
+                        withIcon(ALittleIcons.MEMBER_METHOD).
                         withTypeText(class_method_name_dec.getContainingFile().getName()));
             }
             // 处理结构体的实例对象
@@ -388,7 +400,7 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             ALittleUtil.findStructVarNameDecList(myElement.getProject(), src_namespace, struct_dec, "", struct_var_name_dec_list, 10);
             for (ALittleStructVarNameDec struct_var_name_dec : struct_var_name_dec_list) {
                 variants.add(LookupElementBuilder.create(struct_var_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.PROPERTY).
                         withTypeText(struct_var_name_dec.getContainingFile().getName()));
             }
             // 比如 ALittle.AEnum
@@ -399,35 +411,35 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             List<ALittleEnumNameDec> enum_name_dec_list = ALittleTreeChangeListener.findEnumNameDecList(myElement.getProject(), src_namespace, "");
             for (ALittleEnumNameDec enum_name_dec : enum_name_dec_list) {
                 variants.add(LookupElementBuilder.create(enum_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.ENUM).
                         withTypeText(enum_name_dec.getContainingFile().getName()));
             }
             // 所有全局函数
             List<ALittleMethodNameDec> method_name_dec_list = ALittleTreeChangeListener.findGlobalMethodNameDecList(myElement.getProject(), src_namespace, "");
             for (ALittleMethodNameDec method_name_dec : method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(method_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.GLOBAL_METHOD).
                         withTypeText(method_name_dec.getContainingFile().getName()));
             }
             // 所有类名
             List<ALittleClassNameDec> class_name_dec_list = ALittleTreeChangeListener.findClassNameDecList(myElement.getProject(), src_namespace, "");
             for (ALittleClassNameDec class_name_dec : class_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.CLASS).
                         withTypeText(class_name_dec.getContainingFile().getName()));
             }
             // 所有结构体名
             List<ALittleStructNameDec> struct_name_dec_list = ALittleTreeChangeListener.findStructNameDecList(myElement.getProject(), src_namespace, "");
             for (ALittleStructNameDec struct_name_dec : struct_name_dec_list) {
                 variants.add(LookupElementBuilder.create(struct_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.STRUCT).
                         withTypeText(struct_name_dec.getContainingFile().getName()));
             }
             // 所有单例
             List<ALittleInstanceNameDec> instance_name_dec_list = ALittleTreeChangeListener.findInstanceNameDecList(myElement.getProject(), src_namespace, "", false);
             for (ALittleInstanceNameDec instance_name_dec : instance_name_dec_list) {
                 variants.add(LookupElementBuilder.create(instance_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.INSTANCE).
                         withTypeText(instance_name_dec.getContainingFile().getName()));
             }
             // 比如 AClass.StaticMethod()
@@ -438,18 +450,35 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             // 所有静态函数
             List<ALittleMethodNameDec> class_method_name_dec_list = new ArrayList<>();
             ALittleUtil.findMethodNameDecListForStatic(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
-            // 所有成员函数
-            ALittleUtil.findMethodNameDecListForFun(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
-            // 所有setter
-            ALittleUtil.findMethodNameDecListForSetter(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
-            // 所有getter
-            ALittleUtil.findMethodNameDecListForGetter(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
-            // 过滤掉重复的函数名
-            class_method_name_dec_list = ALittleUtil.filterSameMethodName(class_method_name_dec_list);
-
             for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.STATIC_METHOD).
+                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+            }
+            // 所有成员函数
+            class_method_name_dec_list = new ArrayList<>();
+            ALittleUtil.findMethodNameDecListForFun(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
+            for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
+                variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
+                        withIcon(ALittleIcons.MEMBER_METHOD).
+                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+            }
+
+            // 所有setter
+            class_method_name_dec_list = new ArrayList<>();
+            ALittleUtil.findMethodNameDecListForSetter(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
+            for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
+                variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
+                        withIcon(ALittleIcons.SETTER_METHOD).
+                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+            }
+
+            // 所有getter
+            class_method_name_dec_list = new ArrayList<>();
+            ALittleUtil.findMethodNameDecListForGetter(myElement.getProject(), src_namespace, class_dec, "", class_method_name_dec_list, 10);
+            for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
+                variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
+                        withIcon(ALittleIcons.GETTER_METHOD).
                         withTypeText(class_method_name_dec.getContainingFile().getName()));
             }
             // 比如 AEnum.Var
@@ -460,7 +489,7 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             ALittleUtil.findEnumVarNameDecList(enum_dec, "", var_name_dec_list);
             for (ALittleEnumVarNameDec var_name_dec : var_name_dec_list) {
                 variants.add(LookupElementBuilder.create(var_name_dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.PROPERTY).
                         withTypeText(var_name_dec.getContainingFile().getName()));
             }
         }

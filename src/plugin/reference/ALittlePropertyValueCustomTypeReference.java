@@ -198,7 +198,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             List<ALittleNamespaceNameDec> dec_list = ALittleTreeChangeListener.findNamespaceNameDecList(project, "");
             for (ALittleNamespaceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.NAMESPACE).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -208,7 +208,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             List<ALittleMethodNameDec> dec_list = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, m_src_namespace, "");
             for (ALittleMethodNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.GLOBAL_METHOD).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -218,7 +218,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             List<ALittleClassNameDec> dec_list = ALittleTreeChangeListener.findClassNameDecList(project, m_src_namespace, "");
             for (ALittleClassNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.CLASS).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -228,7 +228,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             List<ALittleStructNameDec> dec_list = ALittleTreeChangeListener.findStructNameDecList(project, m_src_namespace, "");
             for (ALittleStructNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.STRUCT).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -238,7 +238,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             List<ALittleEnumNameDec> dec_list = ALittleTreeChangeListener.findEnumNameDecList(project, m_src_namespace, "");
             for (ALittleEnumNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.ENUM).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -248,7 +248,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             List<ALittleInstanceNameDec> dec_list = ALittleTreeChangeListener.findInstanceNameDecList(project, m_src_namespace, "", true);
             for (ALittleInstanceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.INSTANCE).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -263,7 +263,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
                     , "");
             for (ALittleMethodParamNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.PARAM).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
@@ -274,7 +274,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             List<ALittleVarAssignNameDec> dec_list = ALittleUtil.findVarAssignNameDecList(myElement, "");
             for (ALittleVarAssignNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
-                        withIcon(ALittleIcons.FILE).
+                        withIcon(ALittleIcons.VARIABLE).
                         withTypeText(dec.getContainingFile().getName())
                 );
             }

@@ -71,7 +71,7 @@ public class ALittleClassExtendsNamespaceNameDecReference extends PsiReferenceBa
         List<LookupElement> variants = new ArrayList<>();
         for (final ALittleNamespaceNameDec dec : dec_list) {
             variants.add(LookupElementBuilder.create(dec.getText()).
-                    withIcon(ALittleIcons.FILE).
+                    withIcon(ALittleIcons.NAMESPACE).
                     withTypeText(dec.getContainingFile().getName())
             );
         }

@@ -67,18 +67,17 @@ public class ALittleGenerateLuaAction extends AnAction {
         }
     }
 
-    public boolean DeleteDir(Project project, VirtualFile file) {
+    public String DeleteDir(Project project, VirtualFile file) {
         FileIndexFacade facade = FileIndexFacade.getInstance(project);
         Module module = facade.getModuleForFile(file);
-        if (module == null) return false;
+        if (module == null) return "DeleteDir:module获取失败";
 
         String out_path = CompilerPaths.getModuleOutputPath(module, false);
-        if (out_path == null) return false;
+        if (out_path == null) return "DeleteDir:CompilerPaths.getModuleOutputPath调用失败";
 
         String end_path = "production/" + module.getName();
-        if (out_path.endsWith(end_path)) {
-            out_path = out_path.substring(0, out_path.length() - end_path.length());
-        }
+        if (!out_path.endsWith(end_path)) return "DeleteDir:end_path:" + end_path + "不是out_path:" + out_path + " 的结尾";
+        out_path = out_path.substring(0, out_path.length() - end_path.length());
 
         // 删除根目录并重新创建
         String root_path = out_path + "Script";
@@ -92,7 +91,7 @@ public class ALittleGenerateLuaAction extends AnAction {
         root_file_path = new File(root_path);
         root_file_path.mkdirs();
 
-        return true;
+        return null;
     }
 
     @Override
@@ -114,8 +113,8 @@ public class ALittleGenerateLuaAction extends AnAction {
             ALittleFile alittleFile = (ALittleFile)file;
 
             if (!delete_dir) {
-                if (!DeleteDir(project, virtualFile)) {
-                    error = "Script和Protocol文件夹删除失败!";
+                error = DeleteDir(project, virtualFile);
+                if (error != null) {
                     break;
                 }
                 delete_dir = true;
@@ -124,13 +123,13 @@ public class ALittleGenerateLuaAction extends AnAction {
             ALittleGenerateLua lua = new ALittleGenerateLua();
             error = lua.GenerateLua(alittleFile, true);
             if (error != null) {
-                Notifications.Bus.notify(new Notification("代码生成", "Lua", alittleFile.getName() + ":代码生成失败:" + error, NotificationType.INFORMATION));
+                Messages.showMessageDialog(project, alittleFile.getName() + ":代码生成失败:" + error, "提示", Messages.getInformationIcon());
                 break;
             }
         }
 
         if (error == null) {
-            Notifications.Bus.notify(new Notification("代码生成", "Lua", "代码生成成功", NotificationType.INFORMATION));
+            Messages.showMessageDialog(project, "代码生成成功", "提示", Messages.getInformationIcon());
         }
     }
 }

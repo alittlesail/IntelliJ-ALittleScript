@@ -77,7 +77,7 @@ public class ALittleEnumNameDecReference extends PsiReferenceBase<PsiElement> im
         List<LookupElement> variants = new ArrayList<>();
         for (ALittleEnumNameDec dec : dec_list) {
             variants.add(LookupElementBuilder.create(dec.getText()).
-                    withIcon(ALittleIcons.FILE).
+                    withIcon(ALittleIcons.ENUM).
                     withTypeText(dec.getContainingFile().getName())
             );
         }

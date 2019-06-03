@@ -76,7 +76,7 @@ public class ALittleInstanceClassNameDecReference extends PsiReferenceBase<PsiEl
         List<LookupElement> variants = new ArrayList<>();
         for (ALittleClassNameDec dec : dec_list) {
             variants.add(LookupElementBuilder.create(dec.getText()).
-                    withIcon(ALittleIcons.FILE).
+                    withIcon(ALittleIcons.CLASS).
                     withTypeText(dec.getContainingFile().getName())
             );
         }
