@@ -1563,7 +1563,6 @@ public class ALittleGenerateLua {
                     .append(":Ctor(").append(ctor_param_list).append(")\n");
 
             m_open_rawset = true;
-            m_rawset_use_count = 0;
 
             ALittleMethodBodyDec body_dec = ctor_dec.getMethodBodyDec();
             StringBuilder all_expr_content = new StringBuilder();
