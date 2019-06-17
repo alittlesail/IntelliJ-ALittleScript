@@ -27,6 +27,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return result;
+        if (!listener.m_reload_ed) listener.reload();
 
         if (src_namespace.isEmpty()) {
             for (Map.Entry<String, Map<ALittleNamespaceNameDec, Data>> entry : listener.m_namespace_map.entrySet()) {
@@ -45,6 +46,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return result;
+        if (!listener.m_reload_ed) listener.reload();
+
         Data data = listener.m_data_map.get(src_namespace);
         if (data == null || data.class_map == null) return result;
 
@@ -66,6 +69,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return result;
+        if (!listener.m_reload_ed) listener.reload();
+
         Data data = listener.m_data_map.get(src_namespace);
         if (data == null || data.struct_map == null) return result;
 
@@ -86,6 +91,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return result;
+        if (!listener.m_reload_ed) listener.reload();
+
         Data data = listener.m_data_map.get(src_namespace);
         if (data == null || data.enum_map == null) return result;
 
@@ -106,6 +113,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return result;
+        if (!listener.m_reload_ed) listener.reload();
+
         Data data = listener.m_data_map.get(src_namespace);
         if (data == null || data.global_method_map == null) return result;
 
@@ -126,6 +135,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return result;
+        if (!listener.m_reload_ed) listener.reload();
 
         // 先从指定模块中找
         Data data = listener.m_data_map.get(src_namespace);
@@ -163,6 +173,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return;
 
+        if (!listener.m_reload_ed) listener.reload();
+
         List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
         for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
 
@@ -173,9 +185,25 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
     }
 
+    public static void handleRefresh(Project project) {
+        ALittleTreeChangeListener listener = s_map.get(project);
+        if (listener == null) return;
+        if (listener.m_is_refresh) return;
+        listener.m_is_refresh = true;
+        listener.reload();
+    }
+
+    public static boolean isReloading(Project project) {
+        ALittleTreeChangeListener listener = s_map.get(project);
+        if (listener == null) return true;
+        if (listener.m_reload_ing) return true;
+        return false;
+    }
+
     public static void handleFileCreated(Project project, ALittleFile alittleFile) {
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return;
+        if (!listener.m_reload_ed) listener.reload();
 
         List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
         for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
@@ -317,6 +345,10 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     private Map<String, Data> m_data_map;
     // 全局命名域下的单例
     private Map<String, Set<ALittleInstanceNameDec>> m_instance_map;
+    // 已加载的文件列表
+    boolean m_reload_ing = false;
+    boolean m_reload_ed = false;
+    boolean m_is_refresh = false;
 
     public ALittleTreeChangeListener(Project project) {
         m_project = project;
@@ -326,6 +358,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         m_namespace_map = new HashMap<>();
         m_data_map = new HashMap<>();
         m_instance_map = new HashMap<>();
+        m_reload_ing = true;
 
         // 遍历所有文件，预加载所有内容
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(m_project));
@@ -362,6 +395,12 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                 addNamespaceName(namespace_name_dec.getText(), namespace_name_dec);
             }
         }
+
+        m_reload_ing = false;
+
+        if (!m_reload_ed)
+            PsiManager.getInstance(m_project).addPsiTreeChangeListener(this);
+        m_reload_ed = true;
     }
 
     private void addNamespaceName(String name, ALittleNamespaceNameDec element) {

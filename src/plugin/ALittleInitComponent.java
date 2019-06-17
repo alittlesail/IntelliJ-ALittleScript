@@ -5,21 +5,24 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.BaseComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileEvent;
-import com.intellij.openapi.vfs.VirtualFileListener;
-import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.*;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.SendLogRunnable;
 import plugin.psi.ALittleFile;
+
+import java.util.Collection;
 
 public class ALittleInitComponent implements BaseComponent {
     private boolean USED = false;
@@ -36,6 +39,16 @@ public class ALittleInitComponent implements BaseComponent {
         MessageBusConnection connection = bus.connect();
         connection.subscribe(AppTopics.FILE_DOCUMENT_SYNC
                 , new FileDocumentManagerListener() {
+                    @Override
+                    public void fileContentLoaded(@NotNull VirtualFile file, @NotNull Document document) {
+                        // 如果文件是项目内部的，那么就添加进去
+                        Project[] myProject = ProjectManager.getInstance().getOpenProjects();
+                        for (Project project : myProject) {
+                            if (ALittleTreeChangeListener.isReloading(project)) continue;
+                            ALittleTreeChangeListener.handleRefresh(project);
+                        }
+                    }
+
                     @Override
                     public void beforeDocumentSaving(@NotNull Document document) {
                         Project[] myProject = ProjectManager.getInstance().getOpenProjects();
@@ -74,8 +87,6 @@ public class ALittleInitComponent implements BaseComponent {
                     public void projectOpened(@NotNull Project project) {
                         ALittleTreeChangeListener listener = new ALittleTreeChangeListener(project);
                         ALittleTreeChangeListener.s_map.put(project, listener);
-                        listener.reload();
-                        PsiManager.getInstance(project).addPsiTreeChangeListener(listener);
                     }
 
                     @Override
