@@ -126,10 +126,20 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
                 );
             }
         }
+        // 查找全局函数
+        {
+            List<ALittleMethodNameDec> dec_list = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, m_src_namespace, "");
+            for (ALittleMethodNameDec dec : dec_list) {
+                variants.add(LookupElementBuilder.create(dec.getText()).
+                        withIcon(ALittleIcons.GLOBAL_METHOD).
+                        withTypeText(dec.getContainingFile().getName())
+                );
+            }
+        }
 
-        // 查找所有命名域
         if (!m_key.equals("IntellijIdeaRulezzz"))
         {
+            // 查找所有命名域
             final List<ALittleNamespaceNameDec> dec_list = ALittleTreeChangeListener.findNamespaceNameDecList(project, "");
             for (final ALittleNamespaceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
