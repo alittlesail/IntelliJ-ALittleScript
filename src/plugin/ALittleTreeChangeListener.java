@@ -363,24 +363,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         // 遍历所有文件，预加载所有内容
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(m_project));
 
-        // 加载标准库
-        String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
-        VirtualFile dir = null;
-
-        try {
-            if (jarPath.endsWith(".jar"))
-                dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
-            else
-                dir = VfsUtil.findFileByIoFile(new File(jarPath + "/std"), true);
-
-            if (dir != null) {
-                for (VirtualFile child_dir : dir.getChildren()) {
-                    virtualFiles.addAll(Arrays.asList(child_dir.getChildren()));
-                }
-            }
-        } catch (MalformedURLException e) {
-        }
-
         // 加载所有代码文件
         for (VirtualFile virtualFile : virtualFiles) {
             PsiFile file = PsiManager.getInstance(m_project).findFile(virtualFile);
