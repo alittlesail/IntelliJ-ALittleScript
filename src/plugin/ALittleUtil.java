@@ -2116,17 +2116,14 @@ public class ALittleUtil {
         return false;
     }
 
-    public static String GenerateStruct(ALittleStructDec root, String pre_tab, @NotNull List<String> error) {
+    public static String GenerateStructForJsonProto(ALittleStructDec root, String pre_tab, @NotNull List<String> error) {
         ALittleStructProtocolDec protocol_dec = root.getStructProtocolDec();
         // 如果没有带协议标志，那么就不需要生成协议
         if (protocol_dec == null) return "";
 
         ALittleCustomType custom_type = protocol_dec.getCustomType();
-        if (custom_type == null)
-        {
-            error.add(root.getText() + "没有定义协议枚举");
-            return null;
-        }
+        if (custom_type == null) return "";
+
         PsiElement guess_type = custom_type.getCustomTypeNameDec().guessType();
         if (!(guess_type instanceof ALittleEnumDec))
         {
@@ -2163,7 +2160,12 @@ public class ALittleUtil {
             json += "\"var_name_list\":[";
                 List<String> var_name_list = new ArrayList<>();
                 for (ALittleStructVarDec var_dec : root.getStructVarDecList()) {
-                    var_name_list.add("\"" + var_dec.getStructVarNameDec().getText() + "\"");
+                    ALittleStructVarNameDec var_name_dec = var_dec.getStructVarNameDec();
+                    if (var_name_dec == null) {
+                        error.add(var_dec.getText() + "没有定义字段名");
+                        return null;
+                    }
+                    var_name_list.add("\"" + var_name_dec.getText() + "\"");
                 }
                 json += String.join(",", var_name_list);
             json += "],";
@@ -2194,5 +2196,123 @@ public class ALittleUtil {
         json += "}";
 
         return json;
+    }
+
+    public static String GenerateStructForCPPProto(ALittleStructDec root, @NotNull List<String> class_list, String pre_tab, @NotNull List<String> error) {
+        ALittleStructProtocolDec protocol_dec = root.getStructProtocolDec();
+        // 如果没有带协议标志，那么就不需要生成协议
+        if (protocol_dec == null) return "";
+
+        // 协议名
+        ALittleStructNameDec name_dec = root.getStructNameDec();
+        if (name_dec == null)
+        {
+            error.add(root.getText() + "没有定义协议名");
+            return null;
+        }
+        // 协议名
+        String message_name = name_dec.getIdContent().getText();
+
+        ALittleCustomType custom_type = protocol_dec.getCustomType();
+        boolean is_json = custom_type == null;
+        if (custom_type != null) {
+            PsiElement guess_type = custom_type.getCustomTypeNameDec().guessType();
+            if (!(guess_type instanceof ALittleEnumDec))
+            {
+                error.add(root.getText() + "struct的(XXX)内必须使用enum");
+                return null;
+            }
+            ALittleEnumDec enum_dec = (ALittleEnumDec)guess_type;
+            if (enum_dec.getEnumProtocolDec() == null)
+            {
+                error.add(root.getText() + "struct的(XXX)内必须使用带protocol的enum");
+                return null;
+            }
+
+            // 协议ID
+            List<Integer> result = new ArrayList<>();
+            if (!ALittleUtil.getEnumVarValue(enum_dec, "_" + message_name, result) || result.isEmpty())
+            {
+                error.add(root.getText() + "找不到协议ID:_" + message_name);
+                return null;
+            }
+        }
+
+        List<String> typedef_list = new ArrayList<>();
+        String proto = "MESSAGE_MACRO(" + message_name + "\n";
+        if (is_json) proto = "JSON_MACRO(" + message_name + "\n";
+        for (ALittleStructVarDec var_dec : root.getStructVarDecList()) {
+            ALittleStructVarNameDec var_name_dec = var_dec.getStructVarNameDec();
+            if (var_name_dec == null) {
+                error.add(var_dec.getText() + "没有定义字段名");
+                return null;
+            }
+            String var_name = var_name_dec.getText();
+            ALittleAllType all_type = var_dec.getAllType();
+            if (all_type == null) {
+                error.add(var_dec.getText() + "没有定义字段类型");
+                return null;
+            }
+            String var_type = all_type.getText();
+            // 把空格替换掉
+            var_type = var_type.replace(" ", "");
+            var_type = var_type.replace("List<", "std::vector<");
+            var_type = var_type.replace("Map<", "std::map<");
+            if (var_type.equals("string")) var_type = "std::string";
+            var_type = var_type.replace("<string>", "<std::string>");
+            var_type = var_type.replace(",string>", ",std::string>");
+            var_type = var_type.replace("<string,", "<std::string,");
+
+            // 找出map定义，那么就直接使用预定义
+            int index = var_type.indexOf("std::map<");
+            if (index >= 0) {
+                String typedef = (message_name + "_" + var_name).toUpperCase();
+                typedef_list.add("typedef " + var_type + " " + typedef + ";");
+                var_type = typedef;
+            }
+
+            proto += "\t, " + var_type + ", " + var_name_dec.getText() + "\n";
+        }
+        proto += ");\n";
+
+        if (!typedef_list.isEmpty())
+            proto = String.join("\n", typedef_list) + "\n" + proto;
+
+        class_list.add("class " + message_name + ";");
+        return proto;
+    }
+
+    public static String GenerateEnumForCPPProto(ALittleEnumDec root, String pre_tab, @NotNull List<String> error) {
+        // 如果没有带协议标志，那么就不需要生成协议
+        if (root.getEnumProtocolDec() == null) return "";
+
+        // 协议名
+        ALittleEnumNameDec name_dec = root.getEnumNameDec();
+        if (name_dec == null)
+        {
+            error.add(root.getText() + "没有定义枚举名");
+            return null;
+        }
+        // 协议名
+        String enum_name = name_dec.getIdContent().getText();
+
+        List<String> typedef_list = new ArrayList<>();
+        String proto = "enum " + enum_name + "\n";
+        proto += "{\n";
+        for (ALittleEnumVarDec var_dec : root.getEnumVarDecList()) {
+            ALittleEnumVarNameDec var_name_dec = var_dec.getEnumVarNameDec();
+            if (var_name_dec == null) {
+                error.add(var_dec.getText() + "没有定义字段名");
+                return null;
+            }
+            ALittleEnumVarValueDec var_value_dec = var_dec.getEnumVarValueDec();
+            if (var_value_dec != null && var_value_dec.getStringContent() != null) {
+                error.add(var_dec.getText() + "协议枚举的值不能是字符串");
+                return null;
+            }
+            proto += "\t" + var_dec.getText() + ",\n";
+        }
+        proto += "};\n";
+        return proto;
     }
 }

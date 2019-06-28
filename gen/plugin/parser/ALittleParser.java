@@ -2881,7 +2881,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? struct struct_name_dec (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec)? struct_protocol_dec? struct_body_dec
+  // access_modifier? struct struct_name_dec ((COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec) | struct_protocol_dec)? struct_body_dec
   public static boolean struct_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "struct_dec")) return false;
     boolean r;
@@ -2890,7 +2890,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = r && consumeToken(b, STRUCT);
     r = r && struct_name_dec(b, l + 1);
     r = r && struct_dec_3(b, l + 1);
-    r = r && struct_dec_4(b, l + 1);
     r = r && struct_body_dec(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -2903,48 +2902,52 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec)?
+  // ((COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec) | struct_protocol_dec)?
   private static boolean struct_dec_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "struct_dec_3")) return false;
     struct_dec_3_0(b, l + 1);
     return true;
   }
 
-  // COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec
+  // (COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec) | struct_protocol_dec
   private static boolean struct_dec_3_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "struct_dec_3_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
+    r = struct_dec_3_0_0(b, l + 1);
+    if (!r) r = struct_protocol_dec(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec
+  private static boolean struct_dec_3_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_dec_3_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
     r = consumeToken(b, COLON);
-    r = r && struct_dec_3_0_1(b, l + 1);
+    r = r && struct_dec_3_0_0_1(b, l + 1);
     r = r && struct_extends_name_dec(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // (struct_extends_namespace_name_dec DOT)?
-  private static boolean struct_dec_3_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_dec_3_0_1")) return false;
-    struct_dec_3_0_1_0(b, l + 1);
+  private static boolean struct_dec_3_0_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_dec_3_0_0_1")) return false;
+    struct_dec_3_0_0_1_0(b, l + 1);
     return true;
   }
 
   // struct_extends_namespace_name_dec DOT
-  private static boolean struct_dec_3_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_dec_3_0_1_0")) return false;
+  private static boolean struct_dec_3_0_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_dec_3_0_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = struct_extends_namespace_name_dec(b, l + 1);
     r = r && consumeToken(b, DOT);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // struct_protocol_dec?
-  private static boolean struct_dec_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_dec_4")) return false;
-    struct_protocol_dec(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */
@@ -2984,7 +2987,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LPAREN custom_type RPAREN
+  // LPAREN custom_type? RPAREN
   public static boolean struct_protocol_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "struct_protocol_dec")) return false;
     if (!nextTokenIs(b, LPAREN)) return false;
@@ -2992,10 +2995,17 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, STRUCT_PROTOCOL_DEC, null);
     r = consumeToken(b, LPAREN);
     p = r; // pin = 1
-    r = r && report_error_(b, custom_type(b, l + 1));
+    r = r && report_error_(b, struct_protocol_dec_1(b, l + 1));
     r = p && consumeToken(b, RPAREN) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // custom_type?
+  private static boolean struct_protocol_dec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_protocol_dec_1")) return false;
+    custom_type(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */

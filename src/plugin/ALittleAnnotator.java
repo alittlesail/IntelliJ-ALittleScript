@@ -168,7 +168,6 @@ public class ALittleAnnotator implements Annotator {
                     error = "没有定义协议名";
                     break;
                 }
-
                 String message_name = name_dec.getText();
 
                 String type = all_type.getText();

@@ -1927,7 +1927,7 @@ public class ALittleGenerateJavaScript {
             // 处理结构体
             if (child instanceof ALittleStructDec) {
                 List<String> error = new ArrayList<>();
-                String result = ALittleUtil.GenerateStruct((ALittleStructDec) child, "", error);
+                String result = ALittleUtil.GenerateStructForJsonProto((ALittleStructDec) child, "", error);
                 if (result == null)
                 {
                     if (!error.isEmpty()) m_error = error.get(0);

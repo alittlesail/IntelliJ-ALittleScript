@@ -29,7 +29,10 @@ public class ALittleGenerateLua {
     String m_error = "";
     String m_namespace_name = "";
     Project m_project = null;
-    List<String> m_protocol_list;
+    List<String> m_json_list;
+    List<String> m_cpp_list;
+    List<String> m_enum_list;
+    List<String> m_class_list;
 
     boolean m_open_rawset = false;
     int m_rawset_use_count = 0;
@@ -135,7 +138,10 @@ public class ALittleGenerateLua {
         if (error != null) {
             return "有语法错误:" + error.getErrorDescription();
         }
-        m_protocol_list = new ArrayList<>();
+        m_json_list = new ArrayList<>();
+        m_cpp_list = new ArrayList<>();
+        m_enum_list = new ArrayList<>();
+        m_class_list = new ArrayList<>();
 
         List<ALittleNamespaceDec> namespace_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
         if (namespace_list.isEmpty()) {
@@ -153,9 +159,18 @@ public class ALittleGenerateLua {
         String content = GenerateNamespace(namespace_dec);
         if (content == null) return m_error;
 
-        String protocol_content = null;
-        if (!m_protocol_list.isEmpty())
-            protocol_content = "[" + String.join(",", m_protocol_list) + "]";
+        String json_content = null;
+        if (!m_json_list.isEmpty())
+            json_content = "[" + String.join(",", m_json_list) + "]";
+
+        String cpp_content = null;
+        if (!m_cpp_list.isEmpty()) {
+            if (!m_enum_list.isEmpty())
+                cpp_content = "\n" + String.join("\n", m_enum_list) + "\n\n";
+            if (!m_class_list.isEmpty())
+                cpp_content = "\n" + String.join("\n", m_class_list) + "\n\n";
+            cpp_content += String.join("\n", m_cpp_list);
+        }
 
         // 保存到文件
         try {
@@ -187,7 +202,8 @@ public class ALittleGenerateLua {
                 return "当前文件不在模块路径下:" + file_path;
             }
             String lua_rel_path = file_path.substring(module_base_path.length());
-            String protocol_rel_path = file_path.substring(module_base_path.length());
+            String json_rel_path = file_path.substring(module_base_path.length());
+            String cpp_rel_path = file_path.substring(module_base_path.length());
 
             String std_path = "Script";
 
@@ -200,11 +216,13 @@ public class ALittleGenerateLua {
                 // AEngine的工程文件在：集成开发环境安装目录/Module/ALittleIDE/Other/AEngine/AEngine.iml
                 // 目标的目录是是在：集成开发环境安装目录/Engine
                 lua_rel_path = "../../Engine" + lua_rel_path.substring("src".length());
-                protocol_rel_path = null;
+                json_rel_path = null;
+                cpp_rel_path = null;
                 std_path = "../../Engine";
             } else {
                 lua_rel_path = "Script" + lua_rel_path.substring("src".length());
-                protocol_rel_path = "Protocol" + protocol_rel_path.substring("src".length());
+                json_rel_path = "Protocol" + json_rel_path.substring("src".length());
+                cpp_rel_path = "CPPProto" + cpp_rel_path.substring("src".length());
             }
 
             String ext = "alittle";
@@ -212,8 +230,10 @@ public class ALittleGenerateLua {
                 return "要生成的代码文件后缀名必须是alittle:" + file_path;
             }
             lua_rel_path = lua_rel_path.substring(0, lua_rel_path.length() - ext.length()) + "lua";
-            if (protocol_rel_path != null)
-                protocol_rel_path = protocol_rel_path.substring(0, protocol_rel_path.length() - ext.length()) + "json";
+            if (json_rel_path != null)
+                json_rel_path = json_rel_path.substring(0, json_rel_path.length() - ext.length()) + "json";
+            if (cpp_rel_path != null)
+                cpp_rel_path = cpp_rel_path.substring(0, cpp_rel_path.length() - ext.length()) + "h";
             String lua_full_path = out_path + lua_rel_path;
 
             File file = new File(lua_full_path);
@@ -222,13 +242,33 @@ public class ALittleGenerateLua {
             file_out.write(content.getBytes(StandardCharsets.UTF_8));
             file_out.close();
 
-            if (protocol_content != null && protocol_rel_path != null)
+            if (json_content != null && json_rel_path != null)
             {
-                String protocol_full_path = out_path + protocol_rel_path;
+                String protocol_full_path = out_path + json_rel_path;
                 file = new File(protocol_full_path);
                 result = file.getParentFile().mkdirs();
-                file_out = new FileOutputStream(new File(protocol_full_path));
-                file_out.write(protocol_content.getBytes(StandardCharsets.UTF_8));
+                file_out = new FileOutputStream(file);
+                file_out.write(json_content.getBytes(StandardCharsets.UTF_8));
+                file_out.close();
+            }
+
+            if (cpp_content != null && cpp_rel_path != null)
+            {
+
+                String protocol_full_path = out_path + cpp_rel_path;
+                file = new File(protocol_full_path);
+                result = file.getParentFile().mkdirs();
+                file_out = new FileOutputStream(file);
+
+                String file_name = file.getName().replace('.', '_').toUpperCase();
+                cpp_content = "\n#ifndef ALITTLE_CPPPROTO_" + file_name
+                        + "\n#define ALITTLE_CPPPROTO_" + file_name + "\n"
+                        + "\n#include <ALittleBase/Protocol/Json_ALL.h>"
+                        + "\n#include <ALittleBase/Protocol/Message.h>"
+                        + "\ntypedef long long I64;"
+                        + "\n" + cpp_content + "\n"
+                        + "\n#endif // ALITTLE_CPPPROTO_" + file_name + "\n";
+                file_out.write(cpp_content.getBytes(StandardCharsets.UTF_8));
                 file_out.close();
             }
 
@@ -1827,17 +1867,41 @@ public class ALittleGenerateLua {
         for (PsiElement child : child_list) {
             // 处理结构体
             if (child instanceof ALittleStructDec) {
-                List<String> error = new ArrayList<>();
-                String result = ALittleUtil.GenerateStruct((ALittleStructDec) child, "", error);
-                if (result == null)
                 {
-                    if (!error.isEmpty()) m_error = error.get(0);
-                    return null;
+                    List<String> error = new ArrayList<>();
+                    String result = ALittleUtil.GenerateStructForJsonProto((ALittleStructDec) child, "", error);
+                    if (result == null) {
+                        if (!error.isEmpty()) m_error = error.get(0);
+                        return null;
+                    }
+                    if (!result.isEmpty())
+                        m_json_list.add(result);
                 }
-                if (!result.isEmpty())
-                    m_protocol_list.add(result);
+                {
+                    List<String> error = new ArrayList<>();
+                    String result = ALittleUtil.GenerateStructForCPPProto((ALittleStructDec) child, m_class_list, "", error);
+                    if (result == null) {
+                        if (!error.isEmpty()) m_error = error.get(0);
+                        return null;
+                    }
+                    if (!result.isEmpty()) {
+                        m_cpp_list.add(result);
+                    }
+                }
             // 处理enum
             } else if (child instanceof ALittleEnumDec) {
+                {
+                    List<String> error = new ArrayList<>();
+                    String result = ALittleUtil.GenerateEnumForCPPProto((ALittleEnumDec) child, "", error);
+                    if (result == null) {
+                        if (!error.isEmpty()) m_error = error.get(0);
+                        return null;
+                    }
+                    if (!result.isEmpty()) {
+                        m_cpp_list.add(result);
+                    }
+                }
+
                 String result = GenerateEnum((ALittleEnumDec) child, "");
                 if (result == null) return null;
                 other_content.append(result);
