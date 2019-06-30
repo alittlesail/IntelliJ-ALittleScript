@@ -26,6 +26,6 @@ public class SendLogRunnable implements Runnable {
 
     public static void SendLog(@NotNull String content)
     {
-        new Thread(new SendLogRunnable(content)).start();
+        // new Thread(new SendLogRunnable(content)).start();
     }
 }

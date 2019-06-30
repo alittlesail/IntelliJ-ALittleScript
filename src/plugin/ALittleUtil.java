@@ -685,7 +685,7 @@ public class ALittleUtil {
 
     // 一下guesstype得出的类型值可能是
     // ALittlePrimitiveType 基本类型
-    // ALittleConstValue 常亮类型
+    // ALittleConstValue 常量类型
     // ALittleOp3Stat   这个表示字符串
     // ALittleGenericType 通用类型
 
@@ -732,6 +732,11 @@ public class ALittleUtil {
             GuessTypeInfo info = new GuessTypeInfo();
             info.type = GuessType.GT_PRIMITIVE;
             info.value = element.getText();
+            return info;
+        } else if (element instanceof ALittleReflectValue) {
+            GuessTypeInfo info = new GuessTypeInfo();
+            info.type = GuessType.GT_PRIMITIVE;
+            info.value = "string";
             return info;
         // 常量类型
         } else if (element instanceof ALittleConstValue) {
@@ -1595,6 +1600,8 @@ public class ALittleUtil {
             error_content_list.add("未知的表达式");
             error_element_list.add(value_factor.getPropertyValue());
             return null;
+        } else if (value_factor.getReflectValue() != null) {
+            return value_factor.getReflectValue();
         } else if (value_factor.getConstValue() != null) {
             return value_factor.getConstValue();
         } else if (value_factor.getValueStatParen() != null) {

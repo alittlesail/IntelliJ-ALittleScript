@@ -11,14 +11,14 @@ import static plugin.psi.ALittleTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 
-public class ALittleValueFactorImpl extends ASTWrapperPsiElement implements ALittleValueFactor {
+public class ALittleReflectValueImpl extends ASTWrapperPsiElement implements ALittleReflectValue {
 
-  public ALittleValueFactorImpl(@NotNull ASTNode node) {
+  public ALittleReflectValueImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitValueFactor(this);
+    visitor.visitReflectValue(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -28,26 +28,8 @@ public class ALittleValueFactorImpl extends ASTWrapperPsiElement implements ALit
 
   @Override
   @Nullable
-  public ALittleConstValue getConstValue() {
-    return findChildByClass(ALittleConstValue.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittlePropertyValue getPropertyValue() {
-    return findChildByClass(ALittlePropertyValue.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleReflectValue getReflectValue() {
-    return findChildByClass(ALittleReflectValue.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleValueStatParen getValueStatParen() {
-    return findChildByClass(ALittleValueStatParen.class);
+  public ALittleCustomType getCustomType() {
+    return findChildByClass(ALittleCustomType.class);
   }
 
 }

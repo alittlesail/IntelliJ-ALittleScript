@@ -447,6 +447,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPropertyValueThisTypeElement(o);
   }
 
+  public void visitReflectValue(@NotNull ALittleReflectValue o) {
+    visitPsiElement(o);
+  }
+
   public void visitReturnExpr(@NotNull ALittleReturnExpr o) {
     visitPsiElement(o);
   }

@@ -299,10 +299,12 @@ op_1_expr ::= op_1 value_stat SEMI {pin=1}
 
 // 值
 value_stat_paren ::= LPAREN value_stat RPAREN
-value_factor ::= value_stat_paren | const_value | property_value
+value_factor ::= value_stat_paren | const_value | property_value | reflect_value
 
 // 静态值
 const_value ::= true | false | STRING_CONTENT | DIGIT_CONTENT | null
+// 反射机制 返回的是一个json字符串
+reflect_value ::= reflect LESS custom_type GREATER {pin=1}
 // 属性
 property_value ::= (property_value_custom_type | property_value_this_type | property_value_cast_type) property_value_suffix*
 property_value_cast_type ::= cast LESS all_type GREATER LPAREN value_factor RPAREN {mixin="plugin.psi.impl.ALittlePropertyValueCastTypeElementImpl"

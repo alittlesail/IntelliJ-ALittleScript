@@ -118,6 +118,7 @@ public interface ALittleTypes {
   IElementType PROPERTY_VALUE_METHOD_CALL_STAT = new ALittleElementType("PROPERTY_VALUE_METHOD_CALL_STAT");
   IElementType PROPERTY_VALUE_SUFFIX = new ALittleElementType("PROPERTY_VALUE_SUFFIX");
   IElementType PROPERTY_VALUE_THIS_TYPE = new ALittleElementType("PROPERTY_VALUE_THIS_TYPE");
+  IElementType REFLECT_VALUE = new ALittleElementType("REFLECT_VALUE");
   IElementType RETURN_EXPR = new ALittleElementType("RETURN_EXPR");
   IElementType STRUCT_DEC = new ALittleElementType("STRUCT_DEC");
   IElementType STRUCT_EXTENDS_NAMESPACE_NAME_DEC = new ALittleElementType("STRUCT_EXTENDS_NAMESPACE_NAME_DEC");
@@ -201,6 +202,7 @@ public interface ALittleTypes {
   IElementType QUOTIENT_ASSIGN = new ALittleTokenType("/=");
   IElementType RBRACE = new ALittleTokenType("}");
   IElementType RBRACK = new ALittleTokenType("]");
+  IElementType REFLECT = new ALittleTokenType("reflect");
   IElementType REGISTER = new ALittleTokenType("register");
   IElementType REMAINDER = new ALittleTokenType("%");
   IElementType REMAINDER_ASSIGN = new ALittleTokenType("%=");
@@ -548,6 +550,9 @@ public interface ALittleTypes {
       }
       else if (type == PROPERTY_VALUE_THIS_TYPE) {
         return new ALittlePropertyValueThisTypeImpl(node);
+      }
+      else if (type == REFLECT_VALUE) {
+        return new ALittleReflectValueImpl(node);
       }
       else if (type == RETURN_EXPR) {
         return new ALittleReturnExprImpl(node);

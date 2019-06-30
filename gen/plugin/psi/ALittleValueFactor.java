@@ -14,6 +14,9 @@ public interface ALittleValueFactor extends PsiElement {
   ALittlePropertyValue getPropertyValue();
 
   @Nullable
+  ALittleReflectValue getReflectValue();
+
+  @Nullable
   ALittleValueStatParen getValueStatParen();
 
 }

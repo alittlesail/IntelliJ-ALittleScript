@@ -98,6 +98,30 @@ public class ALittleAnnotator implements Annotator {
         return error;
     }
 
+    public static String CheckErrorForReflect(@NotNull PsiElement element, AnnotationHolder holder, List<PsiElement> guess_list) {
+        String error = null;
+
+        // 结构体类型错误检查
+        if (element instanceof ALittleCustomType) {
+            do {
+                ALittleCustomType custom_type = (ALittleCustomType) element;
+                if (!(element.getParent() instanceof ALittleReflectValue)) break;
+                PsiElement custom_type_guess = custom_type.getCustomTypeNameDec().guessType();
+                if (!element.getContainingFile().equals(custom_type_guess.getContainingFile()))
+                {
+                    error = "反射对象必须和反射操作在同一个文件";
+                    break;
+                }
+            } while (false);
+        }
+
+        if (error != null && holder != null && element != null) {
+            holder.createErrorAnnotation(element, error);
+        }
+
+        return error;
+    }
+
     public static String CheckErrorForStruct(@NotNull PsiElement element, AnnotationHolder holder, List<PsiElement> guess_list) {
         String error = null;
 
@@ -1295,6 +1319,9 @@ public class ALittleAnnotator implements Annotator {
 
         // 检查未定义或者重复定义
         CheckErrorForGuessList(element, holder, guess_list);
+
+        // 检查反射操作
+        CheckErrorForReflect(element, holder, guess_list);
 
         // 枚举类型错误检查
         CheckErrorForEnum(element, holder, guess_list);

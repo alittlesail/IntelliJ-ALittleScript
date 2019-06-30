@@ -86,6 +86,9 @@ public class ALittleGenerateLua {
                 // 检查未定义或者重复定义
                 ALittleAnnotator.CheckErrorForGuessList(element, null, guess_list);
 
+                // 检查反射操作
+                ALittleAnnotator.CheckErrorForReflect(element, null, guess_list);
+
                 // 枚举类型错误检查
                 ALittleAnnotator.CheckErrorForEnum(element, null, guess_list);
 
@@ -867,6 +870,11 @@ public class ALittleGenerateLua {
             return GenerateConstValue(const_value);
         }
 
+        ALittleReflectValue reflect_value = value_factor.getReflectValue();
+        if (reflect_value != null) {
+            return GenerateReflectValue(reflect_value);
+        }
+
         ALittlePropertyValue prop_value = value_factor.getPropertyValue();
         if (prop_value != null) {
             return GeneratePropertyValue(prop_value);
@@ -890,6 +898,75 @@ public class ALittleGenerateLua {
             content += "nil";
         else
             content += const_value_string;
+        return content;
+    }
+
+    static public String GenerateReflectValue(ALittleReflectValue reflect_value) {
+        String content = "";
+        ALittleCustomType custom_type = reflect_value.getCustomType();
+        if (custom_type == null) return content;
+        ALittleCustomTypeNameDec name_dec = custom_type.getCustomTypeNameDec();
+        if (name_dec == null) return content;
+
+        PsiElement element = name_dec.guessType();
+        if (element instanceof ALittleStructDec) {
+            ALittleStructDec dec = (ALittleStructDec)element;
+            ALittleStructNameDec struct_name_dec = dec.getStructNameDec();
+            if (struct_name_dec == null) return content;
+            content = "{\"type\":\"struct\",\"name\":\"" + struct_name_dec.getName() + "\"";
+            content += ",\"var_list\":[";
+            List<String> var_list = new ArrayList<>();
+            for (ALittleStructVarDec var_dec : dec.getStructVarDecList()) {
+                String type = var_dec.getAllType().getText().replace(" ", "");
+                ALittleStructVarNameDec var_name_dec = var_dec.getStructVarNameDec();
+                if (var_name_dec == null) return content;
+                var_list.add("{\"type\":\"" + type + "\",\"name\":\"" + var_name_dec.getText() + "\"}");
+            }
+            content += String.join(",", var_list);
+            content += "]";
+            content += "}";
+            return "\"" + content.replace("\"", "\\\"") + "\"";
+        }
+
+        if (element instanceof ALittleClassDec) {
+            ALittleClassDec dec = (ALittleClassDec)element;
+            ALittleClassNameDec class_name_dec = dec.getClassNameDec();
+            if (class_name_dec == null) return content;
+            content = "{\"type\":\"class\",\"name\":\"" + class_name_dec.getName() + "\"";
+            content += ",\"var_list\":[";
+            List<String> var_list = new ArrayList<>();
+            for (ALittleClassVarDec var_dec : dec.getClassVarDecList()) {
+                String type = var_dec.getAllType().getText().replace(" ", "");
+                ALittleClassVarNameDec var_name_dec = var_dec.getClassVarNameDec();
+                if (var_name_dec == null) return content;
+                var_list.add("{\"type\":\"" + type + "\",\"name\":\"" + var_name_dec.getText() + "\"}");
+            }
+            content += String.join(",", var_list);
+            content += "]";
+            content += "}";
+            return "\"" + content.replace("\"", "\\\"") + "\"";
+        }
+
+        if (element instanceof ALittleEnumDec) {
+            ALittleEnumDec dec = (ALittleEnumDec)element;
+            ALittleEnumNameDec enum_name_dec = dec.getEnumNameDec();
+            if (enum_name_dec == null) return content;
+            content = "{\"type\":\"enum\",\"name\":\"" + enum_name_dec.getName() + "\"";
+            content += ",\"var_list\":[";
+            List<String> var_list = new ArrayList<>();
+            for (ALittleEnumVarDec var_dec : dec.getEnumVarDecList()) {
+                ALittleEnumVarNameDec var_name_dec = var_dec.getEnumVarNameDec();
+                if (var_name_dec == null) return content;
+                String type = "int";
+                if (var_dec.getEnumVarValueDec() != null && var_dec.getEnumVarValueDec().getStringContent() != null)
+                    type = "string";
+                var_list.add("{\"type\":\"" + type + "\",\"name\":\"" + var_name_dec.getText() + "\"}");
+            }
+            content += String.join(",", var_list);
+            content += "]";
+            content += "}";
+            return "\"" + content.replace("\"", "\\\"") + "\"";
+        }
         return content;
     }
 

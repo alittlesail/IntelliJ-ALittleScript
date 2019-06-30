@@ -2790,6 +2790,21 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // reflect LESS custom_type GREATER
+  public static boolean reflect_value(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "reflect_value")) return false;
+    if (!nextTokenIs(b, REFLECT)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, REFLECT_VALUE, null);
+    r = consumeTokens(b, 1, REFLECT, LESS);
+    p = r; // pin = 1
+    r = r && report_error_(b, custom_type(b, l + 1));
+    r = p && consumeToken(b, GREATER) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // return (value_stat (COMMA value_stat)*)? SEMI
   public static boolean return_expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_expr")) return false;
@@ -3035,7 +3050,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // value_stat_paren | const_value | property_value
+  // value_stat_paren | const_value | property_value | reflect_value
   public static boolean value_factor(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "value_factor")) return false;
     boolean r;
@@ -3043,6 +3058,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = value_stat_paren(b, l + 1);
     if (!r) r = const_value(b, l + 1);
     if (!r) r = property_value(b, l + 1);
+    if (!r) r = reflect_value(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

@@ -109,6 +109,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "true"                { return TRUE; }
   "false"               { return FALSE; }
   "null"                { return NULL; }
+  "reflect"             { return REFLECT; }
   "cast"                { return CAST; }
   "this"                { return THIS; }
 

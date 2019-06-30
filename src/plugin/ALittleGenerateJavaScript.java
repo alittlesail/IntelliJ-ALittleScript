@@ -76,6 +76,9 @@ public class ALittleGenerateJavaScript {
                 // 检查未定义或者重复定义
                 ALittleAnnotator.CheckErrorForGuessList(element, null, guess_list);
 
+                // 检查反射操作
+                ALittleAnnotator.CheckErrorForReflect(element, null, guess_list);
+
                 // 枚举类型错误检查
                 ALittleAnnotator.CheckErrorForEnum(element, null, guess_list);
 
@@ -807,6 +810,11 @@ public class ALittleGenerateJavaScript {
         ALittleConstValue const_value = value_factor.getConstValue();
         if (const_value != null) {
             return GenerateConstValue(const_value);
+        }
+
+        ALittleReflectValue reflect_value = value_factor.getReflectValue();
+        if (reflect_value != null) {
+            return ALittleGenerateLua.GenerateReflectValue(reflect_value);
         }
 
         ALittlePropertyValue prop_value = value_factor.getPropertyValue();

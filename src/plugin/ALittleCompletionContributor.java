@@ -13,7 +13,7 @@ public class ALittleCompletionContributor extends CompletionContributor {
     static String[] KEYWORD_LIST = new String[] {
             "int","I64","double","bool","string","auto","List","Map"
             ,"namespace","class","struct","enum"
-            ,"for","do","while","break","return"
+            ,"for","do","while","break","return","cast","reflect"
             ,"get","set","fun","static","Ctor","Functor","this"
             ,"public","protected","private","instance"
     };

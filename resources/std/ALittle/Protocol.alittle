@@ -5,3 +5,16 @@ struct ResultJson
     bool result;
     string reason;
 }
+
+struct ReflectVarInfo
+{
+    string type;
+    string name;
+}
+
+struct ReflectInfo
+{
+    string type;
+    string name;
+    List<ReflectVarInfo> var_list;
+}
