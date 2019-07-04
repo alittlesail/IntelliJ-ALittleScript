@@ -803,11 +803,11 @@ public class ALittleAnnotator implements Annotator {
                 break;
             }
 
-            PsiReference[] references = brack_value.getReferences();
-            if (references == null || references.length <= 0) {
+            PsiReference ref = brack_value.getReference();
+            if (!(ref instanceof ALittlePropertyValueBrackValueStatReference)) {
                 break;
             }
-            ALittlePropertyValueBrackValueStatReference reference = (ALittlePropertyValueBrackValueStatReference) references[0];
+            ALittlePropertyValueBrackValueStatReference reference = (ALittlePropertyValueBrackValueStatReference) ref;
             PsiElement pre_type = reference.guessTypesForPreType();
 
             if (!(pre_type instanceof ALittleGenericType)) {
@@ -882,9 +882,9 @@ public class ALittleAnnotator implements Annotator {
         if (element instanceof ALittlePropertyValueMethodCallStat) {
             ALittlePropertyValueMethodCallStat method_call = (ALittlePropertyValueMethodCallStat)element;
 
-            PsiReference[] references = method_call.getReferences();
-            if (references != null && references.length > 0) {
-                ALittlePropertyValueMethodCallStatReference reference = (ALittlePropertyValueMethodCallStatReference)references[0];
+            PsiReference ref = method_call.getReference();
+            if (ref instanceof ALittlePropertyValueMethodCallStatReference) {
+                ALittlePropertyValueMethodCallStatReference reference = (ALittlePropertyValueMethodCallStatReference)ref;
                 PsiElement pre_type = reference.guessTypesForPreType();
 
                 List<PsiElement> param_type_list = new ArrayList<>();
@@ -1269,9 +1269,9 @@ public class ALittleAnnotator implements Annotator {
             // 起始属性
         } else if (element instanceof ALittlePropertyValueCustomType) {
             ALittlePropertyValueCustomType dec = (ALittlePropertyValueCustomType)element;
-            PsiReference[] ref_list = dec.getReferences();
-            if (ref_list.length > 0) {
-                PsiElement resolve = ref_list[0].resolve();
+            PsiReference ref = dec.getReference();
+            if (ref != null) {
+                PsiElement resolve = ref.resolve();
                 if (resolve instanceof ALittleMethodParamNameDec) {
                     Annotation anno = holder.createInfoAnnotation(dec.getIdContent(), null);
                     anno.setTextAttributes(CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);

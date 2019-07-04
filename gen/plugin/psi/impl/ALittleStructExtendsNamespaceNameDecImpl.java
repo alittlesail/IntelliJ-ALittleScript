@@ -44,8 +44,8 @@ public class ALittleStructExtendsNamespaceNameDecImpl extends ALittleStructExten
   }
 
   @Override
-  public PsiReference[] getReferences() {
-    return ALittlePsiImplUtil.getReferences(this);
+  public PsiReference getReference() {
+    return ALittlePsiImplUtil.getReference(this);
   }
 
   @Override

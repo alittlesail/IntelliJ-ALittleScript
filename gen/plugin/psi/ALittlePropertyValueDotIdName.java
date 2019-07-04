@@ -16,7 +16,7 @@ public interface ALittlePropertyValueDotIdName extends ALittlePropertyValueDotId
   @NotNull
   List<PsiElement> guessTypes();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
   String getName();
 

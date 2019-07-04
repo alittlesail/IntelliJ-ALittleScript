@@ -16,7 +16,7 @@ public interface ALittleMethodParamNameDec extends ALittleMethodParamNameDecElem
   @NotNull
   List<PsiElement> guessTypes();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
   String getName();
 

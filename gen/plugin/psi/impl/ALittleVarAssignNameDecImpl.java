@@ -44,8 +44,8 @@ public class ALittleVarAssignNameDecImpl extends ALittleVarAssignNameDecElementI
   }
 
   @Override
-  public PsiReference[] getReferences() {
-    return ALittlePsiImplUtil.getReferences(this);
+  public PsiReference getReference() {
+    return ALittlePsiImplUtil.getReference(this);
   }
 
   @Override

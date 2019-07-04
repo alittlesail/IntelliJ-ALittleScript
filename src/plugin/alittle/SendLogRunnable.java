@@ -1,7 +1,6 @@
 package plugin.alittle;
 
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 
 public class SendLogRunnable implements Runnable {
     private String m_content;

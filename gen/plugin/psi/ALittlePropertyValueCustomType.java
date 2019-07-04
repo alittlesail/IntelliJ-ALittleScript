@@ -16,7 +16,7 @@ public interface ALittlePropertyValueCustomType extends ALittlePropertyValueCust
   @NotNull
   List<PsiElement> guessTypes();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
   String getName();
 

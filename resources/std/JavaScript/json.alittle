@@ -1,7 +1,0 @@
-namespace javascript;
-
-class JSON
-{
-    public static parse(string content) : any {}
-    public static stringify(any object) : string {}
-}

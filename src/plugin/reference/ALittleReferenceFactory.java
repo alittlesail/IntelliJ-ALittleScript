@@ -1,10 +1,7 @@
 package plugin.reference;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFileFactory;
-import plugin.ALittleFileType;
 import plugin.psi.*;
 
 public class ALittleReferenceFactory {

@@ -38,8 +38,8 @@ public class ALittlePropertyValueThisTypeImpl extends ALittlePropertyValueThisTy
   }
 
   @Override
-  public PsiReference[] getReferences() {
-    return ALittlePsiImplUtil.getReferences(this);
+  public PsiReference getReference() {
+    return ALittlePsiImplUtil.getReference(this);
   }
 
   @Override

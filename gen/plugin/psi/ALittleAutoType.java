@@ -13,7 +13,7 @@ public interface ALittleAutoType extends ALittleAutoTypeElement {
   @NotNull
   List<PsiElement> guessTypes();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
   String getName();
 

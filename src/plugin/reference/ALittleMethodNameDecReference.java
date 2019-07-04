@@ -33,8 +33,6 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
     }
 
     public PsiElement guessTypeForSetter() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
         ResolveResult[] result_list = multiResolve(false);
         for (ResolveResult result : result_list) {
             PsiElement element = result.getElement();
@@ -63,8 +61,6 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
     }
 
     public PsiElement guessTypeForGetter() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
         ResolveResult[] result_list = multiResolve(false);
         for (ResolveResult result : result_list) {
             PsiElement element = result.getElement();

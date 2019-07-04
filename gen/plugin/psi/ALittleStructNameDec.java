@@ -16,7 +16,7 @@ public interface ALittleStructNameDec extends ALittleStructNameDecElement {
   @NotNull
   List<PsiElement> guessTypes();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
   String getName();
 

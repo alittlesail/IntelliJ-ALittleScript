@@ -1,21 +1,14 @@
 package plugin.format;
 
 import com.intellij.formatting.*;
-import com.intellij.formatting.templateLanguages.BlockWithParent;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.TokenType;
-import com.intellij.psi.codeStyle.CodeStyleSettings;
-import com.intellij.psi.formatter.FormatterUtil;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.ALittleLanguage;
-import plugin.ALittleUtil;
 import plugin.psi.*;
-import plugin.psi.impl.ALittleClassStaticDecImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,8 +74,6 @@ public class ALittleBlock extends AbstractBlock {
     @Override
     public ChildAttributes getChildAttributes(int newChildIndex) {
         PsiElement element = myNode.getPsi();
-        PsiElement parent = element.getParent();
-        IElementType type = myNode.getElementType();
 
         if (element instanceof ALittleStructDec
             || element instanceof ALittleEnumDec

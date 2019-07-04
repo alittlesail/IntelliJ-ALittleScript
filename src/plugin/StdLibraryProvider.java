@@ -16,7 +16,6 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 public class StdLibraryProvider extends AdditionalLibraryRootsProvider {
     @Override

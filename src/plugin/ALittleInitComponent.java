@@ -55,26 +55,19 @@ public class ALittleInitComponent implements BaseComponent {
                         for (Project project : myProject) {
                             PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
                             if (psiFile instanceof ALittleFile) {
-                                ALittleGenerateLua lua = new ALittleGenerateLua();
-                                String error = lua.GenerateLua((ALittleFile) psiFile, false);
-                                if (error == null) {
-                                    System.out.println(psiFile.getName() + ":生成lua代码成功");
-                                } else {
-                                    System.out.println(psiFile.getName() + ":生成lua代码失败:" + error);
-                                }
-
                                 if (!USED) {
                                     SendLogRunnable.SendLog("fist use gen a single lua file");
                                     USED = true;
                                 }
 
-                                // ALittleGenerateJavaScript js = new ALittleGenerateJavaScript();
-                                // error = js.GenerateJavaScript((ALittleFile) psiFile, false);
-                                // if (error == null) {
-                                //     System.out.println(psiFile.getName() + ":生成javascript代码成功");
-                                // } else {
-                                //     System.out.println(psiFile.getName() + ":生成javascript代码失败:" + error);
-                                // }
+                                ALittleGenerateLua lua = new ALittleGenerateLua();
+                                try {
+                                    lua.GenerateLua((ALittleFile) psiFile, false);
+                                } catch (Exception e) {
+                                    System.out.println(psiFile.getName() + ":生成lua代码失败:" + e.getMessage());
+                                    break;
+                                }
+                                System.out.println(psiFile.getName() + ":生成lua代码成功");
                                 break;
                             }
                         }

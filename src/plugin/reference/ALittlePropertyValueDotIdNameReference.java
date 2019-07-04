@@ -72,16 +72,16 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
                 }
                 if (is_getter) {
                     ALittleMethodNameDec dec = (ALittleMethodNameDec)element;
-                    PsiReference[] references = dec.getReferences();
-                    if (references != null && references.length > 0) {
-                        ALittleMethodNameDecReference reference = (ALittleMethodNameDecReference)references[0];
+                    PsiReference ref = dec.getReference();
+                    if (ref instanceof ALittleMethodNameDecReference) {
+                        ALittleMethodNameDecReference reference = (ALittleMethodNameDecReference)ref;
                         guess = reference.guessTypeForGetter();
                     }
                 } else if (is_setter) {
                     ALittleMethodNameDec dec = (ALittleMethodNameDec)element;
-                    PsiReference[] references = dec.getReferences();
-                    if (references != null && references.length > 0) {
-                        ALittleMethodNameDecReference reference = (ALittleMethodNameDecReference)references[0];
+                    PsiReference ref = dec.getReference();
+                    if (ref instanceof ALittleMethodNameDecReference) {
+                        ALittleMethodNameDecReference reference = (ALittleMethodNameDecReference)ref;
                         guess = reference.guessTypeForSetter();
                     }
                 } else {

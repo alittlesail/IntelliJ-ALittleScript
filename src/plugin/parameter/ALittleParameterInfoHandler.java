@@ -8,6 +8,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.alittle.PsiHelper;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallStatReference;
 
@@ -33,13 +34,9 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
         ALittlePropertyValueMethodCallStat stat = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittlePropertyValueMethodCallStat.class, false);
         if (stat != null) {
             do {
-                List<String> list = new ArrayList<>();
-                PsiReference[] references = stat.getReferences();
-                if (references == null) break;
-                if (references.length == 0) break;
-                if (references[0] == null) break;
-                if (!(references[0] instanceof ALittlePropertyValueMethodCallStatReference)) break;
-                ALittlePropertyValueMethodCallStatReference reference = (ALittlePropertyValueMethodCallStatReference) references[0];
+                PsiReference ref = stat.getReference();
+                if (!(ref instanceof ALittlePropertyValueMethodCallStatReference)) break;
+                ALittlePropertyValueMethodCallStatReference reference = (ALittlePropertyValueMethodCallStatReference)ref;
 
                 PsiElement pre_type = reference.guessTypesForPreType();
                 if (!(pre_type instanceof ALittleMethodNameDec)) break;
@@ -47,30 +44,21 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
                 PsiElement method_dec = method_name_dec.getParent();
 
                 List<String> param_name_list = new ArrayList<>();
-
                 // getter函数使用()来调用，只有这种情况 Class.getter_x(object)
                 if (method_dec instanceof ALittleClassGetterDec) {
                     // 第一个参数就是getter所在的类
-                    PsiElement parent = method_dec;
-                    while (parent != null) {
-                        if (parent instanceof ALittleClassDec) {
-                            ALittleClassNameDec class_name_dec = ((ALittleClassDec)parent).getClassNameDec();
-                            if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
-                            break;
-                        }
-                        parent = parent.getParent();
+                    ALittleClassDec class_dec = PsiHelper.findClassDecFromParent(method_dec);
+                    if (class_dec != null) {
+                        ALittleClassNameDec class_name_dec = class_dec.getClassNameDec();
+                        if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
                     }
                     // setter函数使用()来调用，只有这种情况 Class.setter_x(object, value)
                 } else if (method_dec instanceof ALittleClassSetterDec) {
                     // 第一个参数就是setter所在的类
-                    PsiElement parent = method_dec;
-                    while (parent != null) {
-                        if (parent instanceof ALittleClassDec) {
-                            ALittleClassNameDec class_name_dec = ((ALittleClassDec)parent).getClassNameDec();
-                            if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
-                            break;
-                        }
-                        parent = parent.getParent();
+                    ALittleClassDec class_dec = PsiHelper.findClassDecFromParent(method_dec);
+                    if (class_dec != null) {
+                        ALittleClassNameDec class_name_dec = class_dec.getClassNameDec();
+                        if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
                     }
                     ALittleClassSetterDec dec = (ALittleClassSetterDec) method_dec;
                     ALittleMethodParamOneDec one_dec = dec.getMethodParamOneDec();
@@ -113,6 +101,7 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
                         }
                     }
                 }
+                List<String> list = new ArrayList<>();
                 list.add(String.join(", ", param_name_list));
                 context.setItemsToShow(list.toArray());
             } while (false);
@@ -149,7 +138,7 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
 
         int start_index = 0;
         int end_index = 0;
-        if (string_list != null && string_list.length > index) {
+        if (string_list.length > index) {
             for (int i = 0; i <= index; ++i) {
                 if (i != index) {
                     start_index += string_list[i].length() + 2;

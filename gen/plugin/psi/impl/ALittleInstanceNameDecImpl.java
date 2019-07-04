@@ -44,8 +44,8 @@ public class ALittleInstanceNameDecImpl extends ALittleInstanceNameDecElementImp
   }
 
   @Override
-  public PsiReference[] getReferences() {
-    return ALittlePsiImplUtil.getReferences(this);
+  public PsiReference getReference() {
+    return ALittlePsiImplUtil.getReference(this);
   }
 
   @Override

@@ -16,7 +16,7 @@ public interface ALittleInstanceClassNameDec extends ALittleInstanceClassNameDec
   @NotNull
   List<PsiElement> guessTypes();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
   String getName();
 

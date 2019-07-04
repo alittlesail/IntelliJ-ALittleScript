@@ -19,7 +19,7 @@ public interface ALittlePropertyValueCastType extends ALittlePropertyValueCastTy
   @NotNull
   List<PsiElement> guessTypes();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
   String getName();
 

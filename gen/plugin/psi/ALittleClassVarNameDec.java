@@ -16,7 +16,7 @@ public interface ALittleClassVarNameDec extends ALittleClassVarNameDecElement {
   @NotNull
   List<PsiElement> guessTypes();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
   String getName();
 

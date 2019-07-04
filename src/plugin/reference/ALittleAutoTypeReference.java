@@ -60,9 +60,9 @@ public class ALittleAutoTypeReference extends PsiReferenceBase<PsiElement> imple
                 if (index == -1) return guess_list;
                 boolean has_handle = false;
 
-                // 如果返回值只有一个函数调用
+                // 如果左边有多个变量，那么右边肯定是一个多返回值的函数调用
                 if (pair_dec_list.size() > 1) {
-                    // 获取函数返回值类型
+                    // 获取函数对应的那个返回值类型
                     List<PsiElement> method_call_guess_list = ALittleUtil.guessTypeForMethodCall(value_stat);
                     if (method_call_guess_list != null) {
                         if (index < method_call_guess_list.size()) {

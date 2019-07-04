@@ -16,7 +16,7 @@ public interface ALittlePropertyValueBrackValueStat extends ALittlePropertyValue
   @NotNull
   List<PsiElement> guessTypes();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
   String getName();
 

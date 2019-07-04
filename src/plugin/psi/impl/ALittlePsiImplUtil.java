@@ -3,7 +3,6 @@ package plugin.psi.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.reference.*;
 import plugin.psi.*;
 
@@ -35,10 +34,9 @@ public class ALittlePsiImplUtil {
         }
         return element;
     }
-    public static PsiReference[] getReferences(PsiElement element) {
-        ALittleReference ref = ALittleReferenceFactory.create(element);
-        if (ref == null) return new PsiReference[0];
-        return new PsiReference[]{ref};
+
+    public static PsiReference getReference(PsiElement element) {
+        return ALittleReferenceFactory.create(element);
     }
 
     public static PsiElement guessType(PsiElement element) {
