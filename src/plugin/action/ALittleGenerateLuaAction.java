@@ -5,21 +5,34 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import plugin.ALittleFileType;
 import plugin.ALittleGenerateLua;
 import plugin.alittle.FileHelper;
 import plugin.alittle.SendLogRunnable;
 import plugin.psi.ALittleFile;
 
-import java.util.Collection;
-
 public class ALittleGenerateLuaAction extends AnAction {
+    private void generateDir(PsiManager psi_mgr, VirtualFile root) throws Exception {
+        if (root.isDirectory()) {
+            VirtualFile[] files = root.getChildren();
+            if (files != null) {
+                for (VirtualFile file : files) {
+                    generateDir(psi_mgr, file);
+                }
+            }
+        } else {
+            PsiFile psi_file = psi_mgr.findFile(root);
+            if (psi_file instanceof ALittleFile) {
+                ALittleGenerateLua lua = new ALittleGenerateLua();
+                lua.GenerateLua((ALittleFile)psi_file, true);
+            }
+        }
+    }
+
     @Override
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getProject();
@@ -37,16 +50,10 @@ public class ALittleGenerateLuaAction extends AnAction {
                 FileHelper.rebuildPath(FileHelper.calcCPPProtoPath(module));
             }
 
-            // 获取所有文件
-            Collection<VirtualFile> virtual_files = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(project));
-
-            // 遍历文件，逐个生成
-            for (VirtualFile virtual_file : virtual_files) {
-                PsiFile file = PsiManager.getInstance(project).findFile(virtual_file);
-                // 过滤掉非ALittle文件
-                if (!(file instanceof ALittleFile)) continue;
-                ALittleGenerateLua lua = new ALittleGenerateLua();
-                lua.GenerateLua((ALittleFile)file, true);
+            PsiManager psi_mgr = PsiManager.getInstance(project);
+            VirtualFile[] roots = ProjectRootManager.getInstance(project).getContentRoots();
+            for (VirtualFile root : roots) {
+                generateDir(psi_mgr, root);
             }
         } catch (Exception e) {
             Messages.showMessageDialog(project, e.getMessage(), "提示", Messages.getInformationIcon());

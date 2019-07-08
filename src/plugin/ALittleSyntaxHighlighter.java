@@ -1,23 +1,11 @@
 package plugin;
 
-import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.colors.EditorColorsUtil;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.ex.util.LexerEditorHighlighter;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
-import com.intellij.psi.TokenType;
-import com.intellij.psi.impl.search.LexerEditorHighlighterLexer;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
-import plugin.parser.ALittleParser;
-import plugin.psi.ALittleClassNameDecElement;
-import plugin.psi.ALittleElementType;
-import plugin.psi.ALittleTokenType;
-import plugin.psi.ALittleTypes;
-
-import java.util.HashSet;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 

@@ -2,6 +2,7 @@ package plugin;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
@@ -527,10 +528,22 @@ public class ALittleUtil {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // 从文件中获取AlittleNamespaceDec
+    @NotNull
+    public static List<ALittleNamespaceDec> getNamespaceDec(PsiFile psi_file) {
+        List<ALittleNamespaceDec> namespace_dec_list = new ArrayList<>();
+        for(PsiElement child = psi_file.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof ALittleNamespaceDec) {
+                namespace_dec_list.add((ALittleNamespaceDec)child);
+            }
+        }
+        return namespace_dec_list;
+    }
+
     // 根据文件对象获取命名域
     @NotNull
     public static String getNamespaceName(ALittleFile alittleFile) {
-        List<ALittleNamespaceDec> namespace_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
+        List<ALittleNamespaceDec> namespace_list = getNamespaceDec(alittleFile);
         for (ALittleNamespaceDec namespace_dec : namespace_list) {
             ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
             if (namespace_name_dec == null) continue;

@@ -1,11 +1,7 @@
 package plugin;
 
-import com.intellij.openapi.compiler.CompilerPaths;
-import com.intellij.openapi.compiler.ex.CompilerPathsEx;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndexFacade;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -18,13 +14,8 @@ import plugin.alittle.FileHelper;
 import plugin.psi.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ALittleGenerateLua {
@@ -136,7 +127,7 @@ public class ALittleGenerateLua {
         m_enum_list = new ArrayList<>();
         m_class_list = new ArrayList<>();
 
-        List<ALittleNamespaceDec> namespace_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
+        List<ALittleNamespaceDec> namespace_list = ALittleUtil.getNamespaceDec(alittleFile);
         if (namespace_list.isEmpty()) throw new Exception("没有定义命名域 namespace");
         if (namespace_list.size() > 1) throw new Exception("代码生成失败 每个文件只有有一个命名域");
 

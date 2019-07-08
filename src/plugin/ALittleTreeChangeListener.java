@@ -1,22 +1,20 @@
 package plugin;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.SyntheticLibrary;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.*;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.PathUtil;
 import com.intellij.util.SmartList;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.FileOutputStream;
 import java.util.*;
 
 public class ALittleTreeChangeListener implements PsiTreeChangeListener {
@@ -175,7 +173,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
         if (!listener.m_reload_ed) listener.reload();
 
-        List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
+        List<ALittleNamespaceDec> namespace_dec_list = ALittleUtil.getNamespaceDec(alittleFile);
         for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
 
             ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
@@ -205,7 +203,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         if (listener == null) return;
         if (!listener.m_reload_ed) listener.reload();
 
-        List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
+        List<ALittleNamespaceDec> namespace_dec_list = ALittleUtil.getNamespaceDec(alittleFile);
         for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
 
             ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
@@ -354,28 +352,59 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         m_project = project;
     }
 
+    private void loadDir(PsiManager psi_mgr, VirtualFile root) {
+        if (root.isDirectory()) {
+            VirtualFile[] files = root.getChildren();
+            if (files != null) {
+                for (VirtualFile file : files) {
+                    loadDir(psi_mgr, file);
+                }
+            }
+        } else {
+            PsiFile psi_file = psi_mgr.findFile(root);
+            if (psi_file instanceof ALittleFile) {
+                List<ALittleNamespaceDec> namespace_dec_list = new ArrayList<>();
+                for(PsiElement child = psi_file.getFirstChild(); child != null; child = child.getNextSibling()) {
+                    if (child instanceof ALittleNamespaceDec) {
+                        namespace_dec_list.add((ALittleNamespaceDec)child);
+                    }
+                }
+                for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
+
+                    ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
+                    if (namespace_name_dec == null) continue;
+
+                    addNamespaceName(namespace_name_dec.getText(), namespace_name_dec);
+                }
+            }
+        }
+    }
+
     public void reload() {
         m_namespace_map = new HashMap<>();
         m_data_map = new HashMap<>();
         m_instance_map = new HashMap<>();
         m_reload_ing = true;
 
-        // 遍历所有文件，预加载所有内容
-        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(ALittleFileType.INSTANCE, GlobalSearchScope.allScope(m_project));
+        PsiManager psi_mgr = PsiManager.getInstance(m_project);
+        VirtualFile[] roots = ProjectRootManager.getInstance(m_project).getContentRoots();
+        for (VirtualFile root : roots) {
+            loadDir(psi_mgr, root);
+        }
 
-        // 加载所有代码文件
-        for (VirtualFile virtualFile : virtualFiles) {
-            PsiFile file = PsiManager.getInstance(m_project).findFile(virtualFile);
-            if (!(file instanceof ALittleFile)) continue;
+        try {
+            // 适配代码
+            String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
+            VirtualFile dir;
+            if (jarPath.endsWith(".jar"))
+                dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
+            else
+                dir = VfsUtil.findFileByIoFile(new File(jarPath + "/std"), true);
 
-            List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList(file, ALittleNamespaceDec.class);
-            for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
-
-                ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
-                if (namespace_name_dec == null) continue;
-
-                addNamespaceName(namespace_name_dec.getText(), namespace_name_dec);
+            if (dir != null) {
+                loadDir(psi_mgr, dir);
             }
+        } catch (Exception e) {
         }
 
         m_reload_ing = false;
@@ -526,7 +555,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         PsiFile file = var1.getFile();
         if (file instanceof ALittleFile) {
             ALittleFile alittleFile = (ALittleFile)file;
-            List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
+            List<ALittleNamespaceDec> namespace_dec_list = ALittleUtil.getNamespaceDec(alittleFile);
             for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
 
                 ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
@@ -558,7 +587,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         PsiFile file = var1.getFile();
         if (file instanceof ALittleFile) {
             ALittleFile alittleFile = (ALittleFile)file;
-            List<ALittleNamespaceDec> namespace_dec_list = PsiTreeUtil.getChildrenOfTypeAsList(alittleFile, ALittleNamespaceDec.class);
+            List<ALittleNamespaceDec> namespace_dec_list = ALittleUtil.getNamespaceDec(alittleFile);
             for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
 
                 ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
