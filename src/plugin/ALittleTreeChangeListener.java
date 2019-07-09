@@ -167,6 +167,23 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         return result;
     }
 
+    public static void handleDirDelete(Project project, VirtualFile virtualFile) {
+        if (virtualFile.isDirectory()) {
+            VirtualFile[] file_list = virtualFile.getChildren();
+            if (file_list != null) {
+                for (VirtualFile file : file_list) {
+                    handleDirDelete(project, file);
+                }
+            }
+            // 如果是文件
+        } else {
+            PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
+            if (file instanceof ALittleFile) {
+                handleFileDelete(project, (ALittleFile) file);
+            }
+        }
+    }
+
     public static void handleFileDelete(Project project, ALittleFile alittleFile) {
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return;
@@ -183,19 +200,21 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
     }
 
-    public static void handleRefresh(Project project) {
-        ALittleTreeChangeListener listener = s_map.get(project);
-        if (listener == null) return;
-        if (listener.m_is_refresh) return;
-        listener.m_is_refresh = true;
-        listener.reload();
-    }
-
-    public static boolean isReloading(Project project) {
-        ALittleTreeChangeListener listener = s_map.get(project);
-        if (listener == null) return true;
-        if (listener.m_reload_ing) return true;
-        return false;
+    public static void handleDirCreated(Project project, VirtualFile virtualFile) {
+        if (virtualFile.isDirectory()) {
+            VirtualFile[] file_list = virtualFile.getChildren();
+            if (file_list != null) {
+                for (VirtualFile file : file_list) {
+                    handleDirCreated(project, file);
+                }
+            }
+            // 如果是文件
+        } else {
+            PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
+            if (file instanceof ALittleFile) {
+                handleFileCreated(project, (ALittleFile) file);
+            }
+        }
     }
 
     public static void handleFileCreated(Project project, ALittleFile alittleFile) {
@@ -211,6 +230,21 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
             listener.addNamespaceName(namespace_name_dec.getText(), namespace_name_dec);
         }
+    }
+
+    public static void handleRefresh(Project project) {
+        ALittleTreeChangeListener listener = s_map.get(project);
+        if (listener == null) return;
+        if (listener.m_is_refresh) return;
+        listener.m_is_refresh = true;
+        listener.reload();
+    }
+
+    public static boolean isReloading(Project project) {
+        ALittleTreeChangeListener listener = s_map.get(project);
+        if (listener == null) return true;
+        if (listener.m_reload_ing) return true;
+        return false;
     }
 
     private Project m_project;

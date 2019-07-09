@@ -44,10 +44,8 @@ public class ALittleGenerateLua {
 
         if (dir != null) {
             VirtualFile[] file_list = dir.getChildren();
-            if (file_list != null)
-            {
-                for (VirtualFile virtualFile : file_list)
-                {
+            if (file_list != null) {
+                for (VirtualFile virtualFile : file_list) {
                     FileOutputStream file_out = new FileOutputStream(new File(module_base_path + "/std/" + virtualFile.getName()));
                     file_out.write(virtualFile.contentsToByteArray());
                     file_out.close();
