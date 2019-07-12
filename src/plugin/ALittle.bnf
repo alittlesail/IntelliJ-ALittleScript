@@ -159,7 +159,11 @@ all_expr ::= var_assign_expr |
             return_expr |
             flow_expr |
             wrap_expr |
-            property_value_expr
+            property_value_expr |
+            empty_expr
+
+// 空语句
+empty_expr ::= SEMI
 
 // for 流程控制
 for_expr ::= for private_for_condition (private_for_body | all_expr) {pin=1}

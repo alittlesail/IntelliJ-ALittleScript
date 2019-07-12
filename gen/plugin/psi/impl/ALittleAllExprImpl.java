@@ -34,6 +34,12 @@ public class ALittleAllExprImpl extends ASTWrapperPsiElement implements ALittleA
 
   @Override
   @Nullable
+  public ALittleEmptyExpr getEmptyExpr() {
+    return findChildByClass(ALittleEmptyExpr.class);
+  }
+
+  @Override
+  @Nullable
   public ALittleFlowExpr getFlowExpr() {
     return findChildByClass(ALittleFlowExpr.class);
   }

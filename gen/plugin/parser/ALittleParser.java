@@ -69,7 +69,8 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   //             return_expr |
   //             flow_expr |
   //             wrap_expr |
-  //             property_value_expr
+  //             property_value_expr |
+  //             empty_expr
   public static boolean all_expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "all_expr")) return false;
     boolean r;
@@ -85,6 +86,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = flow_expr(b, l + 1);
     if (!r) r = wrap_expr(b, l + 1);
     if (!r) r = property_value_expr(b, l + 1);
+    if (!r) r = empty_expr(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -564,6 +566,18 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     boolean r;
     r = private_else_if_body(b, l + 1);
     if (!r) r = all_expr(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // SEMI
+  public static boolean empty_expr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "empty_expr")) return false;
+    if (!nextTokenIs(b, SEMI)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, SEMI);
+    exit_section_(b, m, EMPTY_EXPR, r);
     return r;
   }
 

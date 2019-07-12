@@ -11,6 +11,9 @@ public interface ALittleAllExpr extends PsiElement {
   ALittleDoWhileExpr getDoWhileExpr();
 
   @Nullable
+  ALittleEmptyExpr getEmptyExpr();
+
+  @Nullable
   ALittleFlowExpr getFlowExpr();
 
   @Nullable

@@ -32,6 +32,7 @@ public interface ALittleTypes {
   IElementType DO_WHILE_EXPR = new ALittleElementType("DO_WHILE_EXPR");
   IElementType ELSE_EXPR = new ALittleElementType("ELSE_EXPR");
   IElementType ELSE_IF_EXPR = new ALittleElementType("ELSE_IF_EXPR");
+  IElementType EMPTY_EXPR = new ALittleElementType("EMPTY_EXPR");
   IElementType ENUM_DEC = new ALittleElementType("ENUM_DEC");
   IElementType ENUM_NAME_DEC = new ALittleElementType("ENUM_NAME_DEC");
   IElementType ENUM_PROTOCOL_DEC = new ALittleElementType("ENUM_PROTOCOL_DEC");
@@ -292,6 +293,9 @@ public interface ALittleTypes {
       }
       else if (type == ELSE_IF_EXPR) {
         return new ALittleElseIfExprImpl(node);
+      }
+      else if (type == EMPTY_EXPR) {
+        return new ALittleEmptyExprImpl(node);
       }
       else if (type == ENUM_DEC) {
         return new ALittleEnumDecImpl(node);

@@ -103,6 +103,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitEmptyExpr(@NotNull ALittleEmptyExpr o) {
+    visitPsiElement(o);
+  }
+
   public void visitEnumDec(@NotNull ALittleEnumDec o) {
     visitPsiElement(o);
   }
