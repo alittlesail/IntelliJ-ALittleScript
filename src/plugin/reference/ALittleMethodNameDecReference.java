@@ -197,8 +197,7 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
                 if (i < icon_list.size()) icon = icon_list.get(i);
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(icon).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         // 全局函数
@@ -207,8 +206,7 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
             for (ALittleMethodNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }

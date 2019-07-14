@@ -202,8 +202,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             for (ALittleNamespaceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.NAMESPACE).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
@@ -213,8 +212,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             for (ALittleMethodNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
@@ -224,8 +222,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             for (ALittleClassNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.CLASS).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
@@ -235,8 +232,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             for (ALittleStructNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.STRUCT).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
@@ -246,8 +242,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             for (ALittleEnumNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.ENUM).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
@@ -257,8 +252,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             for (ALittleInstanceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.INSTANCE).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
@@ -273,8 +267,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             for (ALittleMethodParamNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.PARAM).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
@@ -285,8 +278,7 @@ public class ALittlePropertyValueCustomTypeReference extends PsiReferenceBase<Ps
             for (ALittleVarAssignNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.VARIABLE).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }

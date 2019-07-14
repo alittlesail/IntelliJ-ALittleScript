@@ -156,7 +156,7 @@ public class ALittleAutoTypeReference extends PsiReferenceBase<PsiElement> imple
     @Override
     public Object[] getVariants() {
         List<LookupElement> variants = new ArrayList<>();
-        variants.add(LookupElementBuilder.create("auto").withCaseSensitivity(false));
+        variants.add(LookupElementBuilder.create("auto"));
         return variants.toArray();
     }
 }

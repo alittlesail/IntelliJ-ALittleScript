@@ -32,7 +32,7 @@ public class ALittleCompletionContributor extends CompletionContributor {
                             return;
                         }
                         for (String keyword : KEYWORD_LIST) {
-                            resultSet.addElement(LookupElementBuilder.create(keyword).withCaseSensitivity(false));
+                            resultSet.addElement(LookupElementBuilder.create(keyword));
                         }
                     }
                 }

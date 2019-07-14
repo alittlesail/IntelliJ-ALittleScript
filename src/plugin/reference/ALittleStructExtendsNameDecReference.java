@@ -87,8 +87,7 @@ public class ALittleStructExtendsNameDecReference extends PsiReferenceBase<PsiEl
             for (ALittleStructNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.STRUCT).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
@@ -100,8 +99,7 @@ public class ALittleStructExtendsNameDecReference extends PsiReferenceBase<PsiEl
             for (ALittleNamespaceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.NAMESPACE).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }

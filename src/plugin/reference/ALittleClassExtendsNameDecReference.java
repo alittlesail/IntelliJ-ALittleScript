@@ -84,8 +84,7 @@ public class ALittleClassExtendsNameDecReference extends PsiReferenceBase<PsiEle
             for (ALittleClassNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.CLASS).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
@@ -97,8 +96,7 @@ public class ALittleClassExtendsNameDecReference extends PsiReferenceBase<PsiEle
             for (ALittleNamespaceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.NAMESPACE).
-                        withTypeText(dec.getContainingFile().getName()).
-                        withCaseSensitivity(false)
+                        withTypeText(dec.getContainingFile().getName())
                 );
             }
         }
