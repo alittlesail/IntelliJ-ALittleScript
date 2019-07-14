@@ -77,7 +77,8 @@ public class ALittleStructNameDecReference extends PsiReferenceBase<PsiElement> 
         for (ALittleStructNameDec dec : dec_list) {
             variants.add(LookupElementBuilder.create(dec.getText()).
                     withIcon(ALittleIcons.STRUCT).
-                    withTypeText(dec.getContainingFile().getName())
+                    withTypeText(dec.getContainingFile().getName()).
+                    withCaseSensitivity(false)
             );
         }
         return variants.toArray();

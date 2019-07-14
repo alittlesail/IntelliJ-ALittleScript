@@ -58,7 +58,7 @@ public class ALittlePropertyValueCastTypeReference extends PsiReferenceBase<PsiE
     @Override
     public Object[] getVariants() {
         List<LookupElement> variants = new ArrayList<>();
-        variants.add(LookupElementBuilder.create("cast"));
+        variants.add(LookupElementBuilder.create("cast").withCaseSensitivity(false));
         return variants.toArray();
     }
 }

@@ -102,7 +102,8 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
             for (ALittleClassNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.CLASS).
-                        withTypeText(dec.getContainingFile().getName())
+                        withTypeText(dec.getContainingFile().getName()).
+                        withCaseSensitivity(false)
                 );
             }
         }
@@ -112,7 +113,8 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
             for (ALittleStructNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.STRUCT).
-                        withTypeText(dec.getContainingFile().getName())
+                        withTypeText(dec.getContainingFile().getName()).
+                        withCaseSensitivity(false)
                 );
             }
         }
@@ -122,7 +124,8 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
             for (ALittleEnumNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.ENUM).
-                        withTypeText(dec.getContainingFile().getName())
+                        withTypeText(dec.getContainingFile().getName()).
+                        withCaseSensitivity(false)
                 );
             }
         }
@@ -132,7 +135,8 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
             for (ALittleMethodNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).
-                        withTypeText(dec.getContainingFile().getName())
+                        withTypeText(dec.getContainingFile().getName()).
+                        withCaseSensitivity(false)
                 );
             }
         }
@@ -144,7 +148,8 @@ public class ALittleCustomTypeNameDecReference extends PsiReferenceBase<PsiEleme
             for (final ALittleNamespaceNameDec dec : dec_list) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.NAMESPACE).
-                        withTypeText(dec.getContainingFile().getName())
+                        withTypeText(dec.getContainingFile().getName()).
+                        withCaseSensitivity(false)
                 );
             }
         }

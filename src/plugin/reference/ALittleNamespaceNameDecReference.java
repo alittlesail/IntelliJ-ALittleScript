@@ -73,7 +73,8 @@ public class ALittleNamespaceNameDecReference extends PsiReferenceBase<PsiElemen
         for (final ALittleNamespaceNameDec dec : dec_list) {
             variants.add(LookupElementBuilder.create(dec.getText()).
                     withIcon(ALittleIcons.NAMESPACE).
-                    withTypeText(dec.getContainingFile().getName())
+                    withTypeText(dec.getContainingFile().getName()).
+                    withCaseSensitivity(false)
             );
         }
         return variants.toArray();

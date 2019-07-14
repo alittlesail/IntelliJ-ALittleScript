@@ -362,7 +362,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleClassVarNameDec class_var_name_dec : class_var_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_var_name_dec.getText()).
                         withIcon(ALittleIcons.PROPERTY).
-                        withTypeText(class_var_name_dec.getContainingFile().getName()));
+                        withTypeText(class_var_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
 
             // 所有setter
@@ -371,7 +372,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
                         withIcon(ALittleIcons.SETTER_METHOD).
-                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+                        withTypeText(class_method_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
 
             // 所有getter
@@ -380,7 +382,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
                         withIcon(ALittleIcons.GETTER_METHOD).
-                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+                        withTypeText(class_method_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
 
             // 所有成员函数
@@ -389,7 +392,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
                         withIcon(ALittleIcons.MEMBER_METHOD).
-                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+                        withTypeText(class_method_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
             // 处理结构体的实例对象
         } else if (pre_type instanceof ALittleStructDec) {
@@ -401,7 +405,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleStructVarNameDec struct_var_name_dec : struct_var_name_dec_list) {
                 variants.add(LookupElementBuilder.create(struct_var_name_dec.getText()).
                         withIcon(ALittleIcons.PROPERTY).
-                        withTypeText(struct_var_name_dec.getContainingFile().getName()));
+                        withTypeText(struct_var_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
             // 比如 ALittle.AEnum
         } else if (pre_type instanceof ALittleNamespaceNameDec) {
@@ -412,35 +417,40 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleEnumNameDec enum_name_dec : enum_name_dec_list) {
                 variants.add(LookupElementBuilder.create(enum_name_dec.getText()).
                         withIcon(ALittleIcons.ENUM).
-                        withTypeText(enum_name_dec.getContainingFile().getName()));
+                        withTypeText(enum_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
             // 所有全局函数
             List<ALittleMethodNameDec> method_name_dec_list = ALittleTreeChangeListener.findGlobalMethodNameDecList(myElement.getProject(), src_namespace, "");
             for (ALittleMethodNameDec method_name_dec : method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(method_name_dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).
-                        withTypeText(method_name_dec.getContainingFile().getName()));
+                        withTypeText(method_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
             // 所有类名
             List<ALittleClassNameDec> class_name_dec_list = ALittleTreeChangeListener.findClassNameDecList(myElement.getProject(), src_namespace, "");
             for (ALittleClassNameDec class_name_dec : class_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_name_dec.getText()).
                         withIcon(ALittleIcons.CLASS).
-                        withTypeText(class_name_dec.getContainingFile().getName()));
+                        withTypeText(class_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
             // 所有结构体名
             List<ALittleStructNameDec> struct_name_dec_list = ALittleTreeChangeListener.findStructNameDecList(myElement.getProject(), src_namespace, "");
             for (ALittleStructNameDec struct_name_dec : struct_name_dec_list) {
                 variants.add(LookupElementBuilder.create(struct_name_dec.getText()).
                         withIcon(ALittleIcons.STRUCT).
-                        withTypeText(struct_name_dec.getContainingFile().getName()));
+                        withTypeText(struct_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
             // 所有单例
             List<ALittleInstanceNameDec> instance_name_dec_list = ALittleTreeChangeListener.findInstanceNameDecList(myElement.getProject(), src_namespace, "", false);
             for (ALittleInstanceNameDec instance_name_dec : instance_name_dec_list) {
                 variants.add(LookupElementBuilder.create(instance_name_dec.getText()).
                         withIcon(ALittleIcons.INSTANCE).
-                        withTypeText(instance_name_dec.getContainingFile().getName()));
+                        withTypeText(instance_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
             // 比如 AClass.StaticMethod()
         } else if (pre_type instanceof ALittleClassNameDec) {
@@ -453,7 +463,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
                         withIcon(ALittleIcons.STATIC_METHOD).
-                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+                        withTypeText(class_method_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
             // 所有成员函数
             class_method_name_dec_list = new ArrayList<>();
@@ -461,7 +472,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
                         withIcon(ALittleIcons.MEMBER_METHOD).
-                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+                        withTypeText(class_method_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
 
             // 所有setter
@@ -470,7 +482,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
                         withIcon(ALittleIcons.SETTER_METHOD).
-                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+                        withTypeText(class_method_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
 
             // 所有getter
@@ -479,7 +492,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleMethodNameDec class_method_name_dec : class_method_name_dec_list) {
                 variants.add(LookupElementBuilder.create(class_method_name_dec.getText()).
                         withIcon(ALittleIcons.GETTER_METHOD).
-                        withTypeText(class_method_name_dec.getContainingFile().getName()));
+                        withTypeText(class_method_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
             // 比如 AEnum.Var
         } else if (pre_type instanceof ALittleEnumDec) {
@@ -490,7 +504,8 @@ public class ALittlePropertyValueDotIdNameReference extends PsiReferenceBase<Psi
             for (ALittleEnumVarNameDec var_name_dec : var_name_dec_list) {
                 variants.add(LookupElementBuilder.create(var_name_dec.getText()).
                         withIcon(ALittleIcons.PROPERTY).
-                        withTypeText(var_name_dec.getContainingFile().getName()));
+                        withTypeText(var_name_dec.getContainingFile().getName()).
+                        withCaseSensitivity(false));
             }
         }
 

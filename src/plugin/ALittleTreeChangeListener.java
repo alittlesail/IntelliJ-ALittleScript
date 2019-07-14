@@ -148,8 +148,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                     result.addAll(set);
             }
         }
-        // 如果已经找到，那么就直接返回
-        if (!result.isEmpty()) return result;
 
         // 从全局找
         if (find_in_global) {
