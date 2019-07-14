@@ -40,7 +40,8 @@ public class ShowLuaFileAction extends AnAction {
             return;
         }
 
-        if (!file.isDirectory()) {
+        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+        if (psiFile instanceof ALittleFile) {
             try {
                 String alittle_rel_path = FileHelper.calcALittleRelPath(module, file);
                 String full_path = FileHelper.calcScriptPath(module) + alittle_rel_path + "lua";
