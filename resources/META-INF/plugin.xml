@@ -85,5 +85,10 @@
             id="CreateTutorialFile">
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
     </action>
+    <action class="plugin.action.ShowLuaFileAction"
+            text="ShowLuaFile"
+            id="ShowLuaFile">
+      <add-to-group group-id="RefactoringMenu" anchor="first"/>
+    </action>
   </actions>
 </idea-plugin>

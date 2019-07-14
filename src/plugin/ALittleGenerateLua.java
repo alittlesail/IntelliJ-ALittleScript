@@ -155,32 +155,10 @@ public class ALittleGenerateLua {
         FileIndexFacade facade = FileIndexFacade.getInstance(alittleFile.getProject());
         Module module = facade.getModuleForFile(alittleFile.getVirtualFile());
         if (module == null) {
-            // 不是模块目录下的，不能生成文件
             return;
         }
-        String module_name = module.getName();
-        String module_file_path = module.getModuleFilePath();
-        String module_file_name = module_name + ".iml";
-        if (!module_file_path.endsWith(module_file_name))
-            throw new Exception("模块文件路径:" + module_file_path + "没有以:" + module_file_name + "结尾");
 
-        String module_base_path = module_file_path.substring(0, module_file_path.length() - module_file_name.length());
-
-        String file_path = alittleFile.getVirtualFile().getPath();
-        if (!file_path.startsWith(module_base_path)) {
-            throw new Exception("当前文件不在模块路径下:" + file_path);
-        }
-        String alittle_rel_path = file_path.substring(module_base_path.length());
-        if (!alittle_rel_path.startsWith("src")) {
-            throw new Exception("不支持该目录下的文件生成:" + file_path);
-        }
-        alittle_rel_path = alittle_rel_path.substring("src/".length());
-
-        String ext = "alittle";
-        if (!alittle_rel_path.endsWith(ext)) {
-            throw new Exception("要生成的代码文件后缀名必须是alittle:" + file_path);
-        }
-        alittle_rel_path = alittle_rel_path.substring(0, alittle_rel_path.length() - ext.length());
+        String alittle_rel_path = FileHelper.calcALittleRelPath(module, alittleFile.getVirtualFile());
 
         FileHelper.writeFile(FileHelper.calcScriptPath(module) + alittle_rel_path + "lua", content);
 
