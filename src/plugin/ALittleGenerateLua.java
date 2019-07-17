@@ -6,7 +6,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;

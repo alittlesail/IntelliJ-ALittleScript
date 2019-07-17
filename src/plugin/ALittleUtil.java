@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallStatReference;
@@ -1168,6 +1167,20 @@ public class ALittleUtil {
         if (left_guess_info.value.equals("any")) return left_guess;
         if (right_guess_info.value.equals("any")) return right_guess;
 
+        if (!left_guess_info.value.equals("bool"))
+        {
+            error_content_list.add(op_string + "运算符左边必须是bool或者any类型.不能是:" + left_guess_info.value);
+            error_element_list.add(left_src);
+            return null;
+        }
+
+        if (!right_guess_info.value.equals("bool"))
+        {
+            error_content_list.add(op_string + "运算符右边边必须是bool或者any类型.不能是:" + right_guess_info.value);
+            error_element_list.add(right_src);
+            return null;
+        }
+
         return left_guess;
 
     }
@@ -1234,6 +1247,20 @@ public class ALittleUtil {
 
         if (left_guess_info.value.equals("any")) return left_guess;
         if (right_guess_info.value.equals("any")) return right_guess;
+
+        if (!left_guess_info.value.equals("bool"))
+        {
+            error_content_list.add(op_string + "运算符左边必须是bool或者any类型.不能是:" + left_guess_info.value);
+            error_element_list.add(left_src);
+            return null;
+        }
+
+        if (!right_guess_info.value.equals("bool"))
+        {
+            error_content_list.add(op_string + "运算符右边边必须是bool或者any类型.不能是:" + right_guess_info.value);
+            error_element_list.add(right_src);
+            return null;
+        }
 
         return left_guess;
     }
