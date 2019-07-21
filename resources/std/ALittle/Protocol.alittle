@@ -6,15 +6,30 @@ struct ResultJson
     string reason;
 }
 
+enum ReflectTypes
+{
+    RMT_CLASS = "class",
+    RMT_CONST = "const",
+    RMT_ENUM = "enum",
+    RMT_FUNCTOR = "Functor",
+    RMT_LIST = "List",
+    RMT_MAP = "Map",
+    RMT_PRIMITIVE = "Primitive",
+    RMT_STRUCT = "struct",
+}
+
 struct ReflectVarInfo
 {
-    string type;
-    string name;
+    ReflectInfo type;               // 类型信息
+    string name;                    // 变量名
 }
 
 struct ReflectInfo
 {
-    string type;
-    string name;
-    List<ReflectVarInfo> var_list;
+    string type;                    // 主类型
+    string name;                    // 实际类型
+    List<ReflectVarInfo> var_list;  // 成员变量
+    ReflectInfo sub_type;           // 如果type是List时表示子类型
+    ReflectInfo key_type;           // 如果type是Map时表示key的类型
+    ReflectInfo value_type;         // 如果type是Map是表示value的类型
 }

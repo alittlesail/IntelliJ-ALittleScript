@@ -15,6 +15,7 @@ import plugin.psi.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class ALittleGenerateLua {
@@ -761,67 +762,17 @@ public class ALittleGenerateLua {
         if (custom_type == null) return content;
         ALittleCustomTypeNameDec name_dec = custom_type.getCustomTypeNameDec();
         if (name_dec == null) return content;
-
         PsiElement element = name_dec.guessType();
-        if (element instanceof ALittleStructDec) {
-            ALittleStructDec dec = (ALittleStructDec)element;
-            ALittleStructNameDec struct_name_dec = dec.getStructNameDec();
-            if (struct_name_dec == null) return content;
-            content = "{\"type\":\"struct\",\"name\":\"" + struct_name_dec.getName() + "\"";
-            content += ",\"var_list\":[";
-            List<String> var_list = new ArrayList<>();
-            for (ALittleStructVarDec var_dec : dec.getStructVarDecList()) {
-                String type = var_dec.getAllType().getText().replace(" ", "");
-                ALittleStructVarNameDec var_name_dec = var_dec.getStructVarNameDec();
-                if (var_name_dec == null) return content;
-                var_list.add("{\"type\":\"" + type + "\",\"name\":\"" + var_name_dec.getText() + "\"}");
-            }
-            content += String.join(",", var_list);
-            content += "]";
-            content += "}";
-            return "\"" + content.replace("\"", "\\\"") + "\"";
-        }
 
-        if (element instanceof ALittleClassDec) {
-            ALittleClassDec dec = (ALittleClassDec)element;
-            ALittleClassNameDec class_name_dec = dec.getClassNameDec();
-            if (class_name_dec == null) return content;
-            content = "{\"type\":\"class\",\"name\":\"" + class_name_dec.getName() + "\"";
-            content += ",\"var_list\":[";
-            List<String> var_list = new ArrayList<>();
-            for (ALittleClassVarDec var_dec : dec.getClassVarDecList()) {
-                String type = var_dec.getAllType().getText().replace(" ", "");
-                ALittleClassVarNameDec var_name_dec = var_dec.getClassVarNameDec();
-                if (var_name_dec == null) return content;
-                var_list.add("{\"type\":\"" + type + "\",\"name\":\"" + var_name_dec.getText() + "\"}");
-            }
-            content += String.join(",", var_list);
-            content += "]";
-            content += "}";
-            return "\"" + content.replace("\"", "\\\"") + "\"";
-        }
+        List<String> error_content_list = new ArrayList<>();
+        List<PsiElement> error_element_list = new ArrayList<>();
+        HashSet<PsiElement> deep_guess = new HashSet<>();
+        ALittleUtil.GuessTypeInfo info = ALittleUtil.guessTypeString(reflect_value, element, deep_guess, error_content_list, error_element_list);
+        if (!error_content_list.isEmpty()) return "\"" + error_content_list.get(0) + "\"";
+        if (info == null) return null;
 
-        if (element instanceof ALittleEnumDec) {
-            ALittleEnumDec dec = (ALittleEnumDec)element;
-            ALittleEnumNameDec enum_name_dec = dec.getEnumNameDec();
-            if (enum_name_dec == null) return content;
-            content = "{\"type\":\"enum\",\"name\":\"" + enum_name_dec.getName() + "\"";
-            content += ",\"var_list\":[";
-            List<String> var_list = new ArrayList<>();
-            for (ALittleEnumVarDec var_dec : dec.getEnumVarDecList()) {
-                ALittleEnumVarNameDec var_name_dec = var_dec.getEnumVarNameDec();
-                if (var_name_dec == null) return content;
-                String type = "int";
-                if (var_dec.getEnumVarValueDec() != null && var_dec.getEnumVarValueDec().getStringContent() != null)
-                    type = "string";
-                var_list.add("{\"type\":\"" + type + "\",\"name\":\"" + var_name_dec.getText() + "\"}");
-            }
-            content += String.join(",", var_list);
-            content += "]";
-            content += "}";
-            return "\"" + content.replace("\"", "\\\"") + "\"";
-        }
-        return content;
+        content = ALittleUtil.saveGuessTypeInfoToJson(info);
+        return "\"" + content.replace("\"", "\\\"") + "\"";
     }
 
     @NotNull

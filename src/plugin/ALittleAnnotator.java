@@ -598,7 +598,7 @@ public class ALittleAnnotator implements Annotator {
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
                     break;
                 }
-                ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(value_stat, value_stat_guess_type, error_content_list, error_element_list);
+                ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(value_stat, value_stat_guess_type, null, error_content_list, error_element_list);
                 if (guess_info == null) {
                     if (!error_content_list.isEmpty()) error = error_content_list.get(0);
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
@@ -624,7 +624,7 @@ public class ALittleAnnotator implements Annotator {
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
                     break;
                 }
-                guess_info = ALittleUtil.guessTypeString(value_stat, value_stat_guess_type, error_content_list, error_element_list);
+                guess_info = ALittleUtil.guessTypeString(value_stat, value_stat_guess_type, null, error_content_list, error_element_list);
                 if (guess_info == null) {
                     if (!error_content_list.isEmpty()) error = error_content_list.get(0);
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
@@ -650,7 +650,7 @@ public class ALittleAnnotator implements Annotator {
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
                     break;
                 }
-                guess_info = ALittleUtil.guessTypeString(value_stat, value_stat_guess_type, error_content_list, error_element_list);
+                guess_info = ALittleUtil.guessTypeString(value_stat, value_stat_guess_type, null, error_content_list, error_element_list);
                 if (guess_info == null) {
                     if (!error_content_list.isEmpty()) error = error_content_list.get(0);
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
@@ -824,7 +824,7 @@ public class ALittleAnnotator implements Annotator {
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
                     break;
                 }
-                ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(value_stat, guess_type, error_content_list, error_element_list);
+                ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(value_stat, guess_type, null, error_content_list, error_element_list);
                 if (guess_info == null) {
                     if (!error_content_list.isEmpty()) error = error_content_list.get(0);
                     if (!error_element_list.isEmpty()) element = error_element_list.get(0);
@@ -1154,7 +1154,7 @@ public class ALittleAnnotator implements Annotator {
                 {
                     List<String> error_content_list = new ArrayList<>();
                     List<PsiElement> error_element_list = new ArrayList<>();
-                    value_stat_first = ALittleUtil.guessTypeString(value_stat_list.get(0), value_stat_list.get(0), error_content_list, error_element_list);
+                    value_stat_first = ALittleUtil.guessTypeString(value_stat_list.get(0), value_stat_list.get(0), null, error_content_list, error_element_list);
                     if (value_stat_first == null) {
                         if (!error_content_list.isEmpty()) error = error_content_list.get(0);
                         if (!error_element_list.isEmpty()) element = error_element_list.get(0);
@@ -1165,7 +1165,7 @@ public class ALittleAnnotator implements Annotator {
                 for (int i = 1; i < value_stat_list.size(); ++i) {
                     List<String> error_content_list = new ArrayList<>();
                     List<PsiElement> error_element_list = new ArrayList<>();
-                    ALittleUtil.GuessTypeInfo value_stat_info = ALittleUtil.guessTypeString(value_stat_list.get(i), value_stat_list.get(i), error_content_list, error_element_list);
+                    ALittleUtil.GuessTypeInfo value_stat_info = ALittleUtil.guessTypeString(value_stat_list.get(i), value_stat_list.get(i), null, error_content_list, error_element_list);
                     if (value_stat_info == null) {
                         if (!error_content_list.isEmpty()) error = error_content_list.get(0);
                         if (!error_element_list.isEmpty()) element = error_element_list.get(0);

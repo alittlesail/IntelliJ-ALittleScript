@@ -119,7 +119,7 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                     ALittleVarAssignNameDec name_dec = dec.getVarAssignNameDec();
                     if (name_dec == null) break;
 
-                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guess_type, guess_type, new ArrayList<>(), new ArrayList<>());
+                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guess_type, guess_type, null, new ArrayList<>(), new ArrayList<>());
                     if (guess_info == null) break;
                     result.add(new InlayInfo(guess_info.value, name_dec.getNode().getStartOffset()));
                 } else if (auto_type.getParent() instanceof  ALittleForPairDec) {
@@ -127,7 +127,7 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                     ALittleVarAssignNameDec name_dec = dec.getVarAssignNameDec();
                     if (name_dec == null) break;
 
-                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guess_type, guess_type, new ArrayList<>(), new ArrayList<>());
+                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guess_type, guess_type, null, new ArrayList<>(), new ArrayList<>());
                     if (guess_info == null) break;
                     result.add(new InlayInfo(guess_info.value, name_dec.getNode().getStartOffset()));
                 }

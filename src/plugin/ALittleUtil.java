@@ -728,9 +728,55 @@ public class ALittleUtil {
         public GuessTypeInfo map_value_type;                // type="Map"时, 表示Map的Value
         public List<GuessTypeInfo> functor_param_list;      // type="Functor"时, 表示参数列表
         public List<GuessTypeInfo> functor_return_list;     // type="Functor"时, 表示返回值列表
+        public List<GuessTypeInfo> list_var_type;           // type="class" 或者 type="struct"，表示成员的类型列表
+        public List<String> list_var_name;                  // type="class" 或者 type="struct"，表示成员的变量列表
     }
 
-    public static GuessTypeInfo guessTypeString(PsiElement src, PsiElement element, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
+    public static String saveGuessTypeInfoToJson(@NotNull GuessTypeInfo info)
+    {
+        String content = "{\"type\":\"";
+        if (info.type == GuessType.GT_CLASS)
+            content += "class";
+        else if (info.type == GuessType.GT_CONST)
+            content += "const";
+        else if (info.type == GuessType.GT_ENUM)
+            content += "enum";
+        else if (info.type == GuessType.GT_FUNCTOR)
+            content += "Functor";
+        else if (info.type == GuessType.GT_LIST)
+            content += "List";
+        else if (info.type == GuessType.GT_MAP)
+            content += "Map";
+        else if (info.type == GuessType.GT_PRIMITIVE)
+            content += "Primitive";
+        else if (info.type == GuessType.GT_STRUCT)
+            content += "struct";
+
+        content += "\",\"name\":\"" + info.value + "\"";
+
+        if (info.type == GuessType.GT_STRUCT || info.type == GuessType.GT_CLASS) {
+            content += ",\"var_list\":[";
+            List<String> var_list = new ArrayList<>();
+            for (int i = 0; i < info.list_var_type.size(); ++i) {
+                String child_content = "{\"type\":" + saveGuessTypeInfoToJson(info.list_var_type.get(i));
+                child_content += ",\"name\":\"" + info.list_var_name.get(i) + "\"}";
+                var_list.add(child_content);
+            }
+            content += String.join(",", var_list);
+            content += "]";
+        } else if (info.type == GuessType.GT_LIST) {
+            content += ",\"sub_type\":" + saveGuessTypeInfoToJson(info.list_sub_type);
+        } else if (info.type == GuessType.GT_MAP) {
+            content += ",\"key_type\":" + saveGuessTypeInfoToJson(info.map_key_type);
+            content += ",\"value_type\":" + saveGuessTypeInfoToJson(info.map_value_type);
+        }
+
+        content += "}";
+        return content;
+    }
+
+    public static GuessTypeInfo guessTypeString(PsiElement src, PsiElement element, HashSet<PsiElement> deep_guess
+            , @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
         // 基本类型
         if (element instanceof ALittlePrimitiveType) {
             GuessTypeInfo info = new GuessTypeInfo();
@@ -790,7 +836,7 @@ public class ALittleUtil {
             info.value = "bool";
             return info;
         } else if (element instanceof ALittleGenericType) {
-            return guessTypeString(src, (ALittleGenericType)element, error_content_list, error_element_list);
+            return guessTypeString(src, (ALittleGenericType)element, deep_guess, error_content_list, error_element_list);
         } else if (element instanceof ALittlePropertyValueBrackValueStat || element instanceof ALittlePropertyValueMethodCallStat) {
             GuessTypeInfo info = new GuessTypeInfo();
             info.type = GuessType.GT_PRIMITIVE;
@@ -804,6 +850,26 @@ public class ALittleUtil {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_CLASS;
                 info.value = namespace_name + "." + name_dec.getIdContent().getText();
+                // 如果需要深度递归
+                if (deep_guess != null) {
+                    if (deep_guess.contains(dec)) {
+                        error_content_list.add("class member has Recursive definition");
+                        error_element_list.add(src);
+                        return null;
+                    }
+                    deep_guess.add(dec);
+                    info.list_var_name = new ArrayList<>();
+                    info.list_var_type = new ArrayList<>();
+                    for (ALittleClassVarDec var_dec : dec.getClassVarDecList()) {
+                        ALittleClassVarNameDec var_name_dec = var_dec.getClassVarNameDec();
+                        GuessTypeInfo child_info = guessTypeString(src, var_dec.getAllType(), deep_guess, error_content_list, error_element_list);
+                        if (child_info == null) return null;
+                        if (var_name_dec != null) {
+                            info.list_var_type.add(child_info);
+                            info.list_var_name.add(var_name_dec.getText());
+                        }
+                    }
+                }
                 return info;
             }
         } else if (element instanceof ALittleClassNameDec) {
@@ -819,6 +885,26 @@ public class ALittleUtil {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_STRUCT;
                 info.value = namespace_name + "." + name_dec.getIdContent().getText();
+                // 如果需要深度递归
+                if (deep_guess != null) {
+                    if (deep_guess.contains(dec)) {
+                        error_content_list.add("struct member has Recursive definition");
+                        error_element_list.add(src);
+                        return null;
+                    }
+                    deep_guess.add(dec);
+                    info.list_var_name = new ArrayList<>();
+                    info.list_var_type = new ArrayList<>();
+                    for (ALittleStructVarDec var_dec : dec.getStructVarDecList()) {
+                        ALittleStructVarNameDec var_name_dec = var_dec.getStructVarNameDec();
+                        GuessTypeInfo child_info = guessTypeString(src, var_dec.getAllType(), deep_guess, error_content_list, error_element_list);
+                        if (child_info == null) return null;
+                        if (var_name_dec != null) {
+                            info.list_var_type.add(child_info);
+                            info.list_var_name.add(var_name_dec.getText());
+                        }
+                    }
+                }
                 return info;
             }
         } else if (element instanceof ALittleEnumDec) {
@@ -875,7 +961,7 @@ public class ALittleUtil {
                 info.functor_return_list = new ArrayList<>();
 
                 // 第一个参数是类
-                GuessTypeInfo class_guess_info = guessTypeString(element, class_getter_dec.getParent(), error_content_list, error_element_list);
+                GuessTypeInfo class_guess_info = guessTypeString(element, class_getter_dec.getParent(), deep_guess, error_content_list, error_element_list);
                 if (class_guess_info == null) return null;
                 info.functor_param_list.add(class_guess_info);
                 info.value += class_guess_info.value + ")";
@@ -885,7 +971,7 @@ public class ALittleUtil {
                 ALittleMethodReturnTypeDec return_type_dec = class_getter_dec.getMethodReturnTypeDec();
                 if (return_type_dec != null) {
                     ALittleAllType all_type = return_type_dec.getAllType();
-                    GuessTypeInfo guess_info = guessTypeString(element, all_type, error_content_list, error_element_list);
+                    GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
                     if (guess_info == null) return null;
                     type_list.add(guess_info.value);
                     info.functor_return_list.add(guess_info);
@@ -904,7 +990,7 @@ public class ALittleUtil {
 
                 List<String> type_list = new ArrayList<>();
                 // 第一个参数是类
-                GuessTypeInfo class_guess_info = guessTypeString(element, class_setter_dec.getParent(), error_content_list, error_element_list);
+                GuessTypeInfo class_guess_info = guessTypeString(element, class_setter_dec.getParent(), deep_guess, error_content_list, error_element_list);
                 if (class_guess_info == null) return null;
                 type_list.add(class_guess_info.value);
                 info.functor_param_list.add(class_guess_info);
@@ -913,7 +999,7 @@ public class ALittleUtil {
                 ALittleMethodParamOneDec one_dec = class_setter_dec.getMethodParamOneDec();
                 if (one_dec != null) {
                     ALittleAllType all_type = one_dec.getMethodParamTypeDec().getAllType();
-                    GuessTypeInfo guess_info = guessTypeString(element, all_type, error_content_list, error_element_list);
+                    GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
                     if (guess_info == null) return null;
                     type_list.add(guess_info.value);
                     info.functor_param_list.add(guess_info);
@@ -932,7 +1018,7 @@ public class ALittleUtil {
 
                 List<String> type_list = new ArrayList<>();
                 // 第一个参数是类
-                GuessTypeInfo class_guess_info = guessTypeString(element, class_method_dec.getParent(), error_content_list, error_element_list);
+                GuessTypeInfo class_guess_info = guessTypeString(element, class_method_dec.getParent(), deep_guess, error_content_list, error_element_list);
                 if (class_guess_info == null) return null;
                 type_list.add(class_guess_info.value);
                 info.functor_param_list.add(class_guess_info);
@@ -943,7 +1029,7 @@ public class ALittleUtil {
                     List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
                     for (ALittleMethodParamOneDec one_dec : one_dec_list) {
                         ALittleAllType all_type = one_dec.getMethodParamTypeDec().getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, error_content_list, error_element_list);
+                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
                         if (guess_info == null) return null;
                         type_list.add(guess_info.value);
                         info.functor_param_list.add(guess_info);
@@ -957,7 +1043,7 @@ public class ALittleUtil {
                     List<ALittleMethodReturnTypeDec> return_type_dec_list = return_dec.getMethodReturnTypeDecList();
                     for (ALittleMethodReturnTypeDec return_type_dec : return_type_dec_list) {
                         ALittleAllType all_type = return_type_dec.getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, error_content_list, error_element_list);
+                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
                         if (guess_info == null) return null;
                         type_list.add(guess_info.value);
                         info.functor_return_list.add(guess_info);
@@ -981,7 +1067,7 @@ public class ALittleUtil {
                     List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
                     for (ALittleMethodParamOneDec one_dec : one_dec_list) {
                         ALittleAllType all_type = one_dec.getMethodParamTypeDec().getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, error_content_list, error_element_list);
+                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
                         if (guess_info == null) return null;
                         type_list.add(guess_info.value);
                         info.functor_param_list.add(guess_info);
@@ -994,7 +1080,7 @@ public class ALittleUtil {
                     List<ALittleMethodReturnTypeDec> return_type_dec_list = return_dec.getMethodReturnTypeDecList();
                     for (ALittleMethodReturnTypeDec return_type_dec : return_type_dec_list) {
                         ALittleAllType all_type = return_type_dec.getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, error_content_list, error_element_list);
+                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
                         if (guess_info == null) return null;
                         type_list.add(guess_info.value);
                         info.functor_return_list.add(guess_info);
@@ -1018,7 +1104,7 @@ public class ALittleUtil {
                     List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
                     for (ALittleMethodParamOneDec one_dec : one_dec_list) {
                         ALittleAllType all_type = one_dec.getMethodParamTypeDec().getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, error_content_list, error_element_list);
+                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
                         if (guess_info == null) return null;
                         type_list.add(guess_info.value);
                         info.functor_param_list.add(guess_info);
@@ -1031,7 +1117,7 @@ public class ALittleUtil {
                     List<ALittleMethodReturnTypeDec> return_type_dec_list = return_dec.getMethodReturnTypeDecList();
                     for (ALittleMethodReturnTypeDec return_type_dec : return_type_dec_list) {
                         ALittleAllType all_type = return_type_dec.getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, error_content_list, error_element_list);
+                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
                         if (guess_info == null) return null;
                         type_list.add(guess_info.value);
                         info.functor_return_list.add(guess_info);
@@ -1053,7 +1139,7 @@ public class ALittleUtil {
                 info.list_sub_type.value = "any";
                 return info;
             }
-            GuessTypeInfo guess_info = guessTypeString(element, value_stat_list.get(0), error_content_list, error_element_list);
+            GuessTypeInfo guess_info = guessTypeString(element, value_stat_list.get(0), deep_guess, error_content_list, error_element_list);
             if (guess_info == null) return null;
 
             GuessTypeInfo info = new GuessTypeInfo();
@@ -1066,7 +1152,7 @@ public class ALittleUtil {
             PsiElement guess_type = guessSoftType(src, value_stat, error_content_list, error_element_list);
             if (guess_type == null) return null;
 
-            return guessTypeString(src, guess_type, error_content_list, error_element_list);
+            return guessTypeString(src, guess_type, deep_guess, error_content_list, error_element_list);
         }
 
         error_content_list.add("未知的表达式");
@@ -1074,10 +1160,11 @@ public class ALittleUtil {
         return null;
     }
 
-    public static GuessTypeInfo guessTypeString(PsiElement src, ALittleGenericType generic_type, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
+    public static GuessTypeInfo guessTypeString(PsiElement src, ALittleGenericType generic_type, HashSet<PsiElement> deep_guess
+            , @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
         if (generic_type.getGenericListType() != null) {
             ALittleGenericListType dec = generic_type.getGenericListType();
-            GuessTypeInfo guess_info = guessTypeString(src, dec.getAllType(), error_content_list, error_element_list);
+            GuessTypeInfo guess_info = guessTypeString(src, dec.getAllType(), deep_guess, error_content_list, error_element_list);
             if (guess_info == null) return null;
 
             GuessTypeInfo info = new GuessTypeInfo();
@@ -1089,8 +1176,8 @@ public class ALittleUtil {
             ALittleGenericMapType dec = generic_type.getGenericMapType();
             List<ALittleAllType> all_type_list = dec.getAllTypeList();
             if (all_type_list.size() != 2) return null;
-            GuessTypeInfo key_guess_info = guessTypeString(src, all_type_list.get(0), error_content_list, error_element_list);
-            GuessTypeInfo value_guess_info = guessTypeString(src, all_type_list.get(1), error_content_list, error_element_list);
+            GuessTypeInfo key_guess_info = guessTypeString(src, all_type_list.get(0), deep_guess, error_content_list, error_element_list);
+            GuessTypeInfo value_guess_info = guessTypeString(src, all_type_list.get(1), deep_guess, error_content_list, error_element_list);
             if (key_guess_info == null || value_guess_info == null) return null;
 
             GuessTypeInfo info = new GuessTypeInfo();
@@ -1113,7 +1200,7 @@ public class ALittleUtil {
                 List<String> name_list = new ArrayList<>();
                 List<ALittleAllType> all_type_list = param_type.getAllTypeList();
                 for (ALittleAllType all_type : all_type_list) {
-                    GuessTypeInfo guess_info = guessTypeString(src, all_type, error_content_list, error_element_list);
+                    GuessTypeInfo guess_info = guessTypeString(src, all_type, deep_guess, error_content_list, error_element_list);
                     if (guess_info == null) return null;
                     name_list.add(guess_info.value);
                     info.functor_param_list.add(guess_info);
@@ -1126,7 +1213,7 @@ public class ALittleUtil {
                 List<String> name_list = new ArrayList<>();
                 List<ALittleAllType> all_type_list = return_type.getAllTypeList();
                 for (ALittleAllType all_type : all_type_list) {
-                    GuessTypeInfo guess_info = guessTypeString(src, all_type, error_content_list, error_element_list);
+                    GuessTypeInfo guess_info = guessTypeString(src, all_type, deep_guess, error_content_list, error_element_list);
                     if (guess_info == null) return null;
                     name_list.add(guess_info.value);
                     info.functor_return_list.add(guess_info);
@@ -1142,14 +1229,15 @@ public class ALittleUtil {
         return null;
     }
 
-    public static GuessTypeInfo guessTypeString(PsiElement src, ALittleAllType all_type, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
+    public static GuessTypeInfo guessTypeString(PsiElement src, ALittleAllType all_type, HashSet<PsiElement> deep_guess
+            , @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
         PsiElement element = guessType(all_type);
         if (element == null) {
             error_content_list.add("未知的表达式");
             error_element_list.add(src);
             return null;
         }
-        return guessTypeString(src, element, error_content_list, error_element_list);
+        return guessTypeString(src, element, deep_guess, error_content_list, error_element_list);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1159,9 +1247,9 @@ public class ALittleUtil {
                                                     , ALittleOp8Suffix op_8_suffix
                                                     , @NotNull List<String> error_content_list
                                                     , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, error_content_list, error_element_list);
+        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
         if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, error_content_list, error_element_list);
+        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
         if (right_guess_info == null) return null;
 
         if (left_guess_info.value.equals("any")) return left_guess;
@@ -1240,9 +1328,9 @@ public class ALittleUtil {
                                                     , ALittleOp7Suffix op_7_suffix
                                                     , @NotNull List<String> error_content_list
                                                     , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, error_content_list, error_element_list);
+        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
         if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, error_content_list, error_element_list);
+        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
         if (right_guess_info == null) return null;
 
         if (left_guess_info.value.equals("any")) return left_guess;
@@ -1316,9 +1404,9 @@ public class ALittleUtil {
                                                     , ALittleOp6Suffix op_6_suffix
                                                     , @NotNull List<String> error_content_list
                                                     , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, error_content_list, error_element_list);
+        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
         if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, error_content_list, error_element_list);
+        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
         if (right_guess_info == null) return null;
 
         if (left_guess_info.value.equals("any")) return left_guess;
@@ -1399,9 +1487,9 @@ public class ALittleUtil {
                                                     , ALittleOp5Suffix op_5_suffix
                                                     , @NotNull List<String> error_content_list
                                                     , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, error_content_list, error_element_list);
+        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
         if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, error_content_list, error_element_list);
+        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
         if (right_guess_info == null) return null;
 
         if (left_guess_info.value.equals("any")) return left_guess;
@@ -1469,9 +1557,9 @@ public class ALittleUtil {
                                                     , ALittleOp4Suffix op_4_suffix
                                                     , @NotNull List<String> error_content_list
                                                     , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, error_content_list, error_element_list);
+        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
         if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, error_content_list, error_element_list);
+        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
         if (right_guess_info == null) return null;
 
         if (left_guess_info.value.equals("any")) return left_guess;
@@ -1562,9 +1650,9 @@ public class ALittleUtil {
             return null;
         }
 
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, error_content_list, error_element_list);
+        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
         if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, error_content_list, error_element_list);
+        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
         if (right_guess_info == null) return null;
 
         if (left_guess_info.value.equals("any")) return left_guess;
@@ -1861,7 +1949,7 @@ public class ALittleUtil {
         PsiElement suffix_guess_type = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
         if (suffix_guess_type == null) return null;
 
-        GuessTypeInfo guess_info = guessTypeString(value_factor, suffix_guess_type, error_content_list, error_element_list);
+        GuessTypeInfo guess_info = guessTypeString(value_factor, suffix_guess_type, null, error_content_list, error_element_list);
         if (guess_info == null) return null;
 
         String op_2 = op_2_value.getOp2().getText();
@@ -1974,11 +2062,11 @@ public class ALittleUtil {
                                             , PsiElement src_right, PsiElement right, GuessTypeInfo right_guess_info
                                             , @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
         if (left_guess_info == null)
-            left_guess_info = guessTypeString(src_left, left, error_content_list, error_element_list);
+            left_guess_info = guessTypeString(src_left, left, null, error_content_list, error_element_list);
         if (left_guess_info == null) return false;
 
         if (right_guess_info == null)
-            right_guess_info = guessTypeString(src_right, right, error_content_list, error_element_list);
+            right_guess_info = guessTypeString(src_right, right, null, error_content_list, error_element_list);
         if (right_guess_info == null) return false;
 
         // 如果字符串直接相等，那么就直接返回成功

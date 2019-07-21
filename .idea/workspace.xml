@@ -14,14 +14,34 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="278" column="64" selection-start-line="278" selection-start-column="64" selection-end-line="278" selection-end-column="64" />
+            <state relative-caret-position="200">
+              <caret line="767" column="35" selection-start-line="767" selection-start-column="27" selection-end-line="767" selection-end-column="35" />
               <folding>
-                <element signature="e#0#2021#0" expanded="true" />
-                <element signature="e#489#2019#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/resources/std/ALittle/Protocol.alittle">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="155">
+              <caret line="767" column="64" lean-forward="true" selection-start-line="767" selection-start-column="64" selection-end-line="767" selection-end-column="64" />
+              <folding>
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -41,9 +61,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>ModuleBuilder</find>
-      <find>get</find>
-      <find>getRe</find>
       <find>CheckErrorForGuessList</find>
       <find>getReferences</find>
       <find>lua</find>
@@ -71,6 +88,9 @@
       <find>.</find>
       <find>Op8I</find>
       <find>op6suffix</find>
+      <find>Reflect</find>
+      <find>Class</find>
+      <find>guessTypeString</find>
     </findStrings>
     <replaceStrings>
       <replace>NAME</replace>
@@ -122,8 +142,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittleEnumNameDecElementImpl.java" />
-        <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittleInstanceClassNameDecElementImpl.java" />
         <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittleInstanceNameDecElementImpl.java" />
         <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittlePrimitiveTypeElementImpl.java" />
         <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittlePropertyValueBrackValueStatElementImpl.java" />
@@ -136,7 +154,6 @@
         <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittleStructNameDecElementImpl.java" />
         <option value="$PROJECT_DIR$/src/plugin/psi/impl/ALittleStructVarNameDecElementImpl.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleGuessUtil.java" />
-        <option value="$PROJECT_DIR$/src/plugin/ALittleAnnotator.java" />
         <option value="F:/Test/Client/Win32/bin/Module/ABrowser/ALittleProject/.idea/modules.xml" />
         <option value="F:/Test/Client/Win32/bin/Module/CMD/ALittleProject/.idea/modules.xml" />
         <option value="F:/Test/Client/Win32/bin/Module/G2048/ALittleProject/.idea/modules.xml" />
@@ -171,8 +188,11 @@
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCastTypeReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleAutoTypeReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeNameDecReference.java" />
+        <option value="$PROJECT_DIR$/src/plugin/parameter/ALittleParameterHintsProvider.java" />
+        <option value="$PROJECT_DIR$/src/plugin/ALittleAnnotator.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleUtil.java" />
+        <option value="$PROJECT_DIR$/resources/std/ALittle/Protocol.alittle" />
       </list>
     </option>
   </component>
@@ -200,8 +220,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -231,6 +249,20 @@
               <item name="trunk" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
               <item name="std" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ALittleScript" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trunk" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="std" type="462c0819:PsiDirectoryNode" />
+              <item name="ALittle" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ALittleScript" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trunk" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="std" type="462c0819:PsiDirectoryNode" />
+              <item name="Lua" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ALittleScript" type="b2602c69:ProjectViewProjectNode" />
@@ -265,6 +297,8 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -372,10 +406,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.28958333" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14275256" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -385,7 +419,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49947917" weight="0.22962964" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49626866" weight="0.2967359" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.490625" visible="true" weight="0.2899471" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.490625" visible="true" weight="0.28881988" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -395,7 +429,7 @@
       <window_info anchor="bottom" id="Version Control" order="10" />
       <window_info anchor="bottom" id="Tool Output" order="11" sideWeight="0.49924356" weight="0.21472393" />
       <window_info anchor="bottom" id="ANTLR Preview" order="12" weight="0.54141104" />
-      <window_info anchor="bottom" id="Messages" order="13" sideWeight="0.49583334" weight="0.3121693" />
+      <window_info anchor="bottom" id="Messages" order="13" sideWeight="0.49583334" weight="0.3121118" />
       <window_info anchor="bottom" id="PVS-Studio" order="14" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -423,14 +457,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://F:/Test/Client/Win32/bin/Module/GGOD/Protocol/Protocol/BaseProtocol.json" />
-    <entry file="file://$PROJECT_DIR$/src/plugin/module/ALittleModuleBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="30" column="35" selection-start-line="30" selection-start-column="35" selection-end-line="30" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/StdLibraryProvider.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="570">
@@ -780,36 +806,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="84" column="41" selection-start-line="84" selection-start-column="41" selection-end-line="84" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
-          <caret line="506" column="68" selection-start-line="506" selection-start-column="68" selection-end-line="506" selection-end-column="68" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="241">
-          <caret line="1174" column="9" lean-forward="true" selection-start-line="1174" selection-start-column="9" selection-end-line="1174" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="234">
@@ -818,6 +814,50 @@
             <element signature="e#0#2021#0" expanded="true" />
             <element signature="e#489#2019#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="131">
+          <caret line="1167" column="75" selection-start-line="1167" selection-start-column="75" selection-end-line="1167" selection-end-column="75" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/parameter/ALittleParameterHintsProvider.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="319">
+          <caret line="129" column="115" selection-start-line="129" selection-start-column="115" selection-end-line="129" selection-end-column="115" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="767" column="64" lean-forward="true" selection-start-line="767" selection-start-column="64" selection-end-line="767" selection-end-column="64" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="767" column="35" selection-start-line="767" selection-start-column="27" selection-end-line="767" selection-end-column="35" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/std/ALittle/Protocol.alittle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
         </state>
       </provider>
     </entry>
