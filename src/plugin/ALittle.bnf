@@ -104,21 +104,21 @@ method_return_dec ::= COLON method_return_type_dec (COMMA method_return_type_dec
 method_return_type_dec ::= all_type
 
 // 类构造函数定义
-class_ctor_dec ::= access_modifier? Ctor method_param_dec method_body_dec {pin=2}
+class_ctor_dec ::= access_modifier? coroutine_modifier? Ctor method_param_dec method_body_dec {pin=3}
 // 类getter函数
-class_getter_dec ::= access_modifier? get method_name_dec LPAREN RPAREN COLON method_return_type_dec method_body_dec {pin=2}
+class_getter_dec ::= access_modifier? coroutine_modifier? get method_name_dec LPAREN RPAREN COLON method_return_type_dec method_body_dec {pin=3}
 // 类setter函数
-class_setter_dec ::= access_modifier? set method_name_dec LPAREN method_param_one_dec RPAREN method_body_dec {pin=2}
+class_setter_dec ::= access_modifier? coroutine_modifier? set method_name_dec LPAREN method_param_one_dec RPAREN method_body_dec {pin=3}
 // 类成员函数定义
-class_method_dec ::= access_modifier? fun method_name_dec method_param_dec method_return_dec? method_body_dec {pin=2}
+class_method_dec ::= access_modifier? coroutine_modifier? fun method_name_dec method_param_dec method_return_dec? method_body_dec {pin=3}
 // 类静态函数定义
-class_static_dec ::= access_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=2}
+class_static_dec ::= access_modifier? coroutine_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=3}
 // 类成员变量定义
 class_var_dec ::= access_modifier? all_type class_var_name_dec SEMI {pin=2}
 class_var_name_dec ::= ID_CONTENT {mixin="plugin.psi.impl.ALittleClassVarNameDecElementImpl"
                                   implements="plugin.psi.ALittleClassVarNameDecElement" methods=[guessType guessTypes getReference getName setName getNameIdentifier]}
 // 全局函数
-global_method_dec ::= access_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=2}
+global_method_dec ::= access_modifier? coroutine_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=3}
 
 // 结构体
 struct_dec ::= access_modifier? struct struct_name_dec ((COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec) | struct_protocol_dec)? struct_body_dec
@@ -147,6 +147,10 @@ enum_var_value_dec ::= DIGIT_CONTENT | STRING_CONTENT
 
 // 访问修饰符
 access_modifier ::= (public | private | protected)
+
+// 协程修饰符
+coroutine_modifier ::= (async | await)
+coroutine_yield ::= yield
 
 // 表达式
 all_expr ::= var_assign_expr |
@@ -202,7 +206,7 @@ private private_else_if_body ::= LBRACE all_expr* RBRACE {pin=1}
 wrap_expr ::= LBRACE all_expr* RBRACE {pin=1}
 
 // return
-return_expr ::= return (value_stat (COMMA value_stat)*)? SEMI {pin=1}
+return_expr ::= return ((value_stat (COMMA value_stat)*) | coroutine_yield)? SEMI {pin=1}
 
 // break, [ continue 后续添加功能 ]
 flow_expr ::= break SEMI {pin=1}
@@ -245,13 +249,16 @@ op_assign_expr ::= property_value ((COMMA property_value)* private_OP_ASSIGN_val
 private private_OP_ASSIGN_value_stat ::= op_assign value_stat {pin=1}
 
 // 值
-value_stat ::= op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor | op_new_list
+value_stat ::= op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor | op_new_list | bind_stat
 
 // new
 op_new_stat ::= new (custom_type | generic_type) LPAREN (value_stat (COMMA value_stat)*)? RPAREN {pin=1}
 
 // list 快捷表达式
 op_new_list ::= LBRACK (value_stat (COMMA value_stat)*)? RBRACK {pin=1}
+
+// bind
+bind_stat ::= bind LPAREN (value_stat (COMMA value_stat)*)? RPAREN  {pin=1}
 
 // op 类型的运算，编号越大，优先级越低
 

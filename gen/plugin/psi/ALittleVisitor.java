@@ -23,6 +23,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitAutoTypeElement(o);
   }
 
+  public void visitBindStat(@NotNull ALittleBindStat o) {
+    visitPsiElement(o);
+  }
+
   public void visitClassAccessModifier(@NotNull ALittleClassAccessModifier o) {
     visitPsiElement(o);
   }
@@ -76,6 +80,14 @@ public class ALittleVisitor extends PsiElementVisitor {
   }
 
   public void visitConstValue(@NotNull ALittleConstValue o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCoroutineModifier(@NotNull ALittleCoroutineModifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCoroutineYield(@NotNull ALittleCoroutineYield o) {
     visitPsiElement(o);
   }
 

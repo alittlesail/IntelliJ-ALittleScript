@@ -12,6 +12,7 @@ public interface ALittleTypes {
   IElementType ALL_EXPR = new ALittleElementType("ALL_EXPR");
   IElementType ALL_TYPE = new ALittleElementType("ALL_TYPE");
   IElementType AUTO_TYPE = new ALittleElementType("AUTO_TYPE");
+  IElementType BIND_STAT = new ALittleElementType("BIND_STAT");
   IElementType CLASS_ACCESS_MODIFIER = new ALittleElementType("CLASS_ACCESS_MODIFIER");
   IElementType CLASS_CTOR_DEC = new ALittleElementType("CLASS_CTOR_DEC");
   IElementType CLASS_DEC = new ALittleElementType("CLASS_DEC");
@@ -26,6 +27,8 @@ public interface ALittleTypes {
   IElementType CLASS_VAR_DEC = new ALittleElementType("CLASS_VAR_DEC");
   IElementType CLASS_VAR_NAME_DEC = new ALittleElementType("CLASS_VAR_NAME_DEC");
   IElementType CONST_VALUE = new ALittleElementType("CONST_VALUE");
+  IElementType COROUTINE_MODIFIER = new ALittleElementType("COROUTINE_MODIFIER");
+  IElementType COROUTINE_YIELD = new ALittleElementType("COROUTINE_YIELD");
   IElementType CUSTOM_TYPE = new ALittleElementType("CUSTOM_TYPE");
   IElementType CUSTOM_TYPE_NAMESPACE_NAME_DEC = new ALittleElementType("CUSTOM_TYPE_NAMESPACE_NAME_DEC");
   IElementType CUSTOM_TYPE_NAME_DEC = new ALittleElementType("CUSTOM_TYPE_NAME_DEC");
@@ -140,8 +143,11 @@ public interface ALittleTypes {
   IElementType ANY = new ALittleTokenType("any");
   IElementType APOS = new ALittleTokenType("'");
   IElementType ASSIGN = new ALittleTokenType("=");
+  IElementType ASYNC = new ALittleTokenType("async");
   IElementType AUTO = new ALittleTokenType("auto");
+  IElementType AWAIT = new ALittleTokenType("await");
   IElementType BACK = new ALittleTokenType("\\");
+  IElementType BIND = new ALittleTokenType("bind");
   IElementType BOOL = new ALittleTokenType("bool");
   IElementType BREAK = new ALittleTokenType("break");
   IElementType CAST = new ALittleTokenType("cast");
@@ -218,6 +224,7 @@ public interface ALittleTypes {
   IElementType THIS = new ALittleTokenType("this");
   IElementType TRUE = new ALittleTokenType("true");
   IElementType WHILE = new ALittleTokenType("while");
+  IElementType YIELD = new ALittleTokenType("yield");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
@@ -233,6 +240,9 @@ public interface ALittleTypes {
       }
       else if (type == AUTO_TYPE) {
         return new ALittleAutoTypeImpl(node);
+      }
+      else if (type == BIND_STAT) {
+        return new ALittleBindStatImpl(node);
       }
       else if (type == CLASS_ACCESS_MODIFIER) {
         return new ALittleClassAccessModifierImpl(node);
@@ -275,6 +285,12 @@ public interface ALittleTypes {
       }
       else if (type == CONST_VALUE) {
         return new ALittleConstValueImpl(node);
+      }
+      else if (type == COROUTINE_MODIFIER) {
+        return new ALittleCoroutineModifierImpl(node);
+      }
+      else if (type == COROUTINE_YIELD) {
+        return new ALittleCoroutineYieldImpl(node);
       }
       else if (type == CUSTOM_TYPE) {
         return new ALittleCustomTypeImpl(node);

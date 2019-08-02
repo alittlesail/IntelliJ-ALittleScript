@@ -117,6 +117,61 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // bind LPAREN (value_stat (COMMA value_stat)*)? RPAREN
+  public static boolean bind_stat(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bind_stat")) return false;
+    if (!nextTokenIs(b, BIND)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, BIND_STAT, null);
+    r = consumeTokens(b, 1, BIND, LPAREN);
+    p = r; // pin = 1
+    r = r && report_error_(b, bind_stat_2(b, l + 1));
+    r = p && consumeToken(b, RPAREN) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (value_stat (COMMA value_stat)*)?
+  private static boolean bind_stat_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bind_stat_2")) return false;
+    bind_stat_2_0(b, l + 1);
+    return true;
+  }
+
+  // value_stat (COMMA value_stat)*
+  private static boolean bind_stat_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bind_stat_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = value_stat(b, l + 1);
+    r = r && bind_stat_2_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (COMMA value_stat)*
+  private static boolean bind_stat_2_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bind_stat_2_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!bind_stat_2_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "bind_stat_2_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // COMMA value_stat
+  private static boolean bind_stat_2_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bind_stat_2_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && value_stat(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // access_modifier
   public static boolean class_access_modifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_access_modifier")) return false;
@@ -128,14 +183,15 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? Ctor method_param_dec method_body_dec
+  // access_modifier? coroutine_modifier? Ctor method_param_dec method_body_dec
   public static boolean class_ctor_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_ctor_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_CTOR_DEC, "<class ctor dec>");
     r = class_ctor_dec_0(b, l + 1);
+    r = r && class_ctor_dec_1(b, l + 1);
     r = r && consumeToken(b, CTOR);
-    p = r; // pin = 2
+    p = r; // pin = 3
     r = r && report_error_(b, method_param_dec(b, l + 1));
     r = p && method_body_dec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
@@ -146,6 +202,13 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   private static boolean class_ctor_dec_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_ctor_dec_0")) return false;
     access_modifier(b, l + 1);
+    return true;
+  }
+
+  // coroutine_modifier?
+  private static boolean class_ctor_dec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_ctor_dec_1")) return false;
+    coroutine_modifier(b, l + 1);
     return true;
   }
 
@@ -279,14 +342,15 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? get method_name_dec LPAREN RPAREN COLON method_return_type_dec method_body_dec
+  // access_modifier? coroutine_modifier? get method_name_dec LPAREN RPAREN COLON method_return_type_dec method_body_dec
   public static boolean class_getter_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_getter_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_GETTER_DEC, "<class getter dec>");
     r = class_getter_dec_0(b, l + 1);
+    r = r && class_getter_dec_1(b, l + 1);
     r = r && consumeToken(b, GET);
-    p = r; // pin = 2
+    p = r; // pin = 3
     r = r && report_error_(b, method_name_dec(b, l + 1));
     r = p && report_error_(b, consumeTokens(b, -1, LPAREN, RPAREN, COLON)) && r;
     r = p && report_error_(b, method_return_type_dec(b, l + 1)) && r;
@@ -302,18 +366,26 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // coroutine_modifier?
+  private static boolean class_getter_dec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_getter_dec_1")) return false;
+    coroutine_modifier(b, l + 1);
+    return true;
+  }
+
   /* ********************************************************** */
-  // access_modifier? fun method_name_dec method_param_dec method_return_dec? method_body_dec
+  // access_modifier? coroutine_modifier? fun method_name_dec method_param_dec method_return_dec? method_body_dec
   public static boolean class_method_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_method_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_METHOD_DEC, "<class method dec>");
     r = class_method_dec_0(b, l + 1);
+    r = r && class_method_dec_1(b, l + 1);
     r = r && consumeToken(b, FUN);
-    p = r; // pin = 2
+    p = r; // pin = 3
     r = r && report_error_(b, method_name_dec(b, l + 1));
     r = p && report_error_(b, method_param_dec(b, l + 1)) && r;
-    r = p && report_error_(b, class_method_dec_4(b, l + 1)) && r;
+    r = p && report_error_(b, class_method_dec_5(b, l + 1)) && r;
     r = p && method_body_dec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -326,9 +398,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // coroutine_modifier?
+  private static boolean class_method_dec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_method_dec_1")) return false;
+    coroutine_modifier(b, l + 1);
+    return true;
+  }
+
   // method_return_dec?
-  private static boolean class_method_dec_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_method_dec_4")) return false;
+  private static boolean class_method_dec_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_method_dec_5")) return false;
     method_return_dec(b, l + 1);
     return true;
   }
@@ -346,14 +425,15 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? set method_name_dec LPAREN method_param_one_dec RPAREN method_body_dec
+  // access_modifier? coroutine_modifier? set method_name_dec LPAREN method_param_one_dec RPAREN method_body_dec
   public static boolean class_setter_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_setter_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_SETTER_DEC, "<class setter dec>");
     r = class_setter_dec_0(b, l + 1);
+    r = r && class_setter_dec_1(b, l + 1);
     r = r && consumeToken(b, SET);
-    p = r; // pin = 2
+    p = r; // pin = 3
     r = r && report_error_(b, method_name_dec(b, l + 1));
     r = p && report_error_(b, consumeToken(b, LPAREN)) && r;
     r = p && report_error_(b, method_param_one_dec(b, l + 1)) && r;
@@ -370,18 +450,26 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // coroutine_modifier?
+  private static boolean class_setter_dec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_setter_dec_1")) return false;
+    coroutine_modifier(b, l + 1);
+    return true;
+  }
+
   /* ********************************************************** */
-  // access_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec
+  // access_modifier? coroutine_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec
   public static boolean class_static_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_static_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_STATIC_DEC, "<class static dec>");
     r = class_static_dec_0(b, l + 1);
+    r = r && class_static_dec_1(b, l + 1);
     r = r && consumeToken(b, STATIC);
-    p = r; // pin = 2
+    p = r; // pin = 3
     r = r && report_error_(b, method_name_dec(b, l + 1));
     r = p && report_error_(b, method_param_dec(b, l + 1)) && r;
-    r = p && report_error_(b, class_static_dec_4(b, l + 1)) && r;
+    r = p && report_error_(b, class_static_dec_5(b, l + 1)) && r;
     r = p && method_body_dec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -394,9 +482,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // coroutine_modifier?
+  private static boolean class_static_dec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_static_dec_1")) return false;
+    coroutine_modifier(b, l + 1);
+    return true;
+  }
+
   // method_return_dec?
-  private static boolean class_static_dec_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_static_dec_4")) return false;
+  private static boolean class_static_dec_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_static_dec_5")) return false;
     method_return_dec(b, l + 1);
     return true;
   }
@@ -447,6 +542,31 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, DIGIT_CONTENT);
     if (!r) r = consumeToken(b, NULL);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // async | await
+  public static boolean coroutine_modifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "coroutine_modifier")) return false;
+    if (!nextTokenIs(b, "<coroutine modifier>", ASYNC, AWAIT)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, COROUTINE_MODIFIER, "<coroutine modifier>");
+    r = consumeToken(b, ASYNC);
+    if (!r) r = consumeToken(b, AWAIT);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // yield
+  public static boolean coroutine_yield(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "coroutine_yield")) return false;
+    if (!nextTokenIs(b, YIELD)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, YIELD);
+    exit_section_(b, m, COROUTINE_YIELD, r);
     return r;
   }
 
@@ -1036,17 +1156,18 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec
+  // access_modifier? coroutine_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec
   public static boolean global_method_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "global_method_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, GLOBAL_METHOD_DEC, "<global method dec>");
     r = global_method_dec_0(b, l + 1);
+    r = r && global_method_dec_1(b, l + 1);
     r = r && consumeToken(b, STATIC);
-    p = r; // pin = 2
+    p = r; // pin = 3
     r = r && report_error_(b, method_name_dec(b, l + 1));
     r = p && report_error_(b, method_param_dec(b, l + 1)) && r;
-    r = p && report_error_(b, global_method_dec_4(b, l + 1)) && r;
+    r = p && report_error_(b, global_method_dec_5(b, l + 1)) && r;
     r = p && method_body_dec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -1059,9 +1180,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // coroutine_modifier?
+  private static boolean global_method_dec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_method_dec_1")) return false;
+    coroutine_modifier(b, l + 1);
+    return true;
+  }
+
   // method_return_dec?
-  private static boolean global_method_dec_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "global_method_dec_4")) return false;
+  private static boolean global_method_dec_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_method_dec_5")) return false;
     method_return_dec(b, l + 1);
     return true;
   }
@@ -2819,7 +2947,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // return (value_stat (COMMA value_stat)*)? SEMI
+  // return ((value_stat (COMMA value_stat)*) | coroutine_yield)? SEMI
   public static boolean return_expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_expr")) return false;
     if (!nextTokenIs(b, RETURN)) return false;
@@ -2833,38 +2961,49 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // (value_stat (COMMA value_stat)*)?
+  // ((value_stat (COMMA value_stat)*) | coroutine_yield)?
   private static boolean return_expr_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_expr_1")) return false;
     return_expr_1_0(b, l + 1);
     return true;
   }
 
-  // value_stat (COMMA value_stat)*
+  // (value_stat (COMMA value_stat)*) | coroutine_yield
   private static boolean return_expr_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_expr_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
+    r = return_expr_1_0_0(b, l + 1);
+    if (!r) r = coroutine_yield(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // value_stat (COMMA value_stat)*
+  private static boolean return_expr_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_expr_1_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
     r = value_stat(b, l + 1);
-    r = r && return_expr_1_0_1(b, l + 1);
+    r = r && return_expr_1_0_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // (COMMA value_stat)*
-  private static boolean return_expr_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "return_expr_1_0_1")) return false;
+  private static boolean return_expr_1_0_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_expr_1_0_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!return_expr_1_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "return_expr_1_0_1", c)) break;
+      if (!return_expr_1_0_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "return_expr_1_0_0_1", c)) break;
     }
     return true;
   }
 
   // COMMA value_stat
-  private static boolean return_expr_1_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "return_expr_1_0_1_0")) return false;
+  private static boolean return_expr_1_0_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_expr_1_0_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
@@ -3078,7 +3217,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor | op_new_list
+  // op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor | op_new_list | bind_stat
   public static boolean value_stat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "value_stat")) return false;
     boolean r;
@@ -3093,6 +3232,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = op_8_stat(b, l + 1);
     if (!r) r = value_factor(b, l + 1);
     if (!r) r = op_new_list(b, l + 1);
+    if (!r) r = bind_stat(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

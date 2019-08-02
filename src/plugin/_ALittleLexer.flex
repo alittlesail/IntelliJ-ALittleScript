@@ -87,6 +87,9 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "public"              { return PUBLIC; }
   "private"             { return PRIVATE; }
   "protected"           { return PROTECTED; }
+  "async"               { return ASYNC; }
+  "await"               { return AWAIT; }
+  "yield"               { return YIELD; }
   "for"                 { return FOR; }
   "in"                  { return IN; }
   "while"               { return WHILE; }
@@ -106,6 +109,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "any"                 { return ANY; }
   "string"              { return STRING; }
   "auto"                { return AUTO; }
+  "bind"                { return BIND; }
   "true"                { return TRUE; }
   "false"               { return FALSE; }
   "null"                { return NULL; }

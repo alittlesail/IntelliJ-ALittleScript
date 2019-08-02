@@ -1418,6 +1418,9 @@ public class ALittleGenerateLua {
                 List<ALittleMethodParamOneDec> param_one_dec_list = param_dec.getMethodParamOneDecList();
                 for (ALittleMethodParamOneDec param_one_dec : param_one_dec_list) {
                     ALittleMethodParamNameDec param_name_dec = param_one_dec.getMethodParamNameDec();
+                    if (param_name_dec == null) {
+                        throw new Exception("class " + class_name + " 的构造函数没有参数名");
+                    }
                     param_name_list.add(param_name_dec.getIdContent().getText());
                 }
             }
@@ -1441,7 +1444,17 @@ public class ALittleGenerateLua {
             m_open_rawset = false;
 
             content.append(all_expr_content);
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("end\n");
+
+            if (ctor_dec.getCoroutineModifier() != null && ctor_dec.getCoroutineModifier().getText().equals("async")) {
+                content.append(pre_tab)
+                        .append(class_name).append(".Ctor")
+                        .append(" = __coroutine.wrap(")
+                        .append(class_name).append(".Ctor")
+                        .append(")\n");
+            }
+
+            content.append("\n");
         }
         //构建getter函数///////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassGetterDec> class_getter_dec_list = root.getClassGetterDecList();
@@ -1465,7 +1478,17 @@ public class ALittleGenerateLua {
             for (ALittleAllExpr all_expr : all_expr_list) {
                 content.append(GenerateAllExpr(all_expr, pre_tab + "\t"));
             }
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("end\n");
+
+            if (class_getter_dec.getCoroutineModifier() != null && class_getter_dec.getCoroutineModifier().getText().equals("async")) {
+                content.append(pre_tab)
+                        .append(class_name).append(".__getter.").append(class_method_name_dec.getIdContent().getText())
+                        .append(" = __coroutine.wrap(")
+                        .append(class_name).append(".__getter.").append(class_method_name_dec.getIdContent().getText())
+                        .append(")\n");
+            }
+
+            content.append("\n");
         }
         //构建setter函数///////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassSetterDec> class_setter_dec_list = root.getClassSetterDecList();
@@ -1499,7 +1522,17 @@ public class ALittleGenerateLua {
             for (ALittleAllExpr all_expr : all_expr_list) {
                 content.append(GenerateAllExpr(all_expr, pre_tab + "\t"));
             }
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("end\n");
+
+            if (class_setter_dec.getCoroutineModifier() != null && class_setter_dec.getCoroutineModifier().getText().equals("async")) {
+                content.append(pre_tab)
+                        .append(class_name).append(".__setter.").append(class_method_name_dec.getIdContent().getText())
+                        .append(" = __coroutine.wrap(")
+                        .append(class_name).append(".__setter.").append(class_method_name_dec.getIdContent().getText())
+                        .append(")\n");
+            }
+
+            content.append("\n");
         }
         //构建成员函数//////////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassMethodDec> class_method_dec_list = root.getClassMethodDecList();
@@ -1539,7 +1572,17 @@ public class ALittleGenerateLua {
             for (ALittleAllExpr all_expr : all_expr_list) {
                 content.append(GenerateAllExpr(all_expr, pre_tab + "\t"));
             }
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("end\n");
+
+            if (class_method_dec.getCoroutineModifier() != null && class_method_dec.getCoroutineModifier().getText().equals("async")) {
+                content.append(pre_tab)
+                        .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
+                        .append(" = __coroutine.wrap(")
+                        .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
+                        .append(")\n");
+            }
+
+            content.append("\n");
         }
         //构建静态函数//////////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassStaticDec> class_static_dec_list = root.getClassStaticDecList();
@@ -1579,7 +1622,16 @@ public class ALittleGenerateLua {
             for (ALittleAllExpr all_expr : all_expr_list) {
                 content.append(GenerateAllExpr(all_expr, pre_tab + "\t"));
             }
-            content.append(pre_tab).append("end\n\n");
+            content.append(pre_tab).append("end\n");
+
+            if (class_static_dec.getCoroutineModifier() != null && class_static_dec.getCoroutineModifier().getText().equals("async")) {
+                content.append(pre_tab)
+                        .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
+                        .append(" = __coroutine.wrap(")
+                        .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
+                        .append(")\n");
+            }
+            content.append("\n");
         }
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1656,7 +1708,14 @@ public class ALittleGenerateLua {
         for (ALittleAllExpr all_expr : all_expr_list) {
             content.append(GenerateAllExpr(all_expr, pre_tab + "\t"));
         }
-        content.append(pre_tab).append("end\n\n");
+        content.append(pre_tab).append("end\n");
+
+        // 协程判定
+        if (root.getCoroutineModifier() != null && root.getCoroutineModifier().getText().equals("async")) {
+            content.append(pre_tab).append(method_name).append(" = __coroutine.wrap(").append(method_name).append(")\n");
+        }
+
+        content.append("\n");
 
         return content.toString();
     }
@@ -1717,6 +1776,7 @@ public class ALittleGenerateLua {
             content.append("local __rawset = rawset\n");
         content.append("local __pairs = pairs\n");
         content.append("local __ipairs = ipairs\n");
+        content.append("local __coroutine = coroutine\n");
         content.append("\n");
 
         content.append(other_content);

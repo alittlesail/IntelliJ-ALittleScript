@@ -19,6 +19,7 @@ local assert = assert
 local unpack = unpack
 local tostring = tostring
 local setmetatable = setmetatable
+local pcall = pcall
 
 local __functor_mt = {}
 -- 设置call函数。这样创建类实例对象时，可以使用A()这样的书写方式。
@@ -40,11 +41,6 @@ __functor_mt.__call = function(caller, ...)
         new_arg_list[arg_count + i] = select(i, ...)
     end
     -- 把参数列表解包，调用回调函数
-    if caller._use_coroutine then
-        local co = coroutine.create(caller._func)
-        assert(coroutine.resume(co, unpack(new_arg_list, 1, arg_count + add_count)))
-        return
-    end
     return caller._func(unpack(new_arg_list, 1, arg_count + add_count))
 end
 
@@ -54,6 +50,10 @@ __functor_mt.__tostring = function(caller)
 end
 
 function Bind(func, ...)
+    -- 如果没有携带参数，那么就直接返回func
+    if select("#", ...) == 0 then
+        return func
+    end
     -- 委托对象
     local object = {}
     -- 保存func
@@ -66,28 +66,4 @@ function Bind(func, ...)
     setmetatable(object, __functor_mt)
     -- 返回委托对象
     return object
-end
-
--- 使用协程的方式执行，调用之后不会有任何返回值
-function CoBind(func, ...)
-    -- 委托对象
-    local object = {}
-    -- 保存func
-    object._func = func
-    -- 保存参数列表
-    object._arg = { ... }
-    -- 保存参数个数
-    object._arg_count = select("#", ...)
-    -- 使用协程调用
-    object._use_coroutine = true
-    -- 委托对象的metatable
-    setmetatable(object, __functor_mt)
-    -- 返回委托对象
-    return object
-end
-
--- 以协程方式调用函数
-function CoInvoke(func, ...)
-    local co = coroutine.create(func)
-    assert(coroutine.resume(co, ...))
 end

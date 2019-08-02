@@ -34,6 +34,12 @@ public class ALittleGlobalMethodDecImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
+  public ALittleCoroutineModifier getCoroutineModifier() {
+    return findChildByClass(ALittleCoroutineModifier.class);
+  }
+
+  @Override
+  @Nullable
   public ALittleMethodBodyDec getMethodBodyDec() {
     return findChildByClass(ALittleMethodBodyDec.class);
   }

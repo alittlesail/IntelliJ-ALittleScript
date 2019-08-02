@@ -22,7 +22,7 @@ public class ALittleParserDefinition implements ParserDefinition {
     public static final TokenSet KEYWORD_SET = TokenSet.create(ALittleTypes.CAST, ALittleTypes.REFLECT, ALittleTypes.AUTO, ALittleTypes.ANY, ALittleTypes.INT, ALittleTypes.I64, ALittleTypes.DOUBLE, ALittleTypes.STRING, ALittleTypes.BOOL,
             ALittleTypes.CLASS, ALittleTypes.ENUM, ALittleTypes.STRUCT, ALittleTypes.INSTANCE,
             ALittleTypes.PROTO, ALittleTypes.PUBLIC, ALittleTypes.PRIVATE, ALittleTypes.PROTECTED, ALittleTypes.STATIC, ALittleTypes.INSTANCE,
-            ALittleTypes.BREAK, ALittleTypes.CTOR,
+            ALittleTypes.BREAK, ALittleTypes.CTOR, ALittleTypes.YIELD, ALittleTypes.ASYNC, ALittleTypes.AWAIT,
             ALittleTypes.IF, ALittleTypes.ELSE, ALittleTypes.ELSEIF, ALittleTypes.DO, ALittleTypes.WHILE, ALittleTypes.FOR,
             ALittleTypes.IN, ALittleTypes.LIST, ALittleTypes.MAP,
             ALittleTypes.NEW, ALittleTypes.RETURN, ALittleTypes.REGISTER, ALittleTypes.NAMESPACE, ALittleTypes.THIS, ALittleTypes.FUNCTOR,

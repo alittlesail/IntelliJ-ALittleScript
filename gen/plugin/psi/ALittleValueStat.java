@@ -8,6 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface ALittleValueStat extends PsiElement {
 
   @Nullable
+  ALittleBindStat getBindStat();
+
+  @Nullable
   ALittleOp2Stat getOp2Stat();
 
   @Nullable

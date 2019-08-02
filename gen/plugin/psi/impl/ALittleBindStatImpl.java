@@ -11,25 +11,19 @@ import static plugin.psi.ALittleTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 
-public class ALittleReturnExprImpl extends ASTWrapperPsiElement implements ALittleReturnExpr {
+public class ALittleBindStatImpl extends ASTWrapperPsiElement implements ALittleBindStat {
 
-  public ALittleReturnExprImpl(@NotNull ASTNode node) {
+  public ALittleBindStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitReturnExpr(this);
+    visitor.visitBindStat(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ALittleVisitor) accept((ALittleVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public ALittleCoroutineYield getCoroutineYield() {
-    return findChildByClass(ALittleCoroutineYield.class);
   }
 
   @Override

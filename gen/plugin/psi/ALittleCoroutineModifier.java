@@ -5,12 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ALittleReturnExpr extends PsiElement {
-
-  @Nullable
-  ALittleCoroutineYield getCoroutineYield();
-
-  @NotNull
-  List<ALittleValueStat> getValueStatList();
+public interface ALittleCoroutineModifier extends PsiElement {
 
 }
