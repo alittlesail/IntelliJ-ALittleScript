@@ -104,7 +104,7 @@ method_return_dec ::= COLON method_return_type_dec (COMMA method_return_type_dec
 method_return_type_dec ::= all_type
 
 // 类构造函数定义
-class_ctor_dec ::= access_modifier? coroutine_modifier? Ctor method_param_dec method_body_dec {pin=3}
+class_ctor_dec ::= access_modifier? Ctor method_param_dec method_body_dec {pin=2}
 // 类getter函数
 class_getter_dec ::= access_modifier? coroutine_modifier? get method_name_dec LPAREN RPAREN COLON method_return_type_dec method_body_dec {pin=3}
 // 类setter函数
@@ -258,7 +258,8 @@ op_new_stat ::= new (custom_type | generic_type) LPAREN (value_stat (COMMA value
 op_new_list ::= LBRACK (value_stat (COMMA value_stat)*)? RBRACK {pin=1}
 
 // bind
-bind_stat ::= bind LPAREN (value_stat (COMMA value_stat)*)? RPAREN  {pin=1}
+bind_stat ::= bind LPAREN (value_stat (COMMA value_stat)*)? RPAREN  {pin=1 mixin="plugin.psi.impl.ALittleBindStatElementImpl"
+                                                                implements="plugin.psi.ALittleBindStatElement" methods=[guessType guessTypes getReference getName setName getNameIdentifier]}
 
 // op 类型的运算，编号越大，优先级越低
 
@@ -328,8 +329,8 @@ property_value_suffix ::= property_value_dot_id | property_value_brack_value_sta
 property_value_dot_id ::= DOT property_value_dot_id_name
 property_value_dot_id_name ::= ID_CONTENT {mixin="plugin.psi.impl.ALittlePropertyValueDotIdNameElementImpl"
                                           implements="plugin.psi.ALittlePropertyValueDotIdNameElement" methods=[guessType guessTypes getReference getName setName getNameIdentifier]}
-property_value_brack_value_stat ::= LBRACK value_stat RBRACK {mixin="plugin.psi.impl.ALittlePropertyValueBrackValueStatElementImpl"
-                                                             implements="plugin.psi.ALittlePropertyValueBrackValueStatElement" methods=[guessType guessTypes getReference getName setName getNameIdentifier]} {pin=1}
-property_value_method_call_stat ::= LPAREN (value_stat (COMMA value_stat)*)? RPAREN {mixin="plugin.psi.impl.ALittlePropertyValueMethodCallStatElementImpl"
-                                                                                    implements="plugin.psi.ALittlePropertyValueMethodCallStatElement" methods=[guessType guessTypes getReference getName setName getNameIdentifier]} {pin=1}
+property_value_brack_value_stat ::= LBRACK value_stat RBRACK {pin=1 mixin="plugin.psi.impl.ALittlePropertyValueBrackValueStatElementImpl"
+                                                             implements="plugin.psi.ALittlePropertyValueBrackValueStatElement" methods=[guessType guessTypes getReference getName setName getNameIdentifier]}
+property_value_method_call_stat ::= LPAREN (value_stat (COMMA value_stat)*)? RPAREN {pin=1 mixin="plugin.psi.impl.ALittlePropertyValueMethodCallStatElementImpl"
+                                                                                    implements="plugin.psi.ALittlePropertyValueMethodCallStatElement" methods=[guessType guessTypes getReference getName setName getNameIdentifier]}
 property_value_expr ::= property_value SEMI

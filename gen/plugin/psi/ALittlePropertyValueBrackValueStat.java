@@ -8,7 +8,7 @@ import com.intellij.psi.PsiReference;
 
 public interface ALittlePropertyValueBrackValueStat extends ALittlePropertyValueBrackValueStatElement {
 
-  @NotNull
+  @Nullable
   ALittleValueStat getValueStat();
 
   PsiElement guessType();

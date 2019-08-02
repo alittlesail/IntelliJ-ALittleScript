@@ -24,7 +24,7 @@ public class ALittleVisitor extends PsiElementVisitor {
   }
 
   public void visitBindStat(@NotNull ALittleBindStat o) {
-    visitPsiElement(o);
+    visitBindStatElement(o);
   }
 
   public void visitClassAccessModifier(@NotNull ALittleClassAccessModifier o) {
@@ -532,6 +532,10 @@ public class ALittleVisitor extends PsiElementVisitor {
   }
 
   public void visitAutoTypeElement(@NotNull ALittleAutoTypeElement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitBindStatElement(@NotNull ALittleBindStatElement o) {
     visitPsiElement(o);
   }
 

@@ -27,9 +27,9 @@ public class ALittlePropertyValueBrackValueStatImpl extends ALittlePropertyValue
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittleValueStat getValueStat() {
-    return findNotNullChildByClass(ALittleValueStat.class);
+    return findChildByClass(ALittleValueStat.class);
   }
 
   @Override

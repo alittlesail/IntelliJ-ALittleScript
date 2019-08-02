@@ -677,9 +677,9 @@ public class ALittleUtil {
         if (guess_type instanceof ALittleGenericType) {
             ALittleGenericType generic_type = (ALittleGenericType)guess_type;
             if (generic_type.getGenericListType() != null)
-                return "__ipairs";
+                return "___ipairs";
             else if (generic_type.getGenericMapType() != null)
-                return "__pairs";
+                return "___pairs";
         }
 
         return "";
@@ -952,7 +952,7 @@ public class ALittleUtil {
         } else if (element instanceof ALittleMethodNameDec) {
             PsiElement parent = element.getParent();
             if (parent instanceof ALittleClassGetterDec) {
-                ALittleClassGetterDec class_getter_dec = (ALittleClassGetterDec)parent;
+                ALittleClassGetterDec class_getter_dec = (ALittleClassGetterDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
@@ -977,10 +977,10 @@ public class ALittleUtil {
                     info.functor_return_list.add(guess_info);
                 }
                 if (!type_list.isEmpty()) info.value += ":";
-                info.value += String.join(",", type_list) +  ">";
+                info.value += String.join(",", type_list) + ">";
                 return info;
             } else if (parent instanceof ALittleClassSetterDec) {
-                ALittleClassSetterDec class_setter_dec = (ALittleClassSetterDec)parent;
+                ALittleClassSetterDec class_setter_dec = (ALittleClassSetterDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
@@ -1008,7 +1008,7 @@ public class ALittleUtil {
                 info.value += ">";
                 return info;
             } else if (parent instanceof ALittleClassMethodDec) {
-                ALittleClassMethodDec class_method_dec = (ALittleClassMethodDec)parent;
+                ALittleClassMethodDec class_method_dec = (ALittleClassMethodDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
@@ -1050,10 +1050,10 @@ public class ALittleUtil {
                     }
                 }
                 if (!type_list.isEmpty()) info.value += ":";
-                info.value += String.join(",", type_list) +  ">";
+                info.value += String.join(",", type_list) + ">";
                 return info;
             } else if (parent instanceof ALittleClassStaticDec) {
-                ALittleClassStaticDec class_static_dec = (ALittleClassStaticDec)parent;
+                ALittleClassStaticDec class_static_dec = (ALittleClassStaticDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
@@ -1087,10 +1087,10 @@ public class ALittleUtil {
                     }
                 }
                 if (!type_list.isEmpty()) info.value += ":";
-                info.value += String.join(",", type_list) +  ">";
+                info.value += String.join(",", type_list) + ">";
                 return info;
             } else if (parent instanceof ALittleGlobalMethodDec) {
-                ALittleGlobalMethodDec global_method_dec = (ALittleGlobalMethodDec)parent;
+                ALittleGlobalMethodDec global_method_dec = (ALittleGlobalMethodDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
@@ -1124,9 +1124,61 @@ public class ALittleUtil {
                     }
                 }
                 if (!type_list.isEmpty()) info.value += ":";
-                info.value += String.join(",", type_list) +  ">";
+                info.value += String.join(",", type_list) + ">";
                 return info;
             }
+        } else if (element instanceof ALittleBindStat) {
+            ALittleBindStat bind_stat = (ALittleBindStat)element;
+
+            List<ALittleValueStat> value_stat_list = bind_stat.getValueStatList();
+            if (value_stat_list.isEmpty()) {
+                error_content_list.add("bind 表达式不能没有参数");
+                error_element_list.add(bind_stat);
+                return null;
+            }
+            GuessTypeInfo info = new GuessTypeInfo();
+            info.type = GuessType.GT_FUNCTOR;
+            info.functor_param_list = new ArrayList<>();
+            info.functor_return_list = new ArrayList<>();
+
+            ALittleValueStat value_stat = value_stat_list.get(0);
+            // 第一个参数必须是函数
+            PsiElement value_stat_guess = ALittleUtil.guessSoftType(value_stat, value_stat, error_content_list, error_element_list);
+            if (value_stat_guess == null) {
+                return null;
+            }
+            ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(value_stat, value_stat_guess, null, error_content_list, error_element_list);
+            if (guess_info == null) {
+                return null;
+            }
+            if (guess_info.type != ALittleUtil.GuessType.GT_FUNCTOR) {
+                error_content_list.add("bind 表达式第一个参数必须是一个函数");
+                error_element_list.add(value_stat);
+                return null;
+            }
+            info.value = "Functor<(";
+            info.functor_param_list = guess_info.functor_param_list;
+            info.functor_return_list = guess_info.functor_return_list;
+            int param_count = value_stat_list.size() - 1;
+            while (param_count > 0) {
+                info.functor_param_list.remove(0);
+                --param_count;
+            }
+            List<String> name_list = new ArrayList<>();
+            for (GuessTypeInfo param_info : info.functor_param_list) {
+                name_list.add(param_info.value);
+            }
+            info.value += String.join(",", name_list);
+            info.value += ")";
+
+            name_list = new ArrayList<>();
+            for (GuessTypeInfo param_info : info.functor_return_list) {
+                name_list.add(param_info.value);
+            }
+            if (!name_list.isEmpty()) info.value += ":";
+            info.value += String.join(",", name_list);
+            info.value += ">";
+            return info;
         } else if (element instanceof ALittleOpNewList) {
             ALittleOpNewList op_new_list = (ALittleOpNewList)element;
             List<ALittleValueStat> value_stat_list = op_new_list.getValueStatList();
@@ -2051,6 +2103,8 @@ public class ALittleUtil {
         } else if (value_stat.getOp8Stat() != null) {
             ALittleOp8Stat value = value_stat.getOp8Stat();
             return guessSoftType(value, value, error_content_list, error_element_list);
+        } else if (value_stat.getBindStat() != null) {
+            return value_stat.getBindStat();
         }
 
         error_content_list.add("未知的表达式");

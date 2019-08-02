@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
+import com.intellij.psi.PsiReference;
 
-public class ALittleBindStatImpl extends ASTWrapperPsiElement implements ALittleBindStat {
+public class ALittleBindStatImpl extends ALittleBindStatElementImpl implements ALittleBindStat {
 
   public ALittleBindStatImpl(@NotNull ASTNode node) {
     super(node);
@@ -30,6 +30,37 @@ public class ALittleBindStatImpl extends ASTWrapperPsiElement implements ALittle
   @NotNull
   public List<ALittleValueStat> getValueStatList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleValueStat.class);
+  }
+
+  @Override
+  public PsiElement guessType() {
+    return ALittlePsiImplUtil.guessType(this);
+  }
+
+  @Override
+  @NotNull
+  public List<PsiElement> guessTypes() {
+    return ALittlePsiImplUtil.guessTypes(this);
+  }
+
+  @Override
+  public PsiReference getReference() {
+    return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public String getName() {
+    return ALittlePsiImplUtil.getName(this);
+  }
+
+  @Override
+  public PsiElement setName(String new_name) {
+    return ALittlePsiImplUtil.setName(this, new_name);
+  }
+
+  @Override
+  public PsiElement getNameIdentifier() {
+    return ALittlePsiImplUtil.getNameIdentifier(this);
   }
 
 }

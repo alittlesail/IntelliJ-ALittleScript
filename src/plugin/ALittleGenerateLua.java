@@ -100,6 +100,9 @@ public class ALittleGenerateLua {
                 // 检查new表达式的参数
                 ALittleAnnotator.CheckErrorForOpNewStat(element, null, guess_list);
 
+                // 检查bind表达式
+                ALittleAnnotator.CheckErrorForBindStat(element, null, guess_list);
+
                 // 检查变量名
                 ALittleAnnotator.CheckErrorForName(element, null, guess_list);
 
@@ -180,6 +183,22 @@ public class ALittleGenerateLua {
 
         // 复制标准库
         copyStdLibrary(FileHelper.calcScriptPath(module));
+    }
+
+    @NotNull
+    private String GenerateBindStat(ALittleBindStat bind_stat) throws Exception {
+        List<ALittleValueStat> value_stat_list = bind_stat.getValueStatList();
+
+        String content = "ALittle.Bind(";
+        if (ALittleUtil.getNamespaceName((ALittleFile)bind_stat.getContainingFile()).equals("ALittle"))
+            content = "Bind(";
+        List<String> param_list = new ArrayList<>();
+        for (ALittleValueStat value_stat : value_stat_list) {
+            param_list.add(GenerateValueStat(value_stat));
+        }
+        content += String.join(", ", param_list);
+        content += ")";
+        return content;
     }
 
     @NotNull
@@ -714,6 +733,9 @@ public class ALittleGenerateLua {
         ALittleOpNewList op_new_list = root_stat.getOpNewList();
         if (op_new_list != null) return GenerateOpNewList(op_new_list);
 
+        ALittleBindStat bind_stat = root_stat.getBindStat();
+        if (bind_stat != null) return GenerateBindStat(bind_stat);
+
         return "";
     }
 
@@ -1023,7 +1045,7 @@ public class ALittleGenerateLua {
                                     , var_name_list, 100);
                             if (!var_name_list.isEmpty()) {
                                 ++m_rawset_use_count;
-                                return pre_tab + "__rawset(self, \"" + attr_name + "\", " + value_stat_result + ")\n";
+                                return pre_tab + "___rawset(self, \"" + attr_name + "\", " + value_stat_result + ")\n";
                             }
                         }
                     }
@@ -1267,6 +1289,10 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateReturnExpr(ALittleReturnExpr root_expr, String pre_tab) throws Exception {
+        if (root_expr.getCoroutineYield() != null) {
+            return pre_tab + "return ___coroutine.yield()\n";
+        }
+
         List<ALittleValueStat> value_stat_list = root_expr.getValueStatList();
         List<String> content_list = new ArrayList<>();
         for (ALittleValueStat value_stat : value_stat_list) {
@@ -1446,14 +1472,6 @@ public class ALittleGenerateLua {
             content.append(all_expr_content);
             content.append(pre_tab).append("end\n");
 
-            if (ctor_dec.getCoroutineModifier() != null && ctor_dec.getCoroutineModifier().getText().equals("async")) {
-                content.append(pre_tab)
-                        .append(class_name).append(".Ctor")
-                        .append(" = __coroutine.wrap(")
-                        .append(class_name).append(".Ctor")
-                        .append(")\n");
-            }
-
             content.append("\n");
         }
         //构建getter函数///////////////////////////////////////////////////////////////////////////////////////
@@ -1483,7 +1501,7 @@ public class ALittleGenerateLua {
             if (class_getter_dec.getCoroutineModifier() != null && class_getter_dec.getCoroutineModifier().getText().equals("async")) {
                 content.append(pre_tab)
                         .append(class_name).append(".__getter.").append(class_method_name_dec.getIdContent().getText())
-                        .append(" = __coroutine.wrap(")
+                        .append(" = ___coroutine.wrap(")
                         .append(class_name).append(".__getter.").append(class_method_name_dec.getIdContent().getText())
                         .append(")\n");
             }
@@ -1527,7 +1545,7 @@ public class ALittleGenerateLua {
             if (class_setter_dec.getCoroutineModifier() != null && class_setter_dec.getCoroutineModifier().getText().equals("async")) {
                 content.append(pre_tab)
                         .append(class_name).append(".__setter.").append(class_method_name_dec.getIdContent().getText())
-                        .append(" = __coroutine.wrap(")
+                        .append(" = ___coroutine.wrap(")
                         .append(class_name).append(".__setter.").append(class_method_name_dec.getIdContent().getText())
                         .append(")\n");
             }
@@ -1577,7 +1595,7 @@ public class ALittleGenerateLua {
             if (class_method_dec.getCoroutineModifier() != null && class_method_dec.getCoroutineModifier().getText().equals("async")) {
                 content.append(pre_tab)
                         .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
-                        .append(" = __coroutine.wrap(")
+                        .append(" = ___coroutine.wrap(")
                         .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
                         .append(")\n");
             }
@@ -1627,7 +1645,7 @@ public class ALittleGenerateLua {
             if (class_static_dec.getCoroutineModifier() != null && class_static_dec.getCoroutineModifier().getText().equals("async")) {
                 content.append(pre_tab)
                         .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
-                        .append(" = __coroutine.wrap(")
+                        .append(" = ___coroutine.wrap(")
                         .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
                         .append(")\n");
             }
@@ -1712,7 +1730,7 @@ public class ALittleGenerateLua {
 
         // 协程判定
         if (root.getCoroutineModifier() != null && root.getCoroutineModifier().getText().equals("async")) {
-            content.append(pre_tab).append(method_name).append(" = __coroutine.wrap(").append(method_name).append(")\n");
+            content.append(pre_tab).append(method_name).append(" = ___coroutine.wrap(").append(method_name).append(")\n");
         }
 
         content.append("\n");
@@ -1773,10 +1791,10 @@ public class ALittleGenerateLua {
         }
 
         if (m_rawset_use_count > 0)
-            content.append("local __rawset = rawset\n");
-        content.append("local __pairs = pairs\n");
-        content.append("local __ipairs = ipairs\n");
-        content.append("local __coroutine = coroutine\n");
+            content.append("local ___rawset = rawset\n");
+        content.append("local ___pairs = pairs\n");
+        content.append("local ___ipairs = ipairs\n");
+        content.append("local ___coroutine = coroutine\n");
         content.append("\n");
 
         content.append(other_content);

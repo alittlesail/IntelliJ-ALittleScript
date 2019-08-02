@@ -183,15 +183,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? coroutine_modifier? Ctor method_param_dec method_body_dec
+  // access_modifier? Ctor method_param_dec method_body_dec
   public static boolean class_ctor_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_ctor_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_CTOR_DEC, "<class ctor dec>");
     r = class_ctor_dec_0(b, l + 1);
-    r = r && class_ctor_dec_1(b, l + 1);
     r = r && consumeToken(b, CTOR);
-    p = r; // pin = 3
+    p = r; // pin = 2
     r = r && report_error_(b, method_param_dec(b, l + 1));
     r = p && method_body_dec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
@@ -202,13 +201,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   private static boolean class_ctor_dec_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_ctor_dec_0")) return false;
     access_modifier(b, l + 1);
-    return true;
-  }
-
-  // coroutine_modifier?
-  private static boolean class_ctor_dec_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_ctor_dec_1")) return false;
-    coroutine_modifier(b, l + 1);
     return true;
   }
 
@@ -2774,13 +2766,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   public static boolean property_value_brack_value_stat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "property_value_brack_value_stat")) return false;
     if (!nextTokenIs(b, LBRACK)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_BRACK_VALUE_STAT, null);
     r = consumeToken(b, LBRACK);
-    r = r && value_stat(b, l + 1);
-    r = r && consumeToken(b, RBRACK);
-    exit_section_(b, m, PROPERTY_VALUE_BRACK_VALUE_STAT, r);
-    return r;
+    p = r; // pin = 1
+    r = r && report_error_(b, value_stat(b, l + 1));
+    r = p && consumeToken(b, RBRACK) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -2840,13 +2833,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   // property_value SEMI
   public static boolean property_value_expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "property_value_expr")) return false;
-    boolean r, p;
+    boolean r;
     Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_EXPR, "<property value expr>");
     r = property_value(b, l + 1);
-    p = r; // pin = 1
     r = r && consumeToken(b, SEMI);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    exit_section_(b, l, m, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */
@@ -2874,13 +2866,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   // value_stat (COMMA value_stat)*
   private static boolean property_value_method_call_stat_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "property_value_method_call_stat_1_0")) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_);
+    boolean r;
+    Marker m = enter_section_(b);
     r = value_stat(b, l + 1);
-    p = r; // pin = 1
     r = r && property_value_method_call_stat_1_0_1(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // (COMMA value_stat)*
@@ -2897,13 +2888,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   // COMMA value_stat
   private static boolean property_value_method_call_stat_1_0_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "property_value_method_call_stat_1_0_1_0")) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_);
+    boolean r;
+    Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
-    p = r; // pin = 1
     r = r && value_stat(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

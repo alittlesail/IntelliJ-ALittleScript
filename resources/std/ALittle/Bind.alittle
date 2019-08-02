@@ -1,9 +1,0 @@
-namespace ALittle;
-
-// bind
-// 把函数对象携带参数绑定成携带参数的函数对象
-public static Bind(any func, any object, any arg1, any arg2, any arg3, any arg4, any arg5, any arg6, any arg7, any arg8) : any {}
-// 使用协程的方式执行，调用之后不会有任何返回值
-public static CoBind(any func, any object, any arg1, any arg2, any arg3, any arg4, any arg5, any arg6, any arg7, any arg8) : any {}
-// 以协程的方式调用函数对象
-public static CoInvoke(any func, any object, any arg1, any arg2, any arg3, any arg4, any arg5, any arg6, any arg7, any arg8) : any {}
