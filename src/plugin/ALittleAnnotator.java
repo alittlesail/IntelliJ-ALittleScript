@@ -263,14 +263,7 @@ public class ALittleAnnotator implements Annotator {
                 // 获取对应的函数对象
                 PsiElement parent = element;
                 while (parent != null) {
-                    if (parent instanceof ALittleClassGetterDec) {
-                        ALittleClassGetterDec getter_dec = (ALittleClassGetterDec) parent;
-                        if (getter_dec.getCoroutineModifier() == null) {
-                            error = "函数内部使用了return yield表达式，所以必须使用async或await修饰";
-                            element = getter_dec.getMethodNameDec();
-                        }
-                        break;
-                    } else if (parent instanceof ALittleClassMethodDec) {
+                    if (parent instanceof ALittleClassMethodDec) {
                         ALittleClassMethodDec method_dec = (ALittleClassMethodDec) parent;
                         if (method_dec.getCoroutineModifier() == null) {
                             error = "函数内部使用了return yield表达式，所以必须使用async或await修饰";
@@ -428,28 +421,79 @@ public class ALittleAnnotator implements Annotator {
             if (pair_dec_list.size() > 1) {
                 List<PsiElement> method_call_guess_list = ALittleUtil.guessTypeForMethodCall(value_stat);
                 if (method_call_guess_list != null) {
-                    for (int i = 0; i < pair_dec_list.size(); ++i) {
-                        ALittleVarAssignPairDec pair_dec = pair_dec_list.get(i);
-                        if (pair_dec.getAllType() == null) continue;
+                    // 检查这个函数是不是await
+                    List<String> error_content_list = new ArrayList<>();
+                    List<PsiElement> error_element_list = new ArrayList<>();
+                    PsiElement guess_type = ALittleUtil.guessSoftType(value_stat, value_stat, error_content_list, error_element_list);
+                    if (guess_type == null) {
+                        if (!error_content_list.isEmpty()) error = error_content_list.get(0);
+                        if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                    }
 
-                        PsiElement pair_guess_type = ALittleUtil.guessType(pair_dec.getAllType());
-                        if (pair_guess_type == null) {
-                            error = "等号左边所在的第" + (i + 1) + "个变量是未知类型";
-                            break;
-                        }
-                        if (i >= method_call_guess_list.size()) {
-                            break;
-                        }
-                        List<String> error_content_list = new ArrayList<>();
-                        List<PsiElement> error_element_list = new ArrayList<>();
-                        boolean result = ALittleUtil.guessSoftTypeEqual(pair_dec, pair_guess_type, null, value_stat, method_call_guess_list.get(i), null
-                                , error_content_list, error_element_list);
-                        if (!result)
-                        {
-                            error = "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等";
-                            if (!error_content_list.isEmpty()) error += ":" + error_content_list.get(0);
+                    if (error == null) {
+                        ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(value_stat, guess_type, null, error_content_list, error_element_list);
+                        if (guess_info == null) {
+                            if (!error_content_list.isEmpty()) error = error_content_list.get(0);
                             if (!error_element_list.isEmpty()) element = error_element_list.get(0);
-                            break;
+                        } else if (guess_info.type == ALittleUtil.GuessType.GT_FUNCTOR && guess_info.functor_await) {
+                            // 检查这次所在的函数必须要有await或者async修饰
+                            PsiElement parent = element;
+                            while (parent != null) {
+                                if (parent instanceof ALittleClassCtorDec) {
+                                    error = "构造函数内不能使用带有await的函数";
+                                    break;
+                                } else if (parent instanceof ALittleClassGetterDec) {
+                                    error = "Getter函数内不能使用带有await的函数";
+                                    break;
+                                } else if (parent instanceof ALittleClassSetterDec) {
+                                    error = "Setter函数内不能使用带有await的函数";
+                                    break;
+                                } else if (parent instanceof ALittleClassMethodDec) {
+                                    if (((ALittleClassMethodDec)parent).getCoroutineModifier() == null) {
+                                        error = "所在函数没有async或者await修饰";
+                                    }
+                                    break;
+                                } else if (parent instanceof ALittleClassStaticDec) {
+                                    if (((ALittleClassStaticDec)parent).getCoroutineModifier() == null) {
+                                        error = "所在函数没有async或者await修饰";
+                                    }
+                                    break;
+                                } else if (parent instanceof ALittleGlobalMethodDec) {
+                                    if (((ALittleGlobalMethodDec)parent).getCoroutineModifier() == null) {
+                                        error = "所在函数没有async或者await修饰";
+                                    }
+                                    break;
+                                }
+
+                                parent = parent.getParent();
+                            }
+                        }
+                    }
+
+
+                    if (error == null) {
+                        for (int i = 0; i < pair_dec_list.size(); ++i) {
+                            ALittleVarAssignPairDec pair_dec = pair_dec_list.get(i);
+                            if (pair_dec.getAllType() == null) continue;
+
+                            PsiElement pair_guess_type = ALittleUtil.guessType(pair_dec.getAllType());
+                            if (pair_guess_type == null) {
+                                error = "等号左边所在的第" + (i + 1) + "个变量是未知类型";
+                                break;
+                            }
+                            if (i >= method_call_guess_list.size()) {
+                                break;
+                            }
+                            error_content_list = new ArrayList<>();
+                            error_element_list = new ArrayList<>();
+                            boolean result = ALittleUtil.guessSoftTypeEqual(pair_dec, pair_guess_type, null, value_stat, method_call_guess_list.get(i), null
+                                    , error_content_list, error_element_list);
+                            if (!result) {
+                                error = "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等";
+                                if (!error_content_list.isEmpty()) error += ":" + error_content_list.get(0);
+                                if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                                break;
+                            }
                         }
                     }
 
@@ -510,26 +554,76 @@ public class ALittleAnnotator implements Annotator {
             if (property_value_list.size() > 1) {
                 List<PsiElement> method_call_guess_list = ALittleUtil.guessTypeForMethodCall(value_stat);
                 if (method_call_guess_list != null) {
-                    for (int i = 0; i < property_value_list.size(); ++i) {
-                        ALittlePropertyValue property_value_dec = property_value_list.get(i);
-                        PsiElement property_guess_type = ALittleUtil.guessType(property_value_dec);
-                        if (property_guess_type == null) {
-                            error = "等号左边所在的第" + (i + 1) + "个变量是未知类型";
-                            break;
-                        }
-                        if (i >= method_call_guess_list.size()) {
-                            break;
-                        }
-                        List<String> error_content_list = new ArrayList<>();
-                        List<PsiElement> error_element_list = new ArrayList<>();
-                        boolean result = ALittleUtil.guessSoftTypeEqual(property_value_dec, property_guess_type, null, value_stat, method_call_guess_list.get(i), null
-                                , error_content_list, error_element_list);
-                        if (!result)
-                        {
-                            error = "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等";
-                            if (!error_content_list.isEmpty()) error += ":" + error_content_list.get(0);
+                    // 检查这个函数是不是await
+                    List<String> error_content_list = new ArrayList<>();
+                    List<PsiElement> error_element_list = new ArrayList<>();
+                    PsiElement guess_type = ALittleUtil.guessSoftType(value_stat, value_stat, error_content_list, error_element_list);
+                    if (guess_type == null) {
+                        if (!error_content_list.isEmpty()) error = error_content_list.get(0);
+                        if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                    }
+
+                    if (error == null) {
+                        ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(value_stat, guess_type, null, error_content_list, error_element_list);
+                        if (guess_info == null) {
+                            if (!error_content_list.isEmpty()) error = error_content_list.get(0);
                             if (!error_element_list.isEmpty()) element = error_element_list.get(0);
-                            break;
+                        } else if (guess_info.type == ALittleUtil.GuessType.GT_FUNCTOR && guess_info.functor_await) {
+                            // 检查这次所在的函数必须要有await或者async修饰
+                            PsiElement parent = element;
+                            while (parent != null) {
+                                if (parent instanceof ALittleClassCtorDec) {
+                                    error = "构造函数内不能使用带有await的函数";
+                                    break;
+                                } else if (parent instanceof ALittleClassGetterDec) {
+                                    error = "Getter函数内不能使用带有await的函数";
+                                    break;
+                                } else if (parent instanceof ALittleClassSetterDec) {
+                                    error = "Setter函数内不能使用带有await的函数";
+                                    break;
+                                } else if (parent instanceof ALittleClassMethodDec) {
+                                    if (((ALittleClassMethodDec)parent).getCoroutineModifier() == null) {
+                                        error = "所在函数没有async或者await修饰";
+                                    }
+                                    break;
+                                } else if (parent instanceof ALittleClassStaticDec) {
+                                    if (((ALittleClassStaticDec)parent).getCoroutineModifier() == null) {
+                                        error = "所在函数没有async或者await修饰";
+                                    }
+                                    break;
+                                } else if (parent instanceof ALittleGlobalMethodDec) {
+                                    if (((ALittleGlobalMethodDec)parent).getCoroutineModifier() == null) {
+                                        error = "所在函数没有async或者await修饰";
+                                    }
+                                    break;
+                                }
+
+                                parent = parent.getParent();
+                            }
+                        }
+                    }
+
+                    if (error == null) {
+                        for (int i = 0; i < property_value_list.size(); ++i) {
+                            ALittlePropertyValue property_value_dec = property_value_list.get(i);
+                            PsiElement property_guess_type = ALittleUtil.guessType(property_value_dec);
+                            if (property_guess_type == null) {
+                                error = "等号左边所在的第" + (i + 1) + "个变量是未知类型";
+                                break;
+                            }
+                            if (i >= method_call_guess_list.size()) {
+                                break;
+                            }
+                            error_content_list = new ArrayList<>();
+                            error_element_list = new ArrayList<>();
+                            boolean result = ALittleUtil.guessSoftTypeEqual(property_value_dec, property_guess_type, null, value_stat, method_call_guess_list.get(i), null
+                                    , error_content_list, error_element_list);
+                            if (!result) {
+                                error = "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等";
+                                if (!error_content_list.isEmpty()) error += ":" + error_content_list.get(0);
+                                if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                                break;
+                            }
                         }
                     }
 
@@ -1071,6 +1165,48 @@ public class ALittleAnnotator implements Annotator {
                                 if (!error_element_list.isEmpty()) element = error_element_list.get(0);
                                 break;
                             }
+                        }
+                    }
+                }
+
+                if (error == null) {
+                    List<String> error_content_list = new ArrayList<>();
+                    List<PsiElement> error_element_list = new ArrayList<>();
+                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(element, pre_type, null, error_content_list, error_element_list);
+                    if (guess_info == null) {
+                        if (!error_content_list.isEmpty()) error = error_content_list.get(0);
+                        if (!error_element_list.isEmpty()) element = error_element_list.get(0);
+                    } else if (guess_info.type == ALittleUtil.GuessType.GT_FUNCTOR && guess_info.functor_await) {
+                        // 检查这次所在的函数必须要有await或者async修饰
+                        PsiElement parent = element;
+                        while (parent != null) {
+                            if (parent instanceof ALittleClassCtorDec) {
+                                error = "构造函数内不能使用带有await的函数";
+                                break;
+                            } else if (parent instanceof ALittleClassGetterDec) {
+                                error = "Getter函数内不能使用带有await的函数";
+                                break;
+                            } else if (parent instanceof ALittleClassSetterDec) {
+                                error = "Setter函数内不能使用带有await的函数";
+                                break;
+                            } else if (parent instanceof ALittleClassMethodDec) {
+                                if (((ALittleClassMethodDec)parent).getCoroutineModifier() == null) {
+                                    error = "所在函数没有async或者await修饰";
+                                }
+                                break;
+                            } else if (parent instanceof ALittleClassStaticDec) {
+                                if (((ALittleClassStaticDec)parent).getCoroutineModifier() == null) {
+                                    error = "所在函数没有async或者await修饰";
+                                }
+                                break;
+                            } else if (parent instanceof ALittleGlobalMethodDec) {
+                                if (((ALittleGlobalMethodDec)parent).getCoroutineModifier() == null) {
+                                    error = "所在函数没有async或者await修饰";
+                                }
+                                break;
+                            }
+
+                            parent = parent.getParent();
                         }
                     }
                 }

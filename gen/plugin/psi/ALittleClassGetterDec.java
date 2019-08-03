@@ -11,9 +11,6 @@ public interface ALittleClassGetterDec extends PsiElement {
   ALittleAccessModifier getAccessModifier();
 
   @Nullable
-  ALittleCoroutineModifier getCoroutineModifier();
-
-  @Nullable
   ALittleMethodBodyDec getMethodBodyDec();
 
   @Nullable

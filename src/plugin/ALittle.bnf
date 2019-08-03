@@ -106,9 +106,9 @@ method_return_type_dec ::= all_type
 // 类构造函数定义
 class_ctor_dec ::= access_modifier? Ctor method_param_dec method_body_dec {pin=2}
 // 类getter函数
-class_getter_dec ::= access_modifier? coroutine_modifier? get method_name_dec LPAREN RPAREN COLON method_return_type_dec method_body_dec {pin=3}
+class_getter_dec ::= access_modifier? get method_name_dec LPAREN RPAREN COLON method_return_type_dec method_body_dec {pin=2}
 // 类setter函数
-class_setter_dec ::= access_modifier? coroutine_modifier? set method_name_dec LPAREN method_param_one_dec RPAREN method_body_dec {pin=3}
+class_setter_dec ::= access_modifier? set method_name_dec LPAREN method_param_one_dec RPAREN method_body_dec {pin=2}
 // 类成员函数定义
 class_method_dec ::= access_modifier? coroutine_modifier? fun method_name_dec method_param_dec method_return_dec? method_body_dec {pin=3}
 // 类静态函数定义

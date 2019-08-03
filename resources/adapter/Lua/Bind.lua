@@ -67,3 +67,25 @@ function Bind(func, ...)
     -- 返回委托对象
     return object
 end
+
+local __co_functor_mt = {}
+-- 设置call函数。这样创建类实例对象时，可以使用A()这样的书写方式。
+__co_functor_mt.__call = function(caller, ...)
+    return coroutine.wrap(caller._func)(...)
+end
+
+-- 设置tostring函数
+__co_functor_mt.__tostring = function(caller)
+    return "[ALittle CoWrap:" .. tostring(caller) .. "]"
+end
+
+function CoWrap(func)
+    -- 委托对象
+    local object = {}
+    -- 保存func
+    object._func = func
+    -- 委托对象的metatable
+    setmetatable(object, __co_functor_mt)
+    -- 返回委托对象
+    return object
+end

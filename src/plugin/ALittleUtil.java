@@ -728,6 +728,7 @@ public class ALittleUtil {
         public GuessTypeInfo map_value_type;                // type="Map"时, 表示Map的Value
         public List<GuessTypeInfo> functor_param_list;      // type="Functor"时, 表示参数列表
         public List<GuessTypeInfo> functor_return_list;     // type="Functor"时, 表示返回值列表
+        boolean functor_await;                              // type="Functor"时, 表示是否是await
         public List<GuessTypeInfo> list_var_type;           // type="class" 或者 type="struct"，表示成员的类型列表
         public List<String> list_var_name;                  // type="class" 或者 type="struct"，表示成员的变量列表
     }
@@ -957,6 +958,7 @@ public class ALittleUtil {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
+                info.functor_await = false;
                 info.functor_param_list = new ArrayList<>();
                 info.functor_return_list = new ArrayList<>();
 
@@ -985,6 +987,7 @@ public class ALittleUtil {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
+                info.functor_await = false;
                 info.functor_param_list = new ArrayList<>();
                 info.functor_return_list = new ArrayList<>();
 
@@ -1013,6 +1016,10 @@ public class ALittleUtil {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
+                info.functor_await = class_method_dec.getCoroutineModifier() != null && class_method_dec.getCoroutineModifier().getText().equals("await");
+                if (info.functor_await) {
+                    info.value = "Functor<await(";
+                }
                 info.functor_param_list = new ArrayList<>();
                 info.functor_return_list = new ArrayList<>();
 
@@ -1058,6 +1065,10 @@ public class ALittleUtil {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
+                info.functor_await = class_static_dec.getCoroutineModifier() != null && class_static_dec.getCoroutineModifier().getText().equals("await");
+                if (info.functor_await) {
+                    info.value = "Functor<await(";
+                }
                 info.functor_param_list = new ArrayList<>();
                 info.functor_return_list = new ArrayList<>();
 
@@ -1095,6 +1106,10 @@ public class ALittleUtil {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
+                info.functor_await = global_method_dec.getCoroutineModifier() != null && global_method_dec.getCoroutineModifier().getText().equals("await");
+                if (info.functor_await) {
+                    info.value = "Functor<await(";
+                }
                 info.functor_param_list = new ArrayList<>();
                 info.functor_return_list = new ArrayList<>();
 
@@ -1136,10 +1151,6 @@ public class ALittleUtil {
                 error_element_list.add(bind_stat);
                 return null;
             }
-            GuessTypeInfo info = new GuessTypeInfo();
-            info.type = GuessType.GT_FUNCTOR;
-            info.functor_param_list = new ArrayList<>();
-            info.functor_return_list = new ArrayList<>();
 
             ALittleValueStat value_stat = value_stat_list.get(0);
             // 第一个参数必须是函数
@@ -1156,7 +1167,13 @@ public class ALittleUtil {
                 error_element_list.add(value_stat);
                 return null;
             }
+            GuessTypeInfo info = new GuessTypeInfo();
+            info.type = GuessType.GT_FUNCTOR;
             info.value = "Functor<(";
+            info.functor_await = guess_info.functor_await;
+            if (info.functor_await) {
+                info.value = "Functor<await(";
+            }
             info.functor_param_list = guess_info.functor_param_list;
             info.functor_return_list = guess_info.functor_return_list;
             int param_count = value_stat_list.size() - 1;
@@ -2207,7 +2224,8 @@ public class ALittleUtil {
         if (left_guess_info.type == GuessType.GT_FUNCTOR) {
             if (right_guess_info.type == GuessType.GT_FUNCTOR) {
                 if (left_guess_info.functor_param_list.size() == right_guess_info.functor_param_list.size()
-                && left_guess_info.functor_return_list.size() == right_guess_info.functor_return_list.size()) {
+                && left_guess_info.functor_return_list.size() == right_guess_info.functor_return_list.size()
+                && left_guess_info.functor_await == right_guess_info.functor_await) {
                     boolean result = true;
                     if (result) {
                         for (int i = 0; i < left_guess_info.functor_param_list.size(); ++i) {
