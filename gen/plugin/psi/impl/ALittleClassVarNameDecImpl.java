@@ -8,10 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
+import plugin.psi.ALittleClassVarNameDecElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittleClassVarNameDecImpl extends ALittleClassVarNameDecElementImpl implements ALittleClassVarNameDec {
+public class ALittleClassVarNameDecImpl extends ALittleClassVarNameDecElement implements ALittleClassVarNameDec {
 
   public ALittleClassVarNameDecImpl(@NotNull ASTNode node) {
     super(node);
@@ -49,18 +50,13 @@ public class ALittleClassVarNameDecImpl extends ALittleClassVarNameDecElementImp
   }
 
   @Override
-  public String getName() {
-    return ALittlePsiImplUtil.getName(this);
+  public PsiElement getNameIdentifier() {
+    return ALittlePsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
   public PsiElement setName(String new_name) {
     return ALittlePsiImplUtil.setName(this, new_name);
-  }
-
-  @Override
-  public PsiElement getNameIdentifier() {
-    return ALittlePsiImplUtil.getNameIdentifier(this);
   }
 
 }

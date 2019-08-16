@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 
-public interface ALittlePropertyValueThisType extends ALittlePropertyValueThisTypeElement {
+public interface ALittlePropertyValueThisType extends PsiElement {
 
   PsiElement guessType();
 
@@ -15,10 +15,8 @@ public interface ALittlePropertyValueThisType extends ALittlePropertyValueThisTy
 
   PsiReference getReference();
 
-  String getName();
+  PsiElement getNameIdentifier();
 
   PsiElement setName(String new_name);
-
-  PsiElement getNameIdentifier();
 
 }

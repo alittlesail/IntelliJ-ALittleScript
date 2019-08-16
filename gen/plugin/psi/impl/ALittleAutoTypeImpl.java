@@ -8,10 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
+import plugin.psi.ALittleAutoTypeElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittleAutoTypeImpl extends ALittleAutoTypeElementImpl implements ALittleAutoType {
+public class ALittleAutoTypeImpl extends ALittleAutoTypeElement implements ALittleAutoType {
 
   public ALittleAutoTypeImpl(@NotNull ASTNode node) {
     super(node);
@@ -43,18 +44,13 @@ public class ALittleAutoTypeImpl extends ALittleAutoTypeElementImpl implements A
   }
 
   @Override
-  public String getName() {
-    return ALittlePsiImplUtil.getName(this);
+  public PsiElement getNameIdentifier() {
+    return ALittlePsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
   public PsiElement setName(String new_name) {
     return ALittlePsiImplUtil.setName(this, new_name);
-  }
-
-  @Override
-  public PsiElement getNameIdentifier() {
-    return ALittlePsiImplUtil.getNameIdentifier(this);
   }
 
 }

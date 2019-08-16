@@ -11,7 +11,6 @@ import plugin.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
 import plugin.ALittleUtil;
 import plugin.psi.*;
-import plugin.psi.impl.ALittlePsiImplUtil;
 
 import java.util.ArrayList;
 import java.util.List;

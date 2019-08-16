@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 
-public interface ALittleClassExtendsNamespaceNameDec extends ALittleClassExtendsNamespaceNameDecElement {
+public interface ALittleClassExtendsNamespaceNameDec extends PsiElement {
 
   @NotNull
   PsiElement getIdContent();
@@ -18,10 +18,8 @@ public interface ALittleClassExtendsNamespaceNameDec extends ALittleClassExtends
 
   PsiReference getReference();
 
-  String getName();
+  PsiElement getNameIdentifier();
 
   PsiElement setName(String new_name);
-
-  PsiElement getNameIdentifier();
 
 }

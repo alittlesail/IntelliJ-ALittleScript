@@ -1,4 +1,4 @@
-package plugin.psi.impl;
+package plugin.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.*;
@@ -9,6 +9,7 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class ALittlePsiImplUtil {
     public static PsiElement getNameIdentifier(PsiElement element) {
         ASTNode keyNode = element.getNode().findChildByType(ALittleTypes.ID_CONTENT);
@@ -17,12 +18,6 @@ public class ALittlePsiImplUtil {
         } else {
             return null;
         }
-    }
-
-    public static String getName(PsiElement element) {
-        PsiElement id_psi = getNameIdentifier(element);
-        if (id_psi == null) return null;
-        return id_psi.getText();
     }
 
     public static PsiElement setName(PsiElement element, String new_name) {

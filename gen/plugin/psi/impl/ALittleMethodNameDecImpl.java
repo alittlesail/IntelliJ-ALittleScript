@@ -8,10 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
+import plugin.psi.ALittleMethodNameDecElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittleMethodNameDecImpl extends ALittleMethodNameDecElementImpl implements ALittleMethodNameDec {
+public class ALittleMethodNameDecImpl extends ALittleMethodNameDecElement implements ALittleMethodNameDec {
 
   public ALittleMethodNameDecImpl(@NotNull ASTNode node) {
     super(node);
@@ -49,18 +50,13 @@ public class ALittleMethodNameDecImpl extends ALittleMethodNameDecElementImpl im
   }
 
   @Override
-  public String getName() {
-    return ALittlePsiImplUtil.getName(this);
+  public PsiElement getNameIdentifier() {
+    return ALittlePsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
   public PsiElement setName(String new_name) {
     return ALittlePsiImplUtil.setName(this, new_name);
-  }
-
-  @Override
-  public PsiElement getNameIdentifier() {
-    return ALittlePsiImplUtil.getNameIdentifier(this);
   }
 
 }

@@ -8,10 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
+import plugin.psi.ALittleNamespaceNameDecElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittleNamespaceNameDecImpl extends ALittleNamespaceNameDecElementImpl implements ALittleNamespaceNameDec {
+public class ALittleNamespaceNameDecImpl extends ALittleNamespaceNameDecElement implements ALittleNamespaceNameDec {
 
   public ALittleNamespaceNameDecImpl(@NotNull ASTNode node) {
     super(node);
@@ -49,18 +50,13 @@ public class ALittleNamespaceNameDecImpl extends ALittleNamespaceNameDecElementI
   }
 
   @Override
-  public String getName() {
-    return ALittlePsiImplUtil.getName(this);
+  public PsiElement getNameIdentifier() {
+    return ALittlePsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
   public PsiElement setName(String new_name) {
     return ALittlePsiImplUtil.setName(this, new_name);
-  }
-
-  @Override
-  public PsiElement getNameIdentifier() {
-    return ALittlePsiImplUtil.getNameIdentifier(this);
   }
 
 }

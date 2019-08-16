@@ -1,6 +1,12 @@
 package plugin.psi;
 
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import org.jetbrains.annotations.NotNull;
 
-public interface ALittleStructExtendsNamespaceNameDecElement extends PsiNameIdentifierOwner {
+public abstract class ALittleStructExtendsNamespaceNameDecElement extends ASTWrapperPsiElement implements PsiNameIdentifierOwner {
+    public ALittleStructExtendsNamespaceNameDecElement(@NotNull ASTNode node) {
+        super(node);
+    }
 }

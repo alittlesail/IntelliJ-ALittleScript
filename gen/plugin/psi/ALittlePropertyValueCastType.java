@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 
-public interface ALittlePropertyValueCastType extends ALittlePropertyValueCastTypeElement {
+public interface ALittlePropertyValueCastType extends PsiElement {
 
   @NotNull
   ALittleAllType getAllType();
@@ -21,10 +21,8 @@ public interface ALittlePropertyValueCastType extends ALittlePropertyValueCastTy
 
   PsiReference getReference();
 
-  String getName();
+  PsiElement getNameIdentifier();
 
   PsiElement setName(String new_name);
-
-  PsiElement getNameIdentifier();
 
 }

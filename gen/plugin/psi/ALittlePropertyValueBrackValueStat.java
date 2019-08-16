@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 
-public interface ALittlePropertyValueBrackValueStat extends ALittlePropertyValueBrackValueStatElement {
+public interface ALittlePropertyValueBrackValueStat extends PsiElement {
 
   @Nullable
   ALittleValueStat getValueStat();
@@ -18,10 +18,8 @@ public interface ALittlePropertyValueBrackValueStat extends ALittlePropertyValue
 
   PsiReference getReference();
 
-  String getName();
+  PsiElement getNameIdentifier();
 
   PsiElement setName(String new_name);
-
-  PsiElement getNameIdentifier();
 
 }
