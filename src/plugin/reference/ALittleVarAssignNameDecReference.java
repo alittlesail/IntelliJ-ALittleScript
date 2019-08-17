@@ -14,20 +14,9 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleVarAssignNameDecReference extends PsiReferenceBase<PsiElement> implements ALittleReference {
-    private String m_key;
-    private String m_src_namespace;
-
+public class ALittleVarAssignNameDecReference extends ALittleReference {
     public ALittleVarAssignNameDecReference(@NotNull PsiElement element, TextRange textRange) {
         super(element, textRange);
-        m_key = element.getText().substring(textRange.getStartOffset(), textRange.getEndOffset());
-        m_src_namespace = ALittleUtil.getNamespaceName((ALittleFile) element.getContainingFile());
-    }
-
-    public PsiElement guessType() {
-        List<PsiElement> guess_list = guessTypes();
-        if (guess_list.isEmpty()) return null;
-        return guess_list.get(0);
     }
 
     @NotNull
@@ -60,44 +49,30 @@ public class ALittleVarAssignNameDecReference extends PsiReferenceBase<PsiElemen
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> results = new ArrayList<>();
-        ALittleAllType all_type = null;
+        ALittleAllType allType = null;
         ALittleAutoType auto_type = null;
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleVarAssignPairDec) {
             ALittleVarAssignPairDec var_assign_pair = (ALittleVarAssignPairDec)myElement.getParent();
-            all_type = var_assign_pair.getAllType();
+            allType = var_assign_pair.getAllType();
             auto_type = var_assign_pair.getAutoType();
         } else if (parent instanceof ALittleForPairDec) {
             ALittleForPairDec pair_dec = (ALittleForPairDec)parent;
-            all_type = pair_dec.getAllType();
+            allType = pair_dec.getAllType();
             auto_type = pair_dec.getAutoType();
         }
-        if (all_type != null) {
-            if (all_type.getPrimitiveType() != null) {
-                results.add(new PsiElementResolveResult(all_type.getPrimitiveType()));
-            } else if (all_type.getGenericType() != null) {
-                results.add(new PsiElementResolveResult(all_type.getGenericType()));
-            } else if (all_type.getCustomType() != null) {
-                results.add(new PsiElementResolveResult(all_type.getCustomType().getCustomTypeNameDec()));
+        if (allType != null) {
+            if (allType.getPrimitiveType() != null) {
+                results.add(new PsiElementResolveResult(allType.getPrimitiveType()));
+            } else if (allType.getGenericType() != null) {
+                results.add(new PsiElementResolveResult(allType.getGenericType()));
+            } else if (allType.getCustomType() != null) {
+                results.add(new PsiElementResolveResult(allType.getCustomType().getCustomTypeNameDec()));
             }
         }
         if (auto_type != null) {
             results.add(new PsiElementResolveResult(auto_type));
         }
         return results.toArray(new ResolveResult[results.size()]);
-    }
-
-    @Nullable
-    @Override
-    public PsiElement resolve() {
-        ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
-    }
-
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-        List<LookupElement> variants = new ArrayList<>();
-        return variants.toArray();
     }
 }

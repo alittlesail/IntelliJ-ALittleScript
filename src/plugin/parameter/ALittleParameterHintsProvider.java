@@ -61,16 +61,16 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                     ALittleClassMethodDec dec = (ALittleClassMethodDec) method_dec;
 
                     // 如果是使用类的方式调用，那么还需要加上一个参数
-                    ALittleClassDec class_dec = reference.guessClassNameInvoke();
-                    if (class_dec != null) {
+                    ALittleClassDec classDec = reference.guessClassNameInvoke();
+                    if (classDec != null) {
                         param_name_list.add("this");
                     }
 
                     // 获取其他参数
                     ALittleMethodParamDec param_dec = dec.getMethodParamDec();
                     if (param_dec != null) {
-                        List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                        for (ALittleMethodParamOneDec one_dec : one_dec_list) {
+                        List<ALittleMethodParamOneDec> one_decList = param_dec.getMethodParamOneDecList();
+                        for (ALittleMethodParamOneDec one_dec : one_decList) {
                             if (one_dec.getMethodParamNameDec() != null)
                                 param_name_list.add(one_dec.getMethodParamNameDec().getText());
                         }
@@ -80,8 +80,8 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                     // 获取参数
                     ALittleMethodParamDec param_dec = dec.getMethodParamDec();
                     if (param_dec != null) {
-                        List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                        for (ALittleMethodParamOneDec one_dec : one_dec_list) {
+                        List<ALittleMethodParamOneDec> one_decList = param_dec.getMethodParamOneDecList();
+                        for (ALittleMethodParamOneDec one_dec : one_decList) {
                             if (one_dec.getMethodParamNameDec() != null)
                                 param_name_list.add(one_dec.getMethodParamNameDec().getText());
                         }
@@ -91,8 +91,8 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                     // 获取参数
                     ALittleMethodParamDec param_dec = dec.getMethodParamDec();
                     if (param_dec != null) {
-                        List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                        for (ALittleMethodParamOneDec one_dec : one_dec_list) {
+                        List<ALittleMethodParamOneDec> one_decList = param_dec.getMethodParamOneDecList();
+                        for (ALittleMethodParamOneDec one_dec : one_decList) {
                             if (one_dec.getMethodParamNameDec() != null)
                                 param_name_list.add(one_dec.getMethodParamNameDec().getText());
                         }

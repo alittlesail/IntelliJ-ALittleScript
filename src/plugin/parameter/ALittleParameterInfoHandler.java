@@ -47,17 +47,17 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
                 // getter函数使用()来调用，只有这种情况 Class.getter_x(object)
                 if (method_dec instanceof ALittleClassGetterDec) {
                     // 第一个参数就是getter所在的类
-                    ALittleClassDec class_dec = PsiHelper.findClassDecFromParent(method_dec);
-                    if (class_dec != null) {
-                        ALittleClassNameDec class_name_dec = class_dec.getClassNameDec();
+                    ALittleClassDec classDec = PsiHelper.findClassDecFromParent(method_dec);
+                    if (classDec != null) {
+                        ALittleClassNameDec class_name_dec = classDec.getClassNameDec();
                         if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
                     }
                     // setter函数使用()来调用，只有这种情况 Class.setter_x(object, value)
                 } else if (method_dec instanceof ALittleClassSetterDec) {
                     // 第一个参数就是setter所在的类
-                    ALittleClassDec class_dec = PsiHelper.findClassDecFromParent(method_dec);
-                    if (class_dec != null) {
-                        ALittleClassNameDec class_name_dec = class_dec.getClassNameDec();
+                    ALittleClassDec classDec = PsiHelper.findClassDecFromParent(method_dec);
+                    if (classDec != null) {
+                        ALittleClassNameDec class_name_dec = classDec.getClassNameDec();
                         if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
                     }
                     ALittleClassSetterDec dec = (ALittleClassSetterDec) method_dec;
@@ -69,16 +69,16 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
                     ALittleClassMethodDec dec = (ALittleClassMethodDec) method_dec;
 
                     // 如果是使用类的方式调用，那么还需要加上一个参数
-                    ALittleClassDec class_dec = reference.guessClassNameInvoke();
-                    if (class_dec != null) {
-                        ALittleClassNameDec class_name_dec = class_dec.getClassNameDec();
+                    ALittleClassDec classDec = reference.guessClassNameInvoke();
+                    if (classDec != null) {
+                        ALittleClassNameDec class_name_dec = classDec.getClassNameDec();
                         if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
                     }
 
                     ALittleMethodParamDec param_dec = dec.getMethodParamDec();
                     if (param_dec != null) {
-                        List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                        for (ALittleMethodParamOneDec one_dec : one_dec_list) {
+                        List<ALittleMethodParamOneDec> one_decList = param_dec.getMethodParamOneDecList();
+                        for (ALittleMethodParamOneDec one_dec : one_decList) {
                             param_name_list.add(one_dec.getText());
                         }
                     }
@@ -86,8 +86,8 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
                     ALittleClassStaticDec dec = (ALittleClassStaticDec) method_dec;
                     ALittleMethodParamDec param_dec = dec.getMethodParamDec();
                     if (param_dec != null) {
-                        List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                        for (ALittleMethodParamOneDec one_dec : one_dec_list) {
+                        List<ALittleMethodParamOneDec> one_decList = param_dec.getMethodParamOneDecList();
+                        for (ALittleMethodParamOneDec one_dec : one_decList) {
                             param_name_list.add(one_dec.getText());
                         }
                     }
@@ -95,8 +95,8 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
                     ALittleGlobalMethodDec dec = (ALittleGlobalMethodDec) method_dec;
                     ALittleMethodParamDec param_dec = dec.getMethodParamDec();
                     if (param_dec != null) {
-                        List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                        for (ALittleMethodParamOneDec one_dec : one_dec_list) {
+                        List<ALittleMethodParamOneDec> one_decList = param_dec.getMethodParamOneDecList();
+                        for (ALittleMethodParamOneDec one_dec : one_decList) {
                             param_name_list.add(one_dec.getText());
                         }
                     }

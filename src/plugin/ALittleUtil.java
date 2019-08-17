@@ -12,515 +12,537 @@ import javax.swing.*;
 import java.util.*;
 
 public class ALittleUtil {
+    // 定义异常
+    public static class ALittleElementException extends Exception {
+        private String mError;
+        private PsiElement mElement;
 
-    // 查找所有的变量名节点对象
-    private static void findStructVarNameDecList(Project project, String src_namespace, String src_struct, String src_name, @NotNull List<ALittleStructVarNameDec> result, int deep)
-    {        // 这个用于跳出无限递归
-        if (deep <= 0) return;
+        public ALittleElementException(@NotNull PsiElement element, @NotNull String error) {
+            mElement = element;
+            mError = error;
+        }
 
-        List<ALittleStructNameDec> name_dec_list = ALittleTreeChangeListener.findStructNameDecList(project, src_namespace, src_struct);
-        if (name_dec_list == null || name_dec_list.isEmpty()) return;
-        ALittleStructDec struct_dec = (ALittleStructDec)name_dec_list.get(0).getParent();
+        @NotNull
+        public String GetError() { return mError; }
 
-        findStructVarNameDecList(project, src_namespace, struct_dec, src_name, result, deep);
+        @NotNull
+        public PsiElement GetElement() { return mElement; }
     }
 
-    public static void findStructVarNameDecList(Project project, String src_namespace, ALittleStructDec struct_dec, String src_name, @NotNull List<ALittleStructVarNameDec> result, int deep) {
+    // 查找所有的变量名节点对象
+    private static void findStructVarNameDecList(Project project, String namespace, String structName, String varName, @NotNull List<ALittleStructVarNameDec> result, int deep)
+    {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
-        if (struct_dec == null) return;
+
+        List<ALittleStructNameDec> nameDecList = ALittleTreeChangeListener.findStructNameDecList(project, namespace, structName);
+        if (nameDecList == null || nameDecList.isEmpty()) return;
+        ALittleStructDec structDec = (ALittleStructDec)nameDecList.get(0).getParent();
+
+        findStructVarNameDecList(project, namespace, structDec, varName, result, deep);
+    }
+
+    public static void findStructVarNameDecList(Project project, String namespace, ALittleStructDec structDec, String varName, @NotNull List<ALittleStructVarNameDec> result, int deep) {
+        // 这个用于跳出无限递归
+        if (deep <= 0) return;
+        if (structDec == null) return;
 
         // 处理继承
-        ALittleStructExtendsNameDec struct_extends_name_dec = struct_dec.getStructExtendsNameDec();
-        if (struct_extends_name_dec != null) {
-            ALittleStructExtendsNamespaceNameDec struct_extends_namespace_name_dec = struct_dec.getStructExtendsNamespaceNameDec();
-            String namespace_name = src_namespace;
-            if (struct_extends_namespace_name_dec != null) namespace_name = struct_extends_namespace_name_dec.getText();
-            findStructVarNameDecList(project, namespace_name, struct_extends_name_dec.getText(), src_name, result, deep - 1);
+        ALittleStructExtendsNameDec structExtendsNameDec = structDec.getStructExtendsNameDec();
+        if (structExtendsNameDec != null) {
+            ALittleStructExtendsNamespaceNameDec structExtendsNamespaceNameDec = structDec.getStructExtendsNamespaceNameDec();
+            String namespaceName = namespace;
+            if (structExtendsNamespaceNameDec != null) namespaceName = structExtendsNamespaceNameDec.getText();
+            findStructVarNameDecList(project, namespaceName, structExtendsNameDec.getText(), varName, result, deep - 1);
         }
 
         // 处理成员变量
-        List<ALittleStructVarDec> struct_var_dec_list = struct_dec.getStructVarDecList();
-        for (ALittleStructVarDec struct_var_dec : struct_var_dec_list) {
-            ALittleStructVarNameDec var_name_dec = struct_var_dec.getStructVarNameDec();
-            if (var_name_dec != null) {
-                if (src_name.isEmpty() || var_name_dec.getIdContent().getText().equals(src_name))
-                    result.add(var_name_dec);
+        List<ALittleStructVarDec> structVarDecList = structDec.getStructVarDecList();
+        for (ALittleStructVarDec structVarDec : structVarDecList) {
+            ALittleStructVarNameDec varNameDec = structVarDec.getStructVarNameDec();
+            if (varNameDec == null) continue;
+            if (varName.isEmpty() || varNameDec.getIdContent().getText().equals(varName)) {
+                result.add(varNameDec);
             }
         }
     }
 
-    public static void findEnumVarNameDecList(ALittleEnumDec enum_dec, String src_name, @NotNull List<ALittleEnumVarNameDec> result) {
-        if (enum_dec == null) return;
+    public static void findEnumVarNameDecList(ALittleEnumDec enumDec, String varName, @NotNull List<ALittleEnumVarNameDec> result) {
+        if (enumDec == null) return;
 
         // 处理成员变量
-        List<ALittleEnumVarDec> enum_var_dec_list = enum_dec.getEnumVarDecList();
-        for (ALittleEnumVarDec enum_var_dec : enum_var_dec_list) {
-            ALittleEnumVarNameDec var_name_dec = enum_var_dec.getEnumVarNameDec();
-            if (src_name.isEmpty() || var_name_dec.getIdContent().getText().equals(src_name))
-                result.add(var_name_dec);
+        List<ALittleEnumVarDec> enumVarDecList = enumDec.getEnumVarDecList();
+        for (ALittleEnumVarDec enumVarDec : enumVarDecList) {
+            ALittleEnumVarNameDec varNameDec = enumVarDec.getEnumVarNameDec();
+            if (varNameDec == null) continue;
+            if (varName.isEmpty() || varNameDec.getIdContent().getText().equals(varName)) {
+                result.add(varNameDec);
+            }
         }
     }
 
     // 根据枚举字段名，获取对应的值
-    public static boolean getEnumVarValue(ALittleEnumDec enum_dec, String var_name, @NotNull List<Integer> result) {
-        if (enum_dec == null) return false;
+    public static Integer getEnumVarValue(ALittleEnumDec enumDec, String varName) {
+        if (enumDec == null) return null;
 
-        List<ALittleEnumVarDec> var_dec_list = enum_dec.getEnumVarDecList();
-        int enum_value = -1;
-        for (ALittleEnumVarDec var_dec : var_dec_list) {
-            ALittleEnumVarNameDec var_name_dec = var_dec.getEnumVarNameDec();
-            ALittleEnumVarValueDec var_value_dec = var_dec.getEnumVarValueDec();
-            if (var_value_dec == null) {
-                ++enum_value;
-                if (var_name_dec.getIdContent().getText().equals(var_name))
-                {
-                    result.add(enum_value);
-                    return true;
+        // 初始值
+        int enumValue = -1;
+
+        List<ALittleEnumVarDec> varDecList = enumDec.getEnumVarDecList();
+        for (ALittleEnumVarDec varDec : varDecList) {
+            ALittleEnumVarNameDec varNameDec = varDec.getEnumVarNameDec();
+            if (varNameDec == null) continue;
+
+            ALittleEnumVarValueDec varValueDec = varDec.getEnumVarValueDec();
+            // 如果没有设定值，那么就默认+1
+            if (varValueDec == null) {
+                ++enumValue;
+                if (varNameDec.getIdContent().getText().equals(varName)) {
+                    return enumValue;
                 }
-            } else {
-                if (var_value_dec.getDigitContent() != null) {
-                    String value = var_value_dec.getDigitContent().getText();
-                    if (!isInt(value)) {
-                        return false;
-                    }
-                    String number_content = var_value_dec.getText();
-                    if (number_content.startsWith("0x"))
-                        enum_value = Integer.parseInt(number_content.substring(2), 16);
-                    else
-                        enum_value = Integer.parseInt(number_content);
-
-                    if (var_name_dec.getIdContent().getText().equals(var_name))
-                    {
-                        result.add(enum_value);
-                        return true;
-                    }
+            // 如果设定为数字，那么就要设置一下
+            } else if (varValueDec.getDigitContent() != null) {
+                String value = varValueDec.getDigitContent().getText();
+                if (!isInt(value)) {
+                    return null;
+                }
+                // 把字符串转为数值
+                String numberContent = varValueDec.getText();
+                if (numberContent.startsWith("0x"))
+                    enumValue = Integer.parseInt(numberContent.substring(2), 16);
+                else
+                    enumValue = Integer.parseInt(numberContent);
+                if (varNameDec.getIdContent().getText().equals(varName)) {
+                    return enumValue;
                 }
             }
         }
-        return false;
+        return null;
     }
 
     // 查找所有的函数名节点对象
-    private static void findMethodNameDecList(Project project, String src_namespace, String src_class, String src_method, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep)
-    {        // 这个用于跳出无限递归
+    private static void findMethodNameDecList(Project project, String namespace, String className, String methodName, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep) {        // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleClassNameDec> name_dec_list = ALittleTreeChangeListener.findClassNameDecList(project, src_namespace, src_class);
-        if (name_dec_list == null || name_dec_list.isEmpty()) return;
-        ALittleClassDec class_dec = (ALittleClassDec)name_dec_list.get(0).getParent();
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        if (nameDecList == null || nameDecList.isEmpty()) return;
+        ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecList(project, src_namespace, class_dec, src_method, result, icon, deep);
+        findMethodNameDecList(project, namespace, classDec, methodName, result, icon, deep);
     }
 
-    public static void findMethodNameDecList(Project project, String src_namespace, ALittleClassDec class_dec, String src_method, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep) {
+    public static void findMethodNameDecList(Project project, String namespace, ALittleClassDec classDec, String methodName, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
-        if (class_dec == null) return;
+        if (classDec == null) return;
 
         // 处理继承
-        ALittleClassExtendsNameDec class_extends_name_dec = class_dec.getClassExtendsNameDec();
-        if (class_extends_name_dec != null) {
-            ALittleClassExtendsNamespaceNameDec class_extends_namespace_name_dec = class_dec.getClassExtendsNamespaceNameDec();
-            String namespace_name = src_namespace;
-            if (class_extends_namespace_name_dec != null) namespace_name = class_extends_namespace_name_dec.getText();
-            findMethodNameDecList(project, namespace_name, class_extends_name_dec.getText(), src_method, result, icon, deep - 1);
+        ALittleClassExtendsNameDec classExtendsNameDec = classDec.getClassExtendsNameDec();
+        if (classExtendsNameDec != null) {
+            ALittleClassExtendsNamespaceNameDec classExtendsNamespaceNameDec = classDec.getClassExtendsNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            findMethodNameDecList(project, namespaceName, classExtendsNameDec.getText(), methodName, result, icon, deep - 1);
         }
 
         // 处理成员函数
-        List<ALittleClassMethodDec> class_method_dec_list = class_dec.getClassMethodDecList();
-        for (ALittleClassMethodDec class_method_dec : class_method_dec_list) {
-            ALittleMethodNameDec class_method_name_dec = class_method_dec.getMethodNameDec();
-            if (class_method_name_dec == null) continue;
-            if (src_method.isEmpty() || class_method_name_dec.getIdContent().getText().equals(src_method)) {
+        List<ALittleClassMethodDec> classMethodDecList = classDec.getClassMethodDecList();
+        for (ALittleClassMethodDec classMethodDec : classMethodDecList) {
+            ALittleMethodNameDec classMethodNameDec = classMethodDec.getMethodNameDec();
+            if (classMethodNameDec == null) continue;
+            if (methodName.isEmpty() || classMethodNameDec.getIdContent().getText().equals(methodName)) {
                 if (icon != null) icon.add(ALittleIcons.MEMBER_METHOD);
-                result.add(class_method_name_dec);
+                result.add(classMethodNameDec);
             }
         }
 
         // 处理getter函数
-        List<ALittleClassGetterDec> class_getter_dec_list = class_dec.getClassGetterDecList();
-        for (ALittleClassGetterDec class_getter_dec : class_getter_dec_list) {
-            ALittleMethodNameDec class_getter_name_dec = class_getter_dec.getMethodNameDec();
-            if (class_getter_name_dec == null) continue;
-            if (src_method.isEmpty() || class_getter_name_dec.getIdContent().getText().equals(src_method)) {
+        List<ALittleClassGetterDec> classGetterDecList = classDec.getClassGetterDecList();
+        for (ALittleClassGetterDec classGetterDec : classGetterDecList) {
+            ALittleMethodNameDec classGetterNameDec = classGetterDec.getMethodNameDec();
+            if (classGetterNameDec == null) continue;
+            if (methodName.isEmpty() || classGetterNameDec.getIdContent().getText().equals(methodName)) {
                 if (icon != null) icon.add(ALittleIcons.GETTER_METHOD);
-                result.add(class_getter_name_dec);
+                result.add(classGetterNameDec);
             }
         }
 
         // 处理setter函数
-        List<ALittleClassSetterDec> class_setter_dec_list = class_dec.getClassSetterDecList();
-        for (ALittleClassSetterDec class_setter_dec : class_setter_dec_list) {
-            ALittleMethodNameDec class_setter_name_dec = class_setter_dec.getMethodNameDec();
-            if (class_setter_name_dec == null) continue;
-            if (src_method.isEmpty() || class_setter_name_dec.getIdContent().getText().equals(src_method)) {
+        List<ALittleClassSetterDec> classSetterDecList = classDec.getClassSetterDecList();
+        for (ALittleClassSetterDec classSetterDec : classSetterDecList) {
+            ALittleMethodNameDec classSetterNameDec = classSetterDec.getMethodNameDec();
+            if (classSetterNameDec == null) continue;
+            if (methodName.isEmpty() || classSetterNameDec.getIdContent().getText().equals(methodName)) {
                 if (icon != null) icon.add(ALittleIcons.SETTER_METHOD);
-                result.add(class_setter_name_dec);
+                result.add(classSetterNameDec);
             }
         }
 
         // 处理静态函数
-        List<ALittleClassStaticDec> class_static_dec_list = class_dec.getClassStaticDecList();
-        for (ALittleClassStaticDec class_static_dec : class_static_dec_list) {
-            ALittleMethodNameDec class_static_name_dec = class_static_dec.getMethodNameDec();
-            if (class_static_name_dec == null) continue;
-            if (src_method.isEmpty() || class_static_name_dec.getIdContent().getText().equals(src_method)) {
+        List<ALittleClassStaticDec> classStaticDecList = classDec.getClassStaticDecList();
+        for (ALittleClassStaticDec classStaticDec : classStaticDecList) {
+            ALittleMethodNameDec classStaticNameDec = classStaticDec.getMethodNameDec();
+            if (classStaticNameDec == null) continue;
+            if (methodName.isEmpty() || classStaticNameDec.getIdContent().getText().equals(methodName)) {
                 if (icon != null) icon.add(ALittleIcons.STATIC_METHOD);
-                result.add(class_static_name_dec);
+                result.add(classStaticNameDec);
             }
         }
     }
 
     // 查找所有的变量名节点对象
-    private static void findClassVarNameDecList(Project project, String src_namespace, String src_class, String src_name, @NotNull List<ALittleClassVarNameDec> result, int deep)
-    {        // 这个用于跳出无限递归
+    private static void findClassVarNameDecList(Project project, String namespace, String className, String varName, @NotNull List<ALittleClassVarNameDec> result, int deep) {        // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleClassNameDec> name_dec_list = ALittleTreeChangeListener.findClassNameDecList(project, src_namespace, src_class);
-        if (name_dec_list == null || name_dec_list.isEmpty()) return;
-        ALittleClassDec class_dec = (ALittleClassDec)name_dec_list.get(0).getParent();
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        if (nameDecList == null || nameDecList.isEmpty()) return;
+        ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findClassVarNameDecList(project, src_namespace, class_dec, src_name, result, deep);
+        findClassVarNameDecList(project, namespace, classDec, varName, result, deep);
     }
 
-    public static void findClassVarNameDecList(Project project, String src_namespace, ALittleClassDec class_dec, String src_name, @NotNull List<ALittleClassVarNameDec> result, int deep) {
+    public static void findClassVarNameDecList(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleClassVarNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
-        if (class_dec == null) return;
+        if (classDec == null) return;
 
         // 处理继承
-        ALittleClassExtendsNameDec class_extends_name_dec = class_dec.getClassExtendsNameDec();
-        if (class_extends_name_dec != null) {
-            ALittleClassExtendsNamespaceNameDec class_extends_namespace_name_dec = class_dec.getClassExtendsNamespaceNameDec();
-            String namespace_name = src_namespace;
-            if (class_extends_namespace_name_dec != null) namespace_name = class_extends_namespace_name_dec.getText();
-            findClassVarNameDecList(project, namespace_name, class_extends_name_dec.getText(), src_name, result, deep - 1);
+        ALittleClassExtendsNameDec classExtendsNameDec = classDec.getClassExtendsNameDec();
+        if (classExtendsNameDec != null) {
+            ALittleClassExtendsNamespaceNameDec classExtendsNamespaceNameDec = classDec.getClassExtendsNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            findClassVarNameDecList(project, namespaceName, classExtendsNameDec.getText(), varName, result, deep - 1);
         }
 
         // 处理成员变量
-        List<ALittleClassVarDec> class_var_dec_list = class_dec.getClassVarDecList();
-        for (ALittleClassVarDec class_var_dec : class_var_dec_list) {
-            ALittleClassVarNameDec var_name_dec = class_var_dec.getClassVarNameDec();
-            if (var_name_dec != null) {
-                if (src_name.isEmpty() || var_name_dec.getIdContent().getText().equals(src_name))
-                    result.add(var_name_dec);
-            }
+        List<ALittleClassVarDec> classVarDecList = classDec.getClassVarDecList();
+        for (ALittleClassVarDec class_varDec : classVarDecList) {
+            ALittleClassVarNameDec varNameDec = class_varDec.getClassVarNameDec();
+            if (varNameDec == null) continue;
+            if (varName.isEmpty() || varNameDec.getIdContent().getText().equals(varName))
+                result.add(varNameDec);
         }
     }
 
+    // 过滤函数名相同的元素
     @NotNull
-    public static List<ALittleMethodNameDec> filterSameMethodName(@NotNull List<ALittleMethodNameDec> result)
-    {
-        Set<String> name_set = new HashSet<>();
-        List<ALittleMethodNameDec> new_result = new ArrayList<>();
+    public static List<ALittleMethodNameDec> filterSameMethodName(@NotNull List<ALittleMethodNameDec> result) {
+        Set<String> nameSet = new HashSet<>();
+        List<ALittleMethodNameDec> newResult = new ArrayList<>();
         for (int i = result.size() - 1; i >= 0; --i) {
             String name = result.get(i).getIdContent().getText();
-            if (name_set.contains(name)) {
+            if (nameSet.contains(name)) {
                 continue;
             }
-            name_set.add(name);
-            new_result.add(result.get(i));
+            nameSet.add(name);
+            newResult.add(result.get(i));
         }
-        return new_result;
+        return newResult;
     }
 
     // 查找所有的setter节点对象
-    private static void findMethodNameDecListForSetter(Project project, String src_namespace, String src_class, String src_name, @NotNull List<ALittleMethodNameDec> result, int deep)
-    {        // 这个用于跳出无限递归
-        if (deep <= 0) return;
-
-        List<ALittleClassNameDec> name_dec_list = ALittleTreeChangeListener.findClassNameDecList(project, src_namespace, src_class);
-        if (name_dec_list == null || name_dec_list.isEmpty()) return;
-        ALittleClassDec class_dec = (ALittleClassDec)name_dec_list.get(0).getParent();
-
-        findMethodNameDecListForSetter(project, src_namespace, class_dec, src_name, result, deep);
-    }
-
-    public static void findMethodNameDecListForSetter(Project project, String src_namespace, ALittleClassDec class_dec, String src_name, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    private static void findMethodNameDecListForSetter(Project project, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
-        if (class_dec == null) return;
+
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        if (nameDecList == null || nameDecList.isEmpty()) return;
+        ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
+
+        findMethodNameDecListForSetter(project, namespace, classDec, varName, result, deep);
+    }
+
+    public static void findMethodNameDecListForSetter(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+        // 这个用于跳出无限递归
+        if (deep <= 0) return;
+        if (classDec == null) return;
 
         // 处理继承
-        ALittleClassExtendsNameDec class_extends_name_dec = class_dec.getClassExtendsNameDec();
-        if (class_extends_name_dec != null) {
-            ALittleClassExtendsNamespaceNameDec class_extends_namespace_name_dec = class_dec.getClassExtendsNamespaceNameDec();
-            String namespace_name = src_namespace;
-            if (class_extends_namespace_name_dec != null) namespace_name = class_extends_namespace_name_dec.getText();
-            findMethodNameDecListForSetter(project, namespace_name, class_extends_name_dec.getText(), src_name, result, deep - 1);
+        ALittleClassExtendsNameDec classExtendsNameDec = classDec.getClassExtendsNameDec();
+        if (classExtendsNameDec != null) {
+            ALittleClassExtendsNamespaceNameDec classExtendsNamespaceNameDec = classDec.getClassExtendsNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            findMethodNameDecListForSetter(project, namespaceName, classExtendsNameDec.getText(), varName, result, deep - 1);
         }
 
         // 处理setter函数
-        List<ALittleClassSetterDec> class_setter_dec_list = class_dec.getClassSetterDecList();
-        for (ALittleClassSetterDec class_setter_dec : class_setter_dec_list) {
-            ALittleMethodNameDec method_name_dec = class_setter_dec.getMethodNameDec();
-            if (method_name_dec == null) continue;
-            if (src_name.isEmpty() || method_name_dec.getIdContent().getText().equals(src_name))
-                result.add(method_name_dec);
+        List<ALittleClassSetterDec> classSetterDecList = classDec.getClassSetterDecList();
+        for (ALittleClassSetterDec classSetterDec : classSetterDecList) {
+            ALittleMethodNameDec methodNameDec = classSetterDec.getMethodNameDec();
+            if (methodNameDec == null) continue;
+            if (varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+                result.add(methodNameDec);
         }
     }
 
     // 查找所有的getter节点对象
-    private static void findMethodNameDecListForGetter(Project project, String src_namespace, String src_class, String src_name, @NotNull List<ALittleMethodNameDec> result, int deep)
-    {        // 这个用于跳出无限递归
-        if (deep <= 0) return;
-
-        List<ALittleClassNameDec> name_dec_list = ALittleTreeChangeListener.findClassNameDecList(project, src_namespace, src_class);
-        if (name_dec_list == null || name_dec_list.isEmpty()) return;
-        ALittleClassDec class_dec = (ALittleClassDec)name_dec_list.get(0).getParent();
-
-        findMethodNameDecListForGetter(project, src_namespace, class_dec, src_name, result, deep);
-    }
-
-    public static void findMethodNameDecListForGetter(Project project, String src_namespace, ALittleClassDec class_dec, String src_name, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    private static void findMethodNameDecListForGetter(Project project, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
-        if (class_dec == null) return;
+
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        if (nameDecList == null || nameDecList.isEmpty()) return;
+        ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
+
+        findMethodNameDecListForGetter(project, namespace, classDec, varName, result, deep);
+    }
+
+    public static void findMethodNameDecListForGetter(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+        // 这个用于跳出无限递归
+        if (deep <= 0) return;
+        if (classDec == null) return;
 
         // 处理继承
-        ALittleClassExtendsNameDec class_extends_name_dec = class_dec.getClassExtendsNameDec();
-        if (class_extends_name_dec != null) {
-            ALittleClassExtendsNamespaceNameDec class_extends_namespace_name_dec = class_dec.getClassExtendsNamespaceNameDec();
-            String namespace_name = src_namespace;
-            if (class_extends_namespace_name_dec != null) namespace_name = class_extends_namespace_name_dec.getText();
-            findMethodNameDecListForGetter(project, namespace_name, class_extends_name_dec.getText(), src_name, result, deep - 1);
+        ALittleClassExtendsNameDec classExtendsNameDec = classDec.getClassExtendsNameDec();
+        if (classExtendsNameDec != null) {
+            ALittleClassExtendsNamespaceNameDec classExtendsNamespaceNameDec = classDec.getClassExtendsNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            findMethodNameDecListForGetter(project, namespaceName, classExtendsNameDec.getText(), varName, result, deep - 1);
         }
 
         // 处理getter函数
-        List<ALittleClassGetterDec> class_getter_dec_list = class_dec.getClassGetterDecList();
-        for (ALittleClassGetterDec class_getter_dec : class_getter_dec_list) {
-            ALittleMethodNameDec method_name_dec = class_getter_dec.getMethodNameDec();
-            if (method_name_dec == null) continue;
-            if (src_name.isEmpty() || method_name_dec.getIdContent().getText().equals(src_name))
-                result.add(method_name_dec);
+        List<ALittleClassGetterDec> classGetterDecList = classDec.getClassGetterDecList();
+        for (ALittleClassGetterDec classGetterDec : classGetterDecList) {
+            ALittleMethodNameDec methodNameDec = classGetterDec.getMethodNameDec();
+            if (methodNameDec == null) continue;
+            if (varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+                result.add(methodNameDec);
         }
     }
 
     // 查找所有的getter节点对象
-    private static void findMethodNameDecListForFun(Project project, String src_namespace, String src_class, String src_name, @NotNull List<ALittleMethodNameDec> result, int deep)
-    {        // 这个用于跳出无限递归
-        if (deep <= 0) return;
-
-        List<ALittleClassNameDec> name_dec_list = ALittleTreeChangeListener.findClassNameDecList(project, src_namespace, src_class);
-        if (name_dec_list == null || name_dec_list.isEmpty()) return;
-        ALittleClassDec class_dec = (ALittleClassDec)name_dec_list.get(0).getParent();
-
-        findMethodNameDecListForFun(project, src_namespace, class_dec, src_name, result, deep);
-    }
-
-    public static void findMethodNameDecListForFun(Project project, String src_namespace, ALittleClassDec class_dec, String src_name, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    private static void findMethodNameDecListForFun(Project project, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
-        if (class_dec == null) return;
+
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        if (nameDecList == null || nameDecList.isEmpty()) return;
+        ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
+
+        findMethodNameDecListForFun(project, namespace, classDec, varName, result, deep);
+    }
+
+    public static void findMethodNameDecListForFun(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+        // 这个用于跳出无限递归
+        if (deep <= 0) return;
+        if (classDec == null) return;
 
         // 处理继承
-        ALittleClassExtendsNameDec class_extends_name_dec = class_dec.getClassExtendsNameDec();
-        if (class_extends_name_dec != null) {
-            ALittleClassExtendsNamespaceNameDec class_extends_namespace_name_dec = class_dec.getClassExtendsNamespaceNameDec();
-            String namespace_name = src_namespace;
-            if (class_extends_namespace_name_dec != null) namespace_name = class_extends_namespace_name_dec.getText();
-            findMethodNameDecListForFun(project, namespace_name, class_extends_name_dec.getText(), src_name, result, deep - 1);
+        ALittleClassExtendsNameDec classExtendsNameDec = classDec.getClassExtendsNameDec();
+        if (classExtendsNameDec != null) {
+            ALittleClassExtendsNamespaceNameDec classExtendsNamespaceNameDec = classDec.getClassExtendsNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            findMethodNameDecListForFun(project, namespaceName, classExtendsNameDec.getText(), varName, result, deep - 1);
         }
 
         // 处理成员函数
-        List<ALittleClassMethodDec> class_method_dec_list = class_dec.getClassMethodDecList();
-        for (ALittleClassMethodDec class_method_dec : class_method_dec_list) {
-            ALittleMethodNameDec method_name_dec = class_method_dec.getMethodNameDec();
-            if (method_name_dec == null) continue;
-            if (src_name.isEmpty() || method_name_dec.getIdContent().getText().equals(src_name))
-                result.add(method_name_dec);
+        List<ALittleClassMethodDec> classMethodDecList = classDec.getClassMethodDecList();
+        for (ALittleClassMethodDec classMethodDec : classMethodDecList) {
+            ALittleMethodNameDec methodNameDec = classMethodDec.getMethodNameDec();
+            if (methodNameDec == null) continue;
+            if (varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+                result.add(methodNameDec);
         }
     }
 
-    // 查找所有的getter节点对象
-    private static void findMethodNameDecListForStatic(Project project, String src_namespace, String src_class, String src_name, @NotNull List<ALittleMethodNameDec> result, int deep)
-    {        // 这个用于跳出无限递归
+    // 查找所有的static节点对象
+    private static void findMethodNameDecListForStatic(Project project, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {        // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleClassNameDec> name_dec_list = ALittleTreeChangeListener.findClassNameDecList(project, src_namespace, src_class);
-        if (name_dec_list == null || name_dec_list.isEmpty()) return;
-        ALittleClassDec class_dec = (ALittleClassDec)name_dec_list.get(0).getParent();
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        if (nameDecList == null || nameDecList.isEmpty()) return;
+        ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecListForStatic(project, src_namespace, class_dec, src_name, result, deep);
+        findMethodNameDecListForStatic(project, namespace, classDec, varName, result, deep);
     }
 
-    public static void findMethodNameDecListForStatic(Project project, String src_namespace, ALittleClassDec class_dec, String src_name, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecListForStatic(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
-        if (class_dec == null) return;
+        if (classDec == null) return;
 
         // 处理继承
-        ALittleClassExtendsNameDec class_extends_name_dec = class_dec.getClassExtendsNameDec();
-        if (class_extends_name_dec != null) {
-            ALittleClassExtendsNamespaceNameDec class_extends_namespace_name_dec = class_dec.getClassExtendsNamespaceNameDec();
-            String namespace_name = src_namespace;
-            if (class_extends_namespace_name_dec != null) namespace_name = class_extends_namespace_name_dec.getText();
-            findMethodNameDecListForStatic(project, namespace_name, class_extends_name_dec.getText(), src_name, result, deep - 1);
+        ALittleClassExtendsNameDec classExtendsNameDec = classDec.getClassExtendsNameDec();
+        if (classExtendsNameDec != null) {
+            ALittleClassExtendsNamespaceNameDec classExtendsNamespaceNameDec = classDec.getClassExtendsNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            findMethodNameDecListForStatic(project, namespaceName, classExtendsNameDec.getText(), varName, result, deep - 1);
         }
 
         // 处理惊天函数
-        List<ALittleClassStaticDec> class_static_dec_list = class_dec.getClassStaticDecList();
-        for (ALittleClassStaticDec class_static_dec : class_static_dec_list) {
-            ALittleMethodNameDec method_name_dec = class_static_dec.getMethodNameDec();
-            if (method_name_dec == null) continue;
-            if (src_name.isEmpty() || method_name_dec.getIdContent().getText().equals(src_name))
-                result.add(method_name_dec);
+        List<ALittleClassStaticDec> classStaticDecList = classDec.getClassStaticDecList();
+        for (ALittleClassStaticDec classStaticDec : classStaticDecList) {
+            ALittleMethodNameDec methodNameDec = classStaticDec.getMethodNameDec();
+            if (methodNameDec == null) continue;
+            if (varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+                result.add(methodNameDec);
         }
     }
 
     // 查找函数的参数
     @NotNull
     public static List<ALittleMethodParamNameDec> findMethodParamNameDecList(
-            ALittleClassCtorDec class_ctor_dec
-            , ALittleClassSetterDec class_setter_dec
-            , ALittleClassMethodDec class_method_dec
-            , ALittleClassStaticDec class_static_dec
-            , ALittleGlobalMethodDec global_method_dec
-            , String src_name) {
-        List<ALittleMethodParamOneDec> param_one_dec_list = new ArrayList<>();
-        if (class_ctor_dec != null) {
-            ALittleMethodParamDec method_param_dec = class_ctor_dec.getMethodParamDec();
-            if (method_param_dec != null) {
-                List<ALittleMethodParamOneDec> param_one_dec_tmp_list = method_param_dec.getMethodParamOneDecList();
-                param_one_dec_list.addAll(param_one_dec_tmp_list);
+            ALittleClassCtorDec classCtorDec,
+            ALittleClassSetterDec classSetterDec,
+            ALittleClassMethodDec classMethodDec,
+            ALittleClassStaticDec classStaticDec,
+            ALittleGlobalMethodDec globalMethodDec,
+            String varName) {
+        List<ALittleMethodParamOneDec> paramOneDecList = new ArrayList<>();
+        if (classCtorDec != null) {
+            ALittleMethodParamDec methodParamDec = classCtorDec.getMethodParamDec();
+            if (methodParamDec != null) {
+                List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
+                paramOneDecList.addAll(paramOneDecTmpList);
             }
-        } else if (class_method_dec != null) {
-            ALittleMethodParamDec method_param_dec = class_method_dec.getMethodParamDec();
-            if (method_param_dec != null) {
-                List<ALittleMethodParamOneDec> param_one_dec_tmp_list = method_param_dec.getMethodParamOneDecList();
-                param_one_dec_list.addAll(param_one_dec_tmp_list);
+        } else if (classMethodDec != null) {
+            ALittleMethodParamDec methodParamDec = classMethodDec.getMethodParamDec();
+            if (methodParamDec != null) {
+                List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
+                paramOneDecList.addAll(paramOneDecTmpList);
             }
-        } else if (class_static_dec != null) {
-            ALittleMethodParamDec method_param_dec = class_static_dec.getMethodParamDec();
-            if (method_param_dec != null) {
-                List<ALittleMethodParamOneDec> param_one_dec_tmp_list = method_param_dec.getMethodParamOneDecList();
-                param_one_dec_list.addAll(param_one_dec_tmp_list);
+        } else if (classStaticDec != null) {
+            ALittleMethodParamDec methodParamDec = classStaticDec.getMethodParamDec();
+            if (methodParamDec != null) {
+                List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
+                paramOneDecList.addAll(paramOneDecTmpList);
             }
-        } else if (class_setter_dec != null) {
-            param_one_dec_list.add(class_setter_dec.getMethodParamOneDec());
-        } else if (global_method_dec != null) {
-            ALittleMethodParamDec method_param_dec = global_method_dec.getMethodParamDec();
-            if (method_param_dec != null) {
-                List<ALittleMethodParamOneDec> param_one_dec_tmp_list = method_param_dec.getMethodParamOneDecList();
-                param_one_dec_list.addAll(param_one_dec_tmp_list);
+        } else if (classSetterDec != null) {
+            paramOneDecList.add(classSetterDec.getMethodParamOneDec());
+        } else if (globalMethodDec != null) {
+            ALittleMethodParamDec methodParamDec = globalMethodDec.getMethodParamDec();
+            if (methodParamDec != null) {
+                List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
+                paramOneDecList.addAll(paramOneDecTmpList);
             }
         }
 
+        // 收集所有的参数名元素
         List<ALittleMethodParamNameDec> result = new ArrayList<>();
-        for (ALittleMethodParamOneDec one_dec : param_one_dec_list) {
-            ALittleMethodParamNameDec name_dec = one_dec.getMethodParamNameDec();
-            if (name_dec != null) {
-                if (src_name.isEmpty() || name_dec.getIdContent().getText().equals(src_name))
-                    result.add(name_dec);
-            }
+        for (ALittleMethodParamOneDec oneDec : paramOneDecList) {
+            ALittleMethodParamNameDec nameDec = oneDec.getMethodParamNameDec();
+            if (nameDec == null) continue;
+            if (varName.isEmpty() || nameDec.getIdContent().getText().equals(varName))
+                result.add(nameDec);
         }
         return result;
     }
 
     // 查找表达式定义的函数名
     @NotNull
-    public static List<ALittleVarAssignNameDec> findVarAssignNameDecList(PsiElement element, String src_name) {
-        List<ALittleVarAssignNameDec> var_dec_list = new ArrayList<>();
+    public static List<ALittleVarAssignNameDec> findVarAssignNameDecList(PsiElement element, String varName) {
+        List<ALittleVarAssignNameDec> varDecList = new ArrayList<>();
 
-        ALittleAllExpr root_all_expr = null;
+        ALittleAllExpr rootAllExpr = null;
         // 计算出所在的表达式
         PsiElement parent = element;
         while (true) {
             if (parent == null) break;
             if (parent instanceof ALittleAllExpr) {
-                root_all_expr = (ALittleAllExpr)parent;
+                rootAllExpr = (ALittleAllExpr)parent;
                 break;
             }
             parent = parent.getParent();
         }
-        if (root_all_expr ==  null) return var_dec_list;
+        if (rootAllExpr ==  null) return varDecList;
 
-        findVarAssignNameDecList(root_all_expr, var_dec_list, src_name);
-        return var_dec_list;
+        findVarAssignNameDecList(rootAllExpr, varDecList, varName);
+        return varDecList;
     }
 
-    private static void findVarAssignNameDecList(@NotNull ALittleAllExpr all_expr, @NotNull List<ALittleVarAssignNameDec> var_dec_list, @NotNull String src_name) {
-        PsiElement parent = all_expr.getParent();
+    private static void findVarAssignNameDecList(@NotNull ALittleAllExpr allExpr, @NotNull List<ALittleVarAssignNameDec> varDecList, @NotNull String varName) {
+        PsiElement parent = allExpr.getParent();
 
-        List<ALittleAllExpr> all_expr_list = null;
+        List<ALittleAllExpr> allExprList = null;
 
-        // 如果是函数体，那么就停止
+        // 处理函数体
         if (parent instanceof ALittleMethodBodyDec) {
-            ALittleMethodBodyDec cur_expr = (ALittleMethodBodyDec)parent;
-            all_expr_list = cur_expr.getAllExprList();
-
+            ALittleMethodBodyDec curExpr = (ALittleMethodBodyDec)parent;
+            allExprList = curExpr.getAllExprList();
+        // 处理for循环
         } else if (parent instanceof ALittleForExpr) {
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), var_dec_list, src_name);
-            ALittleForExpr cur_expr = (ALittleForExpr)parent;
-            all_expr_list = cur_expr.getAllExprList();
+            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, varName);
+
+            ALittleForExpr curExpr = (ALittleForExpr)parent;
+            allExprList = curExpr.getAllExprList();
+
             // for 内部有一个临时变量
-            ALittleForStepCondition step_condition = cur_expr.getForStepCondition();
-            ALittleForInCondition in_condition = cur_expr.getForInCondition();
-            if (step_condition != null)
-            {
-                ALittleForStartStat start_stat = step_condition.getForStartStat();
-                if (start_stat != null) {
-                    ALittleVarAssignNameDec var_assign_name_dec = start_stat.getForPairDec().getVarAssignNameDec();
-                    if (var_assign_name_dec != null) {
-                        String name = var_assign_name_dec.getIdContent().getText();
-                        if (src_name.isEmpty() || name.equals(src_name))
-                            var_dec_list.add(var_assign_name_dec);
+            ALittleForStepCondition stepCondition = curExpr.getForStepCondition();
+            ALittleForInCondition inCondition = curExpr.getForInCondition();
+            if (stepCondition != null) {
+                ALittleForStartStat startStat = stepCondition.getForStartStat();
+                if (startStat != null) {
+                    ALittleVarAssignNameDec varAssignNameDec = startStat.getForPairDec().getVarAssignNameDec();
+                    if (varAssignNameDec != null) {
+                        String name = varAssignNameDec.getIdContent().getText();
+                        if (varName.isEmpty() || name.equals(varName))
+                            varDecList.add(varAssignNameDec);
                     }
                 }
-            } else if (in_condition != null) {
-                List<ALittleForPairDec> pair_dec_list = in_condition.getForPairDecList();
-                for (ALittleForPairDec pair_dec : pair_dec_list) {
-                    ALittleVarAssignNameDec var_assign_name_dec = pair_dec.getVarAssignNameDec();
-                    if (var_assign_name_dec != null) {
-                        String name = var_assign_name_dec.getIdContent().getText();
-                        if (src_name.isEmpty() || name.equals(src_name))
-                            var_dec_list.add(var_assign_name_dec);
+            } else if (inCondition != null) {
+                List<ALittleForPairDec> pairDecList = inCondition.getForPairDecList();
+                for (ALittleForPairDec pairDec : pairDecList) {
+                    ALittleVarAssignNameDec varAssignNameDec = pairDec.getVarAssignNameDec();
+                    if (varAssignNameDec != null) {
+                        String name = varAssignNameDec.getIdContent().getText();
+                        if (varName.isEmpty() || name.equals(varName))
+                            varDecList.add(varAssignNameDec);
                     }
                 }
             }
+        // 处理while循环
         } else if (parent instanceof ALittleWhileExpr) {
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), var_dec_list, src_name);
-            ALittleWhileExpr cur_expr = (ALittleWhileExpr)parent;
-            all_expr_list = cur_expr.getAllExprList();
+            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, varName);
+            ALittleWhileExpr curExpr = (ALittleWhileExpr)parent;
+            allExprList = curExpr.getAllExprList();
+        // 处理do while
         } else if (parent instanceof ALittleDoWhileExpr) {
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), var_dec_list, src_name);
-            ALittleDoWhileExpr cur_expr = (ALittleDoWhileExpr)parent;
-            all_expr_list = cur_expr.getAllExprList();
+            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, varName);
+            ALittleDoWhileExpr curExpr = (ALittleDoWhileExpr)parent;
+            allExprList = curExpr.getAllExprList();
+        // 处理 if
         } else if (parent instanceof ALittleIfExpr) {
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), var_dec_list, src_name);
-            ALittleIfExpr cur_expr = (ALittleIfExpr)parent;
-            all_expr_list = cur_expr.getAllExprList();
+            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, varName);
+            ALittleIfExpr curExpr = (ALittleIfExpr)parent;
+            allExprList = curExpr.getAllExprList();
+        // 处理 else if
         } else if (parent instanceof ALittleElseIfExpr) {
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent().getParent(), var_dec_list, src_name);
-            ALittleElseIfExpr cur_expr = (ALittleElseIfExpr)parent;
-            all_expr_list = cur_expr.getAllExprList();
+            findVarAssignNameDecList((ALittleAllExpr)parent.getParent().getParent(), varDecList, varName);
+            ALittleElseIfExpr curExpr = (ALittleElseIfExpr)parent;
+            allExprList = curExpr.getAllExprList();
+        // 处理 else
         } else if (parent instanceof ALittleElseExpr) {
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent().getParent(), var_dec_list, src_name);
-            ALittleElseExpr cur_expr = (ALittleElseExpr)parent;
-            all_expr_list = cur_expr.getAllExprList();
+            findVarAssignNameDecList((ALittleAllExpr)parent.getParent().getParent(), varDecList, varName);
+            ALittleElseExpr curExpr = (ALittleElseExpr)parent;
+            allExprList = curExpr.getAllExprList();
+        // 处理 wrap
         } else if (parent instanceof ALittleWrapExpr) {
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), var_dec_list, src_name);
-            ALittleWrapExpr cur_expr = (ALittleWrapExpr)parent;
-            all_expr_list = cur_expr.getAllExprList();
+            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, varName);
+            ALittleWrapExpr curExpr = (ALittleWrapExpr)parent;
+            allExprList = curExpr.getAllExprList();
         }
 
-        if (all_expr_list == null) return;
+        if (allExprList == null) return;
 
-        for (ALittleAllExpr expr : all_expr_list) {
-            if (expr.equals(all_expr)) return;
+        for (ALittleAllExpr expr : allExprList) {
+            // 如果已经遍历到当前，那么就可以返回了
+            if (expr.equals(allExpr)) return;
 
-            ALittleVarAssignExpr var_assign_expr = expr.getVarAssignExpr();
-            if (var_assign_expr == null) continue;
+            ALittleVarAssignExpr varAssignExpr = expr.getVarAssignExpr();
+            if (varAssignExpr == null) continue;
 
-            List<ALittleVarAssignPairDec> var_assign_pair_dec_list = var_assign_expr.getVarAssignPairDecList();
-            for (ALittleVarAssignPairDec var_assign_pair_dec : var_assign_pair_dec_list) {
-                ALittleVarAssignNameDec var_assign_name_dec = var_assign_pair_dec.getVarAssignNameDec();
-                if (var_assign_name_dec != null) {
-                    String name = var_assign_name_dec.getIdContent().getText();
-                    if (src_name.isEmpty() || name.equals(src_name))
-                        var_dec_list.add(var_assign_name_dec);
-                }
+            List<ALittleVarAssignPairDec> varAssignPairDecList = varAssignExpr.getVarAssignPairDecList();
+            for (ALittleVarAssignPairDec varAssignPairDec : varAssignPairDecList) {
+                ALittleVarAssignNameDec varAssignNameDec = varAssignPairDec.getVarAssignNameDec();
+                if (varAssignNameDec == null) continue;
+                String name = varAssignNameDec.getIdContent().getText();
+                if (varName.isEmpty() || name.equals(varName))
+                    varDecList.add(varAssignNameDec);
             }
         }
     }
@@ -528,29 +550,26 @@ public class ALittleUtil {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // 从文件中获取AlittleNamespaceDec
-    @NotNull
-    public static List<ALittleNamespaceDec> getNamespaceDec(PsiFile psi_file) {
-        List<ALittleNamespaceDec> namespace_dec_list = new ArrayList<>();
-        for(PsiElement child = psi_file.getFirstChild(); child != null; child = child.getNextSibling()) {
+    public static ALittleNamespaceDec getNamespaceDec(PsiFile psiFile) {
+        for(PsiElement child = psiFile.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleNamespaceDec) {
-                namespace_dec_list.add((ALittleNamespaceDec)child);
+                return (ALittleNamespaceDec)child;
             }
         }
-        return namespace_dec_list;
+        return null;
     }
 
     // 根据文件对象获取命名域
     @NotNull
     public static String getNamespaceName(ALittleFile alittleFile) {
-        List<ALittleNamespaceDec> namespace_list = getNamespaceDec(alittleFile);
-        for (ALittleNamespaceDec namespace_dec : namespace_list) {
-            ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
-            if (namespace_name_dec == null) continue;
-            return namespace_name_dec.getIdContent().getText();
-        }
-        return "";
+        ALittleNamespaceDec namespaceDec = getNamespaceDec(alittleFile);
+        if (namespaceDec == null) return "";
+        ALittleNamespaceNameDec namespaceNameDec = namespaceDec.getNamespaceNameDec();
+        if (namespaceNameDec == null) return "";
+        return namespaceNameDec.getIdContent().getText();
     }
 
+    // 判断字符串是不是int值
     public static boolean isInt(String content) {
         try {
             double v = Double.parseDouble(content);
@@ -560,75 +579,81 @@ public class ALittleUtil {
         }
     }
 
+    // 判断 parent是否是child的父类
     public static boolean IsClassSuper(PsiElement child, PsiElement parent) {
         if (!(child instanceof ALittleClassDec)) return false;
-        ALittleClassDec child_class = (ALittleClassDec)child;
+        ALittleClassDec childClass = (ALittleClassDec)child;
 
-        ALittleClassExtendsNameDec extends_name_dec = child_class.getClassExtendsNameDec();
-        if (extends_name_dec == null) return false;
+        ALittleClassExtendsNameDec extendsNameDec = childClass.getClassExtendsNameDec();
+        if (extendsNameDec == null) return false;
 
-        PsiElement guess_type = child_class.getClassExtendsNameDec().guessType();
-        if (guess_type == null) return false;
+        PsiElement guessType = childClass.getClassExtendsNameDec().guessType();
+        if (guessType == null) return false;
 
-        if (guess_type.equals(parent)) return true;
+        if (guessType.equals(parent)) return true;
 
-        return IsClassSuper(guess_type, parent);
+        return IsClassSuper(guessType, parent);
     }
 
+    // 判断 parent是否是child的父类
     public static boolean IsStructSuper(PsiElement child, PsiElement parent) {
         if (!(child instanceof ALittleStructDec)) return false;
-        ALittleStructDec child_struct = (ALittleStructDec)child;
+        ALittleStructDec childStruct = (ALittleStructDec)child;
 
-        ALittleStructExtendsNameDec extends_name_dec = child_struct.getStructExtendsNameDec();
-        if (extends_name_dec == null) return false;
+        ALittleStructExtendsNameDec extendsNameDec = childStruct.getStructExtendsNameDec();
+        if (extendsNameDec == null) return false;
 
-        PsiElement guess_type = child_struct.getStructExtendsNameDec().guessType();
-        if (guess_type == null) return false;
+        PsiElement guessType = childStruct.getStructExtendsNameDec().guessType();
+        if (guessType == null) return false;
 
-        if (guess_type.equals(parent)) return true;
+        if (guessType.equals(parent)) return true;
 
-        return IsStructSuper(guess_type, parent);
+        return IsStructSuper(guessType, parent);
     }
 
-    public static List<PsiElement> guessTypeForMethodCall(ALittleValueStat value_stat) {
-        if (value_stat.getValueFactor() == null) return null;
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        ALittleValueFactor value_factor = value_stat.getValueFactor();
-        if (value_factor.getValueStatParen() != null)
-            return guessTypeForMethodCall(value_factor.getValueStatParen().getValueStat());
+    @NotNull
+    public static List<PsiElement> guessTypeForMethodCall(ALittleValueStat valueStat) throws ALittleElementException {
+        if (valueStat.getValueFactor() == null) throw new ALittleElementException(valueStat, "改表达式不是函数调用");
 
-        ALittlePropertyValue property_value = value_factor.getPropertyValue();
-        if (property_value == null) return null;
+        ALittleValueFactor valueFactor = valueStat.getValueFactor();
+        if (valueFactor.getValueStatParen() != null)
+            return guessTypeForMethodCall(valueFactor.getValueStatParen().getValueStat());
 
-        List<ALittlePropertyValueSuffix> suffix_list = property_value.getPropertyValueSuffixList();
-        if (suffix_list.isEmpty()) return null;
+        ALittlePropertyValue propertyValue = valueFactor.getPropertyValue();
+        if (propertyValue == null)  throw new ALittleElementException(valueStat, "改表达式不是函数调用");
 
-        ALittlePropertyValueSuffix last_suffix = suffix_list.get(suffix_list.size() - 1);
-        ALittlePropertyValueMethodCallStat method_call = last_suffix.getPropertyValueMethodCallStat();
-        if (method_call == null) return null;
+        List<ALittlePropertyValueSuffix> suffixList = propertyValue.getPropertyValueSuffixList();
+        if (suffixList.isEmpty())  throw new ALittleElementException(valueStat, "改表达式不是函数调用");
 
-        PsiReference ref = method_call.getReference();
+        ALittlePropertyValueSuffix lastSuffix = suffixList.get(suffixList.size() - 1);
+        ALittlePropertyValueMethodCallStat methodCallStat = lastSuffix.getPropertyValueMethodCallStat();
+        if (methodCallStat == null)  throw new ALittleElementException(valueStat, "改表达式不是函数调用");
+
+        // 获取多返回值的类型列表
+        PsiReference ref = methodCallStat.getReference();
         if (ref instanceof ALittlePropertyValueMethodCallStatReference) {
-            ALittlePropertyValueMethodCallStatReference real_ref = (ALittlePropertyValueMethodCallStatReference)ref;
-            return real_ref.guessTypes(true);
+            ALittlePropertyValueMethodCallStatReference realRef = (ALittlePropertyValueMethodCallStatReference)ref;
+            return realRef.guessTypes(true);
         }
-        return null;
+
+        throw new ALittleElementException(valueStat, "改表达式不是函数调用");
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public static PsiElement guessType(ALittlePropertyValue property_value) {
-        List<ALittlePropertyValueSuffix> suffix_list = property_value.getPropertyValueSuffixList();
-        if (suffix_list.isEmpty()) {
-            if (property_value.getPropertyValueThisType() != null) {
-                return property_value.getPropertyValueThisType().guessType();
-            } else if (property_value.getPropertyValueCastType() != null) {
-                return property_value.getPropertyValueCastType().guessType();
-            } else if (property_value.getPropertyValueCustomType() != null) {
-                return property_value.getPropertyValueCustomType().guessType();
+    @NotNull
+    public static PsiElement guessType(ALittlePropertyValue propertyValue) throws ALittleElementException {
+        List<ALittlePropertyValueSuffix> suffixList = propertyValue.getPropertyValueSuffixList();
+        if (suffixList.isEmpty()) {
+            if (propertyValue.getPropertyValueThisType() != null) {
+                return propertyValue.getPropertyValueThisType().guessType();
+            } else if (propertyValue.getPropertyValueCastType() != null) {
+                return propertyValue.getPropertyValueCastType().guessType();
+            } else if (propertyValue.getPropertyValueCustomType() != null) {
+                return propertyValue.getPropertyValueCustomType().guessType();
             }
         } else {
-            ALittlePropertyValueSuffix suffix = suffix_list.get(suffix_list.size() -1);
+            ALittlePropertyValueSuffix suffix = suffixList.get(suffixList.size() -1);
             if (suffix.getPropertyValueDotId() != null) {
                 return suffix.getPropertyValueDotId().getPropertyValueDotIdName().guessType();
             } else if (suffix.getPropertyValueBrackValueStat() != null) {
@@ -637,52 +662,51 @@ public class ALittleUtil {
                 return suffix.getPropertyValueMethodCallStat().guessType();
             }
         }
-        return null;
+        throw new ALittleElementException(propertyValue, "未知的表达式类型");
     }
 
-    public static PsiElement guessType(ALittleAllType all_type) {
-        if (all_type == null) return null;
-
-        if (all_type.getCustomType() != null) {
-            return all_type.getCustomType().getCustomTypeNameDec().guessType();
-        } else if (all_type.getGenericType() != null) {
-            return all_type.getGenericType();
-        } else if (all_type.getPrimitiveType() != null) {
-            return all_type.getPrimitiveType();
+    @NotNull
+    public static PsiElement guessType(ALittleAllType allType) throws ALittleElementException {
+        if (allType.getCustomType() != null) {
+            return allType.getCustomType().getCustomTypeNameDec().guessType();
+        } else if (allType.getGenericType() != null) {
+            return allType.getGenericType();
+        } else if (allType.getPrimitiveType() != null) {
+            return allType.getPrimitiveType();
         }
-        return null;
+        throw new ALittleElementException(allType, "未知的表达式类型");
     }
 
-    public static PsiElement guessType(ALittleMethodReturnTypeDec return_type_dec) {
-        return guessType(return_type_dec.getAllType());
+    @NotNull
+    public static PsiElement guessType(ALittleMethodReturnTypeDec returnTypeDec) throws ALittleElementException {
+        return guessType(returnTypeDec.getAllType());
     }
 
-    public static PsiElement guessType(ALittleOpNewStat op_new_stat) {
-        if (op_new_stat.getCustomType() != null)
-            return op_new_stat.getCustomType().getCustomTypeNameDec().guessType();
-        else if (op_new_stat.getGenericType() != null)
-            return op_new_stat.getGenericType();
-        return null;
+    @NotNull
+    public static PsiElement guessType(ALittleOpNewStat opNewStat) throws ALittleElementException {
+        if (opNewStat.getCustomType() != null)
+            return opNewStat.getCustomType().getCustomTypeNameDec().guessType();
+        else if (opNewStat.getGenericType() != null)
+            return opNewStat.getGenericType();
+        throw new ALittleElementException(opNewStat, "未知的表达式类型");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // 只有new表达式，和factor表达式才会出现可以遍历对象
-    public static String CalcPairsType(ALittleValueStat value_stat) {
-        List<String> error_content_list = new ArrayList<>();
-        List<PsiElement> error_element_list = new ArrayList<>();
-        PsiElement guess_type = guessSoftType(value_stat, value_stat, error_content_list, error_element_list);
-        if (guess_type == null) return null;
-
-        if (guess_type instanceof ALittleGenericType) {
-            ALittleGenericType generic_type = (ALittleGenericType)guess_type;
-            if (generic_type.getGenericListType() != null)
+    // 计算表达式需要使用什么样的变量方式
+    @NotNull
+    public static String CalcPairsType(ALittleValueStat valueStat) throws ALittleElementException {
+        PsiElement guessType = guessSoftType(valueStat, valueStat);
+        // 必须是模板容器
+        if (guessType instanceof ALittleGenericType) {
+            ALittleGenericType genericType = (ALittleGenericType)guessType;
+            if (genericType.getGenericListType() != null)
                 return "___ipairs";
-            else if (generic_type.getGenericMapType() != null)
+            else if (genericType.getGenericMapType() != null)
                 return "___pairs";
         }
 
-        return "";
+        throw new ALittleElementException(valueStat, "改表达式不能遍历");
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -703,9 +727,6 @@ public class ALittleUtil {
     // ALittleNamespaceDec 命名域
 
     // ALittleMethodNameDec 函数名
-
-    // ALittlePropertyValueBrackValueStat 中括号 表示any
-    // ALittlePropertyValueMethodCallStat 括号函数调用 表示any
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     enum GuessType
     {
@@ -715,7 +736,7 @@ public class ALittleUtil {
         GT_STRUCT,
         GT_ENUM,
         GT_MAP,
-        GT_LIST,
+        GTList,
         GT_FUNCTOR,
     }
 
@@ -723,16 +744,17 @@ public class ALittleUtil {
     {
         public GuessType type;                                 // 类型值为 Const Primitive Class Struct Enum Map List Functor
         public String value;                                // 完整类型的字符串
-        public GuessTypeInfo list_sub_type;                 // type="List"时，表示List的子类型
-        public GuessTypeInfo map_key_type;                  // type="Map"时, 表示Map的Key
-        public GuessTypeInfo map_value_type;                // type="Map"时, 表示Map的Value
-        public List<GuessTypeInfo> functor_param_list;      // type="Functor"时, 表示参数列表
-        public List<GuessTypeInfo> functor_return_list;     // type="Functor"时, 表示返回值列表
-        boolean functor_await;                              // type="Functor"时, 表示是否是await
-        public List<GuessTypeInfo> list_var_type;           // type="class" 或者 type="struct"，表示成员的类型列表
-        public List<String> list_var_name;                  // type="class" 或者 type="struct"，表示成员的变量列表
+        public GuessTypeInfo listSubType;                 // type="List"时，表示List的子类型
+        public GuessTypeInfo mapKeyType;                  // type="Map"时, 表示Map的Key
+        public GuessTypeInfo mapValueType;                // type="Map"时, 表示Map的Value
+        public List<GuessTypeInfo> functorParamList;      // type="Functor"时, 表示参数列表
+        public List<GuessTypeInfo> functorReturnList;     // type="Functor"时, 表示返回值列表
+        boolean functorAwait;                              // type="Functor"时, 表示是否是await
+        public List<GuessTypeInfo> listVarType;           // type="class" 或者 type="struct"，表示成员的类型列表
+        public List<String> listVarName;                  // type="class" 或者 type="struct"，表示成员的变量列表
     }
 
+    @NotNull
     public static String saveGuessTypeInfoToJson(@NotNull GuessTypeInfo info)
     {
         String content = "{\"type\":\"";
@@ -744,7 +766,7 @@ public class ALittleUtil {
             content += "enum";
         else if (info.type == GuessType.GT_FUNCTOR)
             content += "Functor";
-        else if (info.type == GuessType.GT_LIST)
+        else if (info.type == GuessType.GTList)
             content += "List";
         else if (info.type == GuessType.GT_MAP)
             content += "Map";
@@ -756,28 +778,28 @@ public class ALittleUtil {
         content += "\",\"name\":\"" + info.value + "\"";
 
         if (info.type == GuessType.GT_STRUCT || info.type == GuessType.GT_CLASS) {
-            content += ",\"var_list\":[";
-            List<String> var_list = new ArrayList<>();
-            for (int i = 0; i < info.list_var_type.size(); ++i) {
-                String child_content = "{\"type\":" + saveGuessTypeInfoToJson(info.list_var_type.get(i));
-                child_content += ",\"name\":\"" + info.list_var_name.get(i) + "\"}";
-                var_list.add(child_content);
+            content += ",\"varList\":[";
+            List<String> varList = new ArrayList<>();
+            for (int i = 0; i < info.listVarType.size(); ++i) {
+                String child_content = "{\"type\":" + saveGuessTypeInfoToJson(info.listVarType.get(i));
+                child_content += ",\"name\":\"" + info.listVarName.get(i) + "\"}";
+                varList.add(child_content);
             }
-            content += String.join(",", var_list);
+            content += String.join(",", varList);
             content += "]";
-        } else if (info.type == GuessType.GT_LIST) {
-            content += ",\"sub_type\":" + saveGuessTypeInfoToJson(info.list_sub_type);
+        } else if (info.type == GuessType.GTList) {
+            content += ",\"sub_type\":" + saveGuessTypeInfoToJson(info.listSubType);
         } else if (info.type == GuessType.GT_MAP) {
-            content += ",\"key_type\":" + saveGuessTypeInfoToJson(info.map_key_type);
-            content += ",\"value_type\":" + saveGuessTypeInfoToJson(info.map_value_type);
+            content += ",\"key_type\":" + saveGuessTypeInfoToJson(info.mapKeyType);
+            content += ",\"value_type\":" + saveGuessTypeInfoToJson(info.mapValueType);
         }
 
         content += "}";
         return content;
     }
 
-    public static GuessTypeInfo guessTypeString(PsiElement src, PsiElement element, HashSet<PsiElement> deep_guess
-            , @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
+    @NotNull
+    public static GuessTypeInfo guessTypeString(PsiElement src, PsiElement element, HashSet<PsiElement> deepGuess) throws ALittleElementException {
         // 基本类型
         if (element instanceof ALittlePrimitiveType) {
             GuessTypeInfo info = new GuessTypeInfo();
@@ -837,37 +859,29 @@ public class ALittleUtil {
             info.value = "bool";
             return info;
         } else if (element instanceof ALittleGenericType) {
-            return guessTypeString(src, (ALittleGenericType)element, deep_guess, error_content_list, error_element_list);
-        } else if (element instanceof ALittlePropertyValueBrackValueStat || element instanceof ALittlePropertyValueMethodCallStat) {
-            GuessTypeInfo info = new GuessTypeInfo();
-            info.type = GuessType.GT_PRIMITIVE;
-            info.value = "any";
-            return info;
+            return guessTypeString(src, (ALittleGenericType)element, deepGuess);
         } else if (element instanceof ALittleClassDec) {
             ALittleClassDec dec = (ALittleClassDec)element;
-            String namespace_name = getNamespaceName((ALittleFile)dec.getContainingFile());
-            ALittleClassNameDec name_dec = dec.getClassNameDec();
-            if (name_dec != null) {
+            String namespaceName = getNamespaceName((ALittleFile)dec.getContainingFile());
+            ALittleClassNameDec nameDec = dec.getClassNameDec();
+            if (nameDec != null) {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_CLASS;
-                info.value = namespace_name + "." + name_dec.getIdContent().getText();
+                info.value = namespaceName + "." + nameDec.getIdContent().getText();
                 // 如果需要深度递归
-                if (deep_guess != null) {
-                    if (deep_guess.contains(dec)) {
-                        error_content_list.add("class member has Recursive definition");
-                        error_element_list.add(src);
-                        return null;
+                if (deepGuess != null) {
+                    if (deepGuess.contains(dec)) {
+                        throw new ALittleElementException(src, "成员变量出现递归定义");
                     }
-                    deep_guess.add(dec);
-                    info.list_var_name = new ArrayList<>();
-                    info.list_var_type = new ArrayList<>();
-                    for (ALittleClassVarDec var_dec : dec.getClassVarDecList()) {
-                        ALittleClassVarNameDec var_name_dec = var_dec.getClassVarNameDec();
-                        GuessTypeInfo child_info = guessTypeString(src, var_dec.getAllType(), deep_guess, error_content_list, error_element_list);
-                        if (child_info == null) return null;
-                        if (var_name_dec != null) {
-                            info.list_var_type.add(child_info);
-                            info.list_var_name.add(var_name_dec.getText());
+                    deepGuess.add(dec);
+                    info.listVarName = new ArrayList<>();
+                    info.listVarType = new ArrayList<>();
+                    for (ALittleClassVarDec varDec : dec.getClassVarDecList()) {
+                        ALittleClassVarNameDec varNameDec = varDec.getClassVarNameDec();
+                        GuessTypeInfo child_info = guessTypeString(src, varDec.getAllType(), deepGuess);
+                        if (varNameDec != null) {
+                            info.listVarType.add(child_info);
+                            info.listVarName.add(varNameDec.getText());
                         }
                     }
                 }
@@ -880,29 +894,26 @@ public class ALittleUtil {
             return info;
         } else if (element instanceof ALittleStructDec) {
             ALittleStructDec dec = (ALittleStructDec)element;
-            String namespace_name = getNamespaceName((ALittleFile)dec.getContainingFile());
-            ALittleStructNameDec name_dec = dec.getStructNameDec();
-            if (name_dec != null) {
+            String namespaceName = getNamespaceName((ALittleFile)dec.getContainingFile());
+            ALittleStructNameDec nameDec = dec.getStructNameDec();
+            if (nameDec != null) {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_STRUCT;
-                info.value = namespace_name + "." + name_dec.getIdContent().getText();
+                info.value = namespaceName + "." + nameDec.getIdContent().getText();
                 // 如果需要深度递归
-                if (deep_guess != null) {
-                    if (deep_guess.contains(dec)) {
-                        error_content_list.add("struct member has Recursive definition");
-                        error_element_list.add(src);
-                        return null;
+                if (deepGuess != null) {
+                    if (deepGuess.contains(dec)) {
+                        throw new ALittleElementException(src, "成员变量出现递归定义");
                     }
-                    deep_guess.add(dec);
-                    info.list_var_name = new ArrayList<>();
-                    info.list_var_type = new ArrayList<>();
-                    for (ALittleStructVarDec var_dec : dec.getStructVarDecList()) {
-                        ALittleStructVarNameDec var_name_dec = var_dec.getStructVarNameDec();
-                        GuessTypeInfo child_info = guessTypeString(src, var_dec.getAllType(), deep_guess, error_content_list, error_element_list);
-                        if (child_info == null) return null;
-                        if (var_name_dec != null) {
-                            info.list_var_type.add(child_info);
-                            info.list_var_name.add(var_name_dec.getText());
+                    deepGuess.add(dec);
+                    info.listVarName = new ArrayList<>();
+                    info.listVarType = new ArrayList<>();
+                    for (ALittleStructVarDec varDec : dec.getStructVarDecList()) {
+                        ALittleStructVarNameDec varNameDec = varDec.getStructVarNameDec();
+                        GuessTypeInfo child_info = guessTypeString(src, varDec.getAllType(), deepGuess);
+                        if (varNameDec != null) {
+                            info.listVarType.add(child_info);
+                            info.listVarName.add(varNameDec.getText());
                         }
                     }
                 }
@@ -910,35 +921,33 @@ public class ALittleUtil {
             }
         } else if (element instanceof ALittleEnumDec) {
             ALittleEnumDec dec = (ALittleEnumDec)element;
-            String namespace_name = getNamespaceName((ALittleFile)dec.getContainingFile());
-            ALittleEnumNameDec name_dec = dec.getEnumNameDec();
-            if (name_dec != null) {
+            String namespaceName = getNamespaceName((ALittleFile)dec.getContainingFile());
+            ALittleEnumNameDec nameDec = dec.getEnumNameDec();
+            if (nameDec != null) {
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_ENUM;
-                info.value = namespace_name + "." + name_dec.getIdContent().getText();
+                info.value = namespaceName + "." + nameDec.getIdContent().getText();
                 return info;
             }
         } else if (element instanceof ALittleEnumVarNameDec) {
-            ALittleEnumVarNameDec name_dec = (ALittleEnumVarNameDec)element;
-            ALittleEnumVarDec dec = (ALittleEnumVarDec)name_dec.getParent();
-            ALittleEnumVarValueDec value_dec = dec.getEnumVarValueDec();
+            ALittleEnumVarNameDec nameDec = (ALittleEnumVarNameDec)element;
+            ALittleEnumVarDec dec = (ALittleEnumVarDec)nameDec.getParent();
+            ALittleEnumVarValueDec valueDec = dec.getEnumVarValueDec();
 
             // 如果枚举带有protocol定义，那么就返回错误信息
-            ALittleEnumDec enum_dec = (ALittleEnumDec)dec.getParent();
-            if (enum_dec.getEnumProtocolDec() != null) {
-                error_content_list.add("不能使用带protocol定义的enum的字段");
-                error_element_list.add(src);
-                return null;
+            ALittleEnumDec enumDec = (ALittleEnumDec)dec.getParent();
+            if (enumDec.getEnumProtocolDec() != null) {
+                throw new ALittleElementException(src, "不能使用带protocol定义的enum的字段");
             }
 
-            if (value_dec != null) {
-                if (value_dec.getDigitContent() != null) {
+            if (valueDec != null) {
+                if (valueDec.getDigitContent() != null) {
                     GuessTypeInfo info = new GuessTypeInfo();
                     info.type = GuessType.GT_PRIMITIVE;
                     info.value = "int";
                     return info;
                 }
-                if (value_dec.getStringContent() != null) {
+                if (valueDec.getStringContent() != null) {
                     GuessTypeInfo info = new GuessTypeInfo();
                     info.type = GuessType.GT_PRIMITIVE;
                     info.value = "string";
@@ -953,1295 +962,1084 @@ public class ALittleUtil {
         } else if (element instanceof ALittleMethodNameDec) {
             PsiElement parent = element.getParent();
             if (parent instanceof ALittleClassGetterDec) {
-                ALittleClassGetterDec class_getter_dec = (ALittleClassGetterDec) parent;
+                ALittleClassGetterDec classGetterDec = (ALittleClassGetterDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
-                info.functor_await = false;
-                info.functor_param_list = new ArrayList<>();
-                info.functor_return_list = new ArrayList<>();
+                info.functorAwait = false;
+                info.functorParamList = new ArrayList<>();
+                info.functorReturnList = new ArrayList<>();
 
                 // 第一个参数是类
-                GuessTypeInfo class_guess_info = guessTypeString(element, class_getter_dec.getParent(), deep_guess, error_content_list, error_element_list);
-                if (class_guess_info == null) return null;
-                info.functor_param_list.add(class_guess_info);
-                info.value += class_guess_info.value + ")";
+                GuessTypeInfo class_GuessInfo = guessTypeString(element, classGetterDec.getParent(), deepGuess);
+                info.functorParamList.add(class_GuessInfo);
+                info.value += class_GuessInfo.value + ")";
 
-                List<String> type_list = new ArrayList<>();
+                List<String> typeList = new ArrayList<>();
                 // 添加返回值列表
-                ALittleMethodReturnTypeDec return_type_dec = class_getter_dec.getMethodReturnTypeDec();
-                if (return_type_dec != null) {
-                    ALittleAllType all_type = return_type_dec.getAllType();
-                    GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
-                    if (guess_info == null) return null;
-                    type_list.add(guess_info.value);
-                    info.functor_return_list.add(guess_info);
+                ALittleMethodReturnTypeDec returnTypeDec = classGetterDec.getMethodReturnTypeDec();
+                if (returnTypeDec != null) {
+                    ALittleAllType allType = returnTypeDec.getAllType();
+                    GuessTypeInfo GuessInfo = guessTypeString(element, allType, deepGuess);
+                    typeList.add(GuessInfo.value);
+                    info.functorReturnList.add(GuessInfo);
                 }
-                if (!type_list.isEmpty()) info.value += ":";
-                info.value += String.join(",", type_list) + ">";
+                if (!typeList.isEmpty()) info.value += ":";
+                info.value += String.join(",", typeList) + ">";
                 return info;
             } else if (parent instanceof ALittleClassSetterDec) {
-                ALittleClassSetterDec class_setter_dec = (ALittleClassSetterDec) parent;
+                ALittleClassSetterDec classSetterDec = (ALittleClassSetterDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
-                info.functor_await = false;
-                info.functor_param_list = new ArrayList<>();
-                info.functor_return_list = new ArrayList<>();
+                info.functorAwait = false;
+                info.functorParamList = new ArrayList<>();
+                info.functorReturnList = new ArrayList<>();
 
-                List<String> type_list = new ArrayList<>();
+                List<String> typeList = new ArrayList<>();
                 // 第一个参数是类
-                GuessTypeInfo class_guess_info = guessTypeString(element, class_setter_dec.getParent(), deep_guess, error_content_list, error_element_list);
-                if (class_guess_info == null) return null;
-                type_list.add(class_guess_info.value);
-                info.functor_param_list.add(class_guess_info);
+                GuessTypeInfo class_GuessInfo = guessTypeString(element, classSetterDec.getParent(), deepGuess);
+                typeList.add(class_GuessInfo.value);
+                info.functorParamList.add(class_GuessInfo);
 
                 // 添加参数列表
-                ALittleMethodParamOneDec one_dec = class_setter_dec.getMethodParamOneDec();
-                if (one_dec != null) {
-                    ALittleAllType all_type = one_dec.getMethodParamTypeDec().getAllType();
-                    GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
-                    if (guess_info == null) return null;
-                    type_list.add(guess_info.value);
-                    info.functor_param_list.add(guess_info);
+                ALittleMethodParamOneDec oneDec = classSetterDec.getMethodParamOneDec();
+                if (oneDec != null) {
+                    ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                    GuessTypeInfo GuessInfo = guessTypeString(element, allType, deepGuess);
+                    typeList.add(GuessInfo.value);
+                    info.functorParamList.add(GuessInfo);
                 }
-                info.value += String.join(",", type_list) + ")";
+                info.value += String.join(",", typeList) + ")";
                 info.value += ">";
                 return info;
             } else if (parent instanceof ALittleClassMethodDec) {
-                ALittleClassMethodDec class_method_dec = (ALittleClassMethodDec) parent;
+                ALittleClassMethodDec classMethodDec = (ALittleClassMethodDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
-                info.functor_await = class_method_dec.getCoroutineModifier() != null && class_method_dec.getCoroutineModifier().getText().equals("await");
-                if (info.functor_await) {
+                info.functorAwait = classMethodDec.getCoroutineModifier() != null && classMethodDec.getCoroutineModifier().getText().equals("await");
+                if (info.functorAwait) {
                     info.value = "Functor<await(";
                 }
-                info.functor_param_list = new ArrayList<>();
-                info.functor_return_list = new ArrayList<>();
+                info.functorParamList = new ArrayList<>();
+                info.functorReturnList = new ArrayList<>();
 
-                List<String> type_list = new ArrayList<>();
+                List<String> typeList = new ArrayList<>();
                 // 第一个参数是类
-                GuessTypeInfo class_guess_info = guessTypeString(element, class_method_dec.getParent(), deep_guess, error_content_list, error_element_list);
-                if (class_guess_info == null) return null;
-                type_list.add(class_guess_info.value);
-                info.functor_param_list.add(class_guess_info);
+                GuessTypeInfo class_GuessInfo = guessTypeString(element, classMethodDec.getParent(), deepGuess);
+                typeList.add(class_GuessInfo.value);
+                info.functorParamList.add(class_GuessInfo);
 
                 // 添加参数列表
-                ALittleMethodParamDec param_dec = class_method_dec.getMethodParamDec();
-                if (param_dec != null) {
-                    List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                    for (ALittleMethodParamOneDec one_dec : one_dec_list) {
-                        ALittleAllType all_type = one_dec.getMethodParamTypeDec().getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
-                        if (guess_info == null) return null;
-                        type_list.add(guess_info.value);
-                        info.functor_param_list.add(guess_info);
+                ALittleMethodParamDec paramDec = classMethodDec.getMethodParamDec();
+                if (paramDec != null) {
+                    List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
+                    for (ALittleMethodParamOneDec oneDec : oneDecList) {
+                        ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                        GuessTypeInfo GuessInfo = guessTypeString(element, allType, deepGuess);
+                        typeList.add(GuessInfo.value);
+                        info.functorParamList.add(GuessInfo);
                     }
                 }
-                info.value += String.join(",", type_list) + ")";
-                type_list = new ArrayList<>();
+                info.value += String.join(",", typeList) + ")";
+                typeList = new ArrayList<>();
                 // 添加返回值列表
-                ALittleMethodReturnDec return_dec = class_method_dec.getMethodReturnDec();
-                if (return_dec != null) {
-                    List<ALittleMethodReturnTypeDec> return_type_dec_list = return_dec.getMethodReturnTypeDecList();
-                    for (ALittleMethodReturnTypeDec return_type_dec : return_type_dec_list) {
-                        ALittleAllType all_type = return_type_dec.getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
-                        if (guess_info == null) return null;
-                        type_list.add(guess_info.value);
-                        info.functor_return_list.add(guess_info);
+                ALittleMethodReturnDec returnDec = classMethodDec.getMethodReturnDec();
+                if (returnDec != null) {
+                    List<ALittleMethodReturnTypeDec> returnTypeDecList = returnDec.getMethodReturnTypeDecList();
+                    for (ALittleMethodReturnTypeDec returnTypeDec : returnTypeDecList) {
+                        ALittleAllType allType = returnTypeDec.getAllType();
+                        GuessTypeInfo GuessInfo = guessTypeString(element, allType, deepGuess);
+                        typeList.add(GuessInfo.value);
+                        info.functorReturnList.add(GuessInfo);
                     }
                 }
-                if (!type_list.isEmpty()) info.value += ":";
-                info.value += String.join(",", type_list) + ">";
+                if (!typeList.isEmpty()) info.value += ":";
+                info.value += String.join(",", typeList) + ">";
                 return info;
             } else if (parent instanceof ALittleClassStaticDec) {
-                ALittleClassStaticDec class_static_dec = (ALittleClassStaticDec) parent;
+                ALittleClassStaticDec classStaticDec = (ALittleClassStaticDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
-                info.functor_await = class_static_dec.getCoroutineModifier() != null && class_static_dec.getCoroutineModifier().getText().equals("await");
-                if (info.functor_await) {
+                info.functorAwait = classStaticDec.getCoroutineModifier() != null && classStaticDec.getCoroutineModifier().getText().equals("await");
+                if (info.functorAwait) {
                     info.value = "Functor<await(";
                 }
-                info.functor_param_list = new ArrayList<>();
-                info.functor_return_list = new ArrayList<>();
+                info.functorParamList = new ArrayList<>();
+                info.functorReturnList = new ArrayList<>();
 
-                List<String> type_list = new ArrayList<>();
-                ALittleMethodParamDec param_dec = class_static_dec.getMethodParamDec();
-                if (param_dec != null) {
-                    List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                    for (ALittleMethodParamOneDec one_dec : one_dec_list) {
-                        ALittleAllType all_type = one_dec.getMethodParamTypeDec().getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
-                        if (guess_info == null) return null;
-                        type_list.add(guess_info.value);
-                        info.functor_param_list.add(guess_info);
+                List<String> typeList = new ArrayList<>();
+                ALittleMethodParamDec paramDec = classStaticDec.getMethodParamDec();
+                if (paramDec != null) {
+                    List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
+                    for (ALittleMethodParamOneDec oneDec : oneDecList) {
+                        ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                        GuessTypeInfo GuessInfo = guessTypeString(element, allType, deepGuess);
+                        typeList.add(GuessInfo.value);
+                        info.functorParamList.add(GuessInfo);
                     }
                 }
-                info.value += String.join(",", type_list) + ")";
-                type_list = new ArrayList<>();
-                ALittleMethodReturnDec return_dec = class_static_dec.getMethodReturnDec();
-                if (return_dec != null) {
-                    List<ALittleMethodReturnTypeDec> return_type_dec_list = return_dec.getMethodReturnTypeDecList();
-                    for (ALittleMethodReturnTypeDec return_type_dec : return_type_dec_list) {
-                        ALittleAllType all_type = return_type_dec.getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
-                        if (guess_info == null) return null;
-                        type_list.add(guess_info.value);
-                        info.functor_return_list.add(guess_info);
+                info.value += String.join(",", typeList) + ")";
+                typeList = new ArrayList<>();
+                ALittleMethodReturnDec returnDec = classStaticDec.getMethodReturnDec();
+                if (returnDec != null) {
+                    List<ALittleMethodReturnTypeDec> returnTypeDecList = returnDec.getMethodReturnTypeDecList();
+                    for (ALittleMethodReturnTypeDec returnTypeDec : returnTypeDecList) {
+                        ALittleAllType allType = returnTypeDec.getAllType();
+                        GuessTypeInfo GuessInfo = guessTypeString(element, allType, deepGuess);
+                        typeList.add(GuessInfo.value);
+                        info.functorReturnList.add(GuessInfo);
                     }
                 }
-                if (!type_list.isEmpty()) info.value += ":";
-                info.value += String.join(",", type_list) + ">";
+                if (!typeList.isEmpty()) info.value += ":";
+                info.value += String.join(",", typeList) + ">";
                 return info;
             } else if (parent instanceof ALittleGlobalMethodDec) {
-                ALittleGlobalMethodDec global_method_dec = (ALittleGlobalMethodDec) parent;
+                ALittleGlobalMethodDec globalMethodDec = (ALittleGlobalMethodDec) parent;
 
                 GuessTypeInfo info = new GuessTypeInfo();
                 info.type = GuessType.GT_FUNCTOR;
                 info.value = "Functor<(";
-                info.functor_await = global_method_dec.getCoroutineModifier() != null && global_method_dec.getCoroutineModifier().getText().equals("await");
-                if (info.functor_await) {
+                info.functorAwait = globalMethodDec.getCoroutineModifier() != null && globalMethodDec.getCoroutineModifier().getText().equals("await");
+                if (info.functorAwait) {
                     info.value = "Functor<await(";
                 }
-                info.functor_param_list = new ArrayList<>();
-                info.functor_return_list = new ArrayList<>();
+                info.functorParamList = new ArrayList<>();
+                info.functorReturnList = new ArrayList<>();
 
-                List<String> type_list = new ArrayList<>();
-                ALittleMethodParamDec param_dec = global_method_dec.getMethodParamDec();
-                if (param_dec != null) {
-                    List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                    for (ALittleMethodParamOneDec one_dec : one_dec_list) {
-                        ALittleAllType all_type = one_dec.getMethodParamTypeDec().getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
-                        if (guess_info == null) return null;
-                        type_list.add(guess_info.value);
-                        info.functor_param_list.add(guess_info);
+                List<String> typeList = new ArrayList<>();
+                ALittleMethodParamDec paramDec = globalMethodDec.getMethodParamDec();
+                if (paramDec != null) {
+                    List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
+                    for (ALittleMethodParamOneDec oneDec : oneDecList) {
+                        ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                        GuessTypeInfo GuessInfo = guessTypeString(element, allType, deepGuess);
+                        typeList.add(GuessInfo.value);
+                        info.functorParamList.add(GuessInfo);
                     }
                 }
-                info.value += String.join(",", type_list) + ")";
-                type_list = new ArrayList<>();
-                ALittleMethodReturnDec return_dec = global_method_dec.getMethodReturnDec();
-                if (return_dec != null) {
-                    List<ALittleMethodReturnTypeDec> return_type_dec_list = return_dec.getMethodReturnTypeDecList();
-                    for (ALittleMethodReturnTypeDec return_type_dec : return_type_dec_list) {
-                        ALittleAllType all_type = return_type_dec.getAllType();
-                        GuessTypeInfo guess_info = guessTypeString(element, all_type, deep_guess, error_content_list, error_element_list);
-                        if (guess_info == null) return null;
-                        type_list.add(guess_info.value);
-                        info.functor_return_list.add(guess_info);
+                info.value += String.join(",", typeList) + ")";
+                typeList = new ArrayList<>();
+                ALittleMethodReturnDec returnDec = globalMethodDec.getMethodReturnDec();
+                if (returnDec != null) {
+                    List<ALittleMethodReturnTypeDec> returnTypeDecList = returnDec.getMethodReturnTypeDecList();
+                    for (ALittleMethodReturnTypeDec returnTypeDec : returnTypeDecList) {
+                        ALittleAllType allType = returnTypeDec.getAllType();
+                        GuessTypeInfo GuessInfo = guessTypeString(element, allType, deepGuess);
+                        typeList.add(GuessInfo.value);
+                        info.functorReturnList.add(GuessInfo);
                     }
                 }
-                if (!type_list.isEmpty()) info.value += ":";
-                info.value += String.join(",", type_list) + ">";
+                if (!typeList.isEmpty()) info.value += ":";
+                info.value += String.join(",", typeList) + ">";
                 return info;
             }
         } else if (element instanceof ALittleBindStat) {
             ALittleBindStat bind_stat = (ALittleBindStat)element;
 
-            List<ALittleValueStat> value_stat_list = bind_stat.getValueStatList();
-            if (value_stat_list.isEmpty()) {
-                error_content_list.add("bind 表达式不能没有参数");
-                error_element_list.add(bind_stat);
-                return null;
+            List<ALittleValueStat> valueStatList = bind_stat.getValueStatList();
+            if (valueStatList.isEmpty()) {
+                throw new ALittleElementException(bind_stat, "bind 表达式不能没有参数");
             }
 
-            ALittleValueStat value_stat = value_stat_list.get(0);
+            ALittleValueStat valueStat = valueStatList.get(0);
             // 第一个参数必须是函数
-            PsiElement value_stat_guess = ALittleUtil.guessSoftType(value_stat, value_stat, error_content_list, error_element_list);
-            if (value_stat_guess == null) {
-                return null;
-            }
-            ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(value_stat, value_stat_guess, null, error_content_list, error_element_list);
-            if (guess_info == null) {
-                return null;
-            }
-            if (guess_info.type != ALittleUtil.GuessType.GT_FUNCTOR) {
-                error_content_list.add("bind 表达式第一个参数必须是一个函数");
-                error_element_list.add(value_stat);
-                return null;
+            PsiElement valueStat_guess = ALittleUtil.guessSoftType(valueStat, valueStat);
+            ALittleUtil.GuessTypeInfo GuessInfo = ALittleUtil.guessTypeString(valueStat, valueStat_guess, null);
+            if (GuessInfo.type != ALittleUtil.GuessType.GT_FUNCTOR) {
+                throw new ALittleElementException(valueStat, "bind 表达式第一个参数必须是一个函数");
             }
             GuessTypeInfo info = new GuessTypeInfo();
             info.type = GuessType.GT_FUNCTOR;
             info.value = "Functor<(";
-            info.functor_await = guess_info.functor_await;
-            if (info.functor_await) {
+            info.functorAwait = GuessInfo.functorAwait;
+            if (info.functorAwait) {
                 info.value = "Functor<await(";
             }
-            info.functor_param_list = guess_info.functor_param_list;
-            info.functor_return_list = guess_info.functor_return_list;
-            int param_count = value_stat_list.size() - 1;
+            info.functorParamList = GuessInfo.functorParamList;
+            info.functorReturnList = GuessInfo.functorReturnList;
+            int param_count = valueStatList.size() - 1;
             while (param_count > 0) {
-                info.functor_param_list.remove(0);
+                info.functorParamList.remove(0);
                 --param_count;
             }
-            List<String> name_list = new ArrayList<>();
-            for (GuessTypeInfo param_info : info.functor_param_list) {
-                name_list.add(param_info.value);
+            List<String> nameList = new ArrayList<>();
+            for (GuessTypeInfo param_info : info.functorParamList) {
+                nameList.add(param_info.value);
             }
-            info.value += String.join(",", name_list);
+            info.value += String.join(",", nameList);
             info.value += ")";
 
-            name_list = new ArrayList<>();
-            for (GuessTypeInfo param_info : info.functor_return_list) {
-                name_list.add(param_info.value);
+            nameList = new ArrayList<>();
+            for (GuessTypeInfo param_info : info.functorReturnList) {
+                nameList.add(param_info.value);
             }
-            if (!name_list.isEmpty()) info.value += ":";
-            info.value += String.join(",", name_list);
+            if (!nameList.isEmpty()) info.value += ":";
+            info.value += String.join(",", nameList);
             info.value += ">";
             return info;
         } else if (element instanceof ALittleOpNewList) {
-            ALittleOpNewList op_new_list = (ALittleOpNewList)element;
-            List<ALittleValueStat> value_stat_list = op_new_list.getValueStatList();
-            if (value_stat_list.isEmpty()) {
+            ALittleOpNewList opNewList = (ALittleOpNewList)element;
+            List<ALittleValueStat> valueStatList = opNewList.getValueStatList();
+            if (valueStatList.isEmpty()) {
                 GuessTypeInfo info = new GuessTypeInfo();
-                info.type = GuessType.GT_LIST;
+                info.type = GuessType.GTList;
                 info.value = "List<any>";
-                info.list_sub_type = new GuessTypeInfo();
-                info.list_sub_type.type = GuessType.GT_PRIMITIVE;
-                info.list_sub_type.value = "any";
+                info.listSubType = new GuessTypeInfo();
+                info.listSubType.type = GuessType.GT_PRIMITIVE;
+                info.listSubType.value = "any";
                 return info;
             }
-            GuessTypeInfo guess_info = guessTypeString(element, value_stat_list.get(0), deep_guess, error_content_list, error_element_list);
-            if (guess_info == null) return null;
+            GuessTypeInfo GuessInfo = guessTypeString(element, valueStatList.get(0), deepGuess);
 
             GuessTypeInfo info = new GuessTypeInfo();
-            info.type = GuessType.GT_LIST;
-            info.value = "List<" + guess_info.value + ">";
-            info.list_sub_type = guess_info;
+            info.type = GuessType.GTList;
+            info.value = "List<" + GuessInfo.value + ">";
+            info.listSubType = GuessInfo;
             return info;
         } else if (element instanceof ALittleValueStat) {
-            ALittleValueStat value_stat = (ALittleValueStat)element;
-            PsiElement guess_type = guessSoftType(src, value_stat, error_content_list, error_element_list);
-            if (guess_type == null) return null;
+            ALittleValueStat valueStat = (ALittleValueStat)element;
+            PsiElement guessType = guessSoftType(src, valueStat);
 
-            return guessTypeString(src, guess_type, deep_guess, error_content_list, error_element_list);
+            return guessTypeString(src, guessType, deepGuess);
         }
 
-        error_content_list.add("未知的表达式");
-        error_element_list.add(src);
-        return null;
+        throw new ALittleElementException(src, "未知的表达式");
     }
 
-    public static GuessTypeInfo guessTypeString(PsiElement src, ALittleGenericType generic_type, HashSet<PsiElement> deep_guess
-            , @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        if (generic_type.getGenericListType() != null) {
-            ALittleGenericListType dec = generic_type.getGenericListType();
-            GuessTypeInfo guess_info = guessTypeString(src, dec.getAllType(), deep_guess, error_content_list, error_element_list);
-            if (guess_info == null) return null;
+    @NotNull
+    public static GuessTypeInfo guessTypeString(PsiElement src, ALittleGenericType genericType, HashSet<PsiElement> deepGuess) throws ALittleElementException {
+        if (genericType.getGenericListType() != null) {
+            ALittleGenericListType dec = genericType.getGenericListType();
+            GuessTypeInfo GuessInfo = guessTypeString(src, dec.getAllType(), deepGuess);
 
             GuessTypeInfo info = new GuessTypeInfo();
-            info.type = GuessType.GT_LIST;
-            info.value = "List<" + guess_info.value + ">";
-            info.list_sub_type = guess_info;
+            info.type = GuessType.GTList;
+            info.value = "List<" + GuessInfo.value + ">";
+            info.listSubType = GuessInfo;
             return info;
-        } else if (generic_type.getGenericMapType() != null) {
-            ALittleGenericMapType dec = generic_type.getGenericMapType();
-            List<ALittleAllType> all_type_list = dec.getAllTypeList();
-            if (all_type_list.size() != 2) return null;
-            GuessTypeInfo key_guess_info = guessTypeString(src, all_type_list.get(0), deep_guess, error_content_list, error_element_list);
-            GuessTypeInfo value_guess_info = guessTypeString(src, all_type_list.get(1), deep_guess, error_content_list, error_element_list);
-            if (key_guess_info == null || value_guess_info == null) return null;
+        } else if (genericType.getGenericMapType() != null) {
+            ALittleGenericMapType dec = genericType.getGenericMapType();
+            List<ALittleAllType> allTypeList = dec.getAllTypeList();
+            if (allTypeList.size() != 2) return null;
+            GuessTypeInfo key_GuessInfo = guessTypeString(src, allTypeList.get(0), deepGuess);
+            GuessTypeInfo value_GuessInfo = guessTypeString(src, allTypeList.get(1), deepGuess);
 
             GuessTypeInfo info = new GuessTypeInfo();
             info.type = GuessType.GT_MAP;
-            info.value = "Map<" + key_guess_info.value + "," + value_guess_info.value + ">";
-            info.map_key_type = key_guess_info;
-            info.map_value_type = value_guess_info;
+            info.value = "Map<" + key_GuessInfo.value + "," + value_GuessInfo.value + ">";
+            info.mapKeyType = key_GuessInfo;
+            info.mapValueType = value_GuessInfo;
             return info;
-        } else if (generic_type.getGenericFunctorType() != null) {
-            ALittleGenericFunctorType dec = generic_type.getGenericFunctorType();
+        } else if (genericType.getGenericFunctorType() != null) {
+            ALittleGenericFunctorType dec = genericType.getGenericFunctorType();
             ALittleGenericFunctorParamType param_type = dec.getGenericFunctorParamType();
 
             GuessTypeInfo info = new GuessTypeInfo();
             info.type = GuessType.GT_FUNCTOR;
             info.value = "Functor<(";
-            info.functor_param_list = new ArrayList<>();
-            info.functor_return_list = new ArrayList<>();
+            info.functorParamList = new ArrayList<>();
+            info.functorReturnList = new ArrayList<>();
 
             if (param_type != null) {
-                List<String> name_list = new ArrayList<>();
-                List<ALittleAllType> all_type_list = param_type.getAllTypeList();
-                for (ALittleAllType all_type : all_type_list) {
-                    GuessTypeInfo guess_info = guessTypeString(src, all_type, deep_guess, error_content_list, error_element_list);
-                    if (guess_info == null) return null;
-                    name_list.add(guess_info.value);
-                    info.functor_param_list.add(guess_info);
+                List<String> nameList = new ArrayList<>();
+                List<ALittleAllType> allTypeList = param_type.getAllTypeList();
+                for (ALittleAllType allType : allTypeList) {
+                    GuessTypeInfo GuessInfo = guessTypeString(src, allType, deepGuess);
+                    nameList.add(GuessInfo.value);
+                    info.functorParamList.add(GuessInfo);
                 }
-                info.value += String.join(",", name_list);
+                info.value += String.join(",", nameList);
             }
             info.value += ")";
             ALittleGenericFunctorReturnType return_type = dec.getGenericFunctorReturnType();
             if (return_type != null) {
-                List<String> name_list = new ArrayList<>();
-                List<ALittleAllType> all_type_list = return_type.getAllTypeList();
-                for (ALittleAllType all_type : all_type_list) {
-                    GuessTypeInfo guess_info = guessTypeString(src, all_type, deep_guess, error_content_list, error_element_list);
-                    if (guess_info == null) return null;
-                    name_list.add(guess_info.value);
-                    info.functor_return_list.add(guess_info);
+                List<String> nameList = new ArrayList<>();
+                List<ALittleAllType> allTypeList = return_type.getAllTypeList();
+                for (ALittleAllType allType : allTypeList) {
+                    GuessTypeInfo GuessInfo = guessTypeString(src, allType, deepGuess);
+                    nameList.add(GuessInfo.value);
+                    info.functorReturnList.add(GuessInfo);
                 }
-                if (!name_list.isEmpty()) info.value += ":";
-                info.value += String.join(",", name_list);
+                if (!nameList.isEmpty()) info.value += ":";
+                info.value += String.join(",", nameList);
             }
             info.value += ">";
             return info;
         }
-        error_content_list.add("未知的表达式");
-        error_element_list.add(src);
-        return null;
+
+        throw new ALittleElementException(src, "未知的表达式");
     }
 
-    public static GuessTypeInfo guessTypeString(PsiElement src, ALittleAllType all_type, HashSet<PsiElement> deep_guess
-            , @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        PsiElement element = guessType(all_type);
-        if (element == null) {
-            error_content_list.add("未知的表达式");
-            error_element_list.add(src);
-            return null;
-        }
-        return guessTypeString(src, element, deep_guess, error_content_list, error_element_list);
+    @NotNull
+    public static GuessTypeInfo guessTypeString(PsiElement src, ALittleAllType allType, HashSet<PsiElement> deepGuess) throws ALittleElementException {
+        PsiElement element = guessType(allType);
+        return guessTypeString(src, element, deepGuess);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public static PsiElement guessSoftTypeForOp8Impl(String op_string
-                                                    , PsiElement left_src, PsiElement left_guess
-                                                    , PsiElement right_src, PsiElement right_guess
-                                                    , ALittleOp8Suffix op_8_suffix
-                                                    , @NotNull List<String> error_content_list
-                                                    , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
-        if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
-        if (right_guess_info == null) return null;
 
-        if (left_guess_info.value.equals("any")) return left_guess;
-        if (right_guess_info.value.equals("any")) return right_guess;
+    @NotNull
+    public static PsiElement guessSoftTypeForOp8Impl(String opString
+                                                    , PsiElement leftSrc, PsiElement leftGuess
+                                                    , PsiElement rightSrc, PsiElement rightGuess
+                                                    , ALittleOp8Suffix op8Suffix) throws ALittleElementException {
+        GuessTypeInfo leftGuessInfo = guessTypeString(leftSrc, leftGuess, null);
+        GuessTypeInfo rightGuessInfo = guessTypeString(rightSrc, rightGuess, null);
 
-        if (!left_guess_info.value.equals("bool"))
-        {
-            error_content_list.add(op_string + "运算符左边必须是bool或者any类型.不能是:" + left_guess_info.value);
-            error_element_list.add(left_src);
-            return null;
+        if (leftGuessInfo.value.equals("any")) return leftGuess;
+        if (rightGuessInfo.value.equals("any")) return rightGuess;
+
+        if (!leftGuessInfo.value.equals("bool")) {
+            throw new ALittleElementException(leftSrc, opString + "运算符左边必须是bool或者any类型.不能是:" + leftGuessInfo.value);
         }
 
-        if (!right_guess_info.value.equals("bool"))
-        {
-            error_content_list.add(op_string + "运算符右边边必须是bool或者any类型.不能是:" + right_guess_info.value);
-            error_element_list.add(right_src);
-            return null;
+        if (!rightGuessInfo.value.equals("bool")) {
+            throw new ALittleElementException(rightSrc, opString + "运算符右边边必须是bool或者any类型.不能是:" + rightGuessInfo.value);
         }
 
-        return left_guess;
+        return leftGuess;
 
     }
-    public static PsiElement guessSoftTypeForOp8(PsiElement left_src, PsiElement left_guess, ALittleOp8Suffix op_8_suffix, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        String op_string = op_8_suffix.getOp8().getText();
+    @NotNull
+    public static PsiElement guessSoftTypeForOp8(PsiElement leftSrc, PsiElement leftGuess, ALittleOp8Suffix op8Suffix) throws ALittleElementException {
+        String opString = op8Suffix.getOp8().getText();
 
-        PsiElement value_factor_guess = null;
-        PsiElement last_src = null;
-        if (op_8_suffix.getValueFactor() != null) {
-            ALittleValueFactor value_factor = op_8_suffix.getValueFactor();
-            value_factor_guess = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = value_factor;
-        } else if (op_8_suffix.getOp2Value() != null) {
-            ALittleOp2Value op_2_value = op_8_suffix.getOp2Value();
-            value_factor_guess = guessSoftType(op_2_value, op_2_value, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = op_2_value;
+        PsiElement valueFactor_guess = null;
+        PsiElement lastSrc = null;
+        if (op8Suffix.getValueFactor() != null) {
+            ALittleValueFactor valueFactor = op8Suffix.getValueFactor();
+            valueFactor_guess = guessSoftType(valueFactor, valueFactor);
+            lastSrc = valueFactor;
+        } else if (op8Suffix.getOp2Value() != null) {
+            ALittleOp2Value op2Value = op8Suffix.getOp2Value();
+            valueFactor_guess = guessSoftType(op2Value, op2Value);
+            lastSrc = op2Value;
         }
 
-        PsiElement suffix_guess_type = value_factor_guess;
-        List<ALittleOp8SuffixEe> suffix_ee_list = op_8_suffix.getOp8SuffixEeList();
-        for (ALittleOp8SuffixEe suffix_ee : suffix_ee_list) {
-            if (suffix_ee.getOp3Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp3(last_src, suffix_guess_type, suffix_ee.getOp3Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp3Suffix();
-            } else if (suffix_ee.getOp4Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp4(last_src, suffix_guess_type, suffix_ee.getOp4Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp4Suffix();
-            } else if (suffix_ee.getOp5Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp5(last_src, suffix_guess_type, suffix_ee.getOp5Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp5Suffix();
-            } else if (suffix_ee.getOp6Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp6(last_src, suffix_guess_type, suffix_ee.getOp6Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp6Suffix();
-            } else if (suffix_ee.getOp7Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp7(last_src, suffix_guess_type, suffix_ee.getOp7Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp7Suffix();
+        PsiElement suffixGuessType = valueFactor_guess;
+        List<ALittleOp8SuffixEe> suffixEEList = op8Suffix.getOp8SuffixEeList();
+        for (ALittleOp8SuffixEe suffixEE : suffixEEList) {
+            if (suffixEE.getOp3Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp3(lastSrc, suffixGuessType, suffixEE.getOp3Suffix());
+                lastSrc = suffixEE.getOp3Suffix();
+            } else if (suffixEE.getOp4Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp4(lastSrc, suffixGuessType, suffixEE.getOp4Suffix());
+                lastSrc = suffixEE.getOp4Suffix();
+            } else if (suffixEE.getOp5Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp5(lastSrc, suffixGuessType, suffixEE.getOp5Suffix());
+                lastSrc = suffixEE.getOp5Suffix();
+            } else if (suffixEE.getOp6Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp6(lastSrc, suffixGuessType, suffixEE.getOp6Suffix());
+                lastSrc = suffixEE.getOp6Suffix();
+            } else if (suffixEE.getOp7Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp7(lastSrc, suffixGuessType, suffixEE.getOp7Suffix());
+                lastSrc = suffixEE.getOp7Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ee);
-                return null;
+                throw new ALittleElementException(suffixEE, "未知的表达式");
             }
         }
 
-        return guessSoftTypeForOp8Impl(op_string, left_src, left_guess, last_src, suffix_guess_type, op_8_suffix, error_content_list, error_element_list);
+        return guessSoftTypeForOp8Impl(opString, leftSrc, leftGuess, lastSrc, suffixGuessType, op8Suffix);
     }
 
-    public static PsiElement guessSoftTypeForOp7Impl(String op_string
-                                                    , PsiElement left_src, PsiElement left_guess
-                                                    , PsiElement right_src, PsiElement right_guess
-                                                    , ALittleOp7Suffix op_7_suffix
-                                                    , @NotNull List<String> error_content_list
-                                                    , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
-        if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
-        if (right_guess_info == null) return null;
+    @NotNull
+    public static PsiElement guessSoftTypeForOp7Impl(String opString
+                                                    , PsiElement leftSrc, PsiElement leftGuess
+                                                    , PsiElement rightSrc, PsiElement rightGuess
+                                                    , ALittleOp7Suffix op_7_suffix) throws ALittleElementException {
+        GuessTypeInfo leftGuessInfo = guessTypeString(leftSrc, leftGuess, null);
+        GuessTypeInfo rightGuessInfo = guessTypeString(rightSrc, rightGuess, null);
 
-        if (left_guess_info.value.equals("any")) return left_guess;
-        if (right_guess_info.value.equals("any")) return right_guess;
+        if (leftGuessInfo.value.equals("any")) return leftGuess;
+        if (rightGuessInfo.value.equals("any")) return rightGuess;
 
-        if (!left_guess_info.value.equals("bool"))
-        {
-            error_content_list.add(op_string + "运算符左边必须是bool或者any类型.不能是:" + left_guess_info.value);
-            error_element_list.add(left_src);
-            return null;
+        if (!leftGuessInfo.value.equals("bool")) {
+            throw new ALittleElementException(leftSrc, opString + "运算符左边必须是bool或者any类型.不能是:" + leftGuessInfo.value);
         }
 
-        if (!right_guess_info.value.equals("bool"))
-        {
-            error_content_list.add(op_string + "运算符右边边必须是bool或者any类型.不能是:" + right_guess_info.value);
-            error_element_list.add(right_src);
-            return null;
+        if (!rightGuessInfo.value.equals("bool")) {
+            throw new ALittleElementException(rightSrc, opString + "运算符右边边必须是bool或者any类型.不能是:" + rightGuessInfo.value);
         }
 
-        return left_guess;
+        return leftGuess;
     }
 
-    public static PsiElement guessSoftTypeForOp7(PsiElement left_src, PsiElement left_guess, ALittleOp7Suffix op_7_suffix, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        String op_string = op_7_suffix.getOp7().getText();
+    @NotNull
+    public static PsiElement guessSoftTypeForOp7(PsiElement leftSrc, PsiElement leftGuess, ALittleOp7Suffix op_7_suffix) throws ALittleElementException {
+        String opString = op_7_suffix.getOp7().getText();
 
-        PsiElement value_factor_guess = null;
-        PsiElement last_src = null;
+        PsiElement valueFactor_guess = null;
+        PsiElement lastSrc = null;
         if (op_7_suffix.getValueFactor() != null) {
-            ALittleValueFactor value_factor = op_7_suffix.getValueFactor();
-            value_factor_guess = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = value_factor;
+            ALittleValueFactor valueFactor = op_7_suffix.getValueFactor();
+            valueFactor_guess = guessSoftType(valueFactor, valueFactor);
+            lastSrc = valueFactor;
         } else if (op_7_suffix.getOp2Value() != null) {
-            ALittleOp2Value op_2_value = op_7_suffix.getOp2Value();
-            value_factor_guess = guessSoftType(op_2_value, op_2_value, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = op_2_value;
+            ALittleOp2Value op2Value = op_7_suffix.getOp2Value();
+            valueFactor_guess = guessSoftType(op2Value, op2Value);
+            lastSrc = op2Value;
         }
 
-        PsiElement suffix_guess_type = value_factor_guess;
-        List<ALittleOp7SuffixEe> suffix_ee_list = op_7_suffix.getOp7SuffixEeList();
-        for (ALittleOp7SuffixEe suffix_ee : suffix_ee_list) {
-            if (suffix_ee.getOp3Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp3(last_src, suffix_guess_type, suffix_ee.getOp3Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp3Suffix();
-            } else if (suffix_ee.getOp4Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp4(last_src, suffix_guess_type, suffix_ee.getOp4Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp4Suffix();
-            } else if (suffix_ee.getOp5Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp5(last_src, suffix_guess_type, suffix_ee.getOp5Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp5Suffix();
-            } else if (suffix_ee.getOp6Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp6(last_src, suffix_guess_type, suffix_ee.getOp6Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp6Suffix();
+        PsiElement suffixGuessType = valueFactor_guess;
+        List<ALittleOp7SuffixEe> suffixEEList = op_7_suffix.getOp7SuffixEeList();
+        for (ALittleOp7SuffixEe suffixEE : suffixEEList) {
+            if (suffixEE.getOp3Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp3(lastSrc, suffixGuessType, suffixEE.getOp3Suffix());
+                lastSrc = suffixEE.getOp3Suffix();
+            } else if (suffixEE.getOp4Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp4(lastSrc, suffixGuessType, suffixEE.getOp4Suffix());
+                lastSrc = suffixEE.getOp4Suffix();
+            } else if (suffixEE.getOp5Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp5(lastSrc, suffixGuessType, suffixEE.getOp5Suffix());
+                lastSrc = suffixEE.getOp5Suffix();
+            } else if (suffixEE.getOp6Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp6(lastSrc, suffixGuessType, suffixEE.getOp6Suffix());
+                lastSrc = suffixEE.getOp6Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ee);
-                return null;
+                throw new ALittleElementException(suffixEE, "未知的表达式");
             }
         }
-        return guessSoftTypeForOp7Impl(op_string, left_src, left_guess, last_src, suffix_guess_type, op_7_suffix, error_content_list, error_element_list);
+        return guessSoftTypeForOp7Impl(opString, leftSrc, leftGuess, lastSrc, suffixGuessType, op_7_suffix);
     }
 
-    public static PsiElement guessSoftTypeForOp6Impl(String op_string
-                                                    , PsiElement left_src, PsiElement left_guess
-                                                    , PsiElement right_src, PsiElement right_guess
-                                                    , ALittleOp6Suffix op_6_suffix
-                                                    , @NotNull List<String> error_content_list
-                                                    , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
-        if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
-        if (right_guess_info == null) return null;
+    @NotNull
+    public static PsiElement guessSoftTypeForOp6Impl(String opString
+                                                    , PsiElement leftSrc, PsiElement leftGuess
+                                                    , PsiElement rightSrc, PsiElement rightGuess
+                                                    , ALittleOp6Suffix op6Suffix) throws ALittleElementException {
+        GuessTypeInfo leftGuessInfo = guessTypeString(leftSrc, leftGuess, null);
+        GuessTypeInfo rightGuessInfo = guessTypeString(rightSrc, rightGuess, null);
 
-        if (left_guess_info.value.equals("any")) return left_guess;
-        if (right_guess_info.value.equals("any")) return right_guess;
+        if (leftGuessInfo.value.equals("any")) return leftGuess;
+        if (rightGuessInfo.value.equals("any")) return rightGuess;
 
-        if (op_string.equals("==") || op_string.equals("!=")) {
-            return op_6_suffix;
+        if (opString.equals("==") || opString.equals("!=")) {
+            return op6Suffix;
         } else {
-            if (left_guess_info.value.equals("int") || left_guess_info.value.equals("I64") || left_guess_info.value.equals("double")) {
-                if (right_guess_info.value.equals("int") || right_guess_info.value.equals("I64") || right_guess_info.value.equals("double")) {
-                    return op_6_suffix;
+            if (leftGuessInfo.value.equals("int") || leftGuessInfo.value.equals("I64") || leftGuessInfo.value.equals("double")) {
+                if (rightGuessInfo.value.equals("int") || rightGuessInfo.value.equals("I64") || rightGuessInfo.value.equals("double")) {
+                    return op6Suffix;
                 }
 
-                error_content_list.add(op_string + "运算符左边是数字，那么右边必须是int,double,any类型.不能是:" + right_guess_info.value);
-                error_element_list.add(right_src);
-                return null;
+                throw new ALittleElementException(rightSrc, opString + "运算符左边是数字，那么右边必须是int,double,any类型.不能是:" + rightGuessInfo.value);
             }
 
-            if (left_guess_info.value.equals("string")) {
-                if (right_guess_info.value.equals("string")) {
-                    return op_6_suffix;
+            if (leftGuessInfo.value.equals("string")) {
+                if (rightGuessInfo.value.equals("string")) {
+                    return op6Suffix;
                 }
-                error_content_list.add(op_string + "运算符左边是字符串，那么右边必须是string,any类型.不能是:" + right_guess_info.value);
-                error_element_list.add(right_src);
-                return null;
+                
+                throw new ALittleElementException(rightSrc, opString + "运算符左边是字符串，那么右边必须是string,any类型.不能是:" + rightGuessInfo.value);
             }
 
-            error_content_list.add(op_string + "运算符左边必须是int,double,string,any类型.不能是:" + left_guess_info.value);
-            error_element_list.add(left_src);
-            return null;
+            throw new ALittleElementException(leftSrc, opString + "运算符左边必须是int,double,string,any类型.不能是:" + leftGuessInfo.value);
         }
     }
 
-    public static PsiElement guessSoftTypeForOp6(PsiElement left_src, PsiElement left_guess, ALittleOp6Suffix op_6_suffix, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        String op_string = op_6_suffix.getOp6().getText();
+    @NotNull
+    public static PsiElement guessSoftTypeForOp6(PsiElement leftSrc, PsiElement leftGuess, ALittleOp6Suffix op6Suffix) throws ALittleElementException {
+        String opString = op6Suffix.getOp6().getText();
 
-        PsiElement value_factor_guess = null;
-        PsiElement last_src = null;
-        if (op_6_suffix.getValueFactor() != null) {
-            ALittleValueFactor value_factor = op_6_suffix.getValueFactor();
-            value_factor_guess = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = value_factor;
-        } else if (op_6_suffix.getOp2Value() != null) {
-            ALittleOp2Value op_2_value = op_6_suffix.getOp2Value();
-            value_factor_guess = guessSoftType(op_2_value, op_2_value, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = op_2_value;
+        PsiElement valueFactor_guess = null;
+        PsiElement lastSrc = null;
+        if (op6Suffix.getValueFactor() != null) {
+            ALittleValueFactor valueFactor = op6Suffix.getValueFactor();
+            valueFactor_guess = guessSoftType(valueFactor, valueFactor);
+            lastSrc = valueFactor;
+        } else if (op6Suffix.getOp2Value() != null) {
+            ALittleOp2Value op2Value = op6Suffix.getOp2Value();
+            valueFactor_guess = guessSoftType(op2Value, op2Value);
+            lastSrc = op2Value;
         }
 
-        PsiElement suffix_guess_type = value_factor_guess;
-        List<ALittleOp6SuffixEe> suffix_ee_list = op_6_suffix.getOp6SuffixEeList();
-        for (ALittleOp6SuffixEe suffix_ee : suffix_ee_list) {
-            if (suffix_ee.getOp3Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp3(last_src, suffix_guess_type, suffix_ee.getOp3Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp3Suffix();
-            } else if (suffix_ee.getOp4Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp4(last_src, suffix_guess_type, suffix_ee.getOp4Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp4Suffix();
-            } else if (suffix_ee.getOp5Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp5(last_src, suffix_guess_type, suffix_ee.getOp5Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp5Suffix();
+        PsiElement suffixGuessType = valueFactor_guess;
+        List<ALittleOp6SuffixEe> suffixEEList = op6Suffix.getOp6SuffixEeList();
+        for (ALittleOp6SuffixEe suffixEE : suffixEEList) {
+            if (suffixEE.getOp3Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp3(lastSrc, suffixGuessType, suffixEE.getOp3Suffix());
+                lastSrc = suffixEE.getOp3Suffix();
+            } else if (suffixEE.getOp4Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp4(lastSrc, suffixGuessType, suffixEE.getOp4Suffix());
+                lastSrc = suffixEE.getOp4Suffix();
+            } else if (suffixEE.getOp5Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp5(lastSrc, suffixGuessType, suffixEE.getOp5Suffix());
+                lastSrc = suffixEE.getOp5Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ee);
-                return null;
+                throw new ALittleElementException(suffixEE, "未知的表达式");
             }
         }
-        return guessSoftTypeForOp6Impl(op_string, left_src, left_guess, last_src, suffix_guess_type, op_6_suffix, error_content_list, error_element_list);
+        return guessSoftTypeForOp6Impl(opString, leftSrc, leftGuess, lastSrc, suffixGuessType, op6Suffix);
     }
 
-    public static PsiElement guessSoftTypeForOp5Impl(String op_string
-                                                    , PsiElement left_src, PsiElement left_guess
-                                                    , PsiElement right_src, PsiElement right_guess
-                                                    , ALittleOp5Suffix op_5_suffix
-                                                    , @NotNull List<String> error_content_list
-                                                    , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
-        if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
-        if (right_guess_info == null) return null;
+    @NotNull
+    public static PsiElement guessSoftTypeForOp5Impl(String opString
+                                                    , PsiElement leftSrc, PsiElement leftGuess
+                                                    , PsiElement rightSrc, PsiElement rightGuess
+                                                    , ALittleOp5Suffix op5Suffix) throws ALittleElementException {
+        GuessTypeInfo leftGuessInfo = guessTypeString(leftSrc, leftGuess, null);
+        GuessTypeInfo rightGuessInfo = guessTypeString(rightSrc, rightGuess, null);
 
-        if (left_guess_info.value.equals("any")) return left_guess;
-        if (right_guess_info.value.equals("any")) return right_guess;
+        if (leftGuessInfo.value.equals("any")) return leftGuess;
+        if (rightGuessInfo.value.equals("any")) return rightGuess;
 
 
-        boolean left_check = left_guess_info.value.equals("int") || left_guess_info.value.equals("I64") || left_guess_info.value.equals("double") ||  left_guess_info.value.equals("string");
+        boolean left_check = leftGuessInfo.value.equals("int") || leftGuessInfo.value.equals("I64") || leftGuessInfo.value.equals("double") ||  leftGuessInfo.value.equals("string");
         if (!left_check) {
-            error_content_list.add(op_string + "运算符左边必须是int,double,string,any类型.不能是:" + left_guess_info.value);
-            error_element_list.add(left_src);
-            return null;
+            throw new ALittleElementException(leftSrc, opString + "运算符左边必须是int,double,string,any类型.不能是:" + leftGuessInfo.value);
         }
 
-        boolean right_check = right_guess_info.value.equals("int") || right_guess_info.value.equals("I64") || right_guess_info.value.equals("double") ||  right_guess_info.value.equals("string");
+        boolean right_check = rightGuessInfo.value.equals("int") || rightGuessInfo.value.equals("I64") || rightGuessInfo.value.equals("double") ||  rightGuessInfo.value.equals("string");
         if (!right_check) {
-            error_content_list.add(op_string + "运算符右边必须是int,double,string,any类型.不能是:" + right_guess_info.value);
-            error_element_list.add(right_src);
-            return null;
+            throw new ALittleElementException(rightSrc, opString + "运算符右边必须是int,double,string,any类型.不能是:" + rightGuessInfo.value);
         }
 
-        return op_5_suffix;
+        return op5Suffix;
     }
 
-    public static PsiElement guessSoftTypeForOp5(PsiElement left_src, PsiElement left_guess, ALittleOp5Suffix op_5_suffix, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        String op_string = op_5_suffix.getOp5().getText();
+    @NotNull
+    public static PsiElement guessSoftTypeForOp5(PsiElement leftSrc, PsiElement leftGuess, ALittleOp5Suffix op5Suffix) throws ALittleElementException {
+        String opString = op5Suffix.getOp5().getText();
 
-        PsiElement value_factor_guess = null;
-        PsiElement last_src = null;
-        if (op_5_suffix.getValueFactor() != null) {
-            ALittleValueFactor value_factor = op_5_suffix.getValueFactor();
-            value_factor_guess = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = value_factor;
-        } else if (op_5_suffix.getOp2Value() != null) {
-            ALittleOp2Value op_2_value = op_5_suffix.getOp2Value();
-            value_factor_guess = guessSoftType(op_2_value, op_2_value, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = op_2_value;
+        PsiElement valueFactor_guess = null;
+        PsiElement lastSrc = null;
+        if (op5Suffix.getValueFactor() != null) {
+            ALittleValueFactor valueFactor = op5Suffix.getValueFactor();
+            valueFactor_guess = guessSoftType(valueFactor, valueFactor);
+            lastSrc = valueFactor;
+        } else if (op5Suffix.getOp2Value() != null) {
+            ALittleOp2Value op2Value = op5Suffix.getOp2Value();
+            valueFactor_guess = guessSoftType(op2Value, op2Value);
+            lastSrc = op2Value;
         }
 
-        PsiElement suffix_guess_type = value_factor_guess;
-        List<ALittleOp5SuffixEe> suffix_ee_list = op_5_suffix.getOp5SuffixEeList();
-        for (ALittleOp5SuffixEe suffix_ee : suffix_ee_list) {
-            if (suffix_ee.getOp3Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp3(last_src, suffix_guess_type, suffix_ee.getOp3Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp3Suffix();
-            } else if (suffix_ee.getOp4Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp4(last_src, suffix_guess_type, suffix_ee.getOp4Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp4Suffix();
+        PsiElement suffixGuessType = valueFactor_guess;
+        List<ALittleOp5SuffixEe> suffixEEList = op5Suffix.getOp5SuffixEeList();
+        for (ALittleOp5SuffixEe suffixEE : suffixEEList) {
+            if (suffixEE.getOp3Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp3(lastSrc, suffixGuessType, suffixEE.getOp3Suffix());
+                lastSrc = suffixEE.getOp3Suffix();
+            } else if (suffixEE.getOp4Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp4(lastSrc, suffixGuessType, suffixEE.getOp4Suffix());
+                lastSrc = suffixEE.getOp4Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ee);
-                return null;
+                throw new ALittleElementException(suffixEE, "未知的表达式");
             }
         }
 
-        return guessSoftTypeForOp5Impl(op_string, left_src, left_guess, last_src, suffix_guess_type, op_5_suffix, error_content_list, error_element_list);
+        return guessSoftTypeForOp5Impl(opString, leftSrc, leftGuess, lastSrc, suffixGuessType, op5Suffix);
     }
 
-    public static PsiElement guessSoftTypeForOp4Impl(String op_string
-                                                    , PsiElement left_src, PsiElement left_guess
-                                                    , PsiElement right_src, PsiElement right_guess
-                                                    , ALittleOp4Suffix op_4_suffix
-                                                    , @NotNull List<String> error_content_list
-                                                    , @NotNull List<PsiElement> error_element_list) {
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
-        if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
-        if (right_guess_info == null) return null;
+    @NotNull
+    public static PsiElement guessSoftTypeForOp4Impl(String opString
+                                                    , PsiElement leftSrc, PsiElement leftGuess
+                                                    , PsiElement rightSrc, PsiElement rightGuess
+                                                    , ALittleOp4Suffix op4Suffix) throws ALittleElementException {
+        GuessTypeInfo leftGuessInfo = guessTypeString(leftSrc, leftGuess, null);
+        GuessTypeInfo rightGuessInfo = guessTypeString(rightSrc, rightGuess, null);
 
-        if (left_guess_info.value.equals("any")) return left_guess;
-        if (right_guess_info.value.equals("any")) return right_guess;
+        if (leftGuessInfo.value.equals("any")) return leftGuess;
+        if (rightGuessInfo.value.equals("any")) return rightGuess;
 
-        if (left_guess_info.value.equals("int") || left_guess_info.value.equals("I64")) {
-            if (right_guess_info.value.equals("int") || right_guess_info.value.equals("I64")) {
-                return left_guess;
-            } else if (right_guess_info.value.equals("double")) {
-                return right_guess;
+        if (leftGuessInfo.value.equals("int") || leftGuessInfo.value.equals("I64")) {
+            if (rightGuessInfo.value.equals("int") || rightGuessInfo.value.equals("I64")) {
+                return leftGuess;
+            } else if (rightGuessInfo.value.equals("double")) {
+                return rightGuess;
             } else {
-                error_content_list.add(op_string + "运算符右边必须是int,double,any类型.不能是:" + right_guess_info.value);
-                error_element_list.add(right_src);
-                return null;
+                throw new ALittleElementException(rightSrc, opString + "运算符右边必须是int,double,any类型.不能是:" + rightGuessInfo.value);
             }
         }
 
-        if (left_guess_info.value.equals("double")) {
-            if (right_guess_info.value.equals("int") || right_guess_info.value.equals("I64")) {
-                return left_guess;
-            } else if (right_guess_info.value.equals("double")) {
-                return right_guess;
+        if (leftGuessInfo.value.equals("double")) {
+            if (rightGuessInfo.value.equals("int") || rightGuessInfo.value.equals("I64")) {
+                return leftGuess;
+            } else if (rightGuessInfo.value.equals("double")) {
+                return rightGuess;
             } else {
-                error_content_list.add(op_string + "运算符右边必须是int,double,any类型.不能是:" + right_guess_info.value);
-                error_element_list.add(right_src);
-                return null;
+                throw new ALittleElementException(rightSrc, opString + "运算符右边必须是int,double,any类型.不能是:" + rightGuessInfo.value);
             }
         }
 
-        error_content_list.add(op_string + "运算符左边必须是int,double,any类型.不能是:" + left_guess_info.value);
-        error_element_list.add(left_src);
-        return null;
-
+        throw new ALittleElementException(leftSrc, opString + "运算符左边必须是int,double,any类型.不能是:" + leftGuessInfo.value);
     }
 
-    public static PsiElement guessSoftTypeForOp4(PsiElement left_src, PsiElement left_guess, ALittleOp4Suffix op_4_suffix, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        String op_string = op_4_suffix.getOp4().getText();
+    @NotNull
+    public static PsiElement guessSoftTypeForOp4(PsiElement leftSrc, PsiElement leftGuess, ALittleOp4Suffix op4Suffix) throws ALittleElementException {
+        String opString = op4Suffix.getOp4().getText();
 
-        PsiElement value_factor_guess = null;
-        PsiElement last_src = null;
-        if (op_4_suffix.getValueFactor() != null) {
-            ALittleValueFactor value_factor = op_4_suffix.getValueFactor();
-            value_factor_guess = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = value_factor;
-        } else if (op_4_suffix.getOp2Value() != null) {
-            ALittleOp2Value op_2_value = op_4_suffix.getOp2Value();
-            value_factor_guess = guessSoftType(op_2_value, op_2_value, error_content_list, error_element_list);
-            if (value_factor_guess == null) return null;
-            last_src = op_2_value;
+        PsiElement valueFactor_guess = null;
+        PsiElement lastSrc = null;
+        if (op4Suffix.getValueFactor() != null) {
+            ALittleValueFactor valueFactor = op4Suffix.getValueFactor();
+            valueFactor_guess = guessSoftType(valueFactor, valueFactor);
+            lastSrc = valueFactor;
+        } else if (op4Suffix.getOp2Value() != null) {
+            ALittleOp2Value op2Value = op4Suffix.getOp2Value();
+            valueFactor_guess = guessSoftType(op2Value, op2Value);
+            lastSrc = op2Value;
         }
 
-        PsiElement suffix_guess_type = value_factor_guess;
-        List<ALittleOp4SuffixEe> suffix_ee_list = op_4_suffix.getOp4SuffixEeList();
-        for (ALittleOp4SuffixEe suffix_ee : suffix_ee_list) {
-            if (suffix_ee.getOp3Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp3(last_src, suffix_guess_type, suffix_ee.getOp3Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ee.getOp3Suffix();
+        PsiElement suffixGuessType = valueFactor_guess;
+        List<ALittleOp4SuffixEe> suffixEEList = op4Suffix.getOp4SuffixEeList();
+        for (ALittleOp4SuffixEe suffixEE : suffixEEList) {
+            if (suffixEE.getOp3Suffix() != null) {
+                suffixGuessType = guessSoftTypeForOp3(lastSrc, suffixGuessType, suffixEE.getOp3Suffix());
+                lastSrc = suffixEE.getOp3Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ee);
-                return null;
+                throw new ALittleElementException(suffixEE, "未知的表达式");
             }
         }
 
-        return guessSoftTypeForOp4Impl(op_string, left_src, left_guess, last_src, suffix_guess_type, op_4_suffix, error_content_list, error_element_list);
+        return guessSoftTypeForOp4Impl(opString, leftSrc, leftGuess, lastSrc, suffixGuessType, op4Suffix);
     }
 
-    public static PsiElement guessSoftTypeForOp3(PsiElement left_src, PsiElement left_guess, ALittleOp3Suffix op_3_suffix, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        String op_string = op_3_suffix.getOp3().getText();
+    @NotNull
+    public static PsiElement guessSoftTypeForOp3(PsiElement leftSrc, PsiElement leftGuess, ALittleOp3Suffix op_3_suffix) throws ALittleElementException {
+        String opString = op_3_suffix.getOp3().getText();
 
-        PsiElement right_guess = null;
-        PsiElement right_src = null;
+        PsiElement rightGuess = null;
+        PsiElement rightSrc = null;
         if (op_3_suffix.getValueFactor() != null) {
             ALittleValueFactor value = op_3_suffix.getValueFactor();
-            right_guess = guessSoftType(value, value, error_content_list, error_element_list);
-            if (right_guess == null) return null;
-            right_src = value;
+            rightGuess = guessSoftType(value, value);
+            rightSrc = value;
         } else if (op_3_suffix.getOp2Value() != null) {
             ALittleOp2Value value = op_3_suffix.getOp2Value();
-            right_guess = guessSoftType(value, value, error_content_list, error_element_list);
-            if (right_guess == null) return null;
-            right_src = value;
+            rightGuess = guessSoftType(value, value);
+            rightSrc = value;
         } else {
-            error_content_list.add("未知的表达式");
-            error_element_list.add(op_3_suffix);
-            return null;
+            throw new ALittleElementException(op_3_suffix, "未知的表达式");
         }
 
-        GuessTypeInfo left_guess_info = guessTypeString(left_src, left_guess, null, error_content_list, error_element_list);
-        if (left_guess_info == null) return null;
-        GuessTypeInfo right_guess_info = guessTypeString(right_src, right_guess, null, error_content_list, error_element_list);
-        if (right_guess_info == null) return null;
+        GuessTypeInfo leftGuessInfo = guessTypeString(leftSrc, leftGuess, null);
+        GuessTypeInfo rightGuessInfo = guessTypeString(rightSrc, rightGuess, null);
 
-        if (left_guess_info.value.equals("any")) return left_guess;
-        if (right_guess_info.value.equals("any")) return right_guess;
+        if (leftGuessInfo.value.equals("any")) return leftGuess;
+        if (rightGuessInfo.value.equals("any")) return rightGuess;
 
-        if (left_guess_info.value.equals("int")) {
-            if (right_guess_info.value.equals("int")) {
+        if (leftGuessInfo.value.equals("int")) {
+            if (rightGuessInfo.value.equals("int")) {
                 // 这个是特殊的
-                if (op_string.equals("/")) {
+                if (opString.equals("/")) {
                     return op_3_suffix;
                 }
-                return left_guess;
-            } else if (right_guess_info.value.equals("I64")) {
+                return leftGuess;
+            } else if (rightGuessInfo.value.equals("I64")) {
                 // 这个是特殊的
-                if (op_string.equals("/")) {
+                if (opString.equals("/")) {
                     return op_3_suffix;
                 }
-                return right_guess;
-            } else if (right_guess_info.value.equals("double")) {
-                return right_guess;
+                return rightGuess;
+            } else if (rightGuessInfo.value.equals("double")) {
+                return rightGuess;
             } else {
-                error_content_list.add(op_string + "运算符右边必须是int,double,any类型.不能是:" + right_guess_info.value);
-                error_element_list.add(right_src);
-                return null;
+                throw new ALittleElementException(rightSrc, opString + "运算符右边必须是int,double,any类型.不能是:" + rightGuessInfo.value);
             }
         }
 
-        if (left_guess_info.value.equals("I64")) {
-            if (right_guess_info.value.equals("int") || right_guess_info.value.equals("I64")) {
+        if (leftGuessInfo.value.equals("I64")) {
+            if (rightGuessInfo.value.equals("int") || rightGuessInfo.value.equals("I64")) {
                 // 这个是特殊的
-                if (op_string.equals("/")) {
+                if (opString.equals("/")) {
                     return op_3_suffix;
                 }
-                return left_guess;
-            } else if (right_guess_info.value.equals("double")) {
-                return right_guess;
+                return leftGuess;
+            } else if (rightGuessInfo.value.equals("double")) {
+                return rightGuess;
             } else {
-                error_content_list.add(op_string + "运算符右边必须是int,double,any类型.不能是:" + right_guess_info.value);
-                error_element_list.add(right_src);
-                return null;
+                throw new ALittleElementException(rightSrc, opString + "运算符右边必须是int,double,any类型.不能是:" + rightGuessInfo.value);
             }
         }
 
-        if (left_guess_info.value.equals("double")) {
-            if (right_guess_info.value.equals("int") || right_guess_info.value.equals("I64")) {
-                return left_guess;
-            } else if (right_guess_info.value.equals("double")) {
-                return right_guess;
+        if (leftGuessInfo.value.equals("double")) {
+            if (rightGuessInfo.value.equals("int") || rightGuessInfo.value.equals("I64")) {
+                return leftGuess;
+            } else if (rightGuessInfo.value.equals("double")) {
+                return rightGuess;
             } else {
-                error_content_list.add(op_string + "运算符右边必须是int,double,any类型.不能是:" + right_guess_info.value);
-                error_element_list.add(right_src);
-                return null;
+                throw new ALittleElementException(rightSrc, opString + "运算符右边必须是int,double,any类型.不能是:" + rightGuessInfo.value);
             }
         }
 
-        error_content_list.add(op_string + "运算符左边必须是int,double,any类型.不能是:" + left_guess_info.value);
-        error_element_list.add(left_src);
-        return null;
+        throw new ALittleElementException(leftSrc, opString + "运算符左边必须是int,double,any类型.不能是:" + leftGuessInfo.value);
     }
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleValueFactor value_factor, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        if (value_factor.getPropertyValue() != null) {
-            PsiElement guess_type = guessType(value_factor.getPropertyValue());
-            if (guess_type != null) return guess_type;
-            error_content_list.add("未知的表达式");
-            error_element_list.add(value_factor.getPropertyValue());
-            return null;
-        } else if (value_factor.getReflectValue() != null) {
-            return value_factor.getReflectValue();
-        } else if (value_factor.getConstValue() != null) {
-            return value_factor.getConstValue();
-        } else if (value_factor.getValueStatParen() != null) {
-            ALittleValueStat value = value_factor.getValueStatParen().getValueStat();
-            return guessSoftType(value, value, error_content_list, error_element_list);
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleValueFactor valueFactor) throws ALittleElementException {
+        if (valueFactor.getPropertyValue() != null) {
+            return guessType(valueFactor.getPropertyValue());
+        } else if (valueFactor.getReflectValue() != null) {
+            return valueFactor.getReflectValue();
+        } else if (valueFactor.getConstValue() != null) {
+            return valueFactor.getConstValue();
+        } else if (valueFactor.getValueStatParen() != null) {
+            ALittleValueStat value = valueFactor.getValueStatParen().getValueStat();
+            return guessSoftType(value, value);
         }
-        error_content_list.add("未知的表达式");
-        error_element_list.add(src);
-        return null;
+
+        throw new ALittleElementException(src, "未知的表达式");
     }
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleOp8Stat op_8_stat, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        ALittleValueFactor value_factor = op_8_stat.getValueFactor();
-        PsiElement factor_guess_type = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-        if (factor_guess_type == null) return null;
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleOp8Stat op_8_stat) throws ALittleElementException {
+        ALittleValueFactor valueFactor = op_8_stat.getValueFactor();
+        PsiElement factor_guessType = guessSoftType(valueFactor, valueFactor);
 
-        PsiElement suffix_guess_type = guessSoftTypeForOp8(value_factor, factor_guess_type, op_8_stat.getOp8Suffix(), error_content_list, error_element_list);
-        if (suffix_guess_type == null) return null;
+        PsiElement suffixGuessType = guessSoftTypeForOp8(valueFactor, factor_guessType, op_8_stat.getOp8Suffix());
 
-        PsiElement last_src = op_8_stat.getOp8Suffix();
-        List<ALittleOp8SuffixEx> suffix_ex_list = op_8_stat.getOp8SuffixExList();
-        for (ALittleOp8SuffixEx suffix_ex : suffix_ex_list) {
+        PsiElement lastSrc = op_8_stat.getOp8Suffix();
+        List<ALittleOp8SuffixEx> suffix_exList = op_8_stat.getOp8SuffixExList();
+        for (ALittleOp8SuffixEx suffix_ex : suffix_exList) {
             if (suffix_ex.getOp8Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp8(last_src, suffix_guess_type, suffix_ex.getOp8Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp8Suffix();
+                suffixGuessType = guessSoftTypeForOp8(lastSrc, suffixGuessType, suffix_ex.getOp8Suffix());
+                lastSrc = suffix_ex.getOp8Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ex);
-                return null;
+                throw new ALittleElementException(suffix_ex, "未知的表达式");
             }
         }
 
-        return suffix_guess_type;
+        return suffixGuessType;
     }
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleOp7Stat op_7_stat, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        ALittleValueFactor value_factor = op_7_stat.getValueFactor();
-        PsiElement factor_guess_type = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-        if (factor_guess_type == null) return null;
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleOp7Stat op_7_stat) throws ALittleElementException {
+        ALittleValueFactor valueFactor = op_7_stat.getValueFactor();
+        PsiElement factor_guessType = guessSoftType(valueFactor, valueFactor);
 
-        PsiElement suffix_guess_type = guessSoftTypeForOp7(value_factor, factor_guess_type, op_7_stat.getOp7Suffix(), error_content_list, error_element_list);
-        if (suffix_guess_type == null) return null;
+        PsiElement suffixGuessType = guessSoftTypeForOp7(valueFactor, factor_guessType, op_7_stat.getOp7Suffix());
 
-        PsiElement last_src = op_7_stat.getOp7Suffix();
-        List<ALittleOp7SuffixEx> suffix_ex_list = op_7_stat.getOp7SuffixExList();
-        for (ALittleOp7SuffixEx suffix_ex : suffix_ex_list) {
+        PsiElement lastSrc = op_7_stat.getOp7Suffix();
+        List<ALittleOp7SuffixEx> suffix_exList = op_7_stat.getOp7SuffixExList();
+        for (ALittleOp7SuffixEx suffix_ex : suffix_exList) {
             if (suffix_ex.getOp7Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp7(last_src, suffix_guess_type, suffix_ex.getOp7Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp7Suffix();
+                suffixGuessType = guessSoftTypeForOp7(lastSrc, suffixGuessType, suffix_ex.getOp7Suffix());
+                lastSrc = suffix_ex.getOp7Suffix();
             } else if (suffix_ex.getOp8Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp8(last_src, suffix_guess_type, suffix_ex.getOp8Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp8Suffix();
+                suffixGuessType = guessSoftTypeForOp8(lastSrc, suffixGuessType, suffix_ex.getOp8Suffix());
+                lastSrc = suffix_ex.getOp8Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ex);
-                return null;
+                throw new ALittleElementException(suffix_ex, "未知的表达式");
             }
         }
 
-        return suffix_guess_type;
+        return suffixGuessType;
     }
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleOp6Stat op_6_stat, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        ALittleValueFactor value_factor = op_6_stat.getValueFactor();
-        PsiElement factor_guess_type = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-        if (factor_guess_type == null) return null;
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleOp6Stat op_6_stat) throws ALittleElementException {
+        ALittleValueFactor valueFactor = op_6_stat.getValueFactor();
+        PsiElement factor_guessType = guessSoftType(valueFactor, valueFactor);
 
-        PsiElement suffix_guess_type = guessSoftTypeForOp6(value_factor, factor_guess_type, op_6_stat.getOp6Suffix(), error_content_list, error_element_list);
-        if (suffix_guess_type == null) return null;
+        PsiElement suffixGuessType = guessSoftTypeForOp6(valueFactor, factor_guessType, op_6_stat.getOp6Suffix());
 
-        PsiElement last_src = op_6_stat.getOp6Suffix();
-        List<ALittleOp6SuffixEx> suffix_ex_list = op_6_stat.getOp6SuffixExList();
-        for (ALittleOp6SuffixEx suffix_ex : suffix_ex_list) {
+        PsiElement lastSrc = op_6_stat.getOp6Suffix();
+        List<ALittleOp6SuffixEx> suffix_exList = op_6_stat.getOp6SuffixExList();
+        for (ALittleOp6SuffixEx suffix_ex : suffix_exList) {
             if (suffix_ex.getOp6Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp6(last_src, suffix_guess_type, suffix_ex.getOp6Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp6Suffix();
+                suffixGuessType = guessSoftTypeForOp6(lastSrc, suffixGuessType, suffix_ex.getOp6Suffix());
+                lastSrc = suffix_ex.getOp6Suffix();
             } else if (suffix_ex.getOp7Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp7(last_src, suffix_guess_type, suffix_ex.getOp7Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp7Suffix();
+                suffixGuessType = guessSoftTypeForOp7(lastSrc, suffixGuessType, suffix_ex.getOp7Suffix());
+                lastSrc = suffix_ex.getOp7Suffix();
             } else if (suffix_ex.getOp8Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp8(last_src, suffix_guess_type, suffix_ex.getOp8Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp8Suffix();
+                suffixGuessType = guessSoftTypeForOp8(lastSrc, suffixGuessType, suffix_ex.getOp8Suffix());
+                lastSrc = suffix_ex.getOp8Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ex);
-                return null;
+                throw new ALittleElementException(suffix_ex, "未知的表达式");
             }
         }
 
-        return suffix_guess_type;
+        return suffixGuessType;
     }
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleOp5Stat op_5_stat, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        ALittleValueFactor value_factor = op_5_stat.getValueFactor();
-        PsiElement factor_guess_type = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-        if (factor_guess_type == null) return null;
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleOp5Stat op_5_stat) throws ALittleElementException {
+        ALittleValueFactor valueFactor = op_5_stat.getValueFactor();
+        PsiElement factor_guessType = guessSoftType(valueFactor, valueFactor);
 
-        PsiElement suffix_guess_type = guessSoftTypeForOp5(value_factor, factor_guess_type, op_5_stat.getOp5Suffix(), error_content_list, error_element_list);
-        if (suffix_guess_type == null) return null;
+        PsiElement suffixGuessType = guessSoftTypeForOp5(valueFactor, factor_guessType, op_5_stat.getOp5Suffix());
 
-        PsiElement last_src = op_5_stat.getOp5Suffix();
-        List<ALittleOp5SuffixEx> suffix_ex_list = op_5_stat.getOp5SuffixExList();
-        for (ALittleOp5SuffixEx suffix_ex : suffix_ex_list) {
+        PsiElement lastSrc = op_5_stat.getOp5Suffix();
+        List<ALittleOp5SuffixEx> suffix_exList = op_5_stat.getOp5SuffixExList();
+        for (ALittleOp5SuffixEx suffix_ex : suffix_exList) {
             if (suffix_ex.getOp5Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp5(last_src, suffix_guess_type, suffix_ex.getOp5Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp5Suffix();
+                suffixGuessType = guessSoftTypeForOp5(lastSrc, suffixGuessType, suffix_ex.getOp5Suffix());
+                lastSrc = suffix_ex.getOp5Suffix();
             } else if (suffix_ex.getOp6Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp6(last_src, suffix_guess_type, suffix_ex.getOp6Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp6Suffix();
+                suffixGuessType = guessSoftTypeForOp6(lastSrc, suffixGuessType, suffix_ex.getOp6Suffix());
+                lastSrc = suffix_ex.getOp6Suffix();
             } else if (suffix_ex.getOp7Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp7(last_src, suffix_guess_type, suffix_ex.getOp7Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp7Suffix();
+                suffixGuessType = guessSoftTypeForOp7(lastSrc, suffixGuessType, suffix_ex.getOp7Suffix());
+                lastSrc = suffix_ex.getOp7Suffix();
             } else if (suffix_ex.getOp8Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp8(last_src, suffix_guess_type, suffix_ex.getOp8Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp8Suffix();
+                suffixGuessType = guessSoftTypeForOp8(lastSrc, suffixGuessType, suffix_ex.getOp8Suffix());
+                lastSrc = suffix_ex.getOp8Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ex);
-                return null;
+                throw new ALittleElementException(suffix_ex, "未知的表达式");
             }
         }
 
-        return suffix_guess_type;
+        return suffixGuessType;
     }
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleOp4Stat op_4_stat, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        ALittleValueFactor value_factor = op_4_stat.getValueFactor();
-        PsiElement factor_guess_type = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-        if (factor_guess_type == null) return null;
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleOp4Stat op_4_stat) throws ALittleElementException {
+        ALittleValueFactor valueFactor = op_4_stat.getValueFactor();
+        PsiElement factor_guessType = guessSoftType(valueFactor, valueFactor);
 
-        PsiElement suffix_guess_type = guessSoftTypeForOp4(value_factor, factor_guess_type, op_4_stat.getOp4Suffix(), error_content_list, error_element_list);
-        if (suffix_guess_type == null) return null;
+        PsiElement suffixGuessType = guessSoftTypeForOp4(valueFactor, factor_guessType, op_4_stat.getOp4Suffix());
 
-        PsiElement last_src = op_4_stat.getOp4Suffix();
-        List<ALittleOp4SuffixEx> suffix_ex_list = op_4_stat.getOp4SuffixExList();
-        for (ALittleOp4SuffixEx suffix_ex : suffix_ex_list) {
+        PsiElement lastSrc = op_4_stat.getOp4Suffix();
+        List<ALittleOp4SuffixEx> suffix_exList = op_4_stat.getOp4SuffixExList();
+        for (ALittleOp4SuffixEx suffix_ex : suffix_exList) {
             if (suffix_ex.getOp4Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp4(last_src, suffix_guess_type, suffix_ex.getOp4Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp4Suffix();
+                suffixGuessType = guessSoftTypeForOp4(lastSrc, suffixGuessType, suffix_ex.getOp4Suffix());
+                lastSrc = suffix_ex.getOp4Suffix();
             } else if (suffix_ex.getOp5Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp5(last_src, suffix_guess_type, suffix_ex.getOp5Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp5Suffix();
+                suffixGuessType = guessSoftTypeForOp5(lastSrc, suffixGuessType, suffix_ex.getOp5Suffix());
+                lastSrc = suffix_ex.getOp5Suffix();
             } else if (suffix_ex.getOp6Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp6(last_src, suffix_guess_type, suffix_ex.getOp6Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp6Suffix();
+                suffixGuessType = guessSoftTypeForOp6(lastSrc, suffixGuessType, suffix_ex.getOp6Suffix());
+                lastSrc = suffix_ex.getOp6Suffix();
             } else if (suffix_ex.getOp7Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp7(last_src, suffix_guess_type, suffix_ex.getOp7Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp7Suffix();
+                suffixGuessType = guessSoftTypeForOp7(lastSrc, suffixGuessType, suffix_ex.getOp7Suffix());
+                lastSrc = suffix_ex.getOp7Suffix();
             } else if (suffix_ex.getOp8Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp8(last_src, suffix_guess_type, suffix_ex.getOp8Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp8Suffix();
+                suffixGuessType = guessSoftTypeForOp8(lastSrc, suffixGuessType, suffix_ex.getOp8Suffix());
+                lastSrc = suffix_ex.getOp8Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ex);
-                return null;
+                throw new ALittleElementException(suffix_ex, "未知的表达式");
             }
         }
 
-        return suffix_guess_type;
+        return suffixGuessType;
     }
 
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleOp3Stat op_3_stat) throws ALittleElementException {
+        ALittleValueFactor valueFactor = op_3_stat.getValueFactor();
+        PsiElement factor_guessType = guessSoftType(valueFactor, valueFactor);
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleOp3Stat op_3_stat, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        ALittleValueFactor value_factor = op_3_stat.getValueFactor();
-        PsiElement factor_guess_type = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-        if (factor_guess_type == null) return null;
+        PsiElement suffixGuessType = guessSoftTypeForOp3(valueFactor, factor_guessType, op_3_stat.getOp3Suffix());
 
-        PsiElement suffix_guess_type = guessSoftTypeForOp3(value_factor, factor_guess_type, op_3_stat.getOp3Suffix(), error_content_list, error_element_list);
-        if (suffix_guess_type == null) return null;
-
-        PsiElement last_src = op_3_stat.getOp3Suffix();
-        List<ALittleOp3SuffixEx> suffix_ex_list = op_3_stat.getOp3SuffixExList();
-        for (ALittleOp3SuffixEx suffix_ex : suffix_ex_list) {
+        PsiElement lastSrc = op_3_stat.getOp3Suffix();
+        List<ALittleOp3SuffixEx> suffix_exList = op_3_stat.getOp3SuffixExList();
+        for (ALittleOp3SuffixEx suffix_ex : suffix_exList) {
             if (suffix_ex.getOp3Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp3(last_src, suffix_guess_type, suffix_ex.getOp3Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp3Suffix();
+                suffixGuessType = guessSoftTypeForOp3(lastSrc, suffixGuessType, suffix_ex.getOp3Suffix());
+                lastSrc = suffix_ex.getOp3Suffix();
             } else if (suffix_ex.getOp4Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp4(last_src, suffix_guess_type, suffix_ex.getOp4Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp4Suffix();
+                suffixGuessType = guessSoftTypeForOp4(lastSrc, suffixGuessType, suffix_ex.getOp4Suffix());
+                lastSrc = suffix_ex.getOp4Suffix();
             } else if (suffix_ex.getOp5Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp5(last_src, suffix_guess_type, suffix_ex.getOp5Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp5Suffix();
+                suffixGuessType = guessSoftTypeForOp5(lastSrc, suffixGuessType, suffix_ex.getOp5Suffix());
+                lastSrc = suffix_ex.getOp5Suffix();
             } else if (suffix_ex.getOp6Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp6(last_src, suffix_guess_type, suffix_ex.getOp6Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp6Suffix();
+                suffixGuessType = guessSoftTypeForOp6(lastSrc, suffixGuessType, suffix_ex.getOp6Suffix());
+                lastSrc = suffix_ex.getOp6Suffix();
             } else if (suffix_ex.getOp7Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp7(last_src, suffix_guess_type, suffix_ex.getOp7Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp7Suffix();
+                suffixGuessType = guessSoftTypeForOp7(lastSrc, suffixGuessType, suffix_ex.getOp7Suffix());
+                lastSrc = suffix_ex.getOp7Suffix();
             } else if (suffix_ex.getOp8Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp8(last_src, suffix_guess_type, suffix_ex.getOp8Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp8Suffix();
+                suffixGuessType = guessSoftTypeForOp8(lastSrc, suffixGuessType, suffix_ex.getOp8Suffix());
+                lastSrc = suffix_ex.getOp8Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ex);
-                return null;
+                throw new ALittleElementException(suffix_ex, "未知的表达式");
             }
         }
 
-        return suffix_guess_type;
+        return suffixGuessType;
     }
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleOp2Value op_2_value, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        ALittleValueFactor value_factor = op_2_value.getValueFactor();
-        PsiElement suffix_guess_type = guessSoftType(value_factor, value_factor, error_content_list, error_element_list);
-        if (suffix_guess_type == null) return null;
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleOp2Value op2Value) throws ALittleElementException {
+        ALittleValueFactor valueFactor = op2Value.getValueFactor();
+        PsiElement suffixGuessType = guessSoftType(valueFactor, valueFactor);
 
-        GuessTypeInfo guess_info = guessTypeString(value_factor, suffix_guess_type, null, error_content_list, error_element_list);
-        if (guess_info == null) return null;
+        GuessTypeInfo GuessInfo = guessTypeString(valueFactor, suffixGuessType, null);
 
-        String op_2 = op_2_value.getOp2().getText();
-        // guess_type必须是逻辑运算符
+        String op_2 = op2Value.getOp2().getText();
+        // guessType必须是逻辑运算符
         if (op_2.equals("!")) {
-            if (!guess_info.value.equals("bool") && !guess_info.value.equals("any")) {
-                error_content_list.add("!运算符右边必须是bool,any类型.不能是:" + guess_info.value);
-                error_element_list.add(value_factor);
-                return null;
+            if (!GuessInfo.value.equals("bool") && !GuessInfo.value.equals("any")) {
+                throw new ALittleElementException(valueFactor, "!运算符右边必须是bool,any类型.不能是:" + GuessInfo.value);
             }
-            // guess_type必须是数字
+            // guessType必须是数字
         } else if (op_2.equals("-")) {
-            if (!guess_info.value.equals("int") && !guess_info.value.equals("I64") && !guess_info.value.equals("double") && !guess_info.value.equals("any")) {
-                error_content_list.add("-运算符右边必须是int,double,any类型.不能是:" + guess_info.value);
-                error_element_list.add(value_factor);
-                return null;
+            if (!GuessInfo.value.equals("int") && !GuessInfo.value.equals("I64") && !GuessInfo.value.equals("double") && !GuessInfo.value.equals("any")) {
+                throw new ALittleElementException(valueFactor, "-运算符右边必须是int,double,any类型.不能是:" + GuessInfo.value);
             }
         } else {
-            error_content_list.add("未知的运算符:" + op_2);
-            error_element_list.add(op_2_value.getOp2());
-            return null;
+            throw new ALittleElementException(op2Value.getOp2(), "未知的运算符:" + op_2);
         }
 
-        return suffix_guess_type;
+        return suffixGuessType;
     }
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleOp2Stat op_2_stat, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        ALittleOp2Value op_2_value = op_2_stat.getOp2Value();
-        PsiElement suffix_guess_type = guessSoftType(op_2_value, op_2_value, error_content_list, error_element_list);
-        if (suffix_guess_type == null) return null;
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleOp2Stat op_2_stat) throws ALittleElementException {
+        ALittleOp2Value op2Value = op_2_stat.getOp2Value();
+        PsiElement suffixGuessType = guessSoftType(op2Value, op2Value);
 
-        PsiElement last_src = suffix_guess_type;
-        List<ALittleOp2SuffixEx> suffix_ex_list = op_2_stat.getOp2SuffixExList();
-        for (ALittleOp2SuffixEx suffix_ex : suffix_ex_list) {
+        PsiElement lastSrc = suffixGuessType;
+        List<ALittleOp2SuffixEx> suffix_exList = op_2_stat.getOp2SuffixExList();
+        for (ALittleOp2SuffixEx suffix_ex : suffix_exList) {
             if (suffix_ex.getOp3Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp3(last_src, suffix_guess_type, suffix_ex.getOp3Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp3Suffix();
+                suffixGuessType = guessSoftTypeForOp3(lastSrc, suffixGuessType, suffix_ex.getOp3Suffix());
+                lastSrc = suffix_ex.getOp3Suffix();
             } else if (suffix_ex.getOp4Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp4(last_src, suffix_guess_type, suffix_ex.getOp4Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp4Suffix();
+                suffixGuessType = guessSoftTypeForOp4(lastSrc, suffixGuessType, suffix_ex.getOp4Suffix());
+                lastSrc = suffix_ex.getOp4Suffix();
             } else if (suffix_ex.getOp5Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp5(last_src, suffix_guess_type, suffix_ex.getOp5Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp5Suffix();
+                suffixGuessType = guessSoftTypeForOp5(lastSrc, suffixGuessType, suffix_ex.getOp5Suffix());
+                lastSrc = suffix_ex.getOp5Suffix();
             } else if (suffix_ex.getOp6Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp6(last_src, suffix_guess_type, suffix_ex.getOp6Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp6Suffix();
+                suffixGuessType = guessSoftTypeForOp6(lastSrc, suffixGuessType, suffix_ex.getOp6Suffix());
+                lastSrc = suffix_ex.getOp6Suffix();
             } else if (suffix_ex.getOp7Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp7(last_src, suffix_guess_type, suffix_ex.getOp7Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp7Suffix();
+                suffixGuessType = guessSoftTypeForOp7(lastSrc, suffixGuessType, suffix_ex.getOp7Suffix());
+                lastSrc = suffix_ex.getOp7Suffix();
             } else if (suffix_ex.getOp8Suffix() != null) {
-                suffix_guess_type = guessSoftTypeForOp8(last_src, suffix_guess_type, suffix_ex.getOp8Suffix(), error_content_list, error_element_list);
-                if (suffix_guess_type == null) return null;
-                last_src = suffix_ex.getOp8Suffix();
+                suffixGuessType = guessSoftTypeForOp8(lastSrc, suffixGuessType, suffix_ex.getOp8Suffix());
+                lastSrc = suffix_ex.getOp8Suffix();
             } else {
-                error_content_list.add("未知的表达式");
-                error_element_list.add(suffix_ex);
-                return null;
+                throw new ALittleElementException(suffix_ex, "未知的表达式");
             }
         }
 
-        return suffix_guess_type;
+        return suffixGuessType;
     }
 
-    public static PsiElement guessSoftType(PsiElement src, ALittleValueStat value_stat, @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        if (value_stat.getOpNewStat() != null) {
-            PsiElement guess_type = guessType(value_stat.getOpNewStat());
-            if (guess_type != null) return guess_type;
-            error_content_list.add("未知的表达式");
-            error_element_list.add(value_stat.getOpNewStat());
-            return null;
-        } else if (value_stat.getOpNewList() != null) {
-            return value_stat.getOpNewList();
-        } else if (value_stat.getValueFactor() != null) {
-            ALittleValueFactor value = value_stat.getValueFactor();
-            return guessSoftType(value, value, error_content_list, error_element_list);
-        } else if (value_stat.getOp2Stat() != null) {
-            ALittleOp2Stat value = value_stat.getOp2Stat();
-            return guessSoftType(value, value, error_content_list, error_element_list);
-        } else if (value_stat.getOp3Stat() != null) {
-            ALittleOp3Stat value = value_stat.getOp3Stat();
-            return guessSoftType(value, value, error_content_list, error_element_list);
-        } else if (value_stat.getOp4Stat() != null) {
-            ALittleOp4Stat value = value_stat.getOp4Stat();
-            return guessSoftType(value, value, error_content_list, error_element_list);
-        } else if (value_stat.getOp5Stat() != null) {
-            ALittleOp5Stat value = value_stat.getOp5Stat();
-            return guessSoftType(value, value, error_content_list, error_element_list);
-        } else if (value_stat.getOp6Stat() != null) {
-            ALittleOp6Stat value = value_stat.getOp6Stat();
-            return guessSoftType(value, value, error_content_list, error_element_list);
-        } else if (value_stat.getOp7Stat() != null) {
-            ALittleOp7Stat value = value_stat.getOp7Stat();
-            return guessSoftType(value, value, error_content_list, error_element_list);
-        } else if (value_stat.getOp8Stat() != null) {
-            ALittleOp8Stat value = value_stat.getOp8Stat();
-            return guessSoftType(value, value, error_content_list, error_element_list);
-        } else if (value_stat.getBindStat() != null) {
-            return value_stat.getBindStat();
+    @NotNull
+    public static PsiElement guessSoftType(PsiElement src, ALittleValueStat valueStat) throws ALittleElementException {
+        if (valueStat.getOpNewStat() != null) {
+            return guessType(valueStat.getOpNewStat());
+        } else if (valueStat.getOpNewList() != null) {
+            return valueStat.getOpNewList();
+        } else if (valueStat.getValueFactor() != null) {
+            ALittleValueFactor value = valueStat.getValueFactor();
+            return guessSoftType(value, value);
+        } else if (valueStat.getOp2Stat() != null) {
+            ALittleOp2Stat value = valueStat.getOp2Stat();
+            return guessSoftType(value, value);
+        } else if (valueStat.getOp3Stat() != null) {
+            ALittleOp3Stat value = valueStat.getOp3Stat();
+            return guessSoftType(value, value);
+        } else if (valueStat.getOp4Stat() != null) {
+            ALittleOp4Stat value = valueStat.getOp4Stat();
+            return guessSoftType(value, value);
+        } else if (valueStat.getOp5Stat() != null) {
+            ALittleOp5Stat value = valueStat.getOp5Stat();
+            return guessSoftType(value, value);
+        } else if (valueStat.getOp6Stat() != null) {
+            ALittleOp6Stat value = valueStat.getOp6Stat();
+            return guessSoftType(value, value);
+        } else if (valueStat.getOp7Stat() != null) {
+            ALittleOp7Stat value = valueStat.getOp7Stat();
+            return guessSoftType(value, value);
+        } else if (valueStat.getOp8Stat() != null) {
+            ALittleOp8Stat value = valueStat.getOp8Stat();
+            return guessSoftType(value, value);
+        } else if (valueStat.getBindStat() != null) {
+            return valueStat.getBindStat();
         }
 
-        error_content_list.add("未知的表达式");
-        error_element_list.add(src);
-        return null;
+        throw new ALittleElementException(src, "未知的表达式");
     }
 
-    public static boolean guessSoftTypeEqual(PsiElement src_left, PsiElement left, GuessTypeInfo left_guess_info
-                                            , PsiElement src_right, PsiElement right, GuessTypeInfo right_guess_info
-                                            , @NotNull List<String> error_content_list, @NotNull List<PsiElement> error_element_list) {
-        if (left_guess_info == null)
-            left_guess_info = guessTypeString(src_left, left, null, error_content_list, error_element_list);
-        if (left_guess_info == null) return false;
+    public static boolean guessSoftTypeEqual(PsiElement src_left, PsiElement left, GuessTypeInfo leftGuessInfo
+                                            , PsiElement src_right, PsiElement right, GuessTypeInfo rightGuessInfo) throws ALittleElementException {
+        if (leftGuessInfo == null)
+            leftGuessInfo = guessTypeString(src_left, left, null);
 
-        if (right_guess_info == null)
-            right_guess_info = guessTypeString(src_right, right, null, error_content_list, error_element_list);
-        if (right_guess_info == null) return false;
+        if (rightGuessInfo == null)
+            rightGuessInfo = guessTypeString(src_right, right, null);
 
         // 如果字符串直接相等，那么就直接返回成功
-        if (left_guess_info.value.equals(right_guess_info.value)) return true;
+        if (leftGuessInfo.value.equals(rightGuessInfo.value)) return true;
 
         // 如果任何一方是any，那么就认为可以相等
-        if (left_guess_info.value.equals("any") || right_guess_info.value.equals("any")) return true;
+        if (leftGuessInfo.value.equals("any") || rightGuessInfo.value.equals("any")) return true;
         // 如果值等于null，那么可以赋值
-        if (right_guess_info.value.equals("null")) return true;
+        if (rightGuessInfo.value.equals("null")) return true;
 
-        if (left_guess_info.value.equals("bool")) {
-            error_content_list.add("要求是bool,不能是:" + right_guess_info.value);
-            error_element_list.add(src_right);
-            return false;
+        if (leftGuessInfo.value.equals("bool")) {
+            throw new ALittleElementException(src_right, "要求是bool,不能是:" + rightGuessInfo.value);
         }
 
-        if (left_guess_info.value.equals("int")) {
-            if (right_guess_info.value.equals("I64"))
-            {
-                error_content_list.add("I64赋值给int，需要使用cast<int>()做强制类型转换");
-                error_element_list.add(src_right);
-                return false;
+        if (leftGuessInfo.value.equals("int")) {
+            if (rightGuessInfo.value.equals("I64")) {
+                throw new ALittleElementException(src_right, "I64赋值给int，需要使用cast<int>()做强制类型转换");
             }
 
-            if (right_guess_info.value.equals("double"))
-            {
-                error_content_list.add("double赋值给int，需要使用cast<int>()做强制类型转换");
-                error_element_list.add(src_right);
-                return false;
+            if (rightGuessInfo.value.equals("double")) {
+                throw new ALittleElementException(src_right, "double赋值给int，需要使用cast<int>()做强制类型转换");
             }
-            error_content_list.add("要求是int, 不能是:" + right_guess_info.value);
-            error_element_list.add(src_right);
-            return false;
+            throw new ALittleElementException(src_right, "要求是int, 不能是:" + rightGuessInfo.value);
         }
 
-        if (left_guess_info.value.equals("I64")) {
-            if (right_guess_info.value.equals("int")) return true;
+        if (leftGuessInfo.value.equals("I64")) {
+            if (rightGuessInfo.value.equals("int")) return true;
 
-            if (right_guess_info.value.equals("double"))
-            {
-                error_content_list.add("double赋值给I64，需要使用cast<I64>()做强制类型转换");
-                error_element_list.add(src_right);
-                return false;
+            if (rightGuessInfo.value.equals("double")) {
+                throw new ALittleElementException(src_right, "double赋值给I64，需要使用cast<I64>()做强制类型转换");
             }
-            error_content_list.add("要求是I64, 不能是:" + right_guess_info.value);
-            error_element_list.add(src_right);
-            return false;
+            throw new ALittleElementException(src_right, "要求是I64, 不能是:" + rightGuessInfo.value);
         }
 
-        if (left_guess_info.value.equals("double")) {
-            if (right_guess_info.value.equals("int") || right_guess_info.value.equals("I64")) return true;
-            error_content_list.add("要求是I64, 不能是:" + right_guess_info.value);
-            error_element_list.add(src_right);
-            return false;
+        if (leftGuessInfo.value.equals("double")) {
+            if (rightGuessInfo.value.equals("int") || rightGuessInfo.value.equals("I64")) return true;
+            throw new ALittleElementException(src_right, "要求是I64, 不能是:" + rightGuessInfo.value);
         }
 
-        if (left_guess_info.value.equals("string")) {
-            error_content_list.add("要求是string,不能是:" + right_guess_info.value);
-            error_element_list.add(src_right);
-            return false;
+        if (leftGuessInfo.value.equals("string")) {
+            throw new ALittleElementException(src_right, "要求是string,不能是:" + rightGuessInfo.value);
         }
 
         // 通用类型Map
-        if (left_guess_info.type == GuessType.GT_MAP) {
-            if (right_guess_info.type == GuessType.GT_MAP) {
-                if (guessSoftTypeEqual(src_left, null, left_guess_info.map_key_type, src_right, null, right_guess_info.map_key_type
-                        , new ArrayList<>(), new ArrayList<>())
-                && guessSoftTypeEqual(src_left, null, left_guess_info.map_value_type, src_right, null, right_guess_info.map_value_type
-                        , new ArrayList<>(), new ArrayList<>()))
+        if (leftGuessInfo.type == GuessType.GT_MAP) {
+            if (rightGuessInfo.type == GuessType.GT_MAP) {
+                if (guessSoftTypeEqual(src_left, null, leftGuessInfo.mapKeyType, src_right, null, rightGuessInfo.mapKeyType)
+                && guessSoftTypeEqual(src_left, null, leftGuessInfo.mapValueType, src_right, null, rightGuessInfo.mapValueType))
                     return true;
             }
         }
 
         // 通用类型List
-        if (left_guess_info.type == GuessType.GT_LIST) {
-            if (right_guess_info.type == GuessType.GT_LIST) {
-                if (guessSoftTypeEqual(src_left, null, left_guess_info.list_sub_type, src_right, null, right_guess_info.list_sub_type
-                        , new ArrayList<>(), new ArrayList<>()))
+        if (leftGuessInfo.type == GuessType.GTList) {
+            if (rightGuessInfo.type == GuessType.GTList) {
+                if (guessSoftTypeEqual(src_left, null, leftGuessInfo.listSubType, src_right, null, rightGuessInfo.listSubType))
                     return true;
             }
         }
 
         // 通用类型Functor
-        if (left_guess_info.type == GuessType.GT_FUNCTOR) {
-            if (right_guess_info.type == GuessType.GT_FUNCTOR) {
-                if (left_guess_info.functor_param_list.size() == right_guess_info.functor_param_list.size()
-                && left_guess_info.functor_return_list.size() == right_guess_info.functor_return_list.size()
-                && left_guess_info.functor_await == right_guess_info.functor_await) {
+        if (leftGuessInfo.type == GuessType.GT_FUNCTOR) {
+            if (rightGuessInfo.type == GuessType.GT_FUNCTOR) {
+                if (leftGuessInfo.functorParamList.size() == rightGuessInfo.functorParamList.size()
+                && leftGuessInfo.functorReturnList.size() == rightGuessInfo.functorReturnList.size()
+                && leftGuessInfo.functorAwait == rightGuessInfo.functorAwait) {
                     boolean result = true;
                     if (result) {
-                        for (int i = 0; i < left_guess_info.functor_param_list.size(); ++i) {
-                            if (!guessSoftTypeEqual(src_left, null, left_guess_info.functor_param_list.get(i)
-                                                , src_right, null, right_guess_info.functor_param_list.get(i)
-                                                , error_content_list, error_element_list)) {
+                        for (int i = 0; i < leftGuessInfo.functorParamList.size(); ++i) {
+                            if (!guessSoftTypeEqual(src_left, null, leftGuessInfo.functorParamList.get(i)
+                                                , src_right, null, rightGuessInfo.functorParamList.get(i))) {
                                 result = false;
                                 break;
                             }
                         }
                     }
                     if (result) {
-                        for (int i = 0; i < left_guess_info.functor_return_list.size(); ++i) {
-                            if (!guessSoftTypeEqual(src_left, null, left_guess_info.functor_return_list.get(i)
-                                                , src_right, null, right_guess_info.functor_return_list.get(i)
-                                                , error_content_list, error_element_list)) {
+                        for (int i = 0; i < leftGuessInfo.functorReturnList.size(); ++i) {
+                            if (!guessSoftTypeEqual(src_left, null, leftGuessInfo.functorReturnList.get(i)
+                                                , src_right, null, rightGuessInfo.functorReturnList.get(i))) {
                                 result = false;
                                 break;
                             }
@@ -2252,32 +2050,32 @@ public class ALittleUtil {
             }
         }
 
-        if (left == null && left_guess_info.type == GuessType.GT_CLASS) {
-            String[] left_type = left_guess_info.value.split("\\.");
+        if (left == null && leftGuessInfo.type == GuessType.GT_CLASS) {
+            String[] left_type = leftGuessInfo.value.split("\\.");
             if (left_type.length == 2) {
                 List<ALittleClassNameDec> list = ALittleTreeChangeListener.findClassNameDecList(src_left.getProject(), left_type[0], left_type[1]);
                 if (list != null && list.size() == 1) left = list.get(0).getParent();
             }
         }
 
-        if (left == null && left_guess_info.type == GuessType.GT_STRUCT) {
-            String[] left_type = left_guess_info.value.split("\\.");
+        if (left == null && leftGuessInfo.type == GuessType.GT_STRUCT) {
+            String[] left_type = leftGuessInfo.value.split("\\.");
             if (left_type.length == 2) {
                 List<ALittleStructNameDec> list = ALittleTreeChangeListener.findStructNameDecList(src_left.getProject(), left_type[0], left_type[1]);
                 if (list != null && list.size() == 1) left = list.get(0).getParent();
             }
         }
 
-        if (right == null && right_guess_info.type == GuessType.GT_CLASS) {
-            String[] right_type = right_guess_info.value.split("\\.");
+        if (right == null && rightGuessInfo.type == GuessType.GT_CLASS) {
+            String[] right_type = rightGuessInfo.value.split("\\.");
             if (right_type.length == 2) {
                 List<ALittleClassNameDec> list = ALittleTreeChangeListener.findClassNameDecList(src_right.getProject(), right_type[0], right_type[1]);
                 if (list != null && list.size() == 1) right = list.get(0).getParent();
             }
         }
 
-        if (right == null && right_guess_info.type == GuessType.GT_STRUCT) {
-            String[] right_type = right_guess_info.value.split("\\.");
+        if (right == null && rightGuessInfo.type == GuessType.GT_STRUCT) {
+            String[] right_type = rightGuessInfo.value.split("\\.");
             if (right_type.length == 2) {
                 List<ALittleStructNameDec> list = ALittleTreeChangeListener.findStructNameDecList(src_right.getProject(), right_type[0], right_type[1]);
                 if (list != null && list.size() == 1) right = list.get(0).getParent();
@@ -2287,9 +2085,7 @@ public class ALittleUtil {
         // 自定义类型 (只有left继承了right，或者right继承了left，才可以赋值)
         if (left instanceof ALittleClassDec) {
             if (!(right instanceof ALittleClassDec)) {
-                error_content_list.add("要求是" + left_guess_info.value + ",不能是:" + right_guess_info.value);
-                error_element_list.add(src_right);
-                return false;
+                throw new ALittleElementException(src_right, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
             }
 
             if (left.equals(right)) return true;
@@ -2299,9 +2095,7 @@ public class ALittleUtil {
 
         } else if (left instanceof ALittleStructDec) {
             if (!(right instanceof ALittleStructDec)) {
-                error_content_list.add("要求是" + left_guess_info.value + ",不能是:" + right_guess_info.value);
-                error_element_list.add(src_right);
-                return false;
+                throw new ALittleElementException(src_right, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
             }
 
             if (left.equals(right)) return true;
@@ -2310,73 +2104,71 @@ public class ALittleUtil {
             if (IsStructSuper(right, left)) return true;
         }
 
-        error_content_list.add("要求是" + left_guess_info.value + ",不能是:" + right_guess_info.value);
-        error_element_list.add(src_right);
-        return false;
+        throw new ALittleElementException(src_right, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
     }
 
     @NotNull
     public static String GenerateStructForJsonProto(ALittleStructDec root, String pre_tab) throws Exception {
-        ALittleStructProtocolDec protocol_dec = root.getStructProtocolDec();
+        ALittleStructProtocolDec protocolDec = root.getStructProtocolDec();
         // 如果没有带协议标志，那么就不需要生成协议
-        if (protocol_dec == null) return "";
+        if (protocolDec == null) return "";
 
-        ALittleCustomType custom_type = protocol_dec.getCustomType();
+        ALittleCustomType custom_type = protocolDec.getCustomType();
         if (custom_type == null) return "";
 
-        PsiElement guess_type = custom_type.getCustomTypeNameDec().guessType();
-        if (!(guess_type instanceof ALittleEnumDec))
+        PsiElement guessType = custom_type.getCustomTypeNameDec().guessType();
+        if (!(guessType instanceof ALittleEnumDec))
             throw new Exception(root.getText() + "struct的(XXX)内必须使用enum");
 
-        ALittleEnumDec enum_dec = (ALittleEnumDec)guess_type;
-        if (enum_dec.getEnumProtocolDec() == null)
+        ALittleEnumDec enumDec = (ALittleEnumDec)guessType;
+        if (enumDec.getEnumProtocolDec() == null)
             throw new Exception(root.getText() + "struct的(XXX)内必须使用带protocol的enum");
 
         // 协议名
-        ALittleStructNameDec name_dec = root.getStructNameDec();
-        if (name_dec == null)
+        ALittleStructNameDec nameDec = root.getStructNameDec();
+        if (nameDec == null)
             throw new Exception(root.getText() + "没有定义协议名");
 
-        String message_name = name_dec.getIdContent().getText();
+        String message_name = nameDec.getIdContent().getText();
 
         // 协议ID
-        List<Integer> result = new ArrayList<>();
-        if (!ALittleUtil.getEnumVarValue(enum_dec, "_" + message_name, result) || result.isEmpty())
+        Integer result = ALittleUtil.getEnumVarValue(enumDec, "_" + message_name);
+        if (result == null)
             throw new Exception(root.getText() + "找不到协议ID:_" + message_name);
 
         String json = "{";
-            json += "\"id\":" + result.get(0) + ",";
+            json += "\"id\":" + result + ",";
             json += "\"name\":\"" + message_name + "\",";
-            json += "\"var_name_list\":[";
-                List<String> var_name_list = new ArrayList<>();
-                for (ALittleStructVarDec var_dec : root.getStructVarDecList()) {
-                    ALittleStructVarNameDec var_name_dec = var_dec.getStructVarNameDec();
-                    if (var_name_dec == null) {
-                        throw new Exception(var_dec.getText() + "没有定义字段名");
+            json += "\"varNameList\":[";
+                List<String> varNameList = new ArrayList<>();
+                for (ALittleStructVarDec varDec : root.getStructVarDecList()) {
+                    ALittleStructVarNameDec varNameDec = varDec.getStructVarNameDec();
+                    if (varNameDec == null) {
+                        throw new Exception(varDec.getText() + "没有定义字段名");
                     }
-                    var_name_list.add("\"" + var_name_dec.getText() + "\"");
+                    varNameList.add("\"" + varNameDec.getText() + "\"");
                 }
-                json += String.join(",", var_name_list);
+                json += String.join(",", varNameList);
             json += "],";
-            json += "\"var_type_list\":[";
-                List<String> var_type_list = new ArrayList<>();
-                for (ALittleStructVarDec var_dec : root.getStructVarDecList()) {
-                    ALittleAllType all_type = var_dec.getAllType();
-                    if (all_type == null) {
-                        throw new Exception(var_dec.getText() + "没有定义字段类型");
+            json += "\"var_typeList\":[";
+                List<String> var_typeList = new ArrayList<>();
+                for (ALittleStructVarDec varDec : root.getStructVarDecList()) {
+                    ALittleAllType allType = varDec.getAllType();
+                    if (allType == null) {
+                        throw new Exception(varDec.getText() + "没有定义字段类型");
                     }
-                    String var_type = all_type.getText();
+                    String var_type = allType.getText();
                     // 把空格替换掉
                     var_type = var_type.replace(" ", "");
                     // 不能支持任何any字段
                     if (var_type.equals("any")
                         || var_type.contains("<any")
                         || var_type.contains("any>")) {
-                        throw new Exception(var_dec.getText() + "协议不支持any类型");
+                        throw new Exception(varDec.getText() + "协议不支持any类型");
                     }
-                    var_type_list.add("\"" + var_type + "\"");
+                    var_typeList.add("\"" + var_type + "\"");
                 }
-                json += String.join(",", var_type_list);
+                json += String.join(",", var_typeList);
             json += "]";
         json += "}";
 
@@ -2384,49 +2176,49 @@ public class ALittleUtil {
     }
 
     @NotNull
-    public static String GenerateStructForCPPProto(ALittleStructDec root, @NotNull List<String> class_list, String pre_tab) throws Exception {
-        ALittleStructProtocolDec protocol_dec = root.getStructProtocolDec();
+    public static String GenerateStructForCPPProto(ALittleStructDec root, @NotNull List<String> classList, String pre_tab) throws Exception {
+        ALittleStructProtocolDec protocolDec = root.getStructProtocolDec();
         // 如果没有带协议标志，那么就不需要生成协议
-        if (protocol_dec == null) return "";
+        if (protocolDec == null) return "";
 
         // 协议名
-        ALittleStructNameDec name_dec = root.getStructNameDec();
-        if (name_dec == null)
+        ALittleStructNameDec nameDec = root.getStructNameDec();
+        if (nameDec == null)
             throw new Exception(root.getText() + "没有定义协议名");
         // 协议名
-        String message_name = name_dec.getIdContent().getText();
+        String message_name = nameDec.getIdContent().getText();
 
-        ALittleCustomType custom_type = protocol_dec.getCustomType();
+        ALittleCustomType custom_type = protocolDec.getCustomType();
         boolean is_json = custom_type == null;
         if (custom_type != null) {
-            PsiElement guess_type = custom_type.getCustomTypeNameDec().guessType();
-            if (!(guess_type instanceof ALittleEnumDec))
+            PsiElement guessType = custom_type.getCustomTypeNameDec().guessType();
+            if (!(guessType instanceof ALittleEnumDec))
                 throw new Exception(root.getText() + "struct的(XXX)内必须使用enum");
 
-            ALittleEnumDec enum_dec = (ALittleEnumDec)guess_type;
-            if (enum_dec.getEnumProtocolDec() == null)
+            ALittleEnumDec enumDec = (ALittleEnumDec)guessType;
+            if (enumDec.getEnumProtocolDec() == null)
                 throw new Exception(root.getText() + "struct的(XXX)内必须使用带protocol的enum");
 
             // 协议ID
-            List<Integer> result = new ArrayList<>();
-            if (!ALittleUtil.getEnumVarValue(enum_dec, "_" + message_name, result) || result.isEmpty())
+            Integer result = ALittleUtil.getEnumVarValue(enumDec, "_" + message_name);
+            if (result == null)
                 throw new Exception(root.getText() + "找不到协议ID:_" + message_name);
         }
 
-        List<String> typedef_list = new ArrayList<>();
+        List<String> typedefList = new ArrayList<>();
         String proto = "MESSAGE_MACRO(" + message_name + "\n";
         if (is_json) proto = "JSON_MACRO(" + message_name + "\n";
-        for (ALittleStructVarDec var_dec : root.getStructVarDecList()) {
-            ALittleStructVarNameDec var_name_dec = var_dec.getStructVarNameDec();
-            if (var_name_dec == null) {
-                throw new Exception(var_dec.getText() + "没有定义字段名");
+        for (ALittleStructVarDec varDec : root.getStructVarDecList()) {
+            ALittleStructVarNameDec varNameDec = varDec.getStructVarNameDec();
+            if (varNameDec == null) {
+                throw new Exception(varDec.getText() + "没有定义字段名");
             }
-            String var_name = var_name_dec.getText();
-            ALittleAllType all_type = var_dec.getAllType();
-            if (all_type == null) {
-                throw new Exception(var_dec.getText() + "没有定义字段类型");
+            String varName = varNameDec.getText();
+            ALittleAllType allType = varDec.getAllType();
+            if (allType == null) {
+                throw new Exception(varDec.getText() + "没有定义字段类型");
             }
-            String var_type = all_type.getText();
+            String var_type = allType.getText();
             // 把空格替换掉
             var_type = var_type.replace(" ", "");
             var_type = var_type.replace("List<", "std::vector<");
@@ -2439,19 +2231,19 @@ public class ALittleUtil {
             // 找出map定义，那么就直接使用预定义
             int index = var_type.indexOf("std::map<");
             if (index >= 0) {
-                String typedef = (message_name + "_" + var_name).toUpperCase();
-                typedef_list.add("typedef " + var_type + " " + typedef + ";");
+                String typedef = (message_name + "_" + varName).toUpperCase();
+                typedefList.add("typedef " + var_type + " " + typedef + ";");
                 var_type = typedef;
             }
 
-            proto += "\t, " + var_type + ", " + var_name_dec.getText() + "\n";
+            proto += "\t, " + var_type + ", " + varNameDec.getText() + "\n";
         }
         proto += ");\n";
 
-        if (!typedef_list.isEmpty())
-            proto = String.join("\n", typedef_list) + "\n" + proto;
+        if (!typedefList.isEmpty())
+            proto = String.join("\n", typedefList) + "\n" + proto;
 
-        class_list.add("class " + message_name + ";");
+        classList.add("class " + message_name + ";");
         return proto;
     }
 
@@ -2461,26 +2253,25 @@ public class ALittleUtil {
         if (root.getEnumProtocolDec() == null) return "";
 
         // 协议名
-        ALittleEnumNameDec name_dec = root.getEnumNameDec();
-        if (name_dec == null)
+        ALittleEnumNameDec nameDec = root.getEnumNameDec();
+        if (nameDec == null)
             throw new Exception(root.getText() + "没有定义枚举名");
 
         // 协议名
-        String enum_name = name_dec.getIdContent().getText();
+        String enum_name = nameDec.getIdContent().getText();
 
-        List<String> typedef_list = new ArrayList<>();
         String proto = "enum " + enum_name + "\n";
         proto += "{\n";
-        for (ALittleEnumVarDec var_dec : root.getEnumVarDecList()) {
-            ALittleEnumVarNameDec var_name_dec = var_dec.getEnumVarNameDec();
-            if (var_name_dec == null) {
-                throw new Exception(var_dec.getText() + "没有定义字段名");
+        for (ALittleEnumVarDec varDec : root.getEnumVarDecList()) {
+            ALittleEnumVarNameDec varNameDec = varDec.getEnumVarNameDec();
+            if (varNameDec == null) {
+                throw new Exception(varDec.getText() + "没有定义字段名");
             }
-            ALittleEnumVarValueDec var_value_dec = var_dec.getEnumVarValueDec();
-            if (var_value_dec != null && var_value_dec.getStringContent() != null) {
-                throw new Exception(var_dec.getText() + "协议枚举的值不能是字符串");
+            ALittleEnumVarValueDec varValueDec = varDec.getEnumVarValueDec();
+            if (varValueDec != null && varValueDec.getStringContent() != null) {
+                throw new Exception(varDec.getText() + "协议枚举的值不能是字符串");
             }
-            proto += "\t" + var_dec.getText() + ",\n";
+            proto += "\t" + varDec.getText() + ",\n";
         }
         proto += "};\n";
         return proto;

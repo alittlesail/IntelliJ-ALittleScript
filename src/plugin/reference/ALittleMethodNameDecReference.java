@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import plugin.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
 import plugin.ALittleUtil;
@@ -16,20 +15,9 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> implements ALittleReference {
-    private String m_key;
-    private String m_src_namespace;
-
+public class ALittleMethodNameDecReference extends ALittleReference {
     public ALittleMethodNameDecReference(@NotNull PsiElement element, TextRange textRange) {
         super(element, textRange);
-        m_key = element.getText().substring(textRange.getStartOffset(), textRange.getEndOffset());
-        m_src_namespace = ALittleUtil.getNamespaceName((ALittleFile)element.getContainingFile());
-    }
-
-    public PsiElement guessType() {
-        List<PsiElement> guess_list = guessTypes();
-        if (guess_list.isEmpty()) return null;
-        return guess_list.get(0);
     }
 
     public PsiElement guessTypeForSetter() {
@@ -40,18 +28,18 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
             if (element instanceof ALittleMethodNameDec) {
                 PsiElement parent = element.getParent();
 
-                List<ALittleAllType> all_type_list = new ArrayList<>();
+                List<ALittleAllType> allTypeList = new ArrayList<>();
 
                 if (parent instanceof ALittleClassSetterDec) {
                     ALittleClassSetterDec method_dec = (ALittleClassSetterDec) parent;
                     ALittleMethodParamOneDec param_one_dec = method_dec.getMethodParamOneDec();
-                    if (param_one_dec != null) all_type_list.add(param_one_dec.getMethodParamTypeDec().getAllType());
+                    if (param_one_dec != null) allTypeList.add(param_one_dec.getMethodParamTypeDec().getAllType());
                 }
 
-                for (ALittleAllType all_type : all_type_list) {
-                    PsiElement guess_type = ALittleUtil.guessType(all_type);
-                    if (guess_type != null) {
-                        return guess_type;
+                for (ALittleAllType allType : allTypeList) {
+                    try {
+                        return ALittleUtil.guessType(allType);
+                    } catch (ALittleUtil.ALittleElementException ignored) {
                     }
                 }
             }
@@ -68,18 +56,18 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
             if (element instanceof ALittleMethodNameDec) {
                 PsiElement parent = element.getParent();
 
-                List<ALittleAllType> all_type_list = new ArrayList<>();
+                List<ALittleAllType> allTypeList = new ArrayList<>();
 
                 if (parent instanceof ALittleClassGetterDec) {
                     ALittleClassGetterDec method_dec = (ALittleClassGetterDec) parent;
                     ALittleMethodReturnTypeDec return_type_dec = method_dec.getMethodReturnTypeDec();
-                    if (return_type_dec != null) all_type_list.add(return_type_dec.getAllType());
+                    if (return_type_dec != null) allTypeList.add(return_type_dec.getAllType());
                 }
 
-                for (ALittleAllType all_type : all_type_list) {
-                    PsiElement guess_type = ALittleUtil.guessType(all_type);
-                    if (guess_type != null) {
-                        return guess_type;
+                for (ALittleAllType allType : allTypeList) {
+                    try {
+                        return ALittleUtil.guessType(allType);
+                    } catch (ALittleUtil.ALittleElementException ignored) {
                     }
                 }
             }
@@ -99,49 +87,56 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
             if (element instanceof ALittleMethodNameDec) {
                 PsiElement parent = element.getParent();
 
-                List<ALittleAllType> all_type_list = new ArrayList<>();
+                List<ALittleAllType> allTypeList = new ArrayList<>();
 
+                // 类成员函数
                 if (parent instanceof ALittleClassMethodDec) {
                     ALittleClassMethodDec method_dec = (ALittleClassMethodDec) parent;
                     ALittleMethodReturnDec return_dec = method_dec.getMethodReturnDec();
                     if (return_dec != null) {
-                        List<ALittleMethodReturnTypeDec> return_type_dec_list = return_dec.getMethodReturnTypeDecList();
-                        for (ALittleMethodReturnTypeDec return_type_dec : return_type_dec_list) {
-                            all_type_list.add(return_type_dec.getAllType());
+                        List<ALittleMethodReturnTypeDec> return_type_decList = return_dec.getMethodReturnTypeDecList();
+                        for (ALittleMethodReturnTypeDec return_type_dec : return_type_decList) {
+                            allTypeList.add(return_type_dec.getAllType());
                         }
                     }
+                // getter
                 } else if (parent instanceof ALittleClassGetterDec) {
                     ALittleClassGetterDec method_dec = (ALittleClassGetterDec) parent;
                     ALittleMethodReturnTypeDec return_type_dec = method_dec.getMethodReturnTypeDec();
-                    if (return_type_dec != null) all_type_list.add(return_type_dec.getAllType());
+                    if (return_type_dec != null) allTypeList.add(return_type_dec.getAllType());
+
+                // setter
                 } else if (parent instanceof ALittleClassSetterDec) {
                     ALittleClassSetterDec method_dec = (ALittleClassSetterDec) parent;
                     ALittleMethodParamOneDec param_one_dec = method_dec.getMethodParamOneDec();
-                    if (param_one_dec != null) all_type_list.add(param_one_dec.getMethodParamTypeDec().getAllType());
+                    if (param_one_dec != null) allTypeList.add(param_one_dec.getMethodParamTypeDec().getAllType());
+                // 类静态函数
                 } else if (parent instanceof ALittleClassStaticDec) {
                     ALittleClassStaticDec method_dec = (ALittleClassStaticDec) parent;
                     ALittleMethodReturnDec return_dec = method_dec.getMethodReturnDec();
                     if (return_dec != null) {
-                        List<ALittleMethodReturnTypeDec> return_type_dec_list = return_dec.getMethodReturnTypeDecList();
-                        for (ALittleMethodReturnTypeDec return_type_dec : return_type_dec_list) {
-                            all_type_list.add(return_type_dec.getAllType());
+                        List<ALittleMethodReturnTypeDec> return_type_decList = return_dec.getMethodReturnTypeDecList();
+                        for (ALittleMethodReturnTypeDec return_type_dec : return_type_decList) {
+                            allTypeList.add(return_type_dec.getAllType());
                         }
                     }
+                // 全局函数
                 } else if (parent instanceof ALittleGlobalMethodDec) {
                     ALittleGlobalMethodDec method_dec = (ALittleGlobalMethodDec) parent;
                     ALittleMethodReturnDec return_dec = method_dec.getMethodReturnDec();
                     if (return_dec != null) {
-                        List<ALittleMethodReturnTypeDec> return_type_dec_list = return_dec.getMethodReturnTypeDecList();
-                        for (ALittleMethodReturnTypeDec return_type_dec : return_type_dec_list) {
-                            all_type_list.add(return_type_dec.getAllType());
+                        List<ALittleMethodReturnTypeDec> return_type_decList = return_dec.getMethodReturnTypeDecList();
+                        for (ALittleMethodReturnTypeDec return_type_dec : return_type_decList) {
+                            allTypeList.add(return_type_dec.getAllType());
                         }
                     }
                 }
 
-                for (ALittleAllType all_type : all_type_list) {
-                    PsiElement guess_type = ALittleUtil.guessType(all_type);
-                    if (guess_type != null) {
-                        guess_list.add(guess_type);
+                for (ALittleAllType allType : allTypeList) {
+                    try {
+                        guess_list.add(ALittleUtil.guessType(allType));
+                    } catch (ALittleUtil.ALittleElementException ignored) {
+
                     }
                 }
             }
@@ -154,27 +149,20 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        List<ALittleMethodNameDec> dec_list = new ArrayList<>();
+        List<ALittleMethodNameDec> decList = new ArrayList<>();
 
         PsiElement method_dec = myElement.getParent();
         if (method_dec.getParent() instanceof ALittleClassDec) {
-            ALittleClassDec class_dec = (ALittleClassDec) method_dec.getParent();
-            ALittleUtil.findMethodNameDecList(project, m_src_namespace, class_dec, m_key, dec_list, null, 100);
+            ALittleClassDec classDec = (ALittleClassDec) method_dec.getParent();
+            ALittleUtil.findMethodNameDecList(project, mNamespace, classDec, mKey, decList, null, 100);
         } else if (method_dec.getParent() instanceof ALittleNamespaceDec) {
-            dec_list = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, m_src_namespace, m_key);
+            decList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, mNamespace, mKey);
         }
         List<ResolveResult> results = new ArrayList<>();
-        for (ALittleMethodNameDec dec : dec_list) {
+        for (ALittleMethodNameDec dec : decList) {
             results.add(new PsiElementResolveResult(dec));
         }
         return results.toArray(new ResolveResult[results.size()]);
-    }
-
-    @Nullable
-    @Override
-    public PsiElement resolve() {
-        ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
     }
 
     @NotNull
@@ -185,16 +173,15 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
         List<LookupElement> variants = new ArrayList<>();
         // 类内部的函数
         if (method_dec.getParent() instanceof ALittleClassDec) {
-            ALittleClassDec class_dec = (ALittleClassDec) method_dec.getParent();
+            ALittleClassDec classDec = (ALittleClassDec) method_dec.getParent();
 
-            List<ALittleMethodNameDec> dec_list = new ArrayList<>();
-            List<Icon> icon_list = new ArrayList<>();
-            ALittleUtil.findMethodNameDecList(project, m_src_namespace, class_dec, "", dec_list, icon_list, 100);
-
-            for (int i = 0; i < dec_list.size(); ++i) {
-                ALittleMethodNameDec dec = dec_list.get(i);
+            List<ALittleMethodNameDec> decList = new ArrayList<>();
+            List<Icon> iconList = new ArrayList<>();
+            ALittleUtil.findMethodNameDecList(project, mNamespace, classDec, "", decList, iconList, 100);
+            for (int i = 0; i < decList.size(); ++i) {
+                ALittleMethodNameDec dec = decList.get(i);
                 Icon icon = null;
-                if (i < icon_list.size()) icon = icon_list.get(i);
+                if (i < iconList.size()) icon = iconList.get(i);
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(icon).
                         withTypeText(dec.getContainingFile().getName())
@@ -202,8 +189,8 @@ public class ALittleMethodNameDecReference extends PsiReferenceBase<PsiElement> 
             }
         // 全局函数
         } else if (method_dec.getParent() instanceof ALittleNamespaceDec) {
-            List<ALittleMethodNameDec> dec_list = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, m_src_namespace, "");
-            for (ALittleMethodNameDec dec : dec_list) {
+            List<ALittleMethodNameDec> decList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, mNamespace, "");
+            for (ALittleMethodNameDec dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).
                         withTypeText(dec.getContainingFile().getName())

@@ -16,229 +16,142 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittlePropertyValueMethodCallStatReference extends PsiReferenceBase<PsiElement> implements ALittleReference {
-    private String m_key;
-
+public class ALittlePropertyValueMethodCallStatReference extends ALittleReference {
     public ALittlePropertyValueMethodCallStatReference(@NotNull PsiElement element, TextRange textRange) {
         super(element, textRange);
-        m_key = element.getText().substring(textRange.getStartOffset(), textRange.getEndOffset());
     }
 
-    public PsiElement guessType() {
-        List<PsiElement> guess_list = guessTypes();
-        if (guess_list.isEmpty()) return null;
-        return guess_list.get(0);
-    }
-
+    // 获取类名调用
     public ALittleClassDec guessClassNameInvoke() {
-        ALittlePropertyValueSuffix property_value_suffix = (ALittlePropertyValueSuffix)myElement.getParent();
-        ALittlePropertyValue property_value = (ALittlePropertyValue)property_value_suffix.getParent();
+        ALittlePropertyValueSuffix propertyValueSuffix = (ALittlePropertyValueSuffix)myElement.getParent();
+        ALittlePropertyValue propertyValue = (ALittlePropertyValue)propertyValueSuffix.getParent();
+        List<ALittlePropertyValueSuffix> suffixList = propertyValue.getPropertyValueSuffixList();
+        PsiElement prePropertyValue = propertyValue.getPropertyValueCustomType();
+        if (prePropertyValue == null) {
+            prePropertyValue = propertyValue.getPropertyValueThisType();
+        }
+        if (prePropertyValue == null) {
+            prePropertyValue = propertyValue.getPropertyValueCastType();
+        }
 
-        List<ALittlePropertyValueSuffix> suffix_list = property_value.getPropertyValueSuffixList();
-        PsiElement pre_property_value = property_value.getPropertyValueCustomType();
-        if (pre_property_value == null) {
-            pre_property_value = property_value.getPropertyValueThisType();
-        }
-        if (pre_property_value == null) {
-            pre_property_value = property_value.getPropertyValueCastType();
-        }
-
-        int index = -1;
-        for (int i = 0; i < suffix_list.size(); ++i) {
-            if (suffix_list.get(i).equals(property_value_suffix)) {
-                index = i;
-                break;
-            }
-        }
+        int index = suffixList.indexOf(propertyValueSuffix);
         if (index == -1) return null;
         // 向前走两个后缀
         index -= 2;
         if (index < -1) return null;
 
         if (index >= 0) {
-            ALittlePropertyValueSuffix suffix = suffix_list.get(index);
-            ALittlePropertyValueDotId dot_id = suffix.getPropertyValueDotId();
-            if (dot_id != null) pre_property_value = dot_id;
-            ALittlePropertyValueBrackValueStat brack_value = suffix.getPropertyValueBrackValueStat();
-            if (brack_value != null) pre_property_value = brack_value;
-            ALittlePropertyValueMethodCallStat method_call = suffix.getPropertyValueMethodCallStat();
-            if (method_call != null) pre_property_value = method_call;
+            ALittlePropertyValueSuffix suffix = suffixList.get(index);
+            ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
+            if (dotId != null) prePropertyValue = dotId;
+            ALittlePropertyValueBrackValueStat brackValue = suffix.getPropertyValueBrackValueStat();
+            if (brackValue != null) prePropertyValue = brackValue;
+            ALittlePropertyValueMethodCallStat methodCall = suffix.getPropertyValueMethodCallStat();
+            if (methodCall != null) prePropertyValue = methodCall;
         }
 
         PsiElement pre_type = null;
-        if (pre_property_value instanceof ALittlePropertyValueCustomType) {
-            pre_type = ((ALittlePropertyValueCustomType) pre_property_value).guessType();
-        } else if (pre_property_value instanceof ALittlePropertyValueThisType) {
-            pre_type = ((ALittlePropertyValueThisType) pre_property_value).guessType();
-        } else if (pre_property_value instanceof ALittlePropertyValueCastType) {
-            pre_type = ((ALittlePropertyValueCastType) pre_property_value).guessType();
-        } else if (pre_property_value instanceof  ALittlePropertyValueDotId) {
-            ALittlePropertyValueDotIdName dot_id_name = ((ALittlePropertyValueDotId) pre_property_value).getPropertyValueDotIdName();
-            pre_type = dot_id_name.guessType();
-        } else if (pre_property_value instanceof ALittlePropertyValueMethodCallStat) {
-            pre_type = ((ALittlePropertyValueMethodCallStat) pre_property_value).guessType();
-        } else if (pre_property_value instanceof ALittlePropertyValueBrackValueStat) {
-            pre_type = ((ALittlePropertyValueBrackValueStat) pre_property_value).guessType();
+        if (prePropertyValue instanceof ALittlePropertyValueCustomType) {
+            pre_type = ((ALittlePropertyValueCustomType) prePropertyValue).guessType();
+        } else if (prePropertyValue instanceof ALittlePropertyValueThisType) {
+            pre_type = ((ALittlePropertyValueThisType) prePropertyValue).guessType();
+        } else if (prePropertyValue instanceof ALittlePropertyValueCastType) {
+            pre_type = ((ALittlePropertyValueCastType) prePropertyValue).guessType();
+        } else if (prePropertyValue instanceof  ALittlePropertyValueDotId) {
+            ALittlePropertyValueDotIdName dotId_name = ((ALittlePropertyValueDotId) prePropertyValue).getPropertyValueDotIdName();
+            pre_type = dotId_name.guessType();
+        } else if (prePropertyValue instanceof ALittlePropertyValueMethodCallStat) {
+            pre_type = ((ALittlePropertyValueMethodCallStat) prePropertyValue).guessType();
+        } else if (prePropertyValue instanceof ALittlePropertyValueBrackValueStat) {
+            pre_type = ((ALittlePropertyValueBrackValueStat) prePropertyValue).guessType();
         }
 
         if (!(pre_type instanceof ALittleClassNameDec)) return null;
         return (ALittleClassDec)pre_type.getParent();
     }
 
+    // 获取前缀的类型
     public PsiElement guessTypesForPreType() {
-        ALittlePropertyValueSuffix property_value_suffix = (ALittlePropertyValueSuffix)myElement.getParent();
-        ALittlePropertyValue property_value = (ALittlePropertyValue)property_value_suffix.getParent();
+        ALittlePropertyValueSuffix propertyValueSuffix = (ALittlePropertyValueSuffix)myElement.getParent();
+        ALittlePropertyValue propertyValue = (ALittlePropertyValue)propertyValueSuffix.getParent();
 
-        List<ALittlePropertyValueSuffix> suffix_list = property_value.getPropertyValueSuffixList();
-        PsiElement pre_property_value = property_value.getPropertyValueCustomType();
-        if (pre_property_value == null) {
-            pre_property_value = property_value.getPropertyValueThisType();
+        List<ALittlePropertyValueSuffix> suffixList = propertyValue.getPropertyValueSuffixList();
+        PsiElement prePropertyValue = propertyValue.getPropertyValueCustomType();
+        if (prePropertyValue == null) {
+            prePropertyValue = propertyValue.getPropertyValueThisType();
         }
-        if (pre_property_value == null) {
-            pre_property_value = property_value.getPropertyValueCastType();
+        if (prePropertyValue == null) {
+            prePropertyValue = propertyValue.getPropertyValueCastType();
         }
 
-        for (ALittlePropertyValueSuffix suffix : suffix_list) {
-            if (suffix.equals(property_value_suffix)) {
+        for (ALittlePropertyValueSuffix suffix : suffixList) {
+            if (suffix.equals(propertyValueSuffix)) {
                 break;
             }
-            ALittlePropertyValueDotId dot_id = suffix.getPropertyValueDotId();
-            if (dot_id != null) pre_property_value = dot_id;
-            ALittlePropertyValueBrackValueStat brack_value = suffix.getPropertyValueBrackValueStat();
-            if (brack_value != null) pre_property_value = brack_value;
-            ALittlePropertyValueMethodCallStat method_call = suffix.getPropertyValueMethodCallStat();
-            if (method_call != null) pre_property_value = method_call;
+            ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
+            if (dotId != null) prePropertyValue = dotId;
+            ALittlePropertyValueBrackValueStat brackValue = suffix.getPropertyValueBrackValueStat();
+            if (brackValue != null) prePropertyValue = brackValue;
+            ALittlePropertyValueMethodCallStat methodCall = suffix.getPropertyValueMethodCallStat();
+            if (methodCall != null) prePropertyValue = methodCall;
         }
 
-        if (pre_property_value == null) {
+        if (prePropertyValue == null) {
             return null;
         }
 
         PsiElement pre_type = null;
-        if (pre_property_value instanceof ALittlePropertyValueCustomType) {
-            pre_type = ((ALittlePropertyValueCustomType) pre_property_value).guessType();
-        } else if (pre_property_value instanceof ALittlePropertyValueThisType) {
-            pre_type = ((ALittlePropertyValueThisType) pre_property_value).guessType();
-        } else if (pre_property_value instanceof ALittlePropertyValueCastType) {
-            pre_type = ((ALittlePropertyValueCastType) pre_property_value).guessType();
-        } else if (pre_property_value instanceof  ALittlePropertyValueDotId) {
-            ALittlePropertyValueDotIdName dot_id_name = ((ALittlePropertyValueDotId) pre_property_value).getPropertyValueDotIdName();
-            pre_type = dot_id_name.guessType();
-        } else if (pre_property_value instanceof ALittlePropertyValueMethodCallStat) {
-            pre_type = ((ALittlePropertyValueMethodCallStat) pre_property_value).guessType();
-        } else if (pre_property_value instanceof ALittlePropertyValueBrackValueStat) {
-            pre_type = ((ALittlePropertyValueBrackValueStat) pre_property_value).guessType();
+        if (prePropertyValue instanceof ALittlePropertyValueCustomType) {
+            pre_type = ((ALittlePropertyValueCustomType) prePropertyValue).guessType();
+        } else if (prePropertyValue instanceof ALittlePropertyValueThisType) {
+            pre_type = ((ALittlePropertyValueThisType) prePropertyValue).guessType();
+        } else if (prePropertyValue instanceof ALittlePropertyValueCastType) {
+            pre_type = ((ALittlePropertyValueCastType) prePropertyValue).guessType();
+        } else if (prePropertyValue instanceof  ALittlePropertyValueDotId) {
+            ALittlePropertyValueDotIdName dotId_name = ((ALittlePropertyValueDotId) prePropertyValue).getPropertyValueDotIdName();
+            pre_type = dotId_name.guessType();
+        } else if (prePropertyValue instanceof ALittlePropertyValueMethodCallStat) {
+            pre_type = ((ALittlePropertyValueMethodCallStat) prePropertyValue).guessType();
+        } else if (prePropertyValue instanceof ALittlePropertyValueBrackValueStat) {
+            pre_type = ((ALittlePropertyValueBrackValueStat) prePropertyValue).guessType();
         }
 
         return pre_type;
     }
 
-    @NotNull
-    public List<PsiElement> guessTypes(boolean method_call_multi) {
-        if (!method_call_multi) {
-            return guessTypes();
-        }
-
-        List<PsiElement> guess_list = new ArrayList<>();
-
-        PsiElement pre_type = guessTypesForPreType();
-        if (pre_type == null) {
-            return guess_list;
-        }
-
-        PsiElement guess = null;
-        if (pre_type instanceof ALittleMethodNameDec) {
-            guess_list = ((ALittleMethodNameDec)pre_type).guessTypes();
-        } else if (pre_type instanceof ALittleClassDec) {
-            guess = pre_type;
-        } else if (pre_type instanceof ALittlePrimitiveType && pre_type.getText().equals("any")) {
-            guess_list.add(myElement);
-        } else if (pre_type instanceof ALittlePropertyValueMethodCallStat) {
-            guess_list.add(myElement);
-        } else if (pre_type instanceof ALittlePropertyValueBrackValueStat) {
-            guess_list.add(myElement);
-        } else if (pre_type instanceof ALittleGenericType) {
-            ALittleGenericType dec = (ALittleGenericType)pre_type;
-            if (dec.getGenericFunctorType() != null) {
-                ALittleGenericFunctorType functor_dec = dec.getGenericFunctorType();
-                if (functor_dec.getGenericFunctorReturnType() != null) {
-                    List<ALittleAllType> all_type_list = functor_dec.getGenericFunctorReturnType().getAllTypeList();
-                    List<PsiElement> tmp = new ArrayList<>();
-                    for (ALittleAllType all_type : all_type_list) {
-                        guess = ALittleUtil.guessType(all_type);
-                        if (guess == null) {
-                            tmp = null;
-                            break;
-                        } else {
-                            tmp.add(guess);
-                        }
-                    }
-                    if (tmp != null) guess_list.addAll(tmp);
-                }
-            }
-        }
-
-        if (guess != null) guess_list.add(guess);
-
-        return guess_list;
-    }
-
+    // 获取返回值类型
     @NotNull
     public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
         PsiElement pre_type = guessTypesForPreType();
         if (pre_type == null) {
-            return guess_list;
+            return new ArrayList<>();
         }
 
-        PsiElement guess = null;
+        // 如果是方法名，那么就返回方法名的返回值类型列表
         if (pre_type instanceof ALittleMethodNameDec) {
-            guess = ((ALittleMethodNameDec)pre_type).guessType();
-        } else if (pre_type instanceof ALittleClassDec) {
-            guess = pre_type;
-        } else if (pre_type instanceof ALittlePrimitiveType && pre_type.getText().equals("any")) {
-            guess = myElement;
-        } else if (pre_type instanceof ALittlePropertyValueMethodCallStat) {
-            guess = myElement;
-        } else if (pre_type instanceof ALittlePropertyValueBrackValueStat) {
-            guess = myElement;
+            return ((ALittleMethodNameDec)pre_type).guessTypes();
+        // 如果是Functor那么就返回Functor的返回值类型列表
         } else if (pre_type instanceof ALittleGenericType) {
-            ALittleGenericType dec = (ALittleGenericType)pre_type;
-            if (dec.getGenericFunctorType() != null) {
+            do {
+                ALittleGenericType dec = (ALittleGenericType) pre_type;
+                if (dec.getGenericFunctorType() == null) break;
                 ALittleGenericFunctorType functor_dec = dec.getGenericFunctorType();
-                if (functor_dec.getGenericFunctorReturnType() != null) {
-                    List<ALittleAllType> all_type_list = functor_dec.getGenericFunctorReturnType().getAllTypeList();
-                    if (all_type_list.size() > 0) {
-                        guess = ALittleUtil.guessType(all_type_list.get(0));
+                if (functor_dec.getGenericFunctorReturnType() == null) break;
+
+                // 遍历列表获取返回值
+                List<ALittleAllType> allTypeList = functor_dec.getGenericFunctorReturnType().getAllTypeList();
+                List<PsiElement> guessList = new ArrayList<>();
+                for (ALittleAllType allType : allTypeList) {
+                    try {
+                        guessList.add(ALittleUtil.guessType(allType));
+                    } catch (ALittleUtil.ALittleElementException ignored) {
+                        return new ArrayList<>();
                     }
                 }
-            }
+                return guessList;
+            } while (false);
         }
 
-        if (guess != null) guess_list.add(guess);
-
-        return guess_list;
-    }
-
-    @NotNull
-    @Override
-    public ResolveResult[] multiResolve(boolean incompleteCode) {
-        List<ResolveResult> results = new ArrayList<>();
-        return results.toArray(new ResolveResult[results.size()]);
-    }
-
-    @Nullable
-    @Override
-    public PsiElement resolve() {
-        ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
-    }
-
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-        List<LookupElement> variants = new ArrayList<>();
-        return variants.toArray();
+        return new ArrayList<>();
     }
 }

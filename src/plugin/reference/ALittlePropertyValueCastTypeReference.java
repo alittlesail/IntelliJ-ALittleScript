@@ -15,16 +15,9 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittlePropertyValueCastTypeReference extends PsiReferenceBase<PsiElement> implements ALittleReference {
-
+public class ALittlePropertyValueCastTypeReference extends ALittleReference {
     public ALittlePropertyValueCastTypeReference(@NotNull PsiElement element, TextRange textRange) {
         super(element, textRange);
-    }
-
-    public PsiElement guessType() {
-        List<PsiElement> guess_list = guessTypes();
-        if (guess_list.isEmpty()) return null;
-        return guess_list.get(0);
     }
 
     @NotNull
@@ -33,25 +26,13 @@ public class ALittlePropertyValueCastTypeReference extends PsiReferenceBase<PsiE
 
         if (myElement instanceof ALittlePropertyValueCastType) {
             ALittlePropertyValueCastType element = (ALittlePropertyValueCastType)myElement;
-            PsiElement guess_type = ALittleUtil.guessType(element.getAllType());
-            if (guess_type != null) guess_list.add(guess_type);
+            try {
+                guess_list.add(ALittleUtil.guessType(element.getAllType()));
+            } catch (ALittleUtil.ALittleElementException ignored) {
+            }
         }
 
         return guess_list;
-    }
-
-    @NotNull
-    @Override
-    public ResolveResult[] multiResolve(boolean incompleteCode) {
-        List<ResolveResult> results = new ArrayList<>();
-        return results.toArray(new ResolveResult[results.size()]);
-    }
-
-    @Nullable
-    @Override
-    public PsiElement resolve() {
-        ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
     }
 
     @NotNull

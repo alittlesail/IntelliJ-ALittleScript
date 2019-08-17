@@ -17,18 +17,9 @@ import plugin.psi.ALittleVarAssignNameDec;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittlePrimitiveTypeReference extends PsiReferenceBase<PsiElement> implements ALittleReference {
-    private String m_key;
-
+public class ALittlePrimitiveTypeReference extends ALittleReference {
     public ALittlePrimitiveTypeReference(@NotNull PsiElement element, TextRange textRange) {
         super(element, textRange);
-        m_key = element.getText().substring(textRange.getStartOffset(), textRange.getEndOffset());
-    }
-
-    public PsiElement guessType() {
-        List<PsiElement> guess_list = guessTypes();
-        if (guess_list.isEmpty()) return null;
-        return guess_list.get(0);
     }
 
     @NotNull
@@ -36,20 +27,6 @@ public class ALittlePrimitiveTypeReference extends PsiReferenceBase<PsiElement> 
         List<PsiElement> guess_list = new ArrayList<>();
         guess_list.add(myElement);
         return guess_list;
-    }
-
-    @NotNull
-    @Override
-    public ResolveResult[] multiResolve(boolean incompleteCode) {
-        List<ResolveResult> results = new ArrayList<>();
-        return results.toArray(new ResolveResult[results.size()]);
-    }
-
-    @Nullable
-    @Override
-    public PsiElement resolve() {
-        ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
     }
 
     @NotNull

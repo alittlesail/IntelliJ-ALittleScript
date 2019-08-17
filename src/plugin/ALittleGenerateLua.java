@@ -828,23 +828,23 @@ public class ALittleGenerateLua {
         }
 
         // 后面跟着后缀属性
-        List<ALittlePropertyValueSuffix> suffix_list = prop_value.getPropertyValueSuffixList();
-        for (int index = 0; index < suffix_list.size(); ++index)
+        List<ALittlePropertyValueSuffix> suffixList = prop_value.getPropertyValueSuffixList();
+        for (int index = 0; index < suffixList.size(); ++index)
         {
             // 获取当前后缀
-            ALittlePropertyValueSuffix suffix = suffix_list.get(index);
+            ALittlePropertyValueSuffix suffix = suffixList.get(index);
             // 获取上一个后缀
             ALittlePropertyValueSuffix pre_suffix = null;
-            if (index - 1 >= 0) pre_suffix = suffix_list.get(index - 1);
+            if (index - 1 >= 0) pre_suffix = suffixList.get(index - 1);
             // 获取下一个后缀
             ALittlePropertyValueSuffix next_suffix = null;
-            if (index + 1 < suffix_list.size()) next_suffix = suffix_list.get(index + 1);
+            if (index + 1 < suffixList.size()) next_suffix = suffixList.get(index + 1);
 
             // 如果当前是
-            ALittlePropertyValueDotId dot_id = suffix.getPropertyValueDotId();
-            if (dot_id != null) {
+            ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
+            if (dotId != null) {
                 // 获取类型
-                PsiElement guess = dot_id.getPropertyValueDotIdName().guessType();
+                PsiElement guess = dotId.getPropertyValueDotIdName().guessType();
                 if (guess == null) {
                     throw new Exception("未知的属性类型");
                 }
@@ -924,7 +924,7 @@ public class ALittleGenerateLua {
                     content.append(split);
                 }
 
-                String name_content = dot_id.getPropertyValueDotIdName().getIdContent().getText();
+                String name_content = dotId.getPropertyValueDotIdName().getIdContent().getText();
                 // 因为lua中自带的string模块名和关键字string一样，所以把lua自动的改成String（大些开头）
                 // 然后再翻译的时候，把String改成string
                 if (is_lua_namespace && name_content.equals("String"))
@@ -936,16 +936,16 @@ public class ALittleGenerateLua {
                 continue;
             }
 
-            ALittlePropertyValueBrackValueStat brack_value_stat = suffix.getPropertyValueBrackValueStat();
-            if (brack_value_stat != null) {
-                ALittleValueStat value_stat = brack_value_stat.getValueStat();
+            ALittlePropertyValueBrackValueStat brackValue_stat = suffix.getPropertyValueBrackValueStat();
+            if (brackValue_stat != null) {
+                ALittleValueStat value_stat = brackValue_stat.getValueStat();
                 content.append("[").append(GenerateValueStat(value_stat)).append("]");
                 continue;
             }
 
-            ALittlePropertyValueMethodCallStat method_call_stat = suffix.getPropertyValueMethodCallStat();
-            if (method_call_stat != null) {
-                List<ALittleValueStat> value_stat_list = method_call_stat.getValueStatList();
+            ALittlePropertyValueMethodCallStat methodCall_stat = suffix.getPropertyValueMethodCallStat();
+            if (methodCall_stat != null) {
+                List<ALittleValueStat> value_stat_list = methodCall_stat.getValueStatList();
                 List<String> param_list = new ArrayList<>();
                 for (ALittleValueStat value_stat : value_stat_list) {
                     param_list.add(GenerateValueStat(value_stat));
@@ -987,15 +987,15 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateVarAssignExpr(ALittleVarAssignExpr root, String pre_tab) throws Exception {
-        List<ALittleVarAssignPairDec> pair_dec_list = root.getVarAssignPairDecList();
-        if (pair_dec_list.isEmpty()) {
+        List<ALittleVarAssignPairDec> pair_decList = root.getVarAssignPairDecList();
+        if (pair_decList.isEmpty()) {
             throw new Exception("局部变量没有变量名:" + root.getText());
         }
 
         String content = pre_tab + "local ";
 
         List<String> name_list = new ArrayList<>();
-        for (ALittleVarAssignPairDec pair_dec : pair_dec_list) {
+        for (ALittleVarAssignPairDec pair_dec : pair_decList) {
             name_list.add(pair_dec.getVarAssignNameDec().getIdContent().getText());
         }
         content += String.join(", ", name_list);
@@ -1033,8 +1033,8 @@ public class ALittleGenerateLua {
                 if (this_type != null && prop_value.getPropertyValueSuffixList().size() == 1) {
                     ALittlePropertyValueSuffix suffix = prop_value.getPropertyValueSuffixList().get(0);
                     if (suffix.getPropertyValueDotId() != null) {
-                        ALittlePropertyValueDotId dot_id = suffix.getPropertyValueDotId();
-                        String attr_name = dot_id.getPropertyValueDotIdName().getText();
+                        ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
+                        String attr_name = dotId.getPropertyValueDotIdName().getText();
                         PsiElement this_element = this_type.guessType();
                         if (this_element instanceof ALittleClassDec) {
                             List<ALittleClassVarNameDec> var_name_list = new ArrayList<>();
@@ -1362,10 +1362,10 @@ public class ALittleGenerateLua {
                 .append(name_dec.getIdContent().getText())
                 .append(" = {\n");
 
-        List<ALittleEnumVarDec> var_dec_list = root.getEnumVarDecList();
+        List<ALittleEnumVarDec> var_decList = root.getEnumVarDecList();
         int enum_value = -1;
         String enum_string = "-1";
-        for (ALittleEnumVarDec var_dec : var_dec_list) {
+        for (ALittleEnumVarDec var_dec : var_decList) {
             ALittleEnumVarNameDec var_name_dec = var_dec.getEnumVarNameDec();
             ALittleEnumVarValueDec var_value_dec = var_dec.getEnumVarValueDec();
             if (var_value_dec == null) {
@@ -1431,18 +1431,18 @@ public class ALittleGenerateLua {
 
         //构建构造函数//////////////////////////////////////////////////////////////////////////////////////////
         String ctor_param_list = "";
-        List<ALittleClassCtorDec> ctor_dec_list = root.getClassCtorDecList();
-        if (ctor_dec_list.size() > 1) {
+        List<ALittleClassCtorDec> ctor_decList = root.getClassCtorDecList();
+        if (ctor_decList.size() > 1) {
             throw new Exception("class " + class_name + " 最多只能有一个构造函数");
         }
-        if (ctor_dec_list.size() > 0) {
-            ALittleClassCtorDec ctor_dec = ctor_dec_list.get(0);
+        if (ctor_decList.size() > 0) {
+            ALittleClassCtorDec ctor_dec = ctor_decList.get(0);
             List<String> param_name_list = new ArrayList<>();
 
             ALittleMethodParamDec param_dec = ctor_dec.getMethodParamDec();
             if (param_dec != null) {
-                List<ALittleMethodParamOneDec> param_one_dec_list = param_dec.getMethodParamOneDecList();
-                for (ALittleMethodParamOneDec param_one_dec : param_one_dec_list) {
+                List<ALittleMethodParamOneDec> param_one_decList = param_dec.getMethodParamOneDecList();
+                for (ALittleMethodParamOneDec param_one_dec : param_one_decList) {
                     ALittleMethodParamNameDec param_name_dec = param_one_dec.getMethodParamNameDec();
                     if (param_name_dec == null) {
                         throw new Exception("class " + class_name + " 的构造函数没有参数名");
@@ -1475,8 +1475,8 @@ public class ALittleGenerateLua {
             content.append("\n");
         }
         //构建getter函数///////////////////////////////////////////////////////////////////////////////////////
-        List<ALittleClassGetterDec> class_getter_dec_list = root.getClassGetterDecList();
-        for (ALittleClassGetterDec class_getter_dec : class_getter_dec_list) {
+        List<ALittleClassGetterDec> class_getter_decList = root.getClassGetterDecList();
+        for (ALittleClassGetterDec class_getter_dec : class_getter_decList) {
             ALittleMethodNameDec class_method_name_dec = class_getter_dec.getMethodNameDec();
             if (class_method_name_dec == null) {
                 throw new Exception("class " + class_name + " getter函数没有函数名");
@@ -1501,8 +1501,8 @@ public class ALittleGenerateLua {
             content.append("\n");
         }
         //构建setter函数///////////////////////////////////////////////////////////////////////////////////////
-        List<ALittleClassSetterDec> class_setter_dec_list = root.getClassSetterDecList();
-        for (ALittleClassSetterDec class_setter_dec : class_setter_dec_list) {
+        List<ALittleClassSetterDec> class_setter_decList = root.getClassSetterDecList();
+        for (ALittleClassSetterDec class_setter_dec : class_setter_decList) {
             ALittleMethodNameDec class_method_name_dec = class_setter_dec.getMethodNameDec();
             if (class_method_name_dec == null) {
                 throw new Exception("class " + class_name + " setter函数没有函数名");
@@ -1537,8 +1537,8 @@ public class ALittleGenerateLua {
             content.append("\n");
         }
         //构建成员函数//////////////////////////////////////////////////////////////////////////////////////////
-        List<ALittleClassMethodDec> class_method_dec_list = root.getClassMethodDecList();
-        for (ALittleClassMethodDec class_method_dec : class_method_dec_list) {
+        List<ALittleClassMethodDec> class_method_decList = root.getClassMethodDecList();
+        for (ALittleClassMethodDec class_method_dec : class_method_decList) {
             ALittleMethodNameDec class_method_name_dec = class_method_dec.getMethodNameDec();
             if (class_method_name_dec == null) {
                 throw new Exception("class " + class_name + " 成员函数没有函数名");
@@ -1547,8 +1547,8 @@ public class ALittleGenerateLua {
             List<String> param_name_list = new ArrayList<>();
             ALittleMethodParamDec param_dec = class_method_dec.getMethodParamDec();
             if (param_dec != null) {
-                List<ALittleMethodParamOneDec> param_one_dec_list = param_dec.getMethodParamOneDecList();
-                for (ALittleMethodParamOneDec param_one_dec : param_one_dec_list) {
+                List<ALittleMethodParamOneDec> param_one_decList = param_dec.getMethodParamOneDecList();
+                for (ALittleMethodParamOneDec param_one_dec : param_one_decList) {
                     ALittleMethodParamNameDec param_name_dec = param_one_dec.getMethodParamNameDec();
                     if (param_name_dec == null) {
                         throw new Exception("class " + class_name + " 成员函数没有参数名");
@@ -1587,8 +1587,8 @@ public class ALittleGenerateLua {
             content.append("\n");
         }
         //构建静态函数//////////////////////////////////////////////////////////////////////////////////////////
-        List<ALittleClassStaticDec> class_static_dec_list = root.getClassStaticDecList();
-        for (ALittleClassStaticDec class_static_dec : class_static_dec_list) {
+        List<ALittleClassStaticDec> class_static_decList = root.getClassStaticDecList();
+        for (ALittleClassStaticDec class_static_dec : class_static_decList) {
             ALittleMethodNameDec class_method_name_dec = class_static_dec.getMethodNameDec();
             if (class_method_name_dec == null) {
                 throw new Exception("class " + class_name + " 静态函数没有函数名");
@@ -1596,8 +1596,8 @@ public class ALittleGenerateLua {
             List<String> param_name_list = new ArrayList<>();
             ALittleMethodParamDec param_dec = class_static_dec.getMethodParamDec();
             if (param_dec != null) {
-                List<ALittleMethodParamOneDec> param_one_dec_list = param_dec.getMethodParamOneDecList();
-                for (ALittleMethodParamOneDec param_one_dec : param_one_dec_list) {
+                List<ALittleMethodParamOneDec> param_one_decList = param_dec.getMethodParamOneDecList();
+                for (ALittleMethodParamOneDec param_one_dec : param_one_decList) {
                     ALittleMethodParamNameDec param_name_dec = param_one_dec.getMethodParamNameDec();
                     if (param_name_dec == null) {
                         throw new Exception("class " + class_name + " 静态函数没有参数名");
@@ -1686,8 +1686,8 @@ public class ALittleGenerateLua {
         List<String> param_name_list = new ArrayList<>();
         ALittleMethodParamDec param_dec = root.getMethodParamDec();
         if (param_dec != null) {
-            List<ALittleMethodParamOneDec> param_one_dec_list = param_dec.getMethodParamOneDecList();
-            for (ALittleMethodParamOneDec param_one_dec : param_one_dec_list) {
+            List<ALittleMethodParamOneDec> param_one_decList = param_dec.getMethodParamOneDecList();
+            for (ALittleMethodParamOneDec param_one_dec : param_one_decList) {
                 ALittleMethodParamNameDec param_name_dec = param_one_dec.getMethodParamNameDec();
                 if (param_name_dec == null) {
                     throw new Exception("全局函数" + method_name + "没有参数名");

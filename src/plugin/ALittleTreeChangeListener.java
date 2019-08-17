@@ -39,22 +39,22 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         return result;
     }
 
-    public static List<ALittleClassNameDec> findClassNameDecList(Project project, String src_namespace, String src_name) {
+    public static List<ALittleClassNameDec> findClassNameDecList(Project project, String namespace, String name) {
         List<ALittleClassNameDec> result = new ArrayList<>();
 
         ALittleTreeChangeListener listener = s_map.get(project);
         if (listener == null) return result;
         if (!listener.m_reload_ed) listener.reload();
 
-        Data data = listener.m_data_map.get(src_namespace);
+        Data data = listener.m_data_map.get(namespace);
         if (data == null || data.class_map == null) return result;
 
-        if (src_name.isEmpty()) {
+        if (name.isEmpty()) {
             for (Map.Entry<String, Set<ALittleClassNameDec>> entry : data.class_map.entrySet()) {
                 result.addAll(entry.getValue());
             }
         } else {
-            Set<ALittleClassNameDec> set = data.class_map.get(src_name);
+            Set<ALittleClassNameDec> set = data.class_map.get(name);
             if (set != null) {
                 result.addAll(set);
             }
@@ -188,8 +188,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
         if (!listener.m_reload_ed) listener.reload();
 
-        List<ALittleNamespaceDec> namespace_dec_list = ALittleUtil.getNamespaceDec(alittleFile);
-        for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
+        List<ALittleNamespaceDec> namespace_decList = ALittleUtil.getNamespaceDec(alittleFile);
+        for (ALittleNamespaceDec namespace_dec : namespace_decList) {
 
             ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
             if (namespace_name_dec == null) continue;
@@ -220,8 +220,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         if (listener == null) return;
         if (!listener.m_reload_ed) listener.reload();
 
-        List<ALittleNamespaceDec> namespace_dec_list = ALittleUtil.getNamespaceDec(alittleFile);
-        for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
+        List<ALittleNamespaceDec> namespace_decList = ALittleUtil.getNamespaceDec(alittleFile);
+        for (ALittleNamespaceDec namespace_dec : namespace_decList) {
 
             ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
             if (namespace_name_dec == null) continue;
@@ -395,13 +395,13 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         } else {
             PsiFile psi_file = psi_mgr.findFile(root);
             if (psi_file instanceof ALittleFile) {
-                List<ALittleNamespaceDec> namespace_dec_list = new ArrayList<>();
+                List<ALittleNamespaceDec> namespace_decList = new ArrayList<>();
                 for(PsiElement child = psi_file.getFirstChild(); child != null; child = child.getNextSibling()) {
                     if (child instanceof ALittleNamespaceDec) {
-                        namespace_dec_list.add((ALittleNamespaceDec)child);
+                        namespace_decList.add((ALittleNamespaceDec)child);
                     }
                 }
-                for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
+                for (ALittleNamespaceDec namespace_dec : namespace_decList) {
 
                     ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
                     if (namespace_name_dec == null) continue;
@@ -587,8 +587,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         PsiFile file = var1.getFile();
         if (file instanceof ALittleFile) {
             ALittleFile alittleFile = (ALittleFile)file;
-            List<ALittleNamespaceDec> namespace_dec_list = ALittleUtil.getNamespaceDec(alittleFile);
-            for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
+            List<ALittleNamespaceDec> namespace_decList = ALittleUtil.getNamespaceDec(alittleFile);
+            for (ALittleNamespaceDec namespace_dec : namespace_decList) {
 
                 ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
                 if (namespace_name_dec == null) continue;
@@ -619,8 +619,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         PsiFile file = var1.getFile();
         if (file instanceof ALittleFile) {
             ALittleFile alittleFile = (ALittleFile)file;
-            List<ALittleNamespaceDec> namespace_dec_list = ALittleUtil.getNamespaceDec(alittleFile);
-            for (ALittleNamespaceDec namespace_dec : namespace_dec_list) {
+            List<ALittleNamespaceDec> namespace_decList = ALittleUtil.getNamespaceDec(alittleFile);
+            for (ALittleNamespaceDec namespace_dec : namespace_decList) {
 
                 ALittleNamespaceNameDec namespace_name_dec = namespace_dec.getNamespaceNameDec();
                 if (namespace_name_dec == null) continue;
