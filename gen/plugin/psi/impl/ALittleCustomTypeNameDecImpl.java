@@ -8,11 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
-import plugin.psi.ALittleCustomTypeNameDecElement;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittleCustomTypeNameDecImpl extends ALittleCustomTypeNameDecElement implements ALittleCustomTypeNameDec {
+public class ALittleCustomTypeNameDecImpl extends ASTWrapperPsiElement implements ALittleCustomTypeNameDec {
 
   public ALittleCustomTypeNameDecImpl(@NotNull ASTNode node) {
     super(node);

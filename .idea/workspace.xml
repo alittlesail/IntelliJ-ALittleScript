@@ -15,31 +15,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittleAutoTypeElement.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/psi/PsiNameIdentifierOwner.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="10" column="17" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="403">
-              <caret line="81" column="9" selection-start-line="81" selection-start-column="9" selection-end-line="81" selection-end-column="9" />
+            <state relative-caret-position="285">
+              <caret line="62" selection-start-line="62" selection-end-line="62" />
               <folding>
                 <element signature="e#0#2015#0" expanded="true" />
               </folding>
@@ -47,20 +26,65 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/plugin/_ALittleLexer.flex">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittleTokenType.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="38">
-              <caret line="78" column="34" selection-start-line="78" selection-start-column="34" selection-end-line="78" selection-end-column="34" />
+            <state relative-caret-position="150">
+              <caret line="17" selection-start-line="17" selection-end-line="17" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleAutoTypeReference.java">
+        <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAccessModifier.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-75">
-              <caret line="16" column="52" selection-start-line="16" selection-start-column="52" selection-end-line="16" selection-end-column="52" />
+            <state relative-caret-position="75">
+              <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAccessModifierImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="29" selection-start-line="29" selection-end-line="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAllExprImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="360">
+              <caret line="45" selection-start-line="45" selection-end-line="45" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAllTypeImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="24" column="75" selection-start-line="24" selection-start-column="75" selection-end-line="24" selection-end-column="75" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAllExpr.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="200">
+              <caret line="25" column="30" lean-forward="true" selection-start-line="25" selection-start-column="30" selection-end-line="25" selection-end-column="30" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAutoTypeImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="240">
+              <caret line="29" column="11" lean-forward="true" selection-start-line="29" selection-start-column="11" selection-end-line="29" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -77,12 +101,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
-              <folding>
-                <element signature="e#323#324#0" expanded="true" />
-                <element signature="e#385#386#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="585">
+              <caret line="48" column="1" selection-start-line="48" selection-start-column="1" selection-end-line="48" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -232,8 +252,8 @@
         <option value="$PROJECT_DIR$/src/plugin/psi/ALittleStructVarNameDecElementImpl.java" />
         <option value="$PROJECT_DIR$/src/plugin/psi/ALittleVarAssignNameDecElementImpl.java" />
         <option value="$PROJECT_DIR$/src/plugin/psi/ALittleAutoTypeElement.java" />
-        <option value="$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittle.bnf" />
+        <option value="$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java" />
       </list>
     </option>
   </component>
@@ -250,7 +270,7 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1936" />
@@ -261,6 +281,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -268,6 +289,32 @@
             <path>
               <item name="ALittleScript" type="b2602c69:ProjectViewProjectNode" />
               <item name="trunk" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ALittleScript" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trunk" type="462c0819:PsiDirectoryNode" />
+              <item name="gen" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ALittleScript" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trunk" type="462c0819:PsiDirectoryNode" />
+              <item name="gen" type="462c0819:PsiDirectoryNode" />
+              <item name="plugin" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ALittleScript" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trunk" type="462c0819:PsiDirectoryNode" />
+              <item name="gen" type="462c0819:PsiDirectoryNode" />
+              <item name="plugin" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ALittleScript" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trunk" type="462c0819:PsiDirectoryNode" />
+              <item name="gen" type="462c0819:PsiDirectoryNode" />
+              <item name="plugin" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+              <item name="impl" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ALittleScript" type="b2602c69:ProjectViewProjectNode" />
@@ -374,7 +421,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -482,10 +528,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1015" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1015" extended-state="7" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.228125" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.228125" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -495,7 +541,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49947917" weight="0.2289823" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49626866" weight="0.29424778" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.490625" weight="0.27544248" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.490625" visible="true" weight="0.27544248" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -533,33 +579,10 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittleInstanceNameDecElement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="40" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="40" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittleMethodNameDecElement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="38" selection-start-line="8" selection-start-column="38" selection-end-line="8" selection-end-column="38" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittleMethodParamNameDecElement.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="43" selection-start-line="8" selection-start-column="43" selection-end-line="8" selection-end-column="43" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -567,9 +590,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="41" selection-start-line="8" selection-start-column="41" selection-end-line="8" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -577,9 +597,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="38" selection-start-line="8" selection-start-column="38" selection-end-line="8" selection-end-column="38" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -587,9 +604,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="52" selection-start-line="8" selection-start-column="52" selection-end-line="8" selection-end-column="52" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -597,9 +611,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="46" selection-start-line="8" selection-start-column="46" selection-end-line="8" selection-end-column="46" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -607,9 +618,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -617,9 +625,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="47" selection-start-line="8" selection-start-column="47" selection-end-line="8" selection-end-column="47" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -627,9 +632,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="52" selection-start-line="8" selection-start-column="52" selection-end-line="8" selection-end-column="52" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -637,23 +639,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="46" selection-start-line="8" selection-start-column="46" selection-end-line="8" selection-end-column="46" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAllTypeImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAutoTypeImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="14" column="80" lean-forward="true" selection-start-line="14" selection-start-column="80" selection-end-line="14" selection-end-column="80" />
         </state>
       </provider>
     </entry>
@@ -671,55 +656,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gen/generated/psi/ALittleClassAccessModifier.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleClassExtendsAccessModifierImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleCoroutineModifierImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleClassNameDecImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="12" column="86" lean-forward="true" selection-start-line="12" selection-start-column="86" selection-end-line="12" selection-end-column="86" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/generated/psi/ALittleClassNameDec.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="29" column="46" lean-forward="true" selection-start-line="29" selection-start-column="46" selection-end-line="29" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAllTypeImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="13" column="79" selection-start-line="13" selection-start-column="79" selection-end-line="13" selection-end-column="79" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/generated/psi/ALittleAllType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/generated/psi/ALittleClassAccessModifier.java" />
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleClassExtendsAccessModifierImpl.java" />
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleCoroutineModifierImpl.java" />
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleClassNameDecImpl.java" />
+    <entry file="file://$PROJECT_DIR$/gen/generated/psi/ALittleClassNameDec.java" />
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAllTypeImpl.java" />
+    <entry file="file://$PROJECT_DIR$/gen/generated/psi/ALittleAllType.java" />
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/util.jar!/com/intellij/openapi/util/UserDataHolderBase.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -748,20 +691,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleGenericFunctorTypeImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAccessModifierImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="13" column="84" selection-start-line="13" selection-start-column="84" selection-end-line="13" selection-end-column="84" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleGenericFunctorTypeImpl.java" />
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAccessModifierImpl.java" />
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/psi/PsiElement.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
@@ -769,13 +700,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gen/generated/psi/ALittleAccessModifier.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/generated/psi/ALittleAccessModifier.java" />
     <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleClassExtendsAccessModifier.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
@@ -811,31 +736,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAllExprImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAccessModifier.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/psi/PsiReferenceBase.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="13" column="22" selection-start-line="13" selection-start-column="22" selection-end-line="13" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAutoType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
         </state>
       </provider>
     </entry>
@@ -846,9 +750,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleClassAccessModifier.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittleBindStatElement.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueDotIdNameImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="14" column="7" selection-start-line="14" selection-start-column="7" selection-end-line="14" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleAutoTypeReference.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-75">
+        <state relative-caret-position="60">
           <caret line="16" column="52" selection-start-line="16" selection-start-column="52" selection-end-line="16" selection-end-column="52" />
         </state>
       </provider>
@@ -860,69 +785,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/psi/PsiNameIdentifierOwner.class">
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAutoType.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="10" column="17" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleClassAccessModifier.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAccessModifierImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="29" selection-start-line="29" selection-end-line="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittleBindStatElement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="75">
+          <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittleAutoTypeElement.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
-          <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
+          <caret line="7" column="73" selection-start-line="7" selection-start-column="53" selection-end-line="7" selection-end-column="73" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueDotIdNameImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="14" column="7" selection-start-line="14" selection-start-column="7" selection-end-line="14" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
-          <folding>
-            <element signature="e#323#324#0" expanded="true" />
-            <element signature="e#385#386#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="585">
+          <caret line="48" column="1" selection-start-line="48" selection-start-column="1" selection-end-line="48" selection-end-column="1" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="403">
-          <caret line="81" column="9" selection-start-line="81" selection-start-column="9" selection-end-line="81" selection-end-column="9" />
+        <state relative-caret-position="285">
+          <caret line="62" selection-start-line="62" selection-end-line="62" />
           <folding>
             <element signature="e#0#2015#0" expanded="true" />
           </folding>
@@ -933,6 +823,62 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="38">
           <caret line="78" column="34" selection-start-line="78" selection-start-column="34" selection-end-line="78" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/psi/PsiNameIdentifierOwner.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittleTokenType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAccessModifier.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAccessModifierImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="29" selection-start-line="29" selection-end-line="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAllExprImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="45" selection-start-line="45" selection-end-line="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAllTypeImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="24" column="75" selection-start-line="24" selection-start-column="75" selection-end-line="24" selection-end-column="75" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleAllExpr.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="25" column="30" lean-forward="true" selection-start-line="25" selection-start-column="30" selection-end-line="25" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAutoTypeImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="29" column="11" lean-forward="true" selection-start-line="29" selection-start-column="11" selection-end-line="29" selection-end-column="11" />
         </state>
       </provider>
     </entry>

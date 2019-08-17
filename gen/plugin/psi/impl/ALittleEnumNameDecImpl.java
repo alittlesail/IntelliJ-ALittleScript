@@ -8,11 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
-import plugin.psi.ALittleEnumNameDecElement;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittleEnumNameDecImpl extends ALittleEnumNameDecElement implements ALittleEnumNameDec {
+public class ALittleEnumNameDecImpl extends ASTWrapperPsiElement implements ALittleEnumNameDec {
 
   public ALittleEnumNameDecImpl(@NotNull ASTNode node) {
     super(node);

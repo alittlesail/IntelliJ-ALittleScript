@@ -8,11 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
-import plugin.psi.ALittlePropertyValueDotIdNameElement;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittlePropertyValueDotIdNameImpl extends ALittlePropertyValueDotIdNameElement implements ALittlePropertyValueDotIdName {
+public class ALittlePropertyValueDotIdNameImpl extends ASTWrapperPsiElement implements ALittlePropertyValueDotIdName {
 
   public ALittlePropertyValueDotIdNameImpl(@NotNull ASTNode node) {
     super(node);

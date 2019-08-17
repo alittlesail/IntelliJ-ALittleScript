@@ -8,11 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
-import plugin.psi.ALittleMethodParamNameDecElement;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittleMethodParamNameDecImpl extends ALittleMethodParamNameDecElement implements ALittleMethodParamNameDec {
+public class ALittleMethodParamNameDecImpl extends ASTWrapperPsiElement implements ALittleMethodParamNameDec {
 
   public ALittleMethodParamNameDecImpl(@NotNull ASTNode node) {
     super(node);

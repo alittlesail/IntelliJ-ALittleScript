@@ -8,11 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
-import plugin.psi.ALittlePrimitiveTypeElement;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittlePrimitiveTypeImpl extends ALittlePrimitiveTypeElement implements ALittlePrimitiveType {
+public class ALittlePrimitiveTypeImpl extends ASTWrapperPsiElement implements ALittlePrimitiveType {
 
   public ALittlePrimitiveTypeImpl(@NotNull ASTNode node) {
     super(node);

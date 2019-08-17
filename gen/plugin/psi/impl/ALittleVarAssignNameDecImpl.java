@@ -8,11 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
-import plugin.psi.ALittleVarAssignNameDecElement;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittleVarAssignNameDecImpl extends ALittleVarAssignNameDecElement implements ALittleVarAssignNameDec {
+public class ALittleVarAssignNameDecImpl extends ASTWrapperPsiElement implements ALittleVarAssignNameDec {
 
   public ALittleVarAssignNameDecImpl(@NotNull ASTNode node) {
     super(node);

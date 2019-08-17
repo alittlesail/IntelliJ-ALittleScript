@@ -8,11 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
-import plugin.psi.ALittlePropertyValueBrackValueStatElement;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittlePropertyValueBrackValueStatImpl extends ALittlePropertyValueBrackValueStatElement implements ALittlePropertyValueBrackValueStat {
+public class ALittlePropertyValueBrackValueStatImpl extends ASTWrapperPsiElement implements ALittlePropertyValueBrackValueStat {
 
   public ALittlePropertyValueBrackValueStatImpl(@NotNull ASTNode node) {
     super(node);

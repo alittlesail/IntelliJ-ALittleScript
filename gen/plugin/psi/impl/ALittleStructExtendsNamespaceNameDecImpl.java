@@ -8,11 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
-import plugin.psi.ALittleStructExtendsNamespaceNameDecElement;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
 
-public class ALittleStructExtendsNamespaceNameDecImpl extends ALittleStructExtendsNamespaceNameDecElement implements ALittleStructExtendsNamespaceNameDec {
+public class ALittleStructExtendsNamespaceNameDecImpl extends ASTWrapperPsiElement implements ALittleStructExtendsNamespaceNameDec {
 
   public ALittleStructExtendsNamespaceNameDecImpl(@NotNull ASTNode node) {
     super(node);
