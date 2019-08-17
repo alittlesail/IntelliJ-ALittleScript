@@ -18,8 +18,4 @@ public interface ALittlePropertyValueCustomType extends PsiElement {
 
   PsiReference getReference();
 
-  PsiElement getNameIdentifier();
-
-  PsiElement setName(String new_name);
-
 }

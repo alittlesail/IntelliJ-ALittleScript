@@ -18,8 +18,4 @@ public interface ALittleStructExtendsNamespaceNameDec extends PsiElement {
 
   PsiReference getReference();
 
-  PsiElement getNameIdentifier();
-
-  PsiElement setName(String new_name);
-
 }

@@ -1,35 +1,14 @@
 package plugin.psi;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.reference.*;
-import plugin.psi.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class ALittlePsiImplUtil {
-    public static PsiElement getNameIdentifier(PsiElement element) {
-        ASTNode keyNode = element.getNode().findChildByType(ALittleTypes.ID_CONTENT);
-        if (keyNode != null) {
-            return keyNode.getPsi();
-        } else {
-            return null;
-        }
-    }
-
-    public static PsiElement setName(PsiElement element, String new_name) {
-        ASTNode node = element.getNode().findChildByType(ALittleTypes.ID_CONTENT);
-        if (node != null) {
-            PsiElement dec = ALittleElementFactory.create(element, new_name);
-            ASTNode new_node = dec.getNode().findChildByType(ALittleTypes.ID_CONTENT);
-            if (new_node != null) element.getNode().replaceChild(node, new_node);
-        }
-        return element;
-    }
-
     public static PsiReference getReference(PsiElement element) {
         return ALittleReferenceFactory.create(element);
     }

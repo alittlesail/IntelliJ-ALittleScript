@@ -49,14 +49,4 @@ public class ALittleStructNameDecImpl extends ASTWrapperPsiElement implements AL
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public PsiElement getNameIdentifier() {
-    return ALittlePsiImplUtil.getNameIdentifier(this);
-  }
-
-  @Override
-  public PsiElement setName(String new_name) {
-    return ALittlePsiImplUtil.setName(this, new_name);
-  }
-
 }
