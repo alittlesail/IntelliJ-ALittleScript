@@ -59,6 +59,19 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // primitive_type | generic_type | custom_type
+  public static boolean allType(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "allType")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, ALL_TYPE, "<all type>");
+    r = primitive_type(b, l + 1);
+    if (!r) r = generic_type(b, l + 1);
+    if (!r) r = custom_type(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // var_assign_expr |
   //             op_assign_expr |
   //             op_1_expr |
@@ -69,7 +82,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   //             return_expr |
   //             flow_expr |
   //             wrap_expr |
-  //             property_value_expr |
+  //             propertyValue_expr |
   //             empty_expr
   public static boolean all_expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "all_expr")) return false;
@@ -85,21 +98,8 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = return_expr(b, l + 1);
     if (!r) r = flow_expr(b, l + 1);
     if (!r) r = wrap_expr(b, l + 1);
-    if (!r) r = property_value_expr(b, l + 1);
+    if (!r) r = propertyValue_expr(b, l + 1);
     if (!r) r = empty_expr(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // primitive_type | generic_type | custom_type
-  public static boolean all_type(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "all_type")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, ALL_TYPE, "<all type>");
-    r = primitive_type(b, l + 1);
-    if (!r) r = generic_type(b, l + 1);
-    if (!r) r = custom_type(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -172,6 +172,100 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // class_access_modifier? class class_name_dec (COLON class_extends_access_modifier? (class_extends_namespace_name_dec DOT)? class_extends_name_dec)? LBRACE (class_var_dec | class_ctor_dec | class_getter_dec | class_setter_dec | class_static_dec | class_method_dec)* RBRACE
+  public static boolean classDec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classDec")) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, CLASS_DEC, "<class dec>");
+    r = classDec_0(b, l + 1);
+    r = r && consumeToken(b, CLASS);
+    p = r; // pin = 2
+    r = r && report_error_(b, class_name_dec(b, l + 1));
+    r = p && report_error_(b, classDec_3(b, l + 1)) && r;
+    r = p && report_error_(b, consumeToken(b, LBRACE)) && r;
+    r = p && report_error_(b, classDec_5(b, l + 1)) && r;
+    r = p && consumeToken(b, RBRACE) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // class_access_modifier?
+  private static boolean classDec_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classDec_0")) return false;
+    class_access_modifier(b, l + 1);
+    return true;
+  }
+
+  // (COLON class_extends_access_modifier? (class_extends_namespace_name_dec DOT)? class_extends_name_dec)?
+  private static boolean classDec_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classDec_3")) return false;
+    classDec_3_0(b, l + 1);
+    return true;
+  }
+
+  // COLON class_extends_access_modifier? (class_extends_namespace_name_dec DOT)? class_extends_name_dec
+  private static boolean classDec_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classDec_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COLON);
+    r = r && classDec_3_0_1(b, l + 1);
+    r = r && classDec_3_0_2(b, l + 1);
+    r = r && class_extends_name_dec(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // class_extends_access_modifier?
+  private static boolean classDec_3_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classDec_3_0_1")) return false;
+    class_extends_access_modifier(b, l + 1);
+    return true;
+  }
+
+  // (class_extends_namespace_name_dec DOT)?
+  private static boolean classDec_3_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classDec_3_0_2")) return false;
+    classDec_3_0_2_0(b, l + 1);
+    return true;
+  }
+
+  // class_extends_namespace_name_dec DOT
+  private static boolean classDec_3_0_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classDec_3_0_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = class_extends_namespace_name_dec(b, l + 1);
+    r = r && consumeToken(b, DOT);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (class_var_dec | class_ctor_dec | class_getter_dec | class_setter_dec | class_static_dec | class_method_dec)*
+  private static boolean classDec_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classDec_5")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!classDec_5_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "classDec_5", c)) break;
+    }
+    return true;
+  }
+
+  // class_var_dec | class_ctor_dec | class_getter_dec | class_setter_dec | class_static_dec | class_method_dec
+  private static boolean classDec_5_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classDec_5_0")) return false;
+    boolean r;
+    r = class_var_dec(b, l + 1);
+    if (!r) r = class_ctor_dec(b, l + 1);
+    if (!r) r = class_getter_dec(b, l + 1);
+    if (!r) r = class_setter_dec(b, l + 1);
+    if (!r) r = class_static_dec(b, l + 1);
+    if (!r) r = class_method_dec(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
   // access_modifier
   public static boolean class_access_modifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_access_modifier")) return false;
@@ -202,100 +296,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "class_ctor_dec_0")) return false;
     access_modifier(b, l + 1);
     return true;
-  }
-
-  /* ********************************************************** */
-  // class_access_modifier? class class_name_dec (COLON class_extends_access_modifier? (class_extends_namespace_name_dec DOT)? class_extends_name_dec)? LBRACE (class_var_dec | class_ctor_dec | class_getter_dec | class_setter_dec | class_static_dec | class_method_dec)* RBRACE
-  public static boolean class_dec(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_dec")) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, CLASS_DEC, "<class dec>");
-    r = class_dec_0(b, l + 1);
-    r = r && consumeToken(b, CLASS);
-    p = r; // pin = 2
-    r = r && report_error_(b, class_name_dec(b, l + 1));
-    r = p && report_error_(b, class_dec_3(b, l + 1)) && r;
-    r = p && report_error_(b, consumeToken(b, LBRACE)) && r;
-    r = p && report_error_(b, class_dec_5(b, l + 1)) && r;
-    r = p && consumeToken(b, RBRACE) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  // class_access_modifier?
-  private static boolean class_dec_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_dec_0")) return false;
-    class_access_modifier(b, l + 1);
-    return true;
-  }
-
-  // (COLON class_extends_access_modifier? (class_extends_namespace_name_dec DOT)? class_extends_name_dec)?
-  private static boolean class_dec_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_dec_3")) return false;
-    class_dec_3_0(b, l + 1);
-    return true;
-  }
-
-  // COLON class_extends_access_modifier? (class_extends_namespace_name_dec DOT)? class_extends_name_dec
-  private static boolean class_dec_3_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_dec_3_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, COLON);
-    r = r && class_dec_3_0_1(b, l + 1);
-    r = r && class_dec_3_0_2(b, l + 1);
-    r = r && class_extends_name_dec(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // class_extends_access_modifier?
-  private static boolean class_dec_3_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_dec_3_0_1")) return false;
-    class_extends_access_modifier(b, l + 1);
-    return true;
-  }
-
-  // (class_extends_namespace_name_dec DOT)?
-  private static boolean class_dec_3_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_dec_3_0_2")) return false;
-    class_dec_3_0_2_0(b, l + 1);
-    return true;
-  }
-
-  // class_extends_namespace_name_dec DOT
-  private static boolean class_dec_3_0_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_dec_3_0_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = class_extends_namespace_name_dec(b, l + 1);
-    r = r && consumeToken(b, DOT);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (class_var_dec | class_ctor_dec | class_getter_dec | class_setter_dec | class_static_dec | class_method_dec)*
-  private static boolean class_dec_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_dec_5")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!class_dec_5_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "class_dec_5", c)) break;
-    }
-    return true;
-  }
-
-  // class_var_dec | class_ctor_dec | class_getter_dec | class_setter_dec | class_static_dec | class_method_dec
-  private static boolean class_dec_5_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_dec_5_0")) return false;
-    boolean r;
-    r = class_var_dec(b, l + 1);
-    if (!r) r = class_ctor_dec(b, l + 1);
-    if (!r) r = class_getter_dec(b, l + 1);
-    if (!r) r = class_setter_dec(b, l + 1);
-    if (!r) r = class_static_dec(b, l + 1);
-    if (!r) r = class_method_dec(b, l + 1);
-    return r;
   }
 
   /* ********************************************************** */
@@ -473,13 +473,13 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? all_type class_var_name_dec SEMI
+  // access_modifier? allType class_var_name_dec SEMI
   public static boolean class_var_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_var_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_VAR_DEC, "<class var dec>");
     r = class_var_dec_0(b, l + 1);
-    r = r && all_type(b, l + 1);
+    r = r && allType(b, l + 1);
     p = r; // pin = 2
     r = r && report_error_(b, class_var_name_dec(b, l + 1));
     r = p && consumeToken(b, SEMI) && r;
@@ -924,7 +924,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (auto_type | all_type) var_assign_name_dec
+  // (auto_type | allType) var_assign_name_dec
   public static boolean for_pair_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "for_pair_dec")) return false;
     boolean r, p;
@@ -936,12 +936,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // auto_type | all_type
+  // auto_type | allType
   private static boolean for_pair_dec_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "for_pair_dec_0")) return false;
     boolean r;
     r = auto_type(b, l + 1);
-    if (!r) r = all_type(b, l + 1);
+    if (!r) r = allType(b, l + 1);
     return r;
   }
 
@@ -986,18 +986,18 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // all_type (COMMA all_type)*
+  // allType (COMMA allType)*
   public static boolean generic_functor_param_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_functor_param_type")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, GENERIC_FUNCTOR_PARAM_TYPE, "<generic functor param type>");
-    r = all_type(b, l + 1);
+    r = allType(b, l + 1);
     r = r && generic_functor_param_type_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // (COMMA all_type)*
+  // (COMMA allType)*
   private static boolean generic_functor_param_type_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_functor_param_type_1")) return false;
     while (true) {
@@ -1008,32 +1008,32 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // COMMA all_type
+  // COMMA allType
   private static boolean generic_functor_param_type_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_functor_param_type_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
-    r = r && all_type(b, l + 1);
+    r = r && allType(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // COLON all_type (COMMA all_type)*
+  // COLON allType (COMMA allType)*
   public static boolean generic_functor_return_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_functor_return_type")) return false;
     if (!nextTokenIs(b, COLON)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COLON);
-    r = r && all_type(b, l + 1);
+    r = r && allType(b, l + 1);
     r = r && generic_functor_return_type_2(b, l + 1);
     exit_section_(b, m, GENERIC_FUNCTOR_RETURN_TYPE, r);
     return r;
   }
 
-  // (COMMA all_type)*
+  // (COMMA allType)*
   private static boolean generic_functor_return_type_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_functor_return_type_2")) return false;
     while (true) {
@@ -1044,13 +1044,13 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // COMMA all_type
+  // COMMA allType
   private static boolean generic_functor_return_type_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_functor_return_type_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
-    r = r && all_type(b, l + 1);
+    r = r && allType(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1087,7 +1087,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // List LESS all_type GREATER
+  // List LESS allType GREATER
   public static boolean generic_list_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_list_type")) return false;
     if (!nextTokenIs(b, LIST)) return false;
@@ -1095,14 +1095,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, GENERIC_LIST_TYPE, null);
     r = consumeTokens(b, 1, LIST, LESS);
     p = r; // pin = 1
-    r = r && report_error_(b, all_type(b, l + 1));
+    r = r && report_error_(b, allType(b, l + 1));
     r = p && consumeToken(b, GREATER) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
   /* ********************************************************** */
-  // Map LESS all_type COMMA all_type GREATER
+  // Map LESS allType COMMA allType GREATER
   public static boolean generic_map_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_map_type")) return false;
     if (!nextTokenIs(b, MAP)) return false;
@@ -1110,9 +1110,9 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, GENERIC_MAP_TYPE, null);
     r = consumeTokens(b, 1, MAP, LESS);
     p = r; // pin = 1
-    r = r && report_error_(b, all_type(b, l + 1));
+    r = r && report_error_(b, allType(b, l + 1));
     r = p && report_error_(b, consumeToken(b, COMMA)) && r;
-    r = p && report_error_(b, all_type(b, l + 1)) && r;
+    r = p && report_error_(b, allType(b, l + 1)) && r;
     r = p && consumeToken(b, GREATER) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -1227,7 +1227,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // access_modifier? instance all_type instance_name_dec (ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN)? SEMI
+  // access_modifier? instance allType instance_name_dec (ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN)? SEMI
   public static boolean instance_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "instance_dec")) return false;
     boolean r, p;
@@ -1235,7 +1235,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = instance_dec_0(b, l + 1);
     r = r && consumeToken(b, INSTANCE);
     p = r; // pin = 2
-    r = r && report_error_(b, all_type(b, l + 1));
+    r = r && report_error_(b, allType(b, l + 1));
     r = p && report_error_(b, instance_name_dec(b, l + 1)) && r;
     r = p && report_error_(b, instance_dec_4(b, l + 1)) && r;
     r = p && consumeToken(b, SEMI) && r;
@@ -1442,12 +1442,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // all_type
+  // allType
   public static boolean method_param_type_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "method_param_type_dec")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, METHOD_PARAM_TYPE_DEC, "<method param type dec>");
-    r = all_type(b, l + 1);
+    r = allType(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -1489,18 +1489,18 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // all_type
+  // allType
   public static boolean method_return_type_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "method_return_type_dec")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, METHOD_RETURN_TYPE_DEC, "<method return type dec>");
-    r = all_type(b, l + 1);
+    r = allType(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // namespace_register_dec? namespace namespace_name_dec SEMI (global_method_dec | class_dec | enum_dec | struct_dec | instance_dec)*
+  // namespace_register_dec? namespace namespace_name_dec SEMI (global_method_dec | classDec | enum_dec | struct_dec | instance_dec)*
   public static boolean namespace_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "namespace_dec")) return false;
     if (!nextTokenIs(b, "<namespace dec>", NAMESPACE, REGISTER)) return false;
@@ -1523,7 +1523,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (global_method_dec | class_dec | enum_dec | struct_dec | instance_dec)*
+  // (global_method_dec | classDec | enum_dec | struct_dec | instance_dec)*
   private static boolean namespace_dec_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "namespace_dec_4")) return false;
     while (true) {
@@ -1534,12 +1534,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // global_method_dec | class_dec | enum_dec | struct_dec | instance_dec
+  // global_method_dec | classDec | enum_dec | struct_dec | instance_dec
   private static boolean namespace_dec_4_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "namespace_dec_4_0")) return false;
     boolean r;
     r = global_method_dec(b, l + 1);
-    if (!r) r = class_dec(b, l + 1);
+    if (!r) r = classDec(b, l + 1);
     if (!r) r = enum_dec(b, l + 1);
     if (!r) r = struct_dec(b, l + 1);
     if (!r) r = instance_dec(b, l + 1);
@@ -2241,12 +2241,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // property_value ((COMMA property_value)* private_OP_ASSIGN_value_stat)? SEMI
+  // propertyValue ((COMMA propertyValue)* private_OP_ASSIGN_value_stat)? SEMI
   public static boolean op_assign_expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "op_assign_expr")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, OP_ASSIGN_EXPR, "<op assign expr>");
-    r = property_value(b, l + 1);
+    r = propertyValue(b, l + 1);
     p = r; // pin = 1
     r = r && report_error_(b, op_assign_expr_1(b, l + 1));
     r = p && consumeToken(b, SEMI) && r;
@@ -2254,14 +2254,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // ((COMMA property_value)* private_OP_ASSIGN_value_stat)?
+  // ((COMMA propertyValue)* private_OP_ASSIGN_value_stat)?
   private static boolean op_assign_expr_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "op_assign_expr_1")) return false;
     op_assign_expr_1_0(b, l + 1);
     return true;
   }
 
-  // (COMMA property_value)* private_OP_ASSIGN_value_stat
+  // (COMMA propertyValue)* private_OP_ASSIGN_value_stat
   private static boolean op_assign_expr_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "op_assign_expr_1_0")) return false;
     boolean r;
@@ -2272,7 +2272,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (COMMA property_value)*
+  // (COMMA propertyValue)*
   private static boolean op_assign_expr_1_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "op_assign_expr_1_0_0")) return false;
     while (true) {
@@ -2283,13 +2283,13 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // COMMA property_value
+  // COMMA propertyValue
   private static boolean op_assign_expr_1_0_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "op_assign_expr_1_0_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
-    r = r && property_value(b, l + 1);
+    r = r && propertyValue(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -2713,42 +2713,55 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (property_value_custom_type | property_value_this_type | property_value_cast_type) property_value_suffix*
-  public static boolean property_value(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value")) return false;
+  // (propertyValue_custom_type | propertyValue_this_type | propertyValue_cast_type) propertyValueSuffix*
+  public static boolean propertyValue(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE, "<property value>");
-    r = property_value_0(b, l + 1);
-    r = r && property_value_1(b, l + 1);
+    r = propertyValue_0(b, l + 1);
+    r = r && propertyValue_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // property_value_custom_type | property_value_this_type | property_value_cast_type
-  private static boolean property_value_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_0")) return false;
+  // propertyValue_custom_type | propertyValue_this_type | propertyValue_cast_type
+  private static boolean propertyValue_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_0")) return false;
     boolean r;
-    r = property_value_custom_type(b, l + 1);
-    if (!r) r = property_value_this_type(b, l + 1);
-    if (!r) r = property_value_cast_type(b, l + 1);
+    r = propertyValue_custom_type(b, l + 1);
+    if (!r) r = propertyValue_this_type(b, l + 1);
+    if (!r) r = propertyValue_cast_type(b, l + 1);
     return r;
   }
 
-  // property_value_suffix*
-  private static boolean property_value_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_1")) return false;
+  // propertyValueSuffix*
+  private static boolean propertyValue_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!property_value_suffix(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "property_value_1", c)) break;
+      if (!propertyValueSuffix(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "propertyValue_1", c)) break;
     }
     return true;
   }
 
   /* ********************************************************** */
+  // propertyValue_dotId | propertyValue_brackValue_stat | propertyValue_methodCall_stat
+  public static boolean propertyValueSuffix(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueSuffix")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_SUFFIX, "<property value suffix>");
+    r = propertyValue_dotId(b, l + 1);
+    if (!r) r = propertyValue_brackValue_stat(b, l + 1);
+    if (!r) r = propertyValue_methodCall_stat(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // LBRACK value_stat RBRACK
-  public static boolean property_value_brack_value_stat(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_brack_value_stat")) return false;
+  public static boolean propertyValue_brackValue_stat(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_brackValue_stat")) return false;
     if (!nextTokenIs(b, LBRACK)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_BRACK_VALUE_STAT, null);
@@ -2761,14 +2774,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // cast LESS all_type GREATER LPAREN value_factor RPAREN
-  public static boolean property_value_cast_type(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_cast_type")) return false;
+  // cast LESS allType GREATER LPAREN value_factor RPAREN
+  public static boolean propertyValue_cast_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_cast_type")) return false;
     if (!nextTokenIs(b, CAST)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, CAST, LESS);
-    r = r && all_type(b, l + 1);
+    r = r && allType(b, l + 1);
     r = r && consumeTokens(b, 0, GREATER, LPAREN);
     r = r && value_factor(b, l + 1);
     r = r && consumeToken(b, RPAREN);
@@ -2778,8 +2791,8 @@ public class ALittleParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // ID_CONTENT
-  public static boolean property_value_custom_type(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_custom_type")) return false;
+  public static boolean propertyValue_custom_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_custom_type")) return false;
     if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r;
     Marker m = enter_section_(b);
@@ -2789,22 +2802,22 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // DOT property_value_dot_id_name
-  public static boolean property_value_dot_id(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_dot_id")) return false;
+  // DOT propertyValue_dotId_name
+  public static boolean propertyValue_dotId(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_dotId")) return false;
     if (!nextTokenIs(b, DOT)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, DOT);
-    r = r && property_value_dot_id_name(b, l + 1);
+    r = r && propertyValue_dotId_name(b, l + 1);
     exit_section_(b, m, PROPERTY_VALUE_DOT_ID, r);
     return r;
   }
 
   /* ********************************************************** */
   // ID_CONTENT
-  public static boolean property_value_dot_id_name(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_dot_id_name")) return false;
+  public static boolean propertyValue_dotId_name(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_dotId_name")) return false;
     if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r;
     Marker m = enter_section_(b);
@@ -2814,12 +2827,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // property_value SEMI
-  public static boolean property_value_expr(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_expr")) return false;
+  // propertyValue SEMI
+  public static boolean propertyValue_expr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_expr")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_EXPR, "<property value expr>");
-    r = property_value(b, l + 1);
+    r = propertyValue(b, l + 1);
     r = r && consumeToken(b, SEMI);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -2827,51 +2840,51 @@ public class ALittleParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // LPAREN (value_stat (COMMA value_stat)*)? RPAREN
-  public static boolean property_value_method_call_stat(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_method_call_stat")) return false;
+  public static boolean propertyValue_methodCall_stat(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_methodCall_stat")) return false;
     if (!nextTokenIs(b, LPAREN)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_METHOD_CALL_STAT, null);
     r = consumeToken(b, LPAREN);
     p = r; // pin = 1
-    r = r && report_error_(b, property_value_method_call_stat_1(b, l + 1));
+    r = r && report_error_(b, propertyValue_methodCall_stat_1(b, l + 1));
     r = p && consumeToken(b, RPAREN) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
   // (value_stat (COMMA value_stat)*)?
-  private static boolean property_value_method_call_stat_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_method_call_stat_1")) return false;
-    property_value_method_call_stat_1_0(b, l + 1);
+  private static boolean propertyValue_methodCall_stat_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_methodCall_stat_1")) return false;
+    propertyValue_methodCall_stat_1_0(b, l + 1);
     return true;
   }
 
   // value_stat (COMMA value_stat)*
-  private static boolean property_value_method_call_stat_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_method_call_stat_1_0")) return false;
+  private static boolean propertyValue_methodCall_stat_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_methodCall_stat_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = value_stat(b, l + 1);
-    r = r && property_value_method_call_stat_1_0_1(b, l + 1);
+    r = r && propertyValue_methodCall_stat_1_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // (COMMA value_stat)*
-  private static boolean property_value_method_call_stat_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_method_call_stat_1_0_1")) return false;
+  private static boolean propertyValue_methodCall_stat_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_methodCall_stat_1_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!property_value_method_call_stat_1_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "property_value_method_call_stat_1_0_1", c)) break;
+      if (!propertyValue_methodCall_stat_1_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "propertyValue_methodCall_stat_1_0_1", c)) break;
     }
     return true;
   }
 
   // COMMA value_stat
-  private static boolean property_value_method_call_stat_1_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_method_call_stat_1_0_1_0")) return false;
+  private static boolean propertyValue_methodCall_stat_1_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_methodCall_stat_1_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
@@ -2881,22 +2894,9 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // property_value_dot_id | property_value_brack_value_stat | property_value_method_call_stat
-  public static boolean property_value_suffix(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_suffix")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_SUFFIX, "<property value suffix>");
-    r = property_value_dot_id(b, l + 1);
-    if (!r) r = property_value_brack_value_stat(b, l + 1);
-    if (!r) r = property_value_method_call_stat(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
   // this
-  public static boolean property_value_this_type(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_value_this_type")) return false;
+  public static boolean propertyValue_this_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValue_this_type")) return false;
     if (!nextTokenIs(b, THIS)) return false;
     boolean r;
     Marker m = enter_section_(b);
@@ -3151,12 +3151,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // all_type struct_var_name_dec SEMI
+  // allType struct_var_name_dec SEMI
   public static boolean struct_var_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "struct_var_dec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, STRUCT_VAR_DEC, "<struct var dec>");
-    r = all_type(b, l + 1);
+    r = allType(b, l + 1);
     p = r; // pin = 1
     r = r && report_error_(b, struct_var_name_dec(b, l + 1));
     r = p && consumeToken(b, SEMI) && r;
@@ -3177,14 +3177,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // value_stat_paren | const_value | property_value | reflect_value
+  // value_stat_paren | const_value | propertyValue | reflect_value
   public static boolean value_factor(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "value_factor")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, VALUE_FACTOR, "<value factor>");
     r = value_stat_paren(b, l + 1);
     if (!r) r = const_value(b, l + 1);
-    if (!r) r = property_value(b, l + 1);
+    if (!r) r = propertyValue(b, l + 1);
     if (!r) r = reflect_value(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -3271,7 +3271,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (auto_type | all_type) var_assign_name_dec
+  // (auto_type | allType) var_assign_name_dec
   public static boolean var_assign_pair_dec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "var_assign_pair_dec")) return false;
     boolean r;
@@ -3282,12 +3282,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // auto_type | all_type
+  // auto_type | allType
   private static boolean var_assign_pair_dec_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "var_assign_pair_dec_0")) return false;
     boolean r;
     r = auto_type(b, l + 1);
-    if (!r) r = all_type(b, l + 1);
+    if (!r) r = allType(b, l + 1);
     return r;
   }
 

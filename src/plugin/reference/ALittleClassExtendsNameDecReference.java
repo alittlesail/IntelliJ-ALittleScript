@@ -26,13 +26,13 @@ public class ALittleClassExtendsNameDecReference extends ALittleReference {
     }
 
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guessList = new ArrayList<>();
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
         ResolveResult[] resultList = multiResolve(false);
         for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
             if (element instanceof ALittleClassNameDec) {
-                guessList.add(element.getParent());
+                guessList.add(((ALittleClassDec)element.getParent()).guessType());
             }
         }
         return guessList;

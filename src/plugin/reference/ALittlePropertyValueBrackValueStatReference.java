@@ -17,11 +17,15 @@ public class ALittlePropertyValueBrackValueStatReference extends ALittleReferenc
         super(element, textRange);
     }
 
-    public PsiElement guessTypesForPreType() {
+    @NotNull
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+
+        // 获取父节点
         ALittlePropertyValueSuffix propertyValueSuffix = (ALittlePropertyValueSuffix)myElement.getParent();
         ALittlePropertyValue propertyValue = (ALittlePropertyValue)propertyValueSuffix.getParent();
 
-        List<ALittlePropertyValueSuffix> suffixList = propertyValue.getPropertyValueSuffixList();
+        // 获取第一个类型
         PsiElement prePropertyValue = propertyValue.getPropertyValueCustomType();
         if (prePropertyValue == null) {
             prePropertyValue = propertyValue.getPropertyValueThisType();
@@ -30,6 +34,8 @@ public class ALittlePropertyValueBrackValueStatReference extends ALittleReferenc
             prePropertyValue = propertyValue.getPropertyValueCastType();
         }
 
+        // 找到前一个的位置
+        List<ALittlePropertyValueSuffix> suffixList = propertyValue.getPropertyValueSuffixList();
         for (ALittlePropertyValueSuffix suffix : suffixList) {
             if (suffix.equals(propertyValueSuffix)) {
                 break;
@@ -43,74 +49,35 @@ public class ALittlePropertyValueBrackValueStatReference extends ALittleReferenc
         }
 
         if (prePropertyValue == null) {
-            return null;
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知的表达式类型");
         }
 
-        PsiElement pre_type = null;
+        // 获取类型
+        ALittleReferenceUtil.GuessTypeInfo preType = null;
         if (prePropertyValue instanceof ALittlePropertyValueCustomType) {
-            pre_type = ((ALittlePropertyValueCustomType) prePropertyValue).guessType();
+            preType = ((ALittlePropertyValueCustomType) prePropertyValue).guessType();
         } else if (prePropertyValue instanceof ALittlePropertyValueThisType) {
-            pre_type = ((ALittlePropertyValueThisType) prePropertyValue).guessType();
+            preType = ((ALittlePropertyValueThisType) prePropertyValue).guessType();
         } else if (prePropertyValue instanceof ALittlePropertyValueCastType) {
-            pre_type = ((ALittlePropertyValueCastType) prePropertyValue).guessType();
+            preType = ((ALittlePropertyValueCastType) prePropertyValue).guessType();
         } else if (prePropertyValue instanceof  ALittlePropertyValueDotId) {
-            ALittlePropertyValueDotIdName dotId_name = ((ALittlePropertyValueDotId) prePropertyValue).getPropertyValueDotIdName();
-            pre_type = dotId_name.guessType();
+            preType = ((ALittlePropertyValueDotId) prePropertyValue).getPropertyValueDotIdName().guessType();
         } else if (prePropertyValue instanceof ALittlePropertyValueMethodCallStat) {
-            pre_type = ((ALittlePropertyValueMethodCallStat) prePropertyValue).guessType();
+            preType = ((ALittlePropertyValueMethodCallStat) prePropertyValue).guessType();
         } else if (prePropertyValue instanceof ALittlePropertyValueBrackValueStat) {
-            pre_type = ((ALittlePropertyValueBrackValueStat) prePropertyValue).guessType();
+            preType = ((ALittlePropertyValueBrackValueStat) prePropertyValue).guessType();
         }
 
-        return pre_type;
-    }
-
-    @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
-        PsiElement pre_type = guessTypesForPreType();
-        if (pre_type == null) {
-            return guess_list;
+        if (preType == null) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知的表达式类型");
         }
 
-        if (pre_type instanceof ALittleGenericType) {
-            ALittleGenericType generic_type = (ALittleGenericType)pre_type;
-            if (generic_type.getGenericListType() != null) {
-                ALittleGenericListType list_type = generic_type.getGenericListType();
-                ALittleAllType allType = list_type.getAllType();
-                if (allType != null) {
-                    if (allType.getPrimitiveType() != null) {
-                        guess_list.add(allType.getPrimitiveType());
-                    } else if (allType.getGenericType() != null) {
-                        guess_list.add(allType.getGenericType());
-                    } else if (allType.getCustomType() != null) {
-                        PsiElement guess = allType.getCustomType().getCustomTypeNameDec().guessType();
-                        if (guess != null) guess_list.add(guess);
-                    }
-                }
-            } else if (generic_type.getGenericMapType() != null) {
-                ALittleGenericMapType map_type = generic_type.getGenericMapType();
-                List<ALittleAllType> allTypeList = map_type.getAllTypeList();
-                if (allTypeList.size() == 2) {
-                    ALittleAllType allType = allTypeList.get(1);
-                    if (allType != null) {
-                        if (allType.getPrimitiveType() != null) {
-                            guess_list.add(allType.getPrimitiveType());
-                        } else if (allType.getGenericType() != null) {
-                            guess_list.add(allType.getGenericType());
-                        } else if (allType.getCustomType() != null) {
-                            PsiElement guess = allType.getCustomType().getCustomTypeNameDec().guessType();
-                            if (guess != null) guess_list.add(guess);
-                        }
-                    }
-                }
-            }
-        // 如果是函数名，并且是getter，那么就返回对应的返回值
-        } else if (pre_type instanceof ALittleMethodNameDec) {
-            guess_list.add(((ALittleMethodNameDec)pre_type).guessType());
+        if (preType.type == ALittleReferenceUtil.GuessType.GT_LIST) {
+            guessList.add(preType.listSubType);
+        } else if (preType.type == ALittleReferenceUtil.GuessType.GT_MAP) {
+            guessList.add(preType.mapValueType);
         }
 
-        return guess_list;
+        return guessList;
     }
 }

@@ -11,11 +11,11 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitAllExpr(@NotNull ALittleAllExpr o) {
+  public void visitAllType(@NotNull ALittleAllType o) {
     visitPsiElement(o);
   }
 
-  public void visitAllType(@NotNull ALittleAllType o) {
+  public void visitAllExpr(@NotNull ALittleAllExpr o) {
     visitPsiElement(o);
   }
 
@@ -27,15 +27,15 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitClassDec(@NotNull ALittleClassDec o) {
+    visitPsiElement(o);
+  }
+
   public void visitClassAccessModifier(@NotNull ALittleClassAccessModifier o) {
     visitPsiElement(o);
   }
 
   public void visitClassCtorDec(@NotNull ALittleClassCtorDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitClassDec(@NotNull ALittleClassDec o) {
     visitPsiElement(o);
   }
 
@@ -427,6 +427,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitPropertyValueSuffix(@NotNull ALittlePropertyValueSuffix o) {
+    visitPsiElement(o);
+  }
+
   public void visitPropertyValueBrackValueStat(@NotNull ALittlePropertyValueBrackValueStat o) {
     visitPsiElement(o);
   }
@@ -452,10 +456,6 @@ public class ALittleVisitor extends PsiElementVisitor {
   }
 
   public void visitPropertyValueMethodCallStat(@NotNull ALittlePropertyValueMethodCallStat o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPropertyValueSuffix(@NotNull ALittlePropertyValueSuffix o) {
     visitPsiElement(o);
   }
 

@@ -10,6 +10,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
+import com.intellij.psi.PsiReference;
+import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
+import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public class ALittleOp7Impl extends ASTWrapperPsiElement implements ALittleOp7 {
 
@@ -24,6 +27,22 @@ public class ALittleOp7Impl extends ASTWrapperPsiElement implements ALittleOp7 {
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ALittleVisitor) accept((ALittleVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  public GuessTypeInfo guessType() throws ALittleReferenceException {
+    return ALittlePsiImplUtil.guessType(this);
+  }
+
+  @Override
+  @NotNull
+  public List<GuessTypeInfo> guessTypes() throws ALittleReferenceException {
+    return ALittlePsiImplUtil.guessTypes(this);
+  }
+
+  @Override
+  public PsiReference getReference() {
+    return ALittlePsiImplUtil.getReference(this);
   }
 
 }

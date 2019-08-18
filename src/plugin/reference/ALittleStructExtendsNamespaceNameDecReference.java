@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import plugin.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
 import plugin.ALittleUtil;
+import plugin.psi.ALittleNamespaceDec;
 import plugin.psi.ALittleNamespaceNameDec;
 
 import java.util.ArrayList;
@@ -24,18 +25,17 @@ public class ALittleStructExtendsNamespaceNameDecReference extends ALittleRefere
     }
 
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
-        ResolveResult[] result_list = multiResolve(false);
-        for (ResolveResult result : result_list) {
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        ResolveResult[] resultList = multiResolve(false);
+        for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
             if (element instanceof ALittleNamespaceNameDec) {
-                guess_list.add(element.getParent());
+                guessList.add(((ALittleNamespaceDec)element.getParent()).guessType());
             }
         }
 
-        return guess_list;
+        return guessList;
     }
 
     @NotNull

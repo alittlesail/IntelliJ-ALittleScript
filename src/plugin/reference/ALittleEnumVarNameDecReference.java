@@ -20,7 +20,24 @@ public class ALittleEnumVarNameDecReference extends ALittleReference {
     }
 
     @NotNull
-    public List<PsiElement> guessTypes() {
-        return new ArrayList<>();
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+
+        ALittleEnumVarDec enumVarDec = (ALittleEnumVarDec)myElement.getParent();
+        if (enumVarDec.getEnumVarValueDec() == null) {
+            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
+            info.value = "int";
+            info.element = myElement;
+            guessList.add(info);
+        } else if (enumVarDec.getEnumVarValueDec().getStringContent() != null) {
+            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
+            info.value = "string";
+            info.element = myElement;
+            guessList.add(info);
+        }
+
+        return guessList;
     }
 }

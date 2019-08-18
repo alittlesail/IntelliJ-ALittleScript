@@ -2,17 +2,9 @@ package plugin.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import plugin.ALittleIcons;
-import plugin.ALittleUtil;
-import plugin.psi.ALittleClassNameDec;
-import plugin.psi.ALittleFile;
-import plugin.psi.ALittlePrimitiveType;
-import plugin.psi.ALittleVarAssignNameDec;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +15,14 @@ public class ALittlePrimitiveTypeReference extends ALittleReference {
     }
 
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
-        guess_list.add(myElement);
-        return guess_list;
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+        info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
+        info.value = myElement.getText();
+        info.element = myElement;
+        guessList.add(info);
+        return guessList;
     }
 
     @NotNull

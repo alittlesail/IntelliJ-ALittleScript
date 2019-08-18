@@ -10,6 +10,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
+import com.intellij.psi.PsiReference;
+import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
+import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public class ALittlePropertyValueImpl extends ASTWrapperPsiElement implements ALittlePropertyValue {
 
@@ -27,6 +30,12 @@ public class ALittlePropertyValueImpl extends ASTWrapperPsiElement implements AL
   }
 
   @Override
+  @NotNull
+  public List<ALittlePropertyValueSuffix> getPropertyValueSuffixList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittlePropertyValueSuffix.class);
+  }
+
+  @Override
   @Nullable
   public ALittlePropertyValueCastType getPropertyValueCastType() {
     return findChildByClass(ALittlePropertyValueCastType.class);
@@ -39,15 +48,25 @@ public class ALittlePropertyValueImpl extends ASTWrapperPsiElement implements AL
   }
 
   @Override
-  @NotNull
-  public List<ALittlePropertyValueSuffix> getPropertyValueSuffixList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittlePropertyValueSuffix.class);
-  }
-
-  @Override
   @Nullable
   public ALittlePropertyValueThisType getPropertyValueThisType() {
     return findChildByClass(ALittlePropertyValueThisType.class);
+  }
+
+  @Override
+  public GuessTypeInfo guessType() throws ALittleReferenceException {
+    return ALittlePsiImplUtil.guessType(this);
+  }
+
+  @Override
+  @NotNull
+  public List<GuessTypeInfo> guessTypes() throws ALittleReferenceException {
+    return ALittlePsiImplUtil.guessTypes(this);
+  }
+
+  @Override
+  public PsiReference getReference() {
+    return ALittlePsiImplUtil.getReference(this);
   }
 
 }

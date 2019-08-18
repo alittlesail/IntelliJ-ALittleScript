@@ -5,16 +5,18 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
+import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittleStructNameDec extends PsiElement {
 
   @NotNull
   PsiElement getIdContent();
 
-  PsiElement guessType();
+  GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
-  List<PsiElement> guessTypes();
+  List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
 

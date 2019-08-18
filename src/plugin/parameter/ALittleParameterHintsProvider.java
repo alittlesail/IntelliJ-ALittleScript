@@ -32,9 +32,9 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                 ALittlePropertyValueMethodCallStatReference reference = (ALittlePropertyValueMethodCallStatReference)ref;
 
                 // 获取函数对象
-                PsiElement pre_type = reference.guessTypesForPreType();
-                if (!(pre_type instanceof ALittleMethodNameDec)) break;
-                ALittleMethodNameDec method_name_dec = (ALittleMethodNameDec) pre_type;
+                PsiElement preType = reference.guessTypesForPreType();
+                if (!(preType instanceof ALittleMethodNameDec)) break;
+                ALittleMethodNameDec method_name_dec = (ALittleMethodNameDec) preType;
                 PsiElement method_dec = method_name_dec.getParent();
 
                 // 收集参数名
@@ -112,14 +112,14 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
         } else if (psiElement instanceof ALittleAutoType) {
             do {
                 ALittleAutoType auto_type = (ALittleAutoType)psiElement;
-                PsiElement guess_type = auto_type.guessType();
-                if (guess_type == null) break;
+                PsiElement guessType = auto_type.guessType();
+                if (guessType == null) break;
                 if (auto_type.getParent() instanceof ALittleVarAssignPairDec) {
                     ALittleVarAssignPairDec dec = (ALittleVarAssignPairDec) auto_type.getParent();
                     ALittleVarAssignNameDec name_dec = dec.getVarAssignNameDec();
                     if (name_dec == null) break;
 
-                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guess_type, guess_type, null, new ArrayList<>(), new ArrayList<>());
+                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guessType, guessType, null, new ArrayList<>(), new ArrayList<>());
                     if (guess_info == null) break;
                     result.add(new InlayInfo(guess_info.value, name_dec.getNode().getStartOffset()));
                 } else if (auto_type.getParent() instanceof  ALittleForPairDec) {
@@ -127,7 +127,7 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
                     ALittleVarAssignNameDec name_dec = dec.getVarAssignNameDec();
                     if (name_dec == null) break;
 
-                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guess_type, guess_type, null, new ArrayList<>(), new ArrayList<>());
+                    ALittleUtil.GuessTypeInfo guess_info = ALittleUtil.guessTypeString(guessType, guessType, null, new ArrayList<>(), new ArrayList<>());
                     if (guess_info == null) break;
                     result.add(new InlayInfo(guess_info.value, name_dec.getNode().getStartOffset()));
                 }

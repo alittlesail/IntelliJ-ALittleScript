@@ -21,25 +21,21 @@ public class ALittleInstanceNameDecReference extends ALittleReference {
     }
 
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
-        ResolveResult[] result_list = multiResolve(false);
-        for (ResolveResult result : result_list) {
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        ResolveResult[] resultList = multiResolve(false);
+        for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
-
             if (element instanceof ALittlePrimitiveType) {
-                guess_list.add(element);
+                guessList.add(((ALittlePrimitiveType)element).guessType());
             } else if (element instanceof ALittleGenericType) {
-                guess_list.add(element);
+                guessList.add(((ALittleGenericType)element).guessType());
             } else if (element instanceof ALittleCustomTypeNameDec) {
-                ALittleCustomTypeNameDec dec = (ALittleCustomTypeNameDec) element;
-                PsiElement guess = dec.guessType();
-                if (guess != null) guess_list.add(guess);
+                guessList.add(((ALittleCustomTypeNameDec)element).guessType());
             }
         }
 
-        return guess_list;
+        return guessList;
     }
 
     @NotNull

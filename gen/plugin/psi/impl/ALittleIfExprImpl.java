@@ -10,6 +10,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
+import com.intellij.psi.PsiReference;
+import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
+import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public class ALittleIfExprImpl extends ASTWrapperPsiElement implements ALittleIfExpr {
 
@@ -48,6 +51,22 @@ public class ALittleIfExprImpl extends ASTWrapperPsiElement implements ALittleIf
   @Nullable
   public ALittleValueStat getValueStat() {
     return findChildByClass(ALittleValueStat.class);
+  }
+
+  @Override
+  public GuessTypeInfo guessType() throws ALittleReferenceException {
+    return ALittlePsiImplUtil.guessType(this);
+  }
+
+  @Override
+  @NotNull
+  public List<GuessTypeInfo> guessTypes() throws ALittleReferenceException {
+    return ALittlePsiImplUtil.guessTypes(this);
+  }
+
+  @Override
+  public PsiReference getReference() {
+    return ALittlePsiImplUtil.getReference(this);
   }
 
 }

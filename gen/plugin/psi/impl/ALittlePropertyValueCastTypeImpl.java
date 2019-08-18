@@ -11,6 +11,8 @@ import static plugin.psi.ALittleTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
+import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
+import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public class ALittlePropertyValueCastTypeImpl extends ASTWrapperPsiElement implements ALittlePropertyValueCastType {
 
@@ -40,13 +42,13 @@ public class ALittlePropertyValueCastTypeImpl extends ASTWrapperPsiElement imple
   }
 
   @Override
-  public PsiElement guessType() {
+  public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
 
   @Override
   @NotNull
-  public List<PsiElement> guessTypes() {
+  public List<GuessTypeInfo> guessTypes() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessTypes(this);
   }
 

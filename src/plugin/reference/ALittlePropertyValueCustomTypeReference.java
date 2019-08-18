@@ -59,22 +59,21 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference {
     }
 
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
-        ResolveResult[] result_list = multiResolve(false);
-        for (ResolveResult result : result_list) {
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        ResolveResult[] resultList = multiResolve(false);
+        for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
 
-            PsiElement guess = null;
+            ALittleReferenceUtil.GuessTypeInfo guess = null;
             if (element instanceof ALittleNamespaceNameDec) {
-                guess = element;
+                guess = ((ALittleNamespaceNameDec)element).guessType();
             } else if (element instanceof ALittleClassNameDec) {
-                guess = element;
+                guess = ((ALittleClassNameDec)element).guessType();
             } else if (element instanceof ALittleStructNameDec) {
-                guess = element;
+                guess = ((ALittleStructNameDec)element).guessType();
             } else if (element instanceof ALittleEnumNameDec) {
-                guess = element.getParent();
+                guess = ((ALittleEnumNameDec)element).guessType();
             } else if (element instanceof ALittleInstanceNameDec) {
                 guess = ((ALittleInstanceNameDec) element).guessType();
             } else if (element instanceof ALittleMethodParamNameDec) {
@@ -82,13 +81,13 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference {
             } else if (element instanceof ALittleVarAssignNameDec) {
                 guess = ((ALittleVarAssignNameDec) element).guessType();
             } else if (element instanceof ALittleMethodNameDec) {
-                guess = element;
+                guess = ((ALittleMethodNameDec) element).guessType();
             }
 
-            if (guess != null) guess_list.add(guess);
+            if (guess != null) guessList.add(guess);
         }
 
-        return guess_list;
+        return guessList;
     }
 
     @NotNull

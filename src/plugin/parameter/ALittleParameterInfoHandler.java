@@ -38,9 +38,9 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
                 if (!(ref instanceof ALittlePropertyValueMethodCallStatReference)) break;
                 ALittlePropertyValueMethodCallStatReference reference = (ALittlePropertyValueMethodCallStatReference)ref;
 
-                PsiElement pre_type = reference.guessTypesForPreType();
-                if (!(pre_type instanceof ALittleMethodNameDec)) break;
-                ALittleMethodNameDec method_name_dec = (ALittleMethodNameDec) pre_type;
+                PsiElement preType = reference.guessTypesForPreType();
+                if (!(preType instanceof ALittleMethodNameDec)) break;
+                ALittleMethodNameDec method_name_dec = (ALittleMethodNameDec) preType;
                 PsiElement method_dec = method_name_dec.getParent();
 
                 List<String> param_name_list = new ArrayList<>();

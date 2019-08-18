@@ -10,6 +10,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static plugin.psi.ALittleTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
+import com.intellij.psi.PsiReference;
+import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
+import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public class ALittleMethodParamDecImpl extends ASTWrapperPsiElement implements ALittleMethodParamDec {
 
@@ -30,6 +33,22 @@ public class ALittleMethodParamDecImpl extends ASTWrapperPsiElement implements A
   @NotNull
   public List<ALittleMethodParamOneDec> getMethodParamOneDecList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleMethodParamOneDec.class);
+  }
+
+  @Override
+  public GuessTypeInfo guessType() throws ALittleReferenceException {
+    return ALittlePsiImplUtil.guessType(this);
+  }
+
+  @Override
+  @NotNull
+  public List<GuessTypeInfo> guessTypes() throws ALittleReferenceException {
+    return ALittlePsiImplUtil.guessTypes(this);
+  }
+
+  @Override
+  public PsiReference getReference() {
+    return ALittlePsiImplUtil.getReference(this);
   }
 
 }

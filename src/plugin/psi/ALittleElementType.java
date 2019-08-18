@@ -1,6 +1,5 @@
 package plugin.psi;
 
-
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.*;
 import plugin.ALittleLanguage;

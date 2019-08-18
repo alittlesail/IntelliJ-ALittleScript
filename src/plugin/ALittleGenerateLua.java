@@ -62,52 +62,52 @@ public class ALittleGenerateLua {
 
             if (full_check) {
                 // 获取对应的定义
-                List<PsiElement> guess_list = ALittleAnnotator.GetGuessList(element);
+                List<PsiElement> guessList = ALittleAnnotator.GetGuessList(element);
 
                 // 检查未定义或者重复定义
-                ALittleAnnotator.CheckErrorForGuessList(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForGuessList(element, null, guessList);
 
                 // 检查反射操作
-                ALittleAnnotator.CheckErrorForReflect(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForReflect(element, null, guessList);
 
                 // 枚举类型错误检查
-                ALittleAnnotator.CheckErrorForEnum(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForEnum(element, null, guessList);
 
                 // 结构体类型错误检查
-                ALittleAnnotator.CheckErrorForStruct(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForStruct(element, null, guessList);
 
                 // return语句返回的内容和函数定义的返回值相符
-                ALittleAnnotator.CheckErrorForReturn(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForReturn(element, null, guessList);
 
                 // 赋值语句左右两方那个的类型检查
-                ALittleAnnotator.CheckErrorForVarAssign(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForVarAssign(element, null, guessList);
 
                 // 赋值语句左右两方那个的类型检查
-                ALittleAnnotator.CheckErrorForOpAssign(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForOpAssign(element, null, guessList);
 
                 // if elseif while dowhile 条件表达式检查
-                ALittleAnnotator.CheckErrorForIfAndElseIfAndWhileAndDoWhile(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForIfAndElseIfAndWhileAndDoWhile(element, null, guessList);
 
                 // for语句内部局部变量的类型
-                ALittleAnnotator.CheckErrorForFor(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForFor(element, null, guessList);
 
                 // 检查函数调用时参数个数，和参数类型
-                ALittleAnnotator.CheckErrorForMethodCall(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForMethodCall(element, null, guessList);
 
                 // 检查中括号内部值的类型检查
-                ALittleAnnotator.CheckErrorForBrackValue(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForBrackValue(element, null, guessList);
 
                 // 检查new表达式的参数
-                ALittleAnnotator.CheckErrorForOpNewStat(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForOpNewStat(element, null, guessList);
 
                 // 检查bind表达式
-                ALittleAnnotator.CheckErrorForBindStat(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForBindStat(element, null, guessList);
 
                 // 检查变量名
-                ALittleAnnotator.CheckErrorForName(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForName(element, null, guessList);
 
                 // 检查便捷List表达式
-                ALittleAnnotator.CheckErrorForOpNewList(element, null, guess_list);
+                ALittleAnnotator.CheckErrorForOpNewList(element, null, guessList);
             }
 
             PsiErrorElement error = checkErrorElement(child, full_check);
@@ -218,17 +218,17 @@ public class ALittleGenerateLua {
     @NotNull
     private String GenerateOpNewStat(ALittleOpNewStat op_new_stat) throws Exception {
         // 如果是通用类型
-        ALittleGenericType generic_type = op_new_stat.getGenericType();
-        if (generic_type != null) {
+        ALittleGenericType genericType = op_new_stat.getGenericType();
+        if (genericType != null) {
             // 如果是Map，那么直接返回{}
-            ALittleGenericMapType map_type = generic_type.getGenericMapType();
+            ALittleGenericMapType map_type = genericType.getGenericMapType();
             if (map_type != null) return "{}";
 
             // 如果是List，那么直接返回{}
-            ALittleGenericListType list_type = generic_type.getGenericListType();
+            ALittleGenericListType list_type = genericType.getGenericListType();
             if (list_type != null) return "{}";
 
-            ALittleGenericFunctorType functor_type = generic_type.getGenericFunctorType();
+            ALittleGenericFunctorType functor_type = genericType.getGenericFunctorType();
             if (functor_type != null) {
                 throw new Exception("Functor不能使用new来创建");
             }
@@ -237,12 +237,12 @@ public class ALittleGenerateLua {
         // 自定义类型
         ALittleCustomType custom_type = op_new_stat.getCustomType();
         if (custom_type != null) {
-            PsiElement guess_type = custom_type.getCustomTypeNameDec().guessType();
+            PsiElement guessType = custom_type.getCustomTypeNameDec().guessType();
             // 如果是结构体名，那么就当表来处理
-            if (guess_type instanceof ALittleStructDec) {
+            if (guessType instanceof ALittleStructDec) {
                 return "{}";
             // 如果是类名
-            } else if (guess_type instanceof ALittleClassDec) {
+            } else if (guessType instanceof ALittleClassDec) {
                 // 如果是类名
                 String content = "";
                 ALittleCustomTypeNamespaceNameDec namespace_name_dec = custom_type.getCustomTypeNamespaceNameDec();
@@ -805,7 +805,7 @@ public class ALittleGenerateLua {
         boolean is_lua_namespace = false;
 
         // 通用类型的类型猜测
-        PsiElement custom_guess_type = null;
+        PsiElement custom_guessType = null;
 
         // 获取开头的属性信息
         ALittlePropertyValueCustomType custom_type = prop_value.getPropertyValueCustomType();
@@ -813,8 +813,8 @@ public class ALittleGenerateLua {
         ALittlePropertyValueCastType cast_type = prop_value.getPropertyValueCastType();
         if (custom_type != null) {
             String custom_type_content = custom_type.getText();
-            custom_guess_type = custom_type.guessType();
-            if (custom_guess_type instanceof ALittleNamespaceNameDec && custom_type_content.equals("lua"))
+            custom_guessType = custom_type.guessType();
+            if (custom_guessType instanceof ALittleNamespaceNameDec && custom_type_content.equals("lua"))
                 is_lua_namespace = true;
 
             // 如果是lua命名域，那么就忽略
@@ -870,10 +870,10 @@ public class ALittleGenerateLua {
                                 // 如果是CustomType那么就判断下类型
                                 if (pre_suffix == null) {
                                     if (custom_type != null) {
-                                        if (custom_guess_type == null) {
-                                            custom_guess_type = custom_type.guessType();
+                                        if (custom_guessType == null) {
+                                            custom_guessType = custom_type.guessType();
                                         }
-                                        pre_guess = custom_guess_type;
+                                        pre_guess = custom_guessType;
                                     }
                                 } else if (pre_suffix.getPropertyValueDotId() != null)
                                     pre_guess = pre_suffix.getPropertyValueDotId().getPropertyValueDotIdName().guessType();
@@ -896,10 +896,10 @@ public class ALittleGenerateLua {
                                 // 如果是CustomType那么就判断下类型
                                 if (pre_suffix == null) {
                                     if (custom_type != null) {
-                                        if (custom_guess_type == null) {
-                                            custom_guess_type = custom_type.guessType();
+                                        if (custom_guessType == null) {
+                                            custom_guessType = custom_type.guessType();
                                         }
-                                        pre_guess = custom_guess_type;
+                                        pre_guess = custom_guessType;
                                     }
                                 } else if (pre_suffix.getPropertyValueDotId() != null)
                                     pre_guess = pre_suffix.getPropertyValueDotId().getPropertyValueDotIdName().guessType();

@@ -5,7 +5,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -17,87 +16,76 @@ public class ALittleAutoTypeReference extends ALittleReference {
     }
 
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guessList = new ArrayList<>();
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
         PsiElement parent = myElement.getParent();
 
-        try {
-            // 处理定义并且赋值
-            if (parent instanceof ALittleVarAssignPairDec) {
-                // 获取父节点
-                ALittleVarAssignPairDec varAssignPairDec = (ALittleVarAssignPairDec) parent;
-                parent = varAssignPairDec.getParent();
-                if (parent == null) return guessList;
-                if (!(parent instanceof ALittleVarAssignExpr)) return guessList;
-                // 获取父节点
-                ALittleVarAssignExpr varAssignExpr = (ALittleVarAssignExpr) parent;
-                // 获取等号右边的表达式
-                ALittleValueStat valueStat = varAssignExpr.getValueStat();
-                if (valueStat == null) return guessList;
-
+        // 处理定义并且赋值
+        if (parent instanceof ALittleVarAssignPairDec) {
+            // 获取父节点
+            ALittleVarAssignPairDec varAssignPairDec = (ALittleVarAssignPairDec) parent;
+            parent = varAssignPairDec.getParent();
+            if (!(parent instanceof ALittleVarAssignExpr)) return guessList;
+            ALittleVarAssignExpr varAssignExpr = (ALittleVarAssignExpr) parent;
+            // 获取等号右边的表达式
+            ALittleValueStat valueStat = varAssignExpr.getValueStat();
+            if (valueStat == null) return guessList;
+            // 获取等号坐标的变量定义列表
+            List<ALittleVarAssignPairDec> pairDecList = varAssignExpr.getVarAssignPairDecList();
+            // 如果左边有多个变量，那么右边肯定是一个多返回值的函数调用
+            if (pairDecList.size() > 1) {
                 // 计算当前是第几个参数
-                List<ALittleVarAssignPairDec> pairDecList = varAssignExpr.getVarAssignPairDecList();
-                // 如果左边有多个变量，那么右边肯定是一个多返回值的函数调用
-                if (pairDecList.size() > 1) {
-                    int index = pairDecList.indexOf(varAssignPairDec);
-                    if (index == -1) return guessList;
-                    // 获取函数对应的那个返回值类型
-                    List<PsiElement> methodCallGuessList = ALittleUtil.guessTypeForMethodCall(valueStat);
-                    if (index < methodCallGuessList.size()) {
-                        guessList.add(methodCallGuessList.get(index));
-                    }
-                } else if (pairDecList.size() == 1) {
-                    guessList.add(ALittleUtil.guessSoftType(valueStat, valueStat));
+                int index = pairDecList.indexOf(varAssignPairDec);
+                if (index == -1) return guessList;
+                // 获取函数对应的那个返回值类型
+                List<ALittleReferenceUtil.GuessTypeInfo> methodCallGuessList = valueStat.guessTypes();
+                if (index < methodCallGuessList.size()) {
+                    guessList.add(methodCallGuessList.get(index));
                 }
-            } else if (parent instanceof ALittleForPairDec) {
-                // 获取父节点
-                ALittleForPairDec forPairDec = (ALittleForPairDec) parent;
-                if (!(forPairDec.getParent() instanceof ALittleForInCondition)) return guessList;
+            // 如果左边只有一个变量，那么就是直接赋值
+            } else if (pairDecList.size() == 1) {
+                guessList.add(valueStat.guessType());
+            }
+        // 处理for循环定义
+        } else if (parent instanceof ALittleForPairDec) {
+            // 获取父节点
+            ALittleForPairDec forPairDec = (ALittleForPairDec) parent;
+            if (!(forPairDec.getParent() instanceof ALittleForInCondition)) return guessList;
 
-                // 获取for in 表达式内容
-                ALittleForInCondition inExpr = (ALittleForInCondition) forPairDec.getParent();
-                ALittleValueStat valueStat = inExpr.getValueStat();
-                if (valueStat == null) return guessList;
+            // 获取for in 表达式内容
+            ALittleForInCondition inExpr = (ALittleForInCondition) forPairDec.getParent();
+            ALittleValueStat valueStat = inExpr.getValueStat();
+            if (valueStat == null) return guessList;
 
-                // 获取循环对象的类型
-                PsiElement guess_type = ALittleUtil.guessSoftType(valueStat, valueStat);
-                // 必须是生成式
-                if (!(guess_type instanceof ALittleGenericType)) return guessList;
+            // 获取定义列表
+            List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
+            int index = pairDecList.indexOf(forPairDec);
 
-                ALittleGenericType genericType = (ALittleGenericType) guess_type;
-                // 如果是List
-                if (genericType.getGenericListType() != null) {
-                    ALittleGenericListType list_type = genericType.getGenericListType();
-                    List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
-                    if (pairDecList.size() != 2) return guessList;
+            // 获取循环对象的类型
+            ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
+            if (guessInfo == null) return guessList;
 
-                    // 因为Key的部分必须是int或者I64，就不允许使用auto了
-                    // 所以这里只获取List的元素类型
-                    if (pairDecList.get(1).equals(forPairDec)) {
-                        ALittleAllType allType = list_type.getAllType();
-                        if (allType != null) {
-                            guessList.add(ALittleUtil.guessType(allType));
-                        }
-                    }
-                } else if (genericType.getGenericMapType() != null) {
-                    ALittleGenericMapType map_type = genericType.getGenericMapType();
-                    List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
-                    if (pairDecList.size() != 2) return guessList;
-
-                    List<ALittleAllType> allTypeList = map_type.getAllTypeList();
-                    if (allTypeList.size() != 2) return guessList;
-
-                    // 如果是key，那么就取key的类型
-                    if (pairDecList.get(0).equals(forPairDec)) {
-                        guessList.add(ALittleUtil.guessType(allTypeList.get(0)));
-                        // 如果是value，那么就去
-                    } else if (pairDecList.get(1).equals(forPairDec)) {
-                        guessList.add(ALittleUtil.guessType(allTypeList.get(1)));
-                    }
+            // 必须是通用类型
+            if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_LIST) {
+                // 对于List的key使用auto，那么就默认是int类型
+                if (index == 0) {
+                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+                    info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
+                    info.value = "int";
+                    info.element = myElement;
+                    guessList.add(info);
+                } else if (index == 1) {
+                    guessList.add(guessInfo.listSubType);
+                }
+            } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_MAP) {
+                // 如果是key，那么就取key的类型
+                if (index == 0) {
+                    guessList.add(guessInfo.mapKeyType);
+                // 如果是value，那么就取value的类型
+                } else if (index == 1) {
+                    guessList.add(guessInfo.mapValueType);
                 }
             }
-        } catch (ALittleUtil.ALittleElementException e) {
-            return guessList;
         }
 
         return guessList;

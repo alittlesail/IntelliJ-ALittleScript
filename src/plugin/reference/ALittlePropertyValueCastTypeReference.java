@@ -21,18 +21,11 @@ public class ALittlePropertyValueCastTypeReference extends ALittleReference {
     }
 
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
-        if (myElement instanceof ALittlePropertyValueCastType) {
-            ALittlePropertyValueCastType element = (ALittlePropertyValueCastType)myElement;
-            try {
-                guess_list.add(ALittleUtil.guessType(element.getAllType()));
-            } catch (ALittleUtil.ALittleElementException ignored) {
-            }
-        }
-
-        return guess_list;
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        ALittlePropertyValueCastType castType = (ALittlePropertyValueCastType)myElement;
+        guessList.add(castType.guessType());
+        return guessList;
     }
 
     @NotNull

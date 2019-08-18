@@ -4,6 +4,9 @@ package plugin.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
+import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittleOpNewStat extends PsiElement {
 
@@ -15,5 +18,12 @@ public interface ALittleOpNewStat extends PsiElement {
 
   @NotNull
   List<ALittleValueStat> getValueStatList();
+
+  GuessTypeInfo guessType() throws ALittleReferenceException;
+
+  @NotNull
+  List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
+
+  PsiReference getReference();
 
 }

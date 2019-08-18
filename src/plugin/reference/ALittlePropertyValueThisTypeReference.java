@@ -56,20 +56,20 @@ public class ALittlePropertyValueThisTypeReference extends ALittleReference {
         }
     }
 
+    // 获取返回值类型
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
 
-        ResolveResult[] result_list = multiResolve(false);
-        for (ResolveResult result : result_list) {
+        ResolveResult[] resultList = multiResolve(false);
+        for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
-
             if (element instanceof ALittleClassDec) {
-                guess_list.add(element);
+                guessList.add(((ALittleClassDec)element).guessType());
             }
         }
 
-        return guess_list;
+        return guessList;
     }
 
     @NotNull

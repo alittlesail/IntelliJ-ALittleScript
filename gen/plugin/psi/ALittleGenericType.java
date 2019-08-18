@@ -4,6 +4,9 @@ package plugin.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
+import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittleGenericType extends PsiElement {
 
@@ -15,5 +18,12 @@ public interface ALittleGenericType extends PsiElement {
 
   @Nullable
   ALittleGenericMapType getGenericMapType();
+
+  GuessTypeInfo guessType() throws ALittleReferenceException;
+
+  @NotNull
+  List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
+
+  PsiReference getReference();
 
 }

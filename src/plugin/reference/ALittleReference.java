@@ -6,9 +6,8 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.ALittleUtil;
-import plugin.psi.ALittleFile;
+import plugin.psi.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ALittleReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
@@ -21,14 +20,8 @@ public abstract class ALittleReference extends PsiReferenceBase<PsiElement> impl
         mNamespace = ALittleUtil.getNamespaceName((ALittleFile) element.getContainingFile());
     }
 
-    public PsiElement guessType() {
-        List<PsiElement> guess_list = guessTypes();
-        if (guess_list.isEmpty()) return null;
-        return guess_list.get(0);
-    }
-
     @NotNull
-    abstract List<PsiElement> guessTypes();
+    public abstract List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException;
 
     @NotNull
     @Override

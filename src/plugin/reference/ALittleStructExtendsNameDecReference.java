@@ -29,19 +29,16 @@ public class ALittleStructExtendsNameDecReference extends ALittleReference {
     }
 
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
-        ResolveResult[] result_list = multiResolve(false);
-        for (ResolveResult result : result_list) {
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        ResolveResult[] resultList = multiResolve(false);
+        for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
-
             if (element instanceof ALittleStructNameDec) {
-                guess_list.add(element.getParent());
+                guessList.add(((ALittleStructDec)element.getParent()).guessType());
             }
         }
-
-        return guess_list;
+        return guessList;
     }
 
     @NotNull

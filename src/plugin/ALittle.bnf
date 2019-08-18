@@ -3,6 +3,7 @@
   parserUtilClass="plugin.parser.ALittleParserUtil"
 
   mixin="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  methods=[guessType guessTypes getReference]
   psiClassPrefix="ALittle"
   psiImplClassSuffix="Impl"
   psiPackage="plugin.psi"
@@ -62,34 +63,34 @@
 alittleFile ::= namespace_dec?
 
 // 命名域
-namespace_dec ::= namespace_register_dec? namespace namespace_name_dec SEMI (global_method_dec | classDec | enum_dec | struct_dec | instance_dec)* {pin=2}
+namespace_dec ::= namespace_register_dec? namespace namespace_name_dec SEMI (global_method_dec | classDec | enumDec | structDec | instance_dec)* {pin=2}
 namespace_register_dec ::= register
-namespace_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+namespace_name_dec ::= ID_CONTENT
 
 // 单例定义
 instance_dec ::= access_modifier? instance allType instance_name_dec (ASSIGN new instance_class_name_dec LPAREN (value_stat (COMMA value_stat)*)? RPAREN)? SEMI {pin=2}
-instance_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+instance_name_dec ::= ID_CONTENT
 
-instance_class_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+instance_class_name_dec ::= ID_CONTENT
 
 // 类定义
 classDec ::= class_access_modifier? class class_name_dec (COLON class_extends_access_modifier? (class_extends_namespace_name_dec DOT)? class_extends_name_dec)? LBRACE (class_var_dec | class_ctor_dec | class_getter_dec | class_setter_dec | class_static_dec | class_method_dec)* RBRACE {pin=2}
 class_access_modifier ::= access_modifier
-class_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+class_name_dec ::= ID_CONTENT
 class_extends_access_modifier ::= access_modifier
-class_extends_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
-class_extends_namespace_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+class_extends_name_dec ::= ID_CONTENT
+class_extends_namespace_name_dec ::= ID_CONTENT
 // 函数参数类型
 method_param_type_dec ::= allType
 // 函数参数名
-method_param_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+method_param_name_dec ::= ID_CONTENT
 // 函数参数部分
 method_param_one_dec ::= method_param_type_dec method_param_name_dec {pin=1}
 method_param_dec ::= LPAREN (method_param_one_dec (COMMA method_param_one_dec)*)? RPAREN {pin=1}
 // 函数体部分
 method_body_dec ::= LBRACE all_expr* RBRACE {pin=1}
 // 函数名部分
-method_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+method_name_dec ::= ID_CONTENT
 // 函数返回值类型
 method_return_dec ::= COLON method_return_type_dec (COMMA method_return_type_dec)*
 method_return_type_dec ::= allType
@@ -106,27 +107,27 @@ class_method_dec ::= access_modifier? coroutine_modifier? fun method_name_dec me
 class_static_dec ::= access_modifier? coroutine_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=3}
 // 类成员变量定义
 class_var_dec ::= access_modifier? allType class_var_name_dec SEMI {pin=2}
-class_var_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+class_var_name_dec ::= ID_CONTENT
 // 全局函数
 global_method_dec ::= access_modifier? coroutine_modifier? static method_name_dec method_param_dec method_return_dec? method_body_dec {pin=3}
 
 // 结构体
-struct_dec ::= access_modifier? struct struct_name_dec ((COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec) | struct_protocol_dec)? struct_body_dec
+structDec ::= access_modifier? struct struct_name_dec ((COLON (struct_extends_namespace_name_dec DOT)? struct_extends_name_dec) | struct_protocol_dec)? struct_body_dec
 private struct_body_dec ::= LBRACE (struct_var_dec)* RBRACE {pin=1}
 struct_protocol_dec ::= LPAREN custom_type? RPAREN {pin=1}
-struct_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
-struct_extends_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
-struct_extends_namespace_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+struct_name_dec ::= ID_CONTENT
+struct_extends_name_dec ::= ID_CONTENT
+struct_extends_namespace_name_dec ::= ID_CONTENT
 
 struct_var_dec ::= allType struct_var_name_dec SEMI {pin=1}
-struct_var_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+struct_var_name_dec ::= ID_CONTENT
 
 // 枚举描述
-enum_dec ::= access_modifier? enum_protocol_dec? enum enum_name_dec LBRACE (enum_var_dec (COMMA enum_var_dec)* COMMA?)? RBRACE {pin=3}
+enumDec ::= access_modifier? enum_protocol_dec? enum enum_name_dec LBRACE (enum_var_dec (COMMA enum_var_dec)* COMMA?)? RBRACE {pin=3}
 enum_protocol_dec ::= proto
-enum_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+enum_name_dec ::= ID_CONTENT
 enum_var_dec ::= enum_var_name_dec (ASSIGN enum_var_value_dec)? {pin=1}
-enum_var_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+enum_var_name_dec ::= ID_CONTENT
 enum_var_value_dec ::= DIGIT_CONTENT | STRING_CONTENT
 
 // 访问修饰符
@@ -200,16 +201,16 @@ var_assign_expr ::= var_assign_pair_dec private_COMMA_var_assign_pair_dec* priva
 private private_ASSIGN_value_stat ::= ASSIGN value_stat {pin=1}
 private private_COMMA_var_assign_pair_dec ::= COMMA var_assign_pair_dec {pin=1}
 var_assign_pair_dec ::= (auto_type | allType) var_assign_name_dec {pin=2}
-var_assign_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+var_assign_name_dec ::= ID_CONTENT
 // 所有类型
-allType ::= primitive_type | generic_type | custom_type
+allType ::= primitive_type | genericType | custom_type
 // 自定义类型
 custom_type ::= (custom_type_namespace_name_dec DOT)? custom_type_name_dec
-custom_type_namespace_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
-custom_type_name_dec ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
+custom_type_namespace_name_dec ::= ID_CONTENT
+custom_type_name_dec ::= ID_CONTENT
 
 // 通用类型
-generic_type ::= generic_list_type | generic_map_type | generic_functor_type
+genericType ::= generic_list_type | generic_map_type | generic_functor_type
 generic_map_type ::= Map LESS allType COMMA allType GREATER {pin=1}
 generic_list_type ::= List LESS allType GREATER {pin=1}
 generic_functor_type ::= Functor LESS LPAREN generic_functor_param_type? RPAREN generic_functor_return_type? GREATER {pin=1}
@@ -217,9 +218,9 @@ generic_functor_param_type ::= allType (COMMA allType)*
 generic_functor_return_type ::=  COLON allType (COMMA allType)*
 
 // 基本类型
-primitive_type ::= bool | double | int | I64 | any | string {methods=[guessType guessTypes getReference]}
+primitive_type ::= bool | double | int | I64 | any | string
 // 推导类型
-auto_type ::= auto {methods=[guessType guessTypes getReference]}
+auto_type ::= auto
 //运算符，值越低，优先级越高///////////////////////////////////////////////////////////////////
 
 // 赋值
@@ -231,13 +232,13 @@ private private_OP_ASSIGN_value_stat ::= op_assign value_stat {pin=1}
 value_stat ::= op_new_stat | op_3_stat | op_2_stat | op_4_stat | op_5_stat | op_6_stat | op_7_stat | op_8_stat | value_factor | op_new_list | bind_stat
 
 // new
-op_new_stat ::= new (custom_type | generic_type) LPAREN (value_stat (COMMA value_stat)*)? RPAREN {pin=1}
+op_new_stat ::= new (custom_type | genericType) LPAREN (value_stat (COMMA value_stat)*)? RPAREN {pin=1}
 
 // list 快捷表达式
 op_new_list ::= LBRACK (value_stat (COMMA value_stat)*)? RBRACK {pin=1}
 
 // bind
-bind_stat ::= bind LPAREN (value_stat (COMMA value_stat)*)? RPAREN  {pin=1 methods=[guessType guessTypes getReference]}
+bind_stat ::= bind LPAREN (value_stat (COMMA value_stat)*)? RPAREN  {pin=1}
 
 // op 类型的运算，编号越大，优先级越低
 
@@ -297,12 +298,12 @@ const_value ::= true | false | STRING_CONTENT | DIGIT_CONTENT | null
 reflect_value ::= reflect LESS custom_type GREATER {pin=1}
 // 属性
 propertyValue ::= (propertyValue_custom_type | propertyValue_this_type | propertyValue_cast_type) propertyValueSuffix*
-propertyValue_cast_type ::= cast LESS allType GREATER LPAREN value_factor RPAREN {methods=[guessType guessTypes getReference]}
-propertyValue_custom_type ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
-propertyValue_this_type ::= this {methods=[guessType guessTypes getReference]}
-propertyValueSuffix ::= propertyValue_dotId | propertyValue_brackValue_stat | propertyValue_methodCall_stat
-propertyValue_dotId ::= DOT propertyValue_dotId_name
-propertyValue_dotId_name ::= ID_CONTENT {methods=[guessType guessTypes getReference]}
-propertyValue_brackValue_stat ::= LBRACK value_stat RBRACK {pin=1 methods=[guessType guessTypes getReference]}
-propertyValue_methodCall_stat ::= LPAREN (value_stat (COMMA value_stat)*)? RPAREN {pin=1 methods=[guessType guessTypes getReference]}
+propertyValue_cast_type ::= cast LESS allType GREATER LPAREN value_factor RPAREN
+propertyValue_custom_type ::= ID_CONTENT
+propertyValue_this_type ::= this
+propertyValueSuffix ::= propertyValueDotId | propertyValue_brackValue_stat | propertyValue_methodCall_stat
+propertyValueDotId ::= DOT propertyValueDotIdName
+propertyValueDotIdName ::= ID_CONTENT
+propertyValue_brackValue_stat ::= LBRACK value_stat RBRACK {pin=1}
+propertyValue_methodCall_stat ::= LPAREN (value_stat (COMMA value_stat)*)? RPAREN {pin=1}
 propertyValue_expr ::= propertyValue SEMI

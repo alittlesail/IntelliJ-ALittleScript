@@ -20,129 +20,202 @@ public class ALittleMethodNameDecReference extends ALittleReference {
         super(element, textRange);
     }
 
-    public PsiElement guessTypeForSetter() {
-        ResolveResult[] result_list = multiResolve(false);
-        for (ResolveResult result : result_list) {
-            PsiElement element = result.getElement();
-
-            if (element instanceof ALittleMethodNameDec) {
-                PsiElement parent = element.getParent();
-
-                List<ALittleAllType> allTypeList = new ArrayList<>();
-
-                if (parent instanceof ALittleClassSetterDec) {
-                    ALittleClassSetterDec method_dec = (ALittleClassSetterDec) parent;
-                    ALittleMethodParamOneDec param_one_dec = method_dec.getMethodParamOneDec();
-                    if (param_one_dec != null) allTypeList.add(param_one_dec.getMethodParamTypeDec().getAllType());
-                }
-
-                for (ALittleAllType allType : allTypeList) {
-                    try {
-                        return ALittleUtil.guessType(allType);
-                    } catch (ALittleUtil.ALittleElementException ignored) {
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public PsiElement guessTypeForGetter() {
-        ResolveResult[] result_list = multiResolve(false);
-        for (ResolveResult result : result_list) {
-            PsiElement element = result.getElement();
-
-            if (element instanceof ALittleMethodNameDec) {
-                PsiElement parent = element.getParent();
-
-                List<ALittleAllType> allTypeList = new ArrayList<>();
-
-                if (parent instanceof ALittleClassGetterDec) {
-                    ALittleClassGetterDec method_dec = (ALittleClassGetterDec) parent;
-                    ALittleMethodReturnTypeDec return_type_dec = method_dec.getMethodReturnTypeDec();
-                    if (return_type_dec != null) allTypeList.add(return_type_dec.getAllType());
-                }
-
-                for (ALittleAllType allType : allTypeList) {
-                    try {
-                        return ALittleUtil.guessType(allType);
-                    } catch (ALittleUtil.ALittleElementException ignored) {
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
     @NotNull
-    public List<PsiElement> guessTypes() {
-        List<PsiElement> guess_list = new ArrayList<>();
-
-        ResolveResult[] result_list = multiResolve(false);
-        for (ResolveResult result : result_list) {
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        ResolveResult[] resultList = multiResolve(false);
+        for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
-
             if (element instanceof ALittleMethodNameDec) {
                 PsiElement parent = element.getParent();
+                if (parent instanceof ALittleClassGetterDec) {
+                    ALittleClassGetterDec classGetterDec = (ALittleClassGetterDec) parent;
 
-                List<ALittleAllType> allTypeList = new ArrayList<>();
+                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+                    info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
+                    info.value = "Functor<(";
+                    info.element = classGetterDec;
+                    info.functorAwait = false;
+                    info.functorParamList = new ArrayList<>();
+                    info.functorReturnList = new ArrayList<>();
 
-                // 类成员函数
-                if (parent instanceof ALittleClassMethodDec) {
-                    ALittleClassMethodDec method_dec = (ALittleClassMethodDec) parent;
-                    ALittleMethodReturnDec return_dec = method_dec.getMethodReturnDec();
-                    if (return_dec != null) {
-                        List<ALittleMethodReturnTypeDec> return_type_decList = return_dec.getMethodReturnTypeDecList();
-                        for (ALittleMethodReturnTypeDec return_type_dec : return_type_decList) {
-                            allTypeList.add(return_type_dec.getAllType());
-                        }
+                    // 第一个参数是类
+                    ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classGetterDec.getParent()).guessType();
+                    info.functorParamList.add(classGuessInfo);
+                    info.value += classGuessInfo.value + ")";
+
+                    List<String> typeList = new ArrayList<>();
+                    // 添加返回值列表
+                    ALittleMethodReturnTypeDec returnTypeDec = classGetterDec.getMethodReturnTypeDec();
+                    if (returnTypeDec != null) {
+                        ALittleAllType allType = returnTypeDec.getAllType();
+                        ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                        typeList.add(GuessInfo.value);
+                        info.functorReturnList.add(GuessInfo);
                     }
-                // getter
-                } else if (parent instanceof ALittleClassGetterDec) {
-                    ALittleClassGetterDec method_dec = (ALittleClassGetterDec) parent;
-                    ALittleMethodReturnTypeDec return_type_dec = method_dec.getMethodReturnTypeDec();
-                    if (return_type_dec != null) allTypeList.add(return_type_dec.getAllType());
-
-                // setter
+                    if (!typeList.isEmpty()) info.value += ":";
+                    info.value += String.join(",", typeList) + ">";
+                    guessList.add(info);
                 } else if (parent instanceof ALittleClassSetterDec) {
-                    ALittleClassSetterDec method_dec = (ALittleClassSetterDec) parent;
-                    ALittleMethodParamOneDec param_one_dec = method_dec.getMethodParamOneDec();
-                    if (param_one_dec != null) allTypeList.add(param_one_dec.getMethodParamTypeDec().getAllType());
-                // 类静态函数
+                    ALittleClassSetterDec classSetterDec = (ALittleClassSetterDec) parent;
+
+                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+                    info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
+                    info.value = "Functor<(";
+                    info.element = classSetterDec;
+                    info.functorAwait = false;
+                    info.functorParamList = new ArrayList<>();
+                    info.functorReturnList = new ArrayList<>();
+
+                    List<String> typeList = new ArrayList<>();
+                    // 第一个参数是类
+                    ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classSetterDec.getParent()).guessType();
+                    typeList.add(classGuessInfo.value);
+                    info.functorParamList.add(classGuessInfo);
+
+                    // 添加参数列表
+                    ALittleMethodParamOneDec oneDec = classSetterDec.getMethodParamOneDec();
+                    if (oneDec != null) {
+                        ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                        ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                        typeList.add(GuessInfo.value);
+                        info.functorParamList.add(GuessInfo);
+                    }
+                    info.value += String.join(",", typeList) + ")";
+                    info.value += ">";
+                    guessList.add(info);
+                } else if (parent instanceof ALittleClassMethodDec) {
+                    ALittleClassMethodDec classMethodDec = (ALittleClassMethodDec) parent;
+
+                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+                    info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
+                    info.value = "Functor<(";
+                    info.element = classMethodDec;
+                    info.functorAwait = classMethodDec.getCoroutineModifier() != null && classMethodDec.getCoroutineModifier().getText().equals("await");
+                    if (info.functorAwait) {
+                        info.value = "Functor<await(";
+                    }
+                    info.functorParamList = new ArrayList<>();
+                    info.functorReturnList = new ArrayList<>();
+
+                    List<String> typeList = new ArrayList<>();
+                    // 第一个参数是类
+                    ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classMethodDec.getParent()).guessType();
+                    typeList.add(classGuessInfo.value);
+                    info.functorParamList.add(classGuessInfo);
+
+                    // 添加参数列表
+                    ALittleMethodParamDec paramDec = classMethodDec.getMethodParamDec();
+                    if (paramDec != null) {
+                        List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
+                        for (ALittleMethodParamOneDec oneDec : oneDecList) {
+                            ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                            ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                            typeList.add(GuessInfo.value);
+                            info.functorParamList.add(GuessInfo);
+                        }
+                    }
+                    info.value += String.join(",", typeList) + ")";
+                    typeList = new ArrayList<>();
+                    // 添加返回值列表
+                    ALittleMethodReturnDec returnDec = classMethodDec.getMethodReturnDec();
+                    if (returnDec != null) {
+                        List<ALittleMethodReturnTypeDec> returnTypeDecList = returnDec.getMethodReturnTypeDecList();
+                        for (ALittleMethodReturnTypeDec returnTypeDec : returnTypeDecList) {
+                            ALittleAllType allType = returnTypeDec.getAllType();
+                            ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                            typeList.add(GuessInfo.value);
+                            info.functorReturnList.add(GuessInfo);
+                        }
+                    }
+                    if (!typeList.isEmpty()) info.value += ":";
+                    info.value += String.join(",", typeList) + ">";
+                    guessList.add(info);
                 } else if (parent instanceof ALittleClassStaticDec) {
-                    ALittleClassStaticDec method_dec = (ALittleClassStaticDec) parent;
-                    ALittleMethodReturnDec return_dec = method_dec.getMethodReturnDec();
-                    if (return_dec != null) {
-                        List<ALittleMethodReturnTypeDec> return_type_decList = return_dec.getMethodReturnTypeDecList();
-                        for (ALittleMethodReturnTypeDec return_type_dec : return_type_decList) {
-                            allTypeList.add(return_type_dec.getAllType());
+                    ALittleClassStaticDec classStaticDec = (ALittleClassStaticDec) parent;
+
+                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+                    info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
+                    info.value = "Functor<(";
+                    info.element = classStaticDec;
+                    info.functorAwait = classStaticDec.getCoroutineModifier() != null && classStaticDec.getCoroutineModifier().getText().equals("await");
+                    if (info.functorAwait) {
+                        info.value = "Functor<await(";
+                    }
+                    info.functorParamList = new ArrayList<>();
+                    info.functorReturnList = new ArrayList<>();
+
+                    List<String> typeList = new ArrayList<>();
+                    ALittleMethodParamDec paramDec = classStaticDec.getMethodParamDec();
+                    if (paramDec != null) {
+                        List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
+                        for (ALittleMethodParamOneDec oneDec : oneDecList) {
+                            ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                            ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                            typeList.add(GuessInfo.value);
+                            info.functorParamList.add(GuessInfo);
                         }
                     }
-                // 全局函数
+                    info.value += String.join(",", typeList) + ")";
+                    typeList = new ArrayList<>();
+                    ALittleMethodReturnDec returnDec = classStaticDec.getMethodReturnDec();
+                    if (returnDec != null) {
+                        List<ALittleMethodReturnTypeDec> returnTypeDecList = returnDec.getMethodReturnTypeDecList();
+                        for (ALittleMethodReturnTypeDec returnTypeDec : returnTypeDecList) {
+                            ALittleAllType allType = returnTypeDec.getAllType();
+                            ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                            typeList.add(GuessInfo.value);
+                            info.functorReturnList.add(GuessInfo);
+                        }
+                    }
+                    if (!typeList.isEmpty()) info.value += ":";
+                    info.value += String.join(",", typeList) + ">";
+                    guessList.add(info);
                 } else if (parent instanceof ALittleGlobalMethodDec) {
-                    ALittleGlobalMethodDec method_dec = (ALittleGlobalMethodDec) parent;
-                    ALittleMethodReturnDec return_dec = method_dec.getMethodReturnDec();
-                    if (return_dec != null) {
-                        List<ALittleMethodReturnTypeDec> return_type_decList = return_dec.getMethodReturnTypeDecList();
-                        for (ALittleMethodReturnTypeDec return_type_dec : return_type_decList) {
-                            allTypeList.add(return_type_dec.getAllType());
+                    ALittleGlobalMethodDec globalMethodDec = (ALittleGlobalMethodDec) parent;
+
+                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+                    info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
+                    info.value = "Functor<(";
+                    info.element = globalMethodDec;
+                    info.functorAwait = globalMethodDec.getCoroutineModifier() != null && globalMethodDec.getCoroutineModifier().getText().equals("await");
+                    if (info.functorAwait) {
+                        info.value = "Functor<await(";
+                    }
+                    info.functorParamList = new ArrayList<>();
+                    info.functorReturnList = new ArrayList<>();
+
+                    List<String> typeList = new ArrayList<>();
+                    ALittleMethodParamDec paramDec = globalMethodDec.getMethodParamDec();
+                    if (paramDec != null) {
+                        List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
+                        for (ALittleMethodParamOneDec oneDec : oneDecList) {
+                            ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                            ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                            typeList.add(GuessInfo.value);
+                            info.functorParamList.add(GuessInfo);
                         }
                     }
-                }
-
-                for (ALittleAllType allType : allTypeList) {
-                    try {
-                        guess_list.add(ALittleUtil.guessType(allType));
-                    } catch (ALittleUtil.ALittleElementException ignored) {
-
+                    info.value += String.join(",", typeList) + ")";
+                    typeList = new ArrayList<>();
+                    ALittleMethodReturnDec returnDec = globalMethodDec.getMethodReturnDec();
+                    if (returnDec != null) {
+                        List<ALittleMethodReturnTypeDec> returnTypeDecList = returnDec.getMethodReturnTypeDecList();
+                        for (ALittleMethodReturnTypeDec returnTypeDec : returnTypeDecList) {
+                            ALittleAllType allType = returnTypeDec.getAllType();
+                            ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                            typeList.add(GuessInfo.value);
+                            info.functorReturnList.add(GuessInfo);
+                        }
                     }
+                    if (!typeList.isEmpty()) info.value += ":";
+                    info.value += String.join(",", typeList) + ">";
+                    guessList.add(info);
                 }
             }
         }
 
-        return guess_list;
+        return guessList;
     }
 
     @NotNull
