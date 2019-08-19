@@ -54,6 +54,7 @@ public class ALittleIfExprImpl extends ASTWrapperPsiElement implements ALittleIf
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -67,6 +68,11 @@ public class ALittleIfExprImpl extends ASTWrapperPsiElement implements ALittleIf
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

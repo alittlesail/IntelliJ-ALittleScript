@@ -31,8 +31,8 @@ public class ALittleClassDecImpl extends ASTWrapperPsiElement implements ALittle
 
   @Override
   @Nullable
-  public ALittleClassAccessModifier getClassAccessModifier() {
-    return findChildByClass(ALittleClassAccessModifier.class);
+  public ALittleAccessModifier getAccessModifier() {
+    return findChildByClass(ALittleAccessModifier.class);
   }
 
   @Override
@@ -43,20 +43,8 @@ public class ALittleClassDecImpl extends ASTWrapperPsiElement implements ALittle
 
   @Override
   @Nullable
-  public ALittleClassExtendsAccessModifier getClassExtendsAccessModifier() {
-    return findChildByClass(ALittleClassExtendsAccessModifier.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleClassExtendsNameDec getClassExtendsNameDec() {
-    return findChildByClass(ALittleClassExtendsNameDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleClassExtendsNamespaceNameDec getClassExtendsNamespaceNameDec() {
-    return findChildByClass(ALittleClassExtendsNamespaceNameDec.class);
+  public ALittleClassExtendsDec getClassExtendsDec() {
+    return findChildByClass(ALittleClassExtendsDec.class);
   }
 
   @Override
@@ -96,6 +84,7 @@ public class ALittleClassDecImpl extends ASTWrapperPsiElement implements ALittle
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -109,6 +98,11 @@ public class ALittleClassDecImpl extends ASTWrapperPsiElement implements ALittle
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

@@ -10,17 +10,20 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittleCustomType extends PsiElement {
 
-  @NotNull
-  ALittleCustomTypeNameDec getCustomTypeNameDec();
-
   @Nullable
-  ALittleCustomTypeNamespaceNameDec getCustomTypeNamespaceNameDec();
+  ALittleNamespaceNameDec getNamespaceNameDec();
 
+  @NotNull
+  PsiElement getIdContent();
+
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

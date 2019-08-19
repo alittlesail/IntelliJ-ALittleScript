@@ -6,17 +6,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import plugin.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
-import plugin.ALittleUtil;
+import plugin.psi.ALittleNamespaceDec;
 import plugin.psi.ALittleNamespaceNameDec;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleNamespaceNameDecReference extends ALittleReference {
-    public ALittleNamespaceNameDecReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNamespaceNameDec> {
+    public ALittleNamespaceNameDecReference(@NotNull ALittleNamespaceNameDec element, TextRange textRange) {
         super(element, textRange);
     }
 
@@ -27,7 +26,7 @@ public class ALittleNamespaceNameDecReference extends ALittleReference {
         for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
             if (element instanceof ALittleNamespaceNameDec) {
-                guessList.add(((ALittleNamespaceNameDec)element.getParent()).guessType());
+                guessList.add(((ALittleNamespaceDec)element.getParent()).guessType());
             }
         }
 

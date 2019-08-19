@@ -11,19 +11,13 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 public interface ALittleClassDec extends PsiElement {
 
   @Nullable
-  ALittleClassAccessModifier getClassAccessModifier();
+  ALittleAccessModifier getAccessModifier();
 
   @NotNull
   List<ALittleClassCtorDec> getClassCtorDecList();
 
   @Nullable
-  ALittleClassExtendsAccessModifier getClassExtendsAccessModifier();
-
-  @Nullable
-  ALittleClassExtendsNameDec getClassExtendsNameDec();
-
-  @Nullable
-  ALittleClassExtendsNamespaceNameDec getClassExtendsNamespaceNameDec();
+  ALittleClassExtendsDec getClassExtendsDec();
 
   @NotNull
   List<ALittleClassGetterDec> getClassGetterDecList();
@@ -43,11 +37,14 @@ public interface ALittleClassDec extends PsiElement {
   @NotNull
   List<ALittleClassVarDec> getClassVarDecList();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

@@ -11,22 +11,19 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 public interface ALittlePropertyValue extends PsiElement {
 
   @NotNull
+  ALittlePropertyValueFirstType getPropertyValueFirstType();
+
+  @NotNull
   List<ALittlePropertyValueSuffix> getPropertyValueSuffixList();
 
-  @Nullable
-  ALittlePropertyValueCastType getPropertyValueCastType();
-
-  @Nullable
-  ALittlePropertyValueCustomType getPropertyValueCustomType();
-
-  @Nullable
-  ALittlePropertyValueThisType getPropertyValueThisType();
-
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

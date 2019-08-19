@@ -17,13 +17,16 @@ public interface ALittleOp7Stat extends PsiElement {
   List<ALittleOp7SuffixEx> getOp7SuffixExList();
 
   @NotNull
-  ALittleValueFactor getValueFactor();
+  ALittleValueFactorStat getValueFactorStat();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

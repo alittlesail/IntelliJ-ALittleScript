@@ -20,13 +20,16 @@ public interface ALittleOp5Suffix extends PsiElement {
   List<ALittleOp5SuffixEe> getOp5SuffixEeList();
 
   @Nullable
-  ALittleValueFactor getValueFactor();
+  ALittleValueFactorStat getValueFactorStat();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

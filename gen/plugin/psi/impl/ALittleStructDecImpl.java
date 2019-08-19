@@ -37,26 +37,14 @@ public class ALittleStructDecImpl extends ASTWrapperPsiElement implements ALittl
 
   @Override
   @Nullable
-  public ALittleStructExtendsNameDec getStructExtendsNameDec() {
-    return findChildByClass(ALittleStructExtendsNameDec.class);
+  public ALittleStructExtendsDec getStructExtendsDec() {
+    return findChildByClass(ALittleStructExtendsDec.class);
   }
 
   @Override
   @Nullable
-  public ALittleStructExtendsNamespaceNameDec getStructExtendsNamespaceNameDec() {
-    return findChildByClass(ALittleStructExtendsNamespaceNameDec.class);
-  }
-
-  @Override
-  @NotNull
   public ALittleStructNameDec getStructNameDec() {
-    return findNotNullChildByClass(ALittleStructNameDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleStructProtocolDec getStructProtocolDec() {
-    return findChildByClass(ALittleStructProtocolDec.class);
+    return findChildByClass(ALittleStructNameDec.class);
   }
 
   @Override
@@ -66,6 +54,7 @@ public class ALittleStructDecImpl extends ASTWrapperPsiElement implements ALittl
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -79,6 +68,11 @@ public class ALittleStructDecImpl extends ASTWrapperPsiElement implements ALittl
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

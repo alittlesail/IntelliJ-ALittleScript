@@ -37,11 +37,12 @@ public class ALittleStructVarDecImpl extends ASTWrapperPsiElement implements ALi
 
   @Override
   @Nullable
-  public ALittleStructVarNameDec getStructVarNameDec() {
-    return findChildByClass(ALittleStructVarNameDec.class);
+  public PsiElement getIdContent() {
+    return findChildByType(ID_CONTENT);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -55,6 +56,11 @@ public class ALittleStructVarDecImpl extends ASTWrapperPsiElement implements ALi
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

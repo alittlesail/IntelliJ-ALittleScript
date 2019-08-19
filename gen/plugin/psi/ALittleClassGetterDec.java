@@ -14,19 +14,22 @@ public interface ALittleClassGetterDec extends PsiElement {
   ALittleAccessModifier getAccessModifier();
 
   @Nullable
+  ALittleAllType getAllType();
+
+  @Nullable
   ALittleMethodBodyDec getMethodBodyDec();
 
   @Nullable
   ALittleMethodNameDec getMethodNameDec();
 
-  @Nullable
-  ALittleMethodReturnTypeDec getMethodReturnTypeDec();
-
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

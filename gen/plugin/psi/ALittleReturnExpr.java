@@ -11,16 +11,19 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 public interface ALittleReturnExpr extends PsiElement {
 
   @Nullable
-  ALittleCoroutineYield getCoroutineYield();
+  ALittleReturnYield getReturnYield();
 
   @NotNull
   List<ALittleValueStat> getValueStatList();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

@@ -10,17 +10,20 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittleMethodParamOneDec extends PsiElement {
 
+  @NotNull
+  ALittleAllType getAllType();
+
   @Nullable
   ALittleMethodParamNameDec getMethodParamNameDec();
 
   @NotNull
-  ALittleMethodParamTypeDec getMethodParamTypeDec();
-
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

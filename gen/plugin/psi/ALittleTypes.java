@@ -13,35 +13,25 @@ public interface ALittleTypes {
   IElementType ALL_TYPE = new ALittleElementType("ALL_TYPE");
   IElementType AUTO_TYPE = new ALittleElementType("AUTO_TYPE");
   IElementType BIND_STAT = new ALittleElementType("BIND_STAT");
-  IElementType CLASS_ACCESS_MODIFIER = new ALittleElementType("CLASS_ACCESS_MODIFIER");
   IElementType CLASS_CTOR_DEC = new ALittleElementType("CLASS_CTOR_DEC");
   IElementType CLASS_DEC = new ALittleElementType("CLASS_DEC");
-  IElementType CLASS_EXTENDS_ACCESS_MODIFIER = new ALittleElementType("CLASS_EXTENDS_ACCESS_MODIFIER");
-  IElementType CLASS_EXTENDS_NAMESPACE_NAME_DEC = new ALittleElementType("CLASS_EXTENDS_NAMESPACE_NAME_DEC");
-  IElementType CLASS_EXTENDS_NAME_DEC = new ALittleElementType("CLASS_EXTENDS_NAME_DEC");
+  IElementType CLASS_EXTENDS_DEC = new ALittleElementType("CLASS_EXTENDS_DEC");
   IElementType CLASS_GETTER_DEC = new ALittleElementType("CLASS_GETTER_DEC");
   IElementType CLASS_METHOD_DEC = new ALittleElementType("CLASS_METHOD_DEC");
   IElementType CLASS_NAME_DEC = new ALittleElementType("CLASS_NAME_DEC");
   IElementType CLASS_SETTER_DEC = new ALittleElementType("CLASS_SETTER_DEC");
   IElementType CLASS_STATIC_DEC = new ALittleElementType("CLASS_STATIC_DEC");
   IElementType CLASS_VAR_DEC = new ALittleElementType("CLASS_VAR_DEC");
-  IElementType CLASS_VAR_NAME_DEC = new ALittleElementType("CLASS_VAR_NAME_DEC");
   IElementType CONST_VALUE = new ALittleElementType("CONST_VALUE");
-  IElementType COROUTINE_MODIFIER = new ALittleElementType("COROUTINE_MODIFIER");
-  IElementType COROUTINE_YIELD = new ALittleElementType("COROUTINE_YIELD");
+  IElementType CO_MODIFIER = new ALittleElementType("CO_MODIFIER");
   IElementType CUSTOM_TYPE = new ALittleElementType("CUSTOM_TYPE");
-  IElementType CUSTOM_TYPE_NAMESPACE_NAME_DEC = new ALittleElementType("CUSTOM_TYPE_NAMESPACE_NAME_DEC");
-  IElementType CUSTOM_TYPE_NAME_DEC = new ALittleElementType("CUSTOM_TYPE_NAME_DEC");
   IElementType DO_WHILE_EXPR = new ALittleElementType("DO_WHILE_EXPR");
   IElementType ELSE_EXPR = new ALittleElementType("ELSE_EXPR");
   IElementType ELSE_IF_EXPR = new ALittleElementType("ELSE_IF_EXPR");
   IElementType EMPTY_EXPR = new ALittleElementType("EMPTY_EXPR");
   IElementType ENUM_DEC = new ALittleElementType("ENUM_DEC");
   IElementType ENUM_NAME_DEC = new ALittleElementType("ENUM_NAME_DEC");
-  IElementType ENUM_PROTOCOL_DEC = new ALittleElementType("ENUM_PROTOCOL_DEC");
   IElementType ENUM_VAR_DEC = new ALittleElementType("ENUM_VAR_DEC");
-  IElementType ENUM_VAR_NAME_DEC = new ALittleElementType("ENUM_VAR_NAME_DEC");
-  IElementType ENUM_VAR_VALUE_DEC = new ALittleElementType("ENUM_VAR_VALUE_DEC");
   IElementType FLOW_EXPR = new ALittleElementType("FLOW_EXPR");
   IElementType FOR_END_STAT = new ALittleElementType("FOR_END_STAT");
   IElementType FOR_EXPR = new ALittleElementType("FOR_EXPR");
@@ -58,20 +48,15 @@ public interface ALittleTypes {
   IElementType GENERIC_TYPE = new ALittleElementType("GENERIC_TYPE");
   IElementType GLOBAL_METHOD_DEC = new ALittleElementType("GLOBAL_METHOD_DEC");
   IElementType IF_EXPR = new ALittleElementType("IF_EXPR");
-  IElementType INSTANCE_CLASS_NAME_DEC = new ALittleElementType("INSTANCE_CLASS_NAME_DEC");
   IElementType INSTANCE_DEC = new ALittleElementType("INSTANCE_DEC");
-  IElementType INSTANCE_NAME_DEC = new ALittleElementType("INSTANCE_NAME_DEC");
   IElementType METHOD_BODY_DEC = new ALittleElementType("METHOD_BODY_DEC");
   IElementType METHOD_NAME_DEC = new ALittleElementType("METHOD_NAME_DEC");
   IElementType METHOD_PARAM_DEC = new ALittleElementType("METHOD_PARAM_DEC");
   IElementType METHOD_PARAM_NAME_DEC = new ALittleElementType("METHOD_PARAM_NAME_DEC");
   IElementType METHOD_PARAM_ONE_DEC = new ALittleElementType("METHOD_PARAM_ONE_DEC");
-  IElementType METHOD_PARAM_TYPE_DEC = new ALittleElementType("METHOD_PARAM_TYPE_DEC");
   IElementType METHOD_RETURN_DEC = new ALittleElementType("METHOD_RETURN_DEC");
-  IElementType METHOD_RETURN_TYPE_DEC = new ALittleElementType("METHOD_RETURN_TYPE_DEC");
   IElementType NAMESPACE_DEC = new ALittleElementType("NAMESPACE_DEC");
   IElementType NAMESPACE_NAME_DEC = new ALittleElementType("NAMESPACE_NAME_DEC");
-  IElementType NAMESPACE_REGISTER_DEC = new ALittleElementType("NAMESPACE_REGISTER_DEC");
   IElementType OP_1 = new ALittleElementType("OP_1");
   IElementType OP_1_EXPR = new ALittleElementType("OP_1_EXPR");
   IElementType OP_2 = new ALittleElementType("OP_2");
@@ -109,36 +94,36 @@ public interface ALittleTypes {
   IElementType OP_8_SUFFIX_EX = new ALittleElementType("OP_8_SUFFIX_EX");
   IElementType OP_ASSIGN = new ALittleElementType("OP_ASSIGN");
   IElementType OP_ASSIGN_EXPR = new ALittleElementType("OP_ASSIGN_EXPR");
-  IElementType OP_NEW_LIST = new ALittleElementType("OP_NEW_LIST");
+  IElementType OP_NEW_LIST_STAT = new ALittleElementType("OP_NEW_LIST_STAT");
   IElementType OP_NEW_STAT = new ALittleElementType("OP_NEW_STAT");
   IElementType PRIMITIVE_TYPE = new ALittleElementType("PRIMITIVE_TYPE");
   IElementType PROPERTY_VALUE = new ALittleElementType("PROPERTY_VALUE");
-  IElementType PROPERTY_VALUE_BRACK_VALUE_STAT = new ALittleElementType("PROPERTY_VALUE_BRACK_VALUE_STAT");
+  IElementType PROPERTY_VALUE_BRACKET_VALUE = new ALittleElementType("PROPERTY_VALUE_BRACKET_VALUE");
   IElementType PROPERTY_VALUE_CAST_TYPE = new ALittleElementType("PROPERTY_VALUE_CAST_TYPE");
   IElementType PROPERTY_VALUE_CUSTOM_TYPE = new ALittleElementType("PROPERTY_VALUE_CUSTOM_TYPE");
   IElementType PROPERTY_VALUE_DOT_ID = new ALittleElementType("PROPERTY_VALUE_DOT_ID");
   IElementType PROPERTY_VALUE_DOT_ID_NAME = new ALittleElementType("PROPERTY_VALUE_DOT_ID_NAME");
   IElementType PROPERTY_VALUE_EXPR = new ALittleElementType("PROPERTY_VALUE_EXPR");
-  IElementType PROPERTY_VALUE_METHOD_CALL_STAT = new ALittleElementType("PROPERTY_VALUE_METHOD_CALL_STAT");
+  IElementType PROPERTY_VALUE_FIRST_TYPE = new ALittleElementType("PROPERTY_VALUE_FIRST_TYPE");
+  IElementType PROPERTY_VALUE_METHOD_CALL = new ALittleElementType("PROPERTY_VALUE_METHOD_CALL");
   IElementType PROPERTY_VALUE_SUFFIX = new ALittleElementType("PROPERTY_VALUE_SUFFIX");
   IElementType PROPERTY_VALUE_THIS_TYPE = new ALittleElementType("PROPERTY_VALUE_THIS_TYPE");
   IElementType REFLECT_VALUE = new ALittleElementType("REFLECT_VALUE");
+  IElementType REGISTER_MODIFIER = new ALittleElementType("REGISTER_MODIFIER");
   IElementType RETURN_EXPR = new ALittleElementType("RETURN_EXPR");
+  IElementType RETURN_YIELD = new ALittleElementType("RETURN_YIELD");
   IElementType STRUCT_DEC = new ALittleElementType("STRUCT_DEC");
-  IElementType STRUCT_EXTENDS_NAMESPACE_NAME_DEC = new ALittleElementType("STRUCT_EXTENDS_NAMESPACE_NAME_DEC");
-  IElementType STRUCT_EXTENDS_NAME_DEC = new ALittleElementType("STRUCT_EXTENDS_NAME_DEC");
+  IElementType STRUCT_EXTENDS_DEC = new ALittleElementType("STRUCT_EXTENDS_DEC");
   IElementType STRUCT_NAME_DEC = new ALittleElementType("STRUCT_NAME_DEC");
-  IElementType STRUCT_PROTOCOL_DEC = new ALittleElementType("STRUCT_PROTOCOL_DEC");
   IElementType STRUCT_VAR_DEC = new ALittleElementType("STRUCT_VAR_DEC");
-  IElementType STRUCT_VAR_NAME_DEC = new ALittleElementType("STRUCT_VAR_NAME_DEC");
-  IElementType VALUE_FACTOR = new ALittleElementType("VALUE_FACTOR");
+  IElementType VALUE_FACTOR_STAT = new ALittleElementType("VALUE_FACTOR_STAT");
   IElementType VALUE_STAT = new ALittleElementType("VALUE_STAT");
-  IElementType VALUE_STAT_PAREN = new ALittleElementType("VALUE_STAT_PAREN");
+  IElementType VAR_ASSIGN_DEC = new ALittleElementType("VAR_ASSIGN_DEC");
   IElementType VAR_ASSIGN_EXPR = new ALittleElementType("VAR_ASSIGN_EXPR");
   IElementType VAR_ASSIGN_NAME_DEC = new ALittleElementType("VAR_ASSIGN_NAME_DEC");
-  IElementType VAR_ASSIGN_PAIR_DEC = new ALittleElementType("VAR_ASSIGN_PAIR_DEC");
   IElementType WHILE_EXPR = new ALittleElementType("WHILE_EXPR");
   IElementType WRAP_EXPR = new ALittleElementType("WRAP_EXPR");
+  IElementType WRAP_VALUE_STAT = new ALittleElementType("WRAP_VALUE_STAT");
 
   IElementType ANY = new ALittleTokenType("any");
   IElementType APOS = new ALittleTokenType("'");
@@ -158,7 +143,6 @@ public interface ALittleTypes {
   IElementType CONCAT = new ALittleTokenType("..");
   IElementType COND_AND = new ALittleTokenType("&&");
   IElementType COND_OR = new ALittleTokenType("||");
-  IElementType CTOR = new ALittleTokenType("Ctor");
   IElementType DIGIT_CONTENT = new ALittleTokenType("DIGIT_CONTENT");
   IElementType DO = new ALittleTokenType("do");
   IElementType DOT = new ALittleTokenType(".");
@@ -170,7 +154,6 @@ public interface ALittleTypes {
   IElementType FALSE = new ALittleTokenType("false");
   IElementType FOR = new ALittleTokenType("for");
   IElementType FUN = new ALittleTokenType("fun");
-  IElementType FUNCTOR = new ALittleTokenType("Functor");
   IElementType GET = new ALittleTokenType("get");
   IElementType GREATER = new ALittleTokenType(">");
   IElementType GREATER_OR_EQUAL = new ALittleTokenType(">=");
@@ -178,15 +161,12 @@ public interface ALittleTypes {
   IElementType ID_CONTENT = new ALittleTokenType("ID_CONTENT");
   IElementType IF = new ALittleTokenType("if");
   IElementType IN = new ALittleTokenType("in");
-  IElementType INSTANCE = new ALittleTokenType("instance");
   IElementType INT = new ALittleTokenType("int");
   IElementType LBRACE = new ALittleTokenType("{");
   IElementType LBRACK = new ALittleTokenType("[");
   IElementType LESS = new ALittleTokenType("<");
   IElementType LESS_OR_EQUAL = new ALittleTokenType("<=");
-  IElementType LIST = new ALittleTokenType("List");
   IElementType LPAREN = new ALittleTokenType("(");
-  IElementType MAP = new ALittleTokenType("Map");
   IElementType MINUS = new ALittleTokenType("-");
   IElementType MINUS_ASSIGN = new ALittleTokenType("-=");
   IElementType MINUS_MINUS = new ALittleTokenType("--");
@@ -202,7 +182,6 @@ public interface ALittleTypes {
   IElementType PLUS_PLUS = new ALittleTokenType("++");
   IElementType PRIVATE = new ALittleTokenType("private");
   IElementType PROTECTED = new ALittleTokenType("protected");
-  IElementType PROTO = new ALittleTokenType("proto");
   IElementType PUBLIC = new ALittleTokenType("public");
   IElementType QUOTE = new ALittleTokenType("\"");
   IElementType QUOTIENT = new ALittleTokenType("/");
@@ -244,23 +223,14 @@ public interface ALittleTypes {
       else if (type == BIND_STAT) {
         return new ALittleBindStatImpl(node);
       }
-      else if (type == CLASS_ACCESS_MODIFIER) {
-        return new ALittleClassAccessModifierImpl(node);
-      }
       else if (type == CLASS_CTOR_DEC) {
         return new ALittleClassCtorDecImpl(node);
       }
       else if (type == CLASS_DEC) {
         return new ALittleClassDecImpl(node);
       }
-      else if (type == CLASS_EXTENDS_ACCESS_MODIFIER) {
-        return new ALittleClassExtendsAccessModifierImpl(node);
-      }
-      else if (type == CLASS_EXTENDS_NAMESPACE_NAME_DEC) {
-        return new ALittleClassExtendsNamespaceNameDecImpl(node);
-      }
-      else if (type == CLASS_EXTENDS_NAME_DEC) {
-        return new ALittleClassExtendsNameDecImpl(node);
+      else if (type == CLASS_EXTENDS_DEC) {
+        return new ALittleClassExtendsDecImpl(node);
       }
       else if (type == CLASS_GETTER_DEC) {
         return new ALittleClassGetterDecImpl(node);
@@ -280,26 +250,14 @@ public interface ALittleTypes {
       else if (type == CLASS_VAR_DEC) {
         return new ALittleClassVarDecImpl(node);
       }
-      else if (type == CLASS_VAR_NAME_DEC) {
-        return new ALittleClassVarNameDecImpl(node);
-      }
       else if (type == CONST_VALUE) {
         return new ALittleConstValueImpl(node);
       }
-      else if (type == COROUTINE_MODIFIER) {
-        return new ALittleCoroutineModifierImpl(node);
-      }
-      else if (type == COROUTINE_YIELD) {
-        return new ALittleCoroutineYieldImpl(node);
+      else if (type == CO_MODIFIER) {
+        return new ALittleCoModifierImpl(node);
       }
       else if (type == CUSTOM_TYPE) {
         return new ALittleCustomTypeImpl(node);
-      }
-      else if (type == CUSTOM_TYPE_NAMESPACE_NAME_DEC) {
-        return new ALittleCustomTypeNamespaceNameDecImpl(node);
-      }
-      else if (type == CUSTOM_TYPE_NAME_DEC) {
-        return new ALittleCustomTypeNameDecImpl(node);
       }
       else if (type == DO_WHILE_EXPR) {
         return new ALittleDoWhileExprImpl(node);
@@ -319,17 +277,8 @@ public interface ALittleTypes {
       else if (type == ENUM_NAME_DEC) {
         return new ALittleEnumNameDecImpl(node);
       }
-      else if (type == ENUM_PROTOCOL_DEC) {
-        return new ALittleEnumProtocolDecImpl(node);
-      }
       else if (type == ENUM_VAR_DEC) {
         return new ALittleEnumVarDecImpl(node);
-      }
-      else if (type == ENUM_VAR_NAME_DEC) {
-        return new ALittleEnumVarNameDecImpl(node);
-      }
-      else if (type == ENUM_VAR_VALUE_DEC) {
-        return new ALittleEnumVarValueDecImpl(node);
       }
       else if (type == FLOW_EXPR) {
         return new ALittleFlowExprImpl(node);
@@ -379,14 +328,8 @@ public interface ALittleTypes {
       else if (type == IF_EXPR) {
         return new ALittleIfExprImpl(node);
       }
-      else if (type == INSTANCE_CLASS_NAME_DEC) {
-        return new ALittleInstanceClassNameDecImpl(node);
-      }
       else if (type == INSTANCE_DEC) {
         return new ALittleInstanceDecImpl(node);
-      }
-      else if (type == INSTANCE_NAME_DEC) {
-        return new ALittleInstanceNameDecImpl(node);
       }
       else if (type == METHOD_BODY_DEC) {
         return new ALittleMethodBodyDecImpl(node);
@@ -403,23 +346,14 @@ public interface ALittleTypes {
       else if (type == METHOD_PARAM_ONE_DEC) {
         return new ALittleMethodParamOneDecImpl(node);
       }
-      else if (type == METHOD_PARAM_TYPE_DEC) {
-        return new ALittleMethodParamTypeDecImpl(node);
-      }
       else if (type == METHOD_RETURN_DEC) {
         return new ALittleMethodReturnDecImpl(node);
-      }
-      else if (type == METHOD_RETURN_TYPE_DEC) {
-        return new ALittleMethodReturnTypeDecImpl(node);
       }
       else if (type == NAMESPACE_DEC) {
         return new ALittleNamespaceDecImpl(node);
       }
       else if (type == NAMESPACE_NAME_DEC) {
         return new ALittleNamespaceNameDecImpl(node);
-      }
-      else if (type == NAMESPACE_REGISTER_DEC) {
-        return new ALittleNamespaceRegisterDecImpl(node);
       }
       else if (type == OP_1) {
         return new ALittleOp1Impl(node);
@@ -532,8 +466,8 @@ public interface ALittleTypes {
       else if (type == OP_ASSIGN_EXPR) {
         return new ALittleOpAssignExprImpl(node);
       }
-      else if (type == OP_NEW_LIST) {
-        return new ALittleOpNewListImpl(node);
+      else if (type == OP_NEW_LIST_STAT) {
+        return new ALittleOpNewListStatImpl(node);
       }
       else if (type == OP_NEW_STAT) {
         return new ALittleOpNewStatImpl(node);
@@ -544,8 +478,8 @@ public interface ALittleTypes {
       else if (type == PROPERTY_VALUE) {
         return new ALittlePropertyValueImpl(node);
       }
-      else if (type == PROPERTY_VALUE_BRACK_VALUE_STAT) {
-        return new ALittlePropertyValueBrackValueStatImpl(node);
+      else if (type == PROPERTY_VALUE_BRACKET_VALUE) {
+        return new ALittlePropertyValueBracketValueImpl(node);
       }
       else if (type == PROPERTY_VALUE_CAST_TYPE) {
         return new ALittlePropertyValueCastTypeImpl(node);
@@ -562,8 +496,11 @@ public interface ALittleTypes {
       else if (type == PROPERTY_VALUE_EXPR) {
         return new ALittlePropertyValueExprImpl(node);
       }
-      else if (type == PROPERTY_VALUE_METHOD_CALL_STAT) {
-        return new ALittlePropertyValueMethodCallStatImpl(node);
+      else if (type == PROPERTY_VALUE_FIRST_TYPE) {
+        return new ALittlePropertyValueFirstTypeImpl(node);
+      }
+      else if (type == PROPERTY_VALUE_METHOD_CALL) {
+        return new ALittlePropertyValueMethodCallImpl(node);
       }
       else if (type == PROPERTY_VALUE_SUFFIX) {
         return new ALittlePropertyValueSuffixImpl(node);
@@ -574,38 +511,35 @@ public interface ALittleTypes {
       else if (type == REFLECT_VALUE) {
         return new ALittleReflectValueImpl(node);
       }
+      else if (type == REGISTER_MODIFIER) {
+        return new ALittleRegisterModifierImpl(node);
+      }
       else if (type == RETURN_EXPR) {
         return new ALittleReturnExprImpl(node);
+      }
+      else if (type == RETURN_YIELD) {
+        return new ALittleReturnYieldImpl(node);
       }
       else if (type == STRUCT_DEC) {
         return new ALittleStructDecImpl(node);
       }
-      else if (type == STRUCT_EXTENDS_NAMESPACE_NAME_DEC) {
-        return new ALittleStructExtendsNamespaceNameDecImpl(node);
-      }
-      else if (type == STRUCT_EXTENDS_NAME_DEC) {
-        return new ALittleStructExtendsNameDecImpl(node);
+      else if (type == STRUCT_EXTENDS_DEC) {
+        return new ALittleStructExtendsDecImpl(node);
       }
       else if (type == STRUCT_NAME_DEC) {
         return new ALittleStructNameDecImpl(node);
       }
-      else if (type == STRUCT_PROTOCOL_DEC) {
-        return new ALittleStructProtocolDecImpl(node);
-      }
       else if (type == STRUCT_VAR_DEC) {
         return new ALittleStructVarDecImpl(node);
       }
-      else if (type == STRUCT_VAR_NAME_DEC) {
-        return new ALittleStructVarNameDecImpl(node);
-      }
-      else if (type == VALUE_FACTOR) {
-        return new ALittleValueFactorImpl(node);
+      else if (type == VALUE_FACTOR_STAT) {
+        return new ALittleValueFactorStatImpl(node);
       }
       else if (type == VALUE_STAT) {
         return new ALittleValueStatImpl(node);
       }
-      else if (type == VALUE_STAT_PAREN) {
-        return new ALittleValueStatParenImpl(node);
+      else if (type == VAR_ASSIGN_DEC) {
+        return new ALittleVarAssignDecImpl(node);
       }
       else if (type == VAR_ASSIGN_EXPR) {
         return new ALittleVarAssignExprImpl(node);
@@ -613,14 +547,14 @@ public interface ALittleTypes {
       else if (type == VAR_ASSIGN_NAME_DEC) {
         return new ALittleVarAssignNameDecImpl(node);
       }
-      else if (type == VAR_ASSIGN_PAIR_DEC) {
-        return new ALittleVarAssignPairDecImpl(node);
-      }
       else if (type == WHILE_EXPR) {
         return new ALittleWhileExprImpl(node);
       }
       else if (type == WRAP_EXPR) {
         return new ALittleWrapExprImpl(node);
+      }
+      else if (type == WRAP_VALUE_STAT) {
+        return new ALittleWrapValueStatImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

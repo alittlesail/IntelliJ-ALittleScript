@@ -21,26 +21,27 @@ public class ALittleReferenceUtil {
         }
 
         @NotNull
-        public String GetError() { return mError; }
+        public String getError() { return mError; }
 
         @NotNull
-        public PsiElement GetElement() { return mElement; }
+        public PsiElement getElement() { return mElement; }
     }
 
+    // 定义类型
     public enum GuessType
     {
         GT_CONST,
         GT_PRIMITIVE,
         GT_CLASS,
-        GT_CLASS_NAME,
         GT_STRUCT,
         GT_ENUM,
         GT_MAP,
         GT_LIST,
         GT_FUNCTOR,
-        GT_NAMESPACE_NAME,
+        GT_NAMESPACE,
     }
 
+    // 类型信息
     public static class GuessTypeInfo
     {
         public GuessType type;
@@ -51,9 +52,23 @@ public class ALittleReferenceUtil {
         public GuessTypeInfo mapValueType;                // type="Map"时, 表示Map的Value
         public List<GuessTypeInfo> functorParamList;      // type="Functor"时, 表示参数列表
         public List<GuessTypeInfo> functorReturnList;     // type="Functor"时, 表示返回值列表
-        boolean functorAwait;                              // type="Functor"时, 表示是否是await
-        // public List<GuessTypeInfo> listVarType;           // type="class" 或者 type="struct"，表示成员的类型列表
-        // public List<String> listVarName;                  // type="class" 或者 type="struct"，表示成员的变量列表
+        boolean functorAwait;                             // type="Functor"时, 表示是否是await
+        boolean callAwait;                                // 当调用了"Functor"时, 表示是否是这个functor是否是await修饰
+    }
+
+    public static GuessTypeInfo DeepCopyGuessTypeInfo(@NotNull GuessTypeInfo info) {
+        GuessTypeInfo copy = new GuessTypeInfo();
+        copy.type = info.type;
+        copy.value = info.value;
+        copy.element = info.element;
+        copy.listSubType = info.listSubType;
+        copy.mapKeyType = info.mapKeyType;
+        copy.mapValueType = info.mapValueType;
+        copy.functorParamList = info.functorParamList;
+        copy.functorReturnList = info.functorReturnList;
+        copy.functorAwait = info.functorAwait;
+        copy.callAwait = info.callAwait;
+        return copy;
     }
 
     // 计算表达式需要使用什么样的变量方式
@@ -70,42 +85,93 @@ public class ALittleReferenceUtil {
         throw new ALittleReferenceException(valueStat, "该表达式不能遍历");
     }
 
+    // 判断 parent是否是child的父类
+    public static boolean IsClassSuper(PsiElement child, PsiElement parent) throws ALittleReferenceException {
+        if (!(child instanceof ALittleClassDec)) return false;
+        ALittleClassDec childClass = (ALittleClassDec)child;
+
+        ALittleClassExtendsDec extendsDec = childClass.getClassExtendsDec();
+        if (extendsDec == null) return false;
+
+        ALittleClassNameDec nameDec = extendsDec.getClassNameDec();
+        if (nameDec == null) return false;
+
+        GuessTypeInfo guessType = nameDec.guessType();
+        if (guessType.element.equals(parent)) return true;
+
+        return IsClassSuper(guessType.element, parent);
+    }
+
+    // 判断 parent是否是child的父类
+    public static boolean IsStructSuper(PsiElement child, PsiElement parent) throws ALittleReferenceException {
+        if (!(child instanceof ALittleStructDec)) return false;
+        ALittleStructDec childStruct = (ALittleStructDec)child;
+
+        ALittleStructExtendsDec extendsDec = childStruct.getStructExtendsDec();
+        if (extendsDec == null) return false;
+
+        ALittleStructNameDec nameDec = extendsDec.getStructNameDec();
+        if (nameDec == null) return false;
+
+        GuessTypeInfo guessType = nameDec.guessType();
+        if (guessType.element.equals(parent)) return true;
+
+        return IsStructSuper(guessType.element, parent);
+    }
+
     // 创建引用对象
     public static ALittleReference create(PsiElement element) {
-        if (element instanceof ALittleNamespaceNameDec) return new ALittleNamespaceNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleClassExtendsNameDec) return new ALittleClassExtendsNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleClassExtendsNamespaceNameDec) return new ALittleClassExtendsNamespaceNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleCustomTypeNamespaceNameDec) return new ALittleCustomTypeNamespaceNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleCustomTypeNameDec) return new ALittleCustomTypeNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittlePropertyValueCustomType) return new ALittlePropertyValueCustomTypeReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittlePropertyValueDotIdName) return new ALittlePropertyValueDotIdNameReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleClassNameDec) return new ALittleClassNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleMethodNameDec) return new ALittleMethodNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleMethodParamNameDec) return new ALittleMethodParamNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleVarAssignNameDec) return new ALittleVarAssignNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleInstanceClassNameDec) return new ALittleInstanceClassNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleInstanceNameDec) return new ALittleInstanceNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleClassVarNameDec) return new ALittleClassVarNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleStructNameDec) return new ALittleStructNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleStructVarNameDec) return new ALittleStructVarNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleStructExtendsNameDec) return new ALittleStructExtendsNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleStructExtendsNamespaceNameDec) return new ALittleStructExtendsNamespaceNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleEnumNameDec) return new ALittleEnumNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleEnumVarNameDec) return new ALittleEnumVarNameDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittlePrimitiveType) return new ALittlePrimitiveTypeReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleAutoType) return new ALittleAutoTypeReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittlePropertyValueThisType) return new ALittlePropertyValueThisTypeReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittlePropertyValueCastType) return new ALittlePropertyValueCastTypeReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittlePropertyValueMethodCallStat) return new ALittlePropertyValueMethodCallStatReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittlePropertyValueBrackValueStat) return new ALittlePropertyValueBrackValueStatReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleBindStat) return new ALittleBindStatReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleConstValue) return new ALittleConstValueReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleOpNewStat) return new ALittleOpNewStatReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleMethodReturnTypeDec) return new ALittleMethodReturnTypeDecReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleAllType) return new ALittleAllTypeReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittlePropertyValue) return new ALittlePropertyValueReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleValueStat) return new ALittleValueStatReference(element, new TextRange(0, element.getText().length()));
-        if (element instanceof ALittleOp2Stat) return new ALittleOp2StatReference(element, new TextRange(0, element.getText().length()));
+        TextRange range = new TextRange(0, element.getText().length());
+
+        if (element instanceof ALittleAllType) return new ALittleAllTypeReference((ALittleAllType)element, range);
+        if (element instanceof ALittleAutoType) return new ALittleAutoTypeReference((ALittleAutoType)element, range);
+        if (element instanceof ALittleBindStat) return new ALittleBindStatReference((ALittleBindStat)element, range);
+
+        if (element instanceof ALittleClassDec) return new ALittleClassDecReference((ALittleClassDec)element, range);
+        if (element instanceof ALittleClassNameDec) return new ALittleClassNameDecReference((ALittleClassNameDec)element, range);
+        if (element instanceof ALittleClassVarDec) return new ALittleClassVarDecReference((ALittleClassVarDec)element, range);
+
+        if (element instanceof ALittleConstValue) return new ALittleConstValueReference((ALittleConstValue)element, range);
+        if (element instanceof ALittleCustomType) return new ALittleCustomTypeReference((ALittleCustomType)element, range);
+
+        if (element instanceof ALittleEnumDec) return new ALittleEnumDecReference((ALittleEnumDec)element, range);
+        if (element instanceof ALittleEnumNameDec) return new ALittleEnumNameDecReference((ALittleEnumNameDec)element, range);
+        if (element instanceof ALittleEnumVarDec) return new ALittleEnumVarDecReference((ALittleEnumVarDec)element, range);
+
+        if (element instanceof ALittleForExpr) return new ALittleForExprReference((ALittleForExpr)element, range);
+        if (element instanceof ALittleGenericType) return new ALittleGenericTypeReference((ALittleGenericType)element, range);
+        if (element instanceof ALittleMethodNameDec) return new ALittleMethodNameDecReference((ALittleMethodNameDec)element, range);
+
+        if (element instanceof ALittleNamespaceDec) return new ALittleNamespaceDecReference((ALittleNamespaceDec)element, range);
+        if (element instanceof ALittleNamespaceNameDec) return new ALittleNamespaceNameDecReference((ALittleNamespaceNameDec)element, range);
+
+        if (element instanceof ALittleOpNewListStat) return new ALittleOpNewListStatReference((ALittleOpNewListStat)element, range);
+        if (element instanceof ALittleOpNewStat) return new ALittleOpNewStatReference((ALittleOpNewStat)element, range);
+        if (element instanceof ALittlePrimitiveType) return new ALittlePrimitiveTypeReference((ALittlePrimitiveType)element, range);
+
+        if (element instanceof ALittlePropertyValueBracketValue) return new ALittlePropertyValueBracketValueReference((ALittlePropertyValueBracketValue)element, range);
+        if (element instanceof ALittlePropertyValueCastType) return new ALittlePropertyValueCastTypeReference((ALittlePropertyValueCastType)element, range);
+        if (element instanceof ALittlePropertyValueCustomType) return new ALittlePropertyValueCustomTypeReference((ALittlePropertyValueCustomType)element, range);
+        if (element instanceof ALittlePropertyValueDotIdName) return new ALittlePropertyValueDotIdNameReference((ALittlePropertyValueDotIdName)element, range);
+        if (element instanceof ALittlePropertyValueFirstType) return new ALittlePropertyValueFirstTypeReference((ALittlePropertyValueFirstType)element, range);
+        if (element instanceof ALittlePropertyValueMethodCall) return new ALittlePropertyValueMethodCallReference((ALittlePropertyValueMethodCall)element, range);
+        if (element instanceof ALittlePropertyValue) return new ALittlePropertyValueReference((ALittlePropertyValue)element, range);
+        if (element instanceof ALittlePropertyValueThisType) return new ALittlePropertyValueThisTypeReference((ALittlePropertyValueThisType)element, range);
+
+        if (element instanceof ALittleReflectValue) return new ALittleReflectValueReference((ALittleReflectValue)element, range);
+        if (element instanceof ALittleReturnExpr) return new ALittleReturnExprReference((ALittleReturnExpr)element, range);
+
+        if (element instanceof ALittleStructDec) return new ALittleStructDecReference((ALittleStructDec)element, range);
+        if (element instanceof ALittleStructNameDec) return new ALittleStructNameDecReference((ALittleStructNameDec)element, range);
+        if (element instanceof ALittleStructVarDec) return new ALittleStructVarDecReference((ALittleStructVarDec)element, range);
+
+        if (element instanceof ALittleValueFactorStat) return new ALittleValueFactorStatReference((ALittleValueFactorStat)element, range);
+        if (element instanceof ALittleValueStat) return new ALittleValueStatReference((ALittleValueStat)element, range);
+
+        if (element instanceof ALittleVarAssignDec) return new ALittleVarAssignDecReference((ALittleVarAssignDec)element, range);
+        if (element instanceof ALittleVarAssignExpr) return new ALittleVarAssignExprReference((ALittleVarAssignExpr)element, range);
+        if (element instanceof ALittleVarAssignNameDec) return new ALittleVarAssignNameDecReference((ALittleVarAssignNameDec)element, range);
+        if (element instanceof ALittleWrapValueStat) return new ALittleWrapValueStatReference((ALittleWrapValueStat)element, range);
 
         return null;
     }

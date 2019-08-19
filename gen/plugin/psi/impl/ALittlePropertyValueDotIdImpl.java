@@ -30,12 +30,13 @@ public class ALittlePropertyValueDotIdImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittlePropertyValueDotIdName getPropertyValueDotIdName() {
-    return findNotNullChildByClass(ALittlePropertyValueDotIdName.class);
+    return findChildByClass(ALittlePropertyValueDotIdName.class);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -49,6 +50,11 @@ public class ALittlePropertyValueDotIdImpl extends ASTWrapperPsiElement implemen
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

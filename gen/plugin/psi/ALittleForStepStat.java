@@ -13,11 +13,14 @@ public interface ALittleForStepStat extends PsiElement {
   @NotNull
   ALittleValueStat getValueStat();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

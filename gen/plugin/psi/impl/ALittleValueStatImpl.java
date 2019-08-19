@@ -79,8 +79,8 @@ public class ALittleValueStatImpl extends ASTWrapperPsiElement implements ALittl
 
   @Override
   @Nullable
-  public ALittleOpNewList getOpNewList() {
-    return findChildByClass(ALittleOpNewList.class);
+  public ALittleOpNewListStat getOpNewListStat() {
+    return findChildByClass(ALittleOpNewListStat.class);
   }
 
   @Override
@@ -91,11 +91,12 @@ public class ALittleValueStatImpl extends ASTWrapperPsiElement implements ALittl
 
   @Override
   @Nullable
-  public ALittleValueFactor getValueFactor() {
-    return findChildByClass(ALittleValueFactor.class);
+  public ALittleValueFactorStat getValueFactorStat() {
+    return findChildByClass(ALittleValueFactorStat.class);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -109,6 +110,11 @@ public class ALittleValueStatImpl extends ASTWrapperPsiElement implements ALittl
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

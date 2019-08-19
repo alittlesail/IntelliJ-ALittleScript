@@ -30,9 +30,9 @@ public class ALittleForStepConditionImpl extends ASTWrapperPsiElement implements
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittleForEndStat getForEndStat() {
-    return findNotNullChildByClass(ALittleForEndStat.class);
+    return findChildByClass(ALittleForEndStat.class);
   }
 
   @Override
@@ -42,12 +42,13 @@ public class ALittleForStepConditionImpl extends ASTWrapperPsiElement implements
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittleForStepStat getForStepStat() {
-    return findNotNullChildByClass(ALittleForStepStat.class);
+    return findChildByClass(ALittleForStepStat.class);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -61,6 +62,11 @@ public class ALittleForStepConditionImpl extends ASTWrapperPsiElement implements
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

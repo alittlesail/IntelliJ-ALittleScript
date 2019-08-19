@@ -10,20 +10,23 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittleForStepCondition extends PsiElement {
 
-  @NotNull
+  @Nullable
   ALittleForEndStat getForEndStat();
 
   @NotNull
   ALittleForStartStat getForStartStat();
 
-  @NotNull
+  @Nullable
   ALittleForStepStat getForStepStat();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

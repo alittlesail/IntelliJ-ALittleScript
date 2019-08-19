@@ -30,18 +30,19 @@ public class ALittlePropertyValueCastTypeImpl extends ASTWrapperPsiElement imple
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ALittleAllType getAllType() {
-    return findNotNullChildByClass(ALittleAllType.class);
+    return findChildByClass(ALittleAllType.class);
+  }
+
+  @Override
+  @Nullable
+  public ALittleValueStat getValueStat() {
+    return findChildByClass(ALittleValueStat.class);
   }
 
   @Override
   @NotNull
-  public ALittleValueFactor getValueFactor() {
-    return findNotNullChildByClass(ALittleValueFactor.class);
-  }
-
-  @Override
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -55,6 +56,11 @@ public class ALittlePropertyValueCastTypeImpl extends ASTWrapperPsiElement imple
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

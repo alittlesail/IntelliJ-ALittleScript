@@ -3,14 +3,14 @@ package plugin.reference;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.psi.ALittlePrimitiveType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittlePrimitiveTypeReference extends ALittleReference {
-    public ALittlePrimitiveTypeReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittlePrimitiveTypeReference extends ALittleReference<ALittlePrimitiveType> {
+    public ALittlePrimitiveTypeReference(@NotNull ALittlePrimitiveType element, TextRange textRange) {
         super(element, textRange);
     }
 

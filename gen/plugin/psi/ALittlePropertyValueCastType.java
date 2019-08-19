@@ -10,17 +10,20 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittlePropertyValueCastType extends PsiElement {
 
-  @NotNull
+  @Nullable
   ALittleAllType getAllType();
 
-  @NotNull
-  ALittleValueFactor getValueFactor();
+  @Nullable
+  ALittleValueStat getValueStat();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

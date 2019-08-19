@@ -19,11 +19,14 @@ public interface ALittleGenericType extends PsiElement {
   @Nullable
   ALittleGenericMapType getGenericMapType();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

@@ -10,14 +10,17 @@ import plugin.psi.*;
 
 import java.util.List;
 
-public abstract class ALittleReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
+public abstract class ALittleReference<T extends PsiElement> extends PsiReferenceBase<T> implements PsiPolyVariantReference {
     protected String mKey;
     protected String mNamespace;
 
-    public ALittleReference(@NotNull PsiElement element, TextRange textRange) {
+    public ALittleReference(@NotNull T element, TextRange textRange) {
         super(element, textRange);
         mKey = element.getText().substring(textRange.getStartOffset(), textRange.getEndOffset());
         mNamespace = ALittleUtil.getNamespaceName((ALittleFile) element.getContainingFile());
+    }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
     }
 
     @NotNull

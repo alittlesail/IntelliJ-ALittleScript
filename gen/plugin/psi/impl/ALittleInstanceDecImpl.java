@@ -36,30 +36,13 @@ public class ALittleInstanceDecImpl extends ASTWrapperPsiElement implements ALit
   }
 
   @Override
-  @Nullable
-  public ALittleAllType getAllType() {
-    return findChildByClass(ALittleAllType.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleInstanceClassNameDec getInstanceClassNameDec() {
-    return findChildByClass(ALittleInstanceClassNameDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleInstanceNameDec getInstanceNameDec() {
-    return findChildByClass(ALittleInstanceNameDec.class);
+  @NotNull
+  public ALittleVarAssignExpr getVarAssignExpr() {
+    return findNotNullChildByClass(ALittleVarAssignExpr.class);
   }
 
   @Override
   @NotNull
-  public List<ALittleValueStat> getValueStatList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleValueStat.class);
-  }
-
-  @Override
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -73,6 +56,11 @@ public class ALittleInstanceDecImpl extends ASTWrapperPsiElement implements ALit
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

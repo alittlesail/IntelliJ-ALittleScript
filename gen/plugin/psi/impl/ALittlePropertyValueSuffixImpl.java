@@ -31,8 +31,8 @@ public class ALittlePropertyValueSuffixImpl extends ASTWrapperPsiElement impleme
 
   @Override
   @Nullable
-  public ALittlePropertyValueBrackValueStat getPropertyValueBrackValueStat() {
-    return findChildByClass(ALittlePropertyValueBrackValueStat.class);
+  public ALittlePropertyValueBracketValue getPropertyValueBracketValue() {
+    return findChildByClass(ALittlePropertyValueBracketValue.class);
   }
 
   @Override
@@ -43,11 +43,12 @@ public class ALittlePropertyValueSuffixImpl extends ASTWrapperPsiElement impleme
 
   @Override
   @Nullable
-  public ALittlePropertyValueMethodCallStat getPropertyValueMethodCallStat() {
-    return findChildByClass(ALittlePropertyValueMethodCallStat.class);
+  public ALittlePropertyValueMethodCall getPropertyValueMethodCall() {
+    return findChildByClass(ALittlePropertyValueMethodCall.class);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -61,6 +62,11 @@ public class ALittlePropertyValueSuffixImpl extends ASTWrapperPsiElement impleme
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

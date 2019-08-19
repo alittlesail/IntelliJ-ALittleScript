@@ -30,6 +30,12 @@ public class ALittleMethodParamOneDecImpl extends ASTWrapperPsiElement implement
   }
 
   @Override
+  @NotNull
+  public ALittleAllType getAllType() {
+    return findNotNullChildByClass(ALittleAllType.class);
+  }
+
+  @Override
   @Nullable
   public ALittleMethodParamNameDec getMethodParamNameDec() {
     return findChildByClass(ALittleMethodParamNameDec.class);
@@ -37,11 +43,6 @@ public class ALittleMethodParamOneDecImpl extends ASTWrapperPsiElement implement
 
   @Override
   @NotNull
-  public ALittleMethodParamTypeDec getMethodParamTypeDec() {
-    return findNotNullChildByClass(ALittleMethodParamTypeDec.class);
-  }
-
-  @Override
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -55,6 +56,11 @@ public class ALittleMethodParamOneDecImpl extends ASTWrapperPsiElement implement
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

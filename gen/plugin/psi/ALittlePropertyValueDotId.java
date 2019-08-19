@@ -10,14 +10,17 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittlePropertyValueDotId extends PsiElement {
 
-  @NotNull
+  @Nullable
   ALittlePropertyValueDotIdName getPropertyValueDotIdName();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

@@ -16,11 +16,14 @@ public interface ALittleGenericFunctorType extends PsiElement {
   @Nullable
   ALittleGenericFunctorReturnType getGenericFunctorReturnType();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

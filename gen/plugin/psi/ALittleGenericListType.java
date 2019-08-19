@@ -13,11 +13,14 @@ public interface ALittleGenericListType extends PsiElement {
   @Nullable
   ALittleAllType getAllType();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

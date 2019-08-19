@@ -30,18 +30,25 @@ public class ALittleEnumVarDecImpl extends ASTWrapperPsiElement implements ALitt
   }
 
   @Override
+  @Nullable
+  public PsiElement getDigitContent() {
+    return findChildByType(DIGIT_CONTENT);
+  }
+
+  @Override
   @NotNull
-  public ALittleEnumVarNameDec getEnumVarNameDec() {
-    return findNotNullChildByClass(ALittleEnumVarNameDec.class);
+  public PsiElement getIdContent() {
+    return findNotNullChildByType(ID_CONTENT);
   }
 
   @Override
   @Nullable
-  public ALittleEnumVarValueDec getEnumVarValueDec() {
-    return findChildByClass(ALittleEnumVarValueDec.class);
+  public PsiElement getStringContent() {
+    return findChildByType(STRING_CONTENT);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -55,6 +62,11 @@ public class ALittleEnumVarDecImpl extends ASTWrapperPsiElement implements ALitt
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

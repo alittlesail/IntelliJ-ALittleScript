@@ -10,16 +10,13 @@ import org.jetbrains.annotations.Nullable;
 import plugin.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
 import plugin.ALittleUtil;
-import plugin.psi.ALittleClassNameDec;
-import plugin.psi.ALittleEnumNameDec;
-import plugin.psi.ALittleFile;
-import plugin.psi.ALittleStructNameDec;
+import plugin.psi.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleEnumNameDecReference extends ALittleReference {
-    public ALittleEnumNameDecReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNameDec> {
+    public ALittleEnumNameDecReference(@NotNull ALittleEnumNameDec element, TextRange textRange) {
         super(element, textRange);
     }
 
@@ -30,7 +27,7 @@ public class ALittleEnumNameDecReference extends ALittleReference {
         for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
             if (element instanceof ALittleEnumNameDec) {
-                guessList.add(((ALittleEnumNameDec)element.getParent()).guessType());
+                guessList.add(((ALittleEnumDec)element.getParent()).guessType());
             }
         }
 

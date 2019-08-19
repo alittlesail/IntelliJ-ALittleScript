@@ -11,11 +11,11 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitAllType(@NotNull ALittleAllType o) {
+  public void visitAllExpr(@NotNull ALittleAllExpr o) {
     visitPsiElement(o);
   }
 
-  public void visitAllExpr(@NotNull ALittleAllExpr o) {
+  public void visitAllType(@NotNull ALittleAllType o) {
     visitPsiElement(o);
   }
 
@@ -27,27 +27,15 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitClassDec(@NotNull ALittleClassDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitClassAccessModifier(@NotNull ALittleClassAccessModifier o) {
-    visitPsiElement(o);
-  }
-
   public void visitClassCtorDec(@NotNull ALittleClassCtorDec o) {
     visitPsiElement(o);
   }
 
-  public void visitClassExtendsAccessModifier(@NotNull ALittleClassExtendsAccessModifier o) {
+  public void visitClassDec(@NotNull ALittleClassDec o) {
     visitPsiElement(o);
   }
 
-  public void visitClassExtendsNameDec(@NotNull ALittleClassExtendsNameDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitClassExtendsNamespaceNameDec(@NotNull ALittleClassExtendsNamespaceNameDec o) {
+  public void visitClassExtendsDec(@NotNull ALittleClassExtendsDec o) {
     visitPsiElement(o);
   }
 
@@ -75,7 +63,7 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitClassVarNameDec(@NotNull ALittleClassVarNameDec o) {
+  public void visitCoModifier(@NotNull ALittleCoModifier o) {
     visitPsiElement(o);
   }
 
@@ -83,23 +71,7 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitCoroutineModifier(@NotNull ALittleCoroutineModifier o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCoroutineYield(@NotNull ALittleCoroutineYield o) {
-    visitPsiElement(o);
-  }
-
   public void visitCustomType(@NotNull ALittleCustomType o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCustomTypeNameDec(@NotNull ALittleCustomTypeNameDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCustomTypeNamespaceNameDec(@NotNull ALittleCustomTypeNamespaceNameDec o) {
     visitPsiElement(o);
   }
 
@@ -127,19 +99,7 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitEnumProtocolDec(@NotNull ALittleEnumProtocolDec o) {
-    visitPsiElement(o);
-  }
-
   public void visitEnumVarDec(@NotNull ALittleEnumVarDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitEnumVarNameDec(@NotNull ALittleEnumVarNameDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitEnumVarValueDec(@NotNull ALittleEnumVarValueDec o) {
     visitPsiElement(o);
   }
 
@@ -207,15 +167,7 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitInstanceClassNameDec(@NotNull ALittleInstanceClassNameDec o) {
-    visitPsiElement(o);
-  }
-
   public void visitInstanceDec(@NotNull ALittleInstanceDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitInstanceNameDec(@NotNull ALittleInstanceNameDec o) {
     visitPsiElement(o);
   }
 
@@ -239,15 +191,7 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitMethodParamTypeDec(@NotNull ALittleMethodParamTypeDec o) {
-    visitPsiElement(o);
-  }
-
   public void visitMethodReturnDec(@NotNull ALittleMethodReturnDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitMethodReturnTypeDec(@NotNull ALittleMethodReturnTypeDec o) {
     visitPsiElement(o);
   }
 
@@ -256,10 +200,6 @@ public class ALittleVisitor extends PsiElementVisitor {
   }
 
   public void visitNamespaceNameDec(@NotNull ALittleNamespaceNameDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitNamespaceRegisterDec(@NotNull ALittleNamespaceRegisterDec o) {
     visitPsiElement(o);
   }
 
@@ -411,7 +351,7 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitOpNewList(@NotNull ALittleOpNewList o) {
+  public void visitOpNewListStat(@NotNull ALittleOpNewListStat o) {
     visitPsiElement(o);
   }
 
@@ -427,11 +367,7 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitPropertyValueSuffix(@NotNull ALittlePropertyValueSuffix o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPropertyValueBrackValueStat(@NotNull ALittlePropertyValueBrackValueStat o) {
+  public void visitPropertyValueBracketValue(@NotNull ALittlePropertyValueBracketValue o) {
     visitPsiElement(o);
   }
 
@@ -455,7 +391,15 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitPropertyValueMethodCallStat(@NotNull ALittlePropertyValueMethodCallStat o) {
+  public void visitPropertyValueFirstType(@NotNull ALittlePropertyValueFirstType o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPropertyValueMethodCall(@NotNull ALittlePropertyValueMethodCall o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPropertyValueSuffix(@NotNull ALittlePropertyValueSuffix o) {
     visitPsiElement(o);
   }
 
@@ -467,7 +411,15 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitRegisterModifier(@NotNull ALittleRegisterModifier o) {
+    visitPsiElement(o);
+  }
+
   public void visitReturnExpr(@NotNull ALittleReturnExpr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitReturnYield(@NotNull ALittleReturnYield o) {
     visitPsiElement(o);
   }
 
@@ -475,11 +427,7 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitStructExtendsNameDec(@NotNull ALittleStructExtendsNameDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitStructExtendsNamespaceNameDec(@NotNull ALittleStructExtendsNamespaceNameDec o) {
+  public void visitStructExtendsDec(@NotNull ALittleStructExtendsDec o) {
     visitPsiElement(o);
   }
 
@@ -487,19 +435,11 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitStructProtocolDec(@NotNull ALittleStructProtocolDec o) {
-    visitPsiElement(o);
-  }
-
   public void visitStructVarDec(@NotNull ALittleStructVarDec o) {
     visitPsiElement(o);
   }
 
-  public void visitStructVarNameDec(@NotNull ALittleStructVarNameDec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitValueFactor(@NotNull ALittleValueFactor o) {
+  public void visitValueFactorStat(@NotNull ALittleValueFactorStat o) {
     visitPsiElement(o);
   }
 
@@ -507,7 +447,7 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitValueStatParen(@NotNull ALittleValueStatParen o) {
+  public void visitVarAssignDec(@NotNull ALittleVarAssignDec o) {
     visitPsiElement(o);
   }
 
@@ -519,15 +459,15 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitVarAssignPairDec(@NotNull ALittleVarAssignPairDec o) {
-    visitPsiElement(o);
-  }
-
   public void visitWhileExpr(@NotNull ALittleWhileExpr o) {
     visitPsiElement(o);
   }
 
   public void visitWrapExpr(@NotNull ALittleWrapExpr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitWrapValueStat(@NotNull ALittleWrapValueStat o) {
     visitPsiElement(o);
   }
 

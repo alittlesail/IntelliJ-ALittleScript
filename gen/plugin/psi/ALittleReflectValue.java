@@ -13,11 +13,14 @@ public interface ALittleReflectValue extends PsiElement {
   @Nullable
   ALittleCustomType getCustomType();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

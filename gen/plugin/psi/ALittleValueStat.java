@@ -35,19 +35,22 @@ public interface ALittleValueStat extends PsiElement {
   ALittleOp8Stat getOp8Stat();
 
   @Nullable
-  ALittleOpNewList getOpNewList();
+  ALittleOpNewListStat getOpNewListStat();
 
   @Nullable
   ALittleOpNewStat getOpNewStat();
 
   @Nullable
-  ALittleValueFactor getValueFactor();
+  ALittleValueFactorStat getValueFactorStat();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

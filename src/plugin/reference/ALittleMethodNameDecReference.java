@@ -15,8 +15,8 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleMethodNameDecReference extends ALittleReference {
-    public ALittleMethodNameDecReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittleMethodNameDecReference extends ALittleReference<ALittleMethodNameDec> {
+    public ALittleMethodNameDecReference(@NotNull ALittleMethodNameDec element, TextRange textRange) {
         super(element, textRange);
     }
 
@@ -28,6 +28,7 @@ public class ALittleMethodNameDecReference extends ALittleReference {
             PsiElement element = result.getElement();
             if (element instanceof ALittleMethodNameDec) {
                 PsiElement parent = element.getParent();
+                // 处理getter
                 if (parent instanceof ALittleClassGetterDec) {
                     ALittleClassGetterDec classGetterDec = (ALittleClassGetterDec) parent;
 
@@ -46,13 +47,12 @@ public class ALittleMethodNameDecReference extends ALittleReference {
 
                     List<String> typeList = new ArrayList<>();
                     // 添加返回值列表
-                    ALittleMethodReturnTypeDec returnTypeDec = classGetterDec.getMethodReturnTypeDec();
-                    if (returnTypeDec != null) {
-                        ALittleAllType allType = returnTypeDec.getAllType();
-                        ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
-                        typeList.add(GuessInfo.value);
-                        info.functorReturnList.add(GuessInfo);
-                    }
+                    ALittleAllType allType = classGetterDec.getAllType();
+                    if (allType == null) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "指向的getter函数没有定义返回值");
+                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                    typeList.add(GuessInfo.value);
+                    info.functorReturnList.add(GuessInfo);
+
                     if (!typeList.isEmpty()) info.value += ":";
                     info.value += String.join(",", typeList) + ">";
                     guessList.add(info);
@@ -75,12 +75,13 @@ public class ALittleMethodNameDecReference extends ALittleReference {
 
                     // 添加参数列表
                     ALittleMethodParamOneDec oneDec = classSetterDec.getMethodParamOneDec();
-                    if (oneDec != null) {
-                        ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
-                        ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
-                        typeList.add(GuessInfo.value);
-                        info.functorParamList.add(GuessInfo);
-                    }
+                    if (oneDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "指向的setter函数没有定义参数");
+
+                    ALittleAllType allType = oneDec.getAllType();
+                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                    typeList.add(GuessInfo.value);
+                    info.functorParamList.add(GuessInfo);
+
                     info.value += String.join(",", typeList) + ")";
                     info.value += ">";
                     guessList.add(info);
@@ -91,7 +92,7 @@ public class ALittleMethodNameDecReference extends ALittleReference {
                     info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
                     info.value = "Functor<(";
                     info.element = classMethodDec;
-                    info.functorAwait = classMethodDec.getCoroutineModifier() != null && classMethodDec.getCoroutineModifier().getText().equals("await");
+                    info.functorAwait = classMethodDec.getCoModifier() != null && classMethodDec.getCoModifier().getText().equals("await");
                     if (info.functorAwait) {
                         info.value = "Functor<await(";
                     }
@@ -109,7 +110,7 @@ public class ALittleMethodNameDecReference extends ALittleReference {
                     if (paramDec != null) {
                         List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
                         for (ALittleMethodParamOneDec oneDec : oneDecList) {
-                            ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                            ALittleAllType allType = oneDec.getAllType();
                             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                             typeList.add(GuessInfo.value);
                             info.functorParamList.add(GuessInfo);
@@ -120,9 +121,8 @@ public class ALittleMethodNameDecReference extends ALittleReference {
                     // 添加返回值列表
                     ALittleMethodReturnDec returnDec = classMethodDec.getMethodReturnDec();
                     if (returnDec != null) {
-                        List<ALittleMethodReturnTypeDec> returnTypeDecList = returnDec.getMethodReturnTypeDecList();
-                        for (ALittleMethodReturnTypeDec returnTypeDec : returnTypeDecList) {
-                            ALittleAllType allType = returnTypeDec.getAllType();
+                        List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
+                        for (ALittleAllType allType : allTypeList) {
                             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                             typeList.add(GuessInfo.value);
                             info.functorReturnList.add(GuessInfo);
@@ -138,7 +138,7 @@ public class ALittleMethodNameDecReference extends ALittleReference {
                     info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
                     info.value = "Functor<(";
                     info.element = classStaticDec;
-                    info.functorAwait = classStaticDec.getCoroutineModifier() != null && classStaticDec.getCoroutineModifier().getText().equals("await");
+                    info.functorAwait = classStaticDec.getCoModifier() != null && classStaticDec.getCoModifier().getText().equals("await");
                     if (info.functorAwait) {
                         info.value = "Functor<await(";
                     }
@@ -150,7 +150,7 @@ public class ALittleMethodNameDecReference extends ALittleReference {
                     if (paramDec != null) {
                         List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
                         for (ALittleMethodParamOneDec oneDec : oneDecList) {
-                            ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                            ALittleAllType allType = oneDec.getAllType();
                             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                             typeList.add(GuessInfo.value);
                             info.functorParamList.add(GuessInfo);
@@ -160,9 +160,8 @@ public class ALittleMethodNameDecReference extends ALittleReference {
                     typeList = new ArrayList<>();
                     ALittleMethodReturnDec returnDec = classStaticDec.getMethodReturnDec();
                     if (returnDec != null) {
-                        List<ALittleMethodReturnTypeDec> returnTypeDecList = returnDec.getMethodReturnTypeDecList();
-                        for (ALittleMethodReturnTypeDec returnTypeDec : returnTypeDecList) {
-                            ALittleAllType allType = returnTypeDec.getAllType();
+                        List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
+                        for (ALittleAllType allType : allTypeList) {
                             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                             typeList.add(GuessInfo.value);
                             info.functorReturnList.add(GuessInfo);
@@ -178,7 +177,7 @@ public class ALittleMethodNameDecReference extends ALittleReference {
                     info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
                     info.value = "Functor<(";
                     info.element = globalMethodDec;
-                    info.functorAwait = globalMethodDec.getCoroutineModifier() != null && globalMethodDec.getCoroutineModifier().getText().equals("await");
+                    info.functorAwait = globalMethodDec.getCoModifier() != null && globalMethodDec.getCoModifier().getText().equals("await");
                     if (info.functorAwait) {
                         info.value = "Functor<await(";
                     }
@@ -190,7 +189,7 @@ public class ALittleMethodNameDecReference extends ALittleReference {
                     if (paramDec != null) {
                         List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
                         for (ALittleMethodParamOneDec oneDec : oneDecList) {
-                            ALittleAllType allType = oneDec.getMethodParamTypeDec().getAllType();
+                            ALittleAllType allType = oneDec.getAllType();
                             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                             typeList.add(GuessInfo.value);
                             info.functorParamList.add(GuessInfo);
@@ -200,9 +199,8 @@ public class ALittleMethodNameDecReference extends ALittleReference {
                     typeList = new ArrayList<>();
                     ALittleMethodReturnDec returnDec = globalMethodDec.getMethodReturnDec();
                     if (returnDec != null) {
-                        List<ALittleMethodReturnTypeDec> returnTypeDecList = returnDec.getMethodReturnTypeDecList();
-                        for (ALittleMethodReturnTypeDec returnTypeDec : returnTypeDecList) {
-                            ALittleAllType allType = returnTypeDec.getAllType();
+                        List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
+                        for (ALittleAllType allType : allTypeList) {
                             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                             typeList.add(GuessInfo.value);
                             info.functorReturnList.add(GuessInfo);

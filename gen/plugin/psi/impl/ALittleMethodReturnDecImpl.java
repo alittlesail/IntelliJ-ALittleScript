@@ -31,11 +31,12 @@ public class ALittleMethodReturnDecImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @NotNull
-  public List<ALittleMethodReturnTypeDec> getMethodReturnTypeDecList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleMethodReturnTypeDec.class);
+  public List<ALittleAllType> getAllTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleAllType.class);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -49,6 +50,11 @@ public class ALittleMethodReturnDecImpl extends ASTWrapperPsiElement implements 
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

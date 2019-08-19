@@ -9,14 +9,25 @@ import org.jetbrains.annotations.NotNull;
 import plugin.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
 import plugin.psi.ALittleClassDec;
+import plugin.psi.ALittleClassExtendsDec;
 import plugin.psi.ALittleClassNameDec;
+import plugin.psi.ALittleNamespaceNameDec;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleClassNameDecReference extends ALittleReference {
-    public ALittleClassNameDecReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittleClassNameDecReference extends ALittleReference<ALittleClassNameDec> {
+    public ALittleClassNameDecReference(@NotNull ALittleClassNameDec element, TextRange textRange) {
         super(element, textRange);
+
+        // 如果父节点是extends，那么就获取指定的命名域
+        PsiElement parent = element.getParent();
+        if (parent instanceof ALittleClassExtendsDec) {
+            ALittleNamespaceNameDec namespaceNameDec = ((ALittleClassExtendsDec)parent).getNamespaceNameDec();
+            if (namespaceNameDec != null) {
+                mNamespace = namespaceNameDec.getText();
+            }
+        }
     }
 
     @NotNull

@@ -15,24 +15,17 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittlePropertyValueCastTypeReference extends ALittleReference {
-    public ALittlePropertyValueCastTypeReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittlePropertyValueCastTypeReference extends ALittleReference<ALittlePropertyValueCastType> {
+    public ALittlePropertyValueCastTypeReference(@NotNull ALittlePropertyValueCastType element, TextRange textRange) {
         super(element, textRange);
     }
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        ALittlePropertyValueCastType castType = (ALittlePropertyValueCastType)myElement;
-        guessList.add(castType.guessType());
-        return guessList;
-    }
+        if (myElement.getAllType() != null) {
+            return myElement.getAllType().guessTypes();
+        }
 
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-        List<LookupElement> variants = new ArrayList<>();
-        variants.add(LookupElementBuilder.create("cast"));
-        return variants.toArray();
+        return new ArrayList<>();
     }
 }

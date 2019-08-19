@@ -37,6 +37,12 @@ public class ALittleClassGetterDecImpl extends ASTWrapperPsiElement implements A
 
   @Override
   @Nullable
+  public ALittleAllType getAllType() {
+    return findChildByClass(ALittleAllType.class);
+  }
+
+  @Override
+  @Nullable
   public ALittleMethodBodyDec getMethodBodyDec() {
     return findChildByClass(ALittleMethodBodyDec.class);
   }
@@ -48,12 +54,7 @@ public class ALittleClassGetterDecImpl extends ASTWrapperPsiElement implements A
   }
 
   @Override
-  @Nullable
-  public ALittleMethodReturnTypeDec getMethodReturnTypeDec() {
-    return findChildByClass(ALittleMethodReturnTypeDec.class);
-  }
-
-  @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -67,6 +68,11 @@ public class ALittleClassGetterDecImpl extends ASTWrapperPsiElement implements A
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

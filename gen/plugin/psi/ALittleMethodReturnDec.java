@@ -11,13 +11,16 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 public interface ALittleMethodReturnDec extends PsiElement {
 
   @NotNull
-  List<ALittleMethodReturnTypeDec> getMethodReturnTypeDecList();
+  List<ALittleAllType> getAllTypeList();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

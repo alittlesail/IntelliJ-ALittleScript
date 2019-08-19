@@ -1,9 +1,6 @@
 package plugin.reference;
 
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.ALittleBindStat;
 import plugin.psi.ALittleValueStat;
@@ -11,26 +8,23 @@ import plugin.psi.ALittleValueStat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleBindStatReference extends ALittleReference {
-    public ALittleBindStatReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> {
+    public ALittleBindStatReference(@NotNull ALittleBindStat element, TextRange textRange) {
         super(element, textRange);
     }
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        ALittleBindStat bindStat = (ALittleBindStat)myElement;
-
-        List<ALittleValueStat> valueStatList = bindStat.getValueStatList();
+        List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(bindStat, "bind 表达式不能没有参数");
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "bind表达式不能没有参数");
         }
 
         ALittleValueStat valueStat = valueStatList.get(0);
         // 第一个参数必须是函数
         ALittleReferenceUtil.GuessTypeInfo GuessInfo = valueStat.guessType();
         if (GuessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "bind 表达式第一个参数必须是一个函数");
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "bind表达式第一个参数必须是一个函数");
         }
 
         // 开始构建类型
@@ -67,15 +61,8 @@ public class ALittleBindStatReference extends ALittleReference {
         info.value += String.join(",", nameList);
         info.value += ">";
 
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
         guessList.add(info);
         return guessList;
-    }
-
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-        List<LookupElement> variants = new ArrayList<>();
-        variants.add(LookupElementBuilder.create("bind"));
-        return variants.toArray();
     }
 }

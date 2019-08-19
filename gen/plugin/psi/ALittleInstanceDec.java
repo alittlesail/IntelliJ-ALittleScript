@@ -13,23 +13,17 @@ public interface ALittleInstanceDec extends PsiElement {
   @Nullable
   ALittleAccessModifier getAccessModifier();
 
-  @Nullable
-  ALittleAllType getAllType();
-
-  @Nullable
-  ALittleInstanceClassNameDec getInstanceClassNameDec();
-
-  @Nullable
-  ALittleInstanceNameDec getInstanceNameDec();
+  @NotNull
+  ALittleVarAssignExpr getVarAssignExpr();
 
   @NotNull
-  List<ALittleValueStat> getValueStatList();
-
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

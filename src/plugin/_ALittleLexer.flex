@@ -26,9 +26,9 @@ EOL=\R
 WHITE_SPACE=\s+
 
 WHITE_SPACE=[ \t\n\x0B\f\r]+
-COMMENT="//".*
+COMMENT=("//".*|"/"\*.*\*"/")
 DIGIT_CONTENT=0x[0-9a-fA-F]+|[0-9]+(\.[0-9]*)?
-STRING_CONTENT=('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")
+STRING_CONTENT=(\"([^\"\\]|\\.)*\")
 ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
 
 %%
@@ -71,25 +71,20 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "'"                   { return APOS; }
   "\""                  { return QUOTE; }
   "\\"                  { return BACK; }
-  "namespace"           { return NAMESPACE; }
   "register"            { return REGISTER; }
-  "instance"            { return INSTANCE; }
-  "new"                 { return NEW; }
-  "class"               { return CLASS; }
-  "Ctor"                { return CTOR; }
-  "get"                 { return GET; }
-  "set"                 { return SET; }
-  "fun"                 { return FUN; }
-  "static"              { return STATIC; }
-  "struct"              { return STRUCT; }
-  "enum"                { return ENUM; }
-  "proto"               { return PROTO; }
   "public"              { return PUBLIC; }
   "private"             { return PRIVATE; }
   "protected"           { return PROTECTED; }
   "async"               { return ASYNC; }
   "await"               { return AWAIT; }
-  "yield"               { return YIELD; }
+  "namespace"           { return NAMESPACE; }
+  "class"               { return CLASS; }
+  "struct"              { return STRUCT; }
+  "enum"                { return ENUM; }
+  "get"                 { return GET; }
+  "set"                 { return SET; }
+  "fun"                 { return FUN; }
+  "static"              { return STATIC; }
   "for"                 { return FOR; }
   "in"                  { return IN; }
   "while"               { return WHILE; }
@@ -98,10 +93,8 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "else"                { return ELSE; }
   "elseif"              { return ELSEIF; }
   "return"              { return RETURN; }
+  "yield"               { return YIELD; }
   "break"               { return BREAK; }
-  "Map"                 { return MAP; }
-  "List"                { return LIST; }
-  "Functor"             { return FUNCTOR; }
   "bool"                { return BOOL; }
   "double"              { return DOUBLE; }
   "int"                 { return INT; }
@@ -109,6 +102,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "any"                 { return ANY; }
   "string"              { return STRING; }
   "auto"                { return AUTO; }
+  "new"                 { return NEW; }
   "bind"                { return BIND; }
   "true"                { return TRUE; }
   "false"               { return FALSE; }

@@ -16,17 +16,17 @@ public interface ALittleEnumDec extends PsiElement {
   @Nullable
   ALittleEnumNameDec getEnumNameDec();
 
-  @Nullable
-  ALittleEnumProtocolDec getEnumProtocolDec();
-
   @NotNull
   List<ALittleEnumVarDec> getEnumVarDecList();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

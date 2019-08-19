@@ -61,8 +61,8 @@ public class ALittleNamespaceDecImpl extends ASTWrapperPsiElement implements ALi
 
   @Override
   @Nullable
-  public ALittleNamespaceRegisterDec getNamespaceRegisterDec() {
-    return findChildByClass(ALittleNamespaceRegisterDec.class);
+  public ALittleRegisterModifier getRegisterModifier() {
+    return findChildByClass(ALittleRegisterModifier.class);
   }
 
   @Override
@@ -72,6 +72,7 @@ public class ALittleNamespaceDecImpl extends ASTWrapperPsiElement implements ALi
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -85,6 +86,11 @@ public class ALittleNamespaceDecImpl extends ASTWrapperPsiElement implements ALi
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

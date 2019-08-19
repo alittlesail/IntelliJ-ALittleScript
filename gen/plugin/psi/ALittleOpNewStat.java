@@ -19,11 +19,14 @@ public interface ALittleOpNewStat extends PsiElement {
   @NotNull
   List<ALittleValueStat> getValueStatList();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

@@ -37,11 +37,12 @@ public class ALittleVarAssignExprImpl extends ASTWrapperPsiElement implements AL
 
   @Override
   @NotNull
-  public List<ALittleVarAssignPairDec> getVarAssignPairDecList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleVarAssignPairDec.class);
+  public List<ALittleVarAssignDec> getVarAssignDecList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleVarAssignDec.class);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -55,6 +56,11 @@ public class ALittleVarAssignExprImpl extends ASTWrapperPsiElement implements AL
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

@@ -133,13 +133,13 @@ public class ALittleGenerateLua {
         if (namespace_list.size() > 1) throw new Exception("代码生成失败 每个文件只有有一个命名域");
 
         // 如果命名域有register标记，那么就不需要生成
-        ALittleNamespaceDec namespace_dec = namespace_list.get(0);
-        if (namespace_dec.getNamespaceRegisterDec() != null) {
+        ALittleNamespaceDec namespaceDec = namespace_list.get(0);
+        if (namespaceDec.getNamespaceRegisterDec() != null) {
             return;
         }
 
         // 生成代码
-        String content = GenerateNamespace(namespace_dec);
+        String content = GenerateNamespace(namespaceDec);
 
         String json_content = null;
         if (!m_json_list.isEmpty())

@@ -43,11 +43,12 @@ public class ALittleClassVarDecImpl extends ASTWrapperPsiElement implements ALit
 
   @Override
   @Nullable
-  public ALittleClassVarNameDec getClassVarNameDec() {
-    return findChildByClass(ALittleClassVarNameDec.class);
+  public PsiElement getIdContent() {
+    return findChildByType(ID_CONTENT);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -61,6 +62,11 @@ public class ALittleClassVarDecImpl extends ASTWrapperPsiElement implements ALit
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

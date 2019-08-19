@@ -30,18 +30,19 @@ public class ALittleCustomTypeImpl extends ASTWrapperPsiElement implements ALitt
   }
 
   @Override
-  @NotNull
-  public ALittleCustomTypeNameDec getCustomTypeNameDec() {
-    return findNotNullChildByClass(ALittleCustomTypeNameDec.class);
-  }
-
-  @Override
   @Nullable
-  public ALittleCustomTypeNamespaceNameDec getCustomTypeNamespaceNameDec() {
-    return findChildByClass(ALittleCustomTypeNamespaceNameDec.class);
+  public ALittleNamespaceNameDec getNamespaceNameDec() {
+    return findChildByClass(ALittleNamespaceNameDec.class);
   }
 
   @Override
+  @NotNull
+  public PsiElement getIdContent() {
+    return findNotNullChildByType(ID_CONTENT);
+  }
+
+  @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -55,6 +56,11 @@ public class ALittleCustomTypeImpl extends ASTWrapperPsiElement implements ALitt
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

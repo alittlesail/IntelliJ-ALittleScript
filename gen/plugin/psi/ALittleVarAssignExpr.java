@@ -14,13 +14,16 @@ public interface ALittleVarAssignExpr extends PsiElement {
   ALittleValueStat getValueStat();
 
   @NotNull
-  List<ALittleVarAssignPairDec> getVarAssignPairDecList();
+  List<ALittleVarAssignDec> getVarAssignDecList();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

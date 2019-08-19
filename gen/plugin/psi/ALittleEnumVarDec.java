@@ -10,17 +10,23 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittleEnumVarDec extends PsiElement {
 
+  @Nullable
+  PsiElement getDigitContent();
+
   @NotNull
-  ALittleEnumVarNameDec getEnumVarNameDec();
+  PsiElement getIdContent();
 
   @Nullable
-  ALittleEnumVarValueDec getEnumVarValueDec();
+  PsiElement getStringContent();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

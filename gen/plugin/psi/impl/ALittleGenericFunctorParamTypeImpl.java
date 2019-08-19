@@ -36,6 +36,7 @@ public class ALittleGenericFunctorParamTypeImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -49,6 +50,11 @@ public class ALittleGenericFunctorParamTypeImpl extends ASTWrapperPsiElement imp
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

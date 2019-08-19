@@ -15,7 +15,7 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittlePropertyValueCustomTypeReference extends ALittleReference {
+public class ALittlePropertyValueCustomTypeReference extends ALittleReference<ALittlePropertyValueCustomType> {
     private ALittleClassDec mClassDec = null;
     private ALittleClassCtorDec mClassCtorDec = null;
     private ALittleClassSetterDec mClassSetterDec = null;
@@ -23,7 +23,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference {
     private ALittleClassStaticDec mClassStaticDec = null;
     private ALittleGlobalMethodDec mGlobalMethodDec = null;
 
-    public ALittlePropertyValueCustomTypeReference(@NotNull PsiElement element, TextRange textRange) {
+    public ALittlePropertyValueCustomTypeReference(@NotNull ALittlePropertyValueCustomType element, TextRange textRange) {
         super(element, textRange);
         reloadInfo();
     }
@@ -74,9 +74,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference {
                 guess = ((ALittleStructNameDec)element).guessType();
             } else if (element instanceof ALittleEnumNameDec) {
                 guess = ((ALittleEnumNameDec)element).guessType();
-            } else if (element instanceof ALittleInstanceNameDec) {
-                guess = ((ALittleInstanceNameDec) element).guessType();
-            } else if (element instanceof ALittleMethodParamNameDec) {
+            } else if (element instanceof ALittleMethodParamDec) {
                 guess = ((ALittleMethodParamNameDec) element).guessType();
             } else if (element instanceof ALittleVarAssignNameDec) {
                 guess = ((ALittleVarAssignNameDec) element).guessType();
@@ -138,9 +136,9 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference {
         }
         // 处理单例
         {
-            List<ALittleInstanceNameDec> decList = ALittleTreeChangeListener.findInstanceNameDecList(project, mNamespace, mKey, true);
+            List<ALittleVarAssignNameDec> decList = ALittleTreeChangeListener.findInstanceNameDecList(project, mNamespace, mKey, true);
             if (!decList.isEmpty()) results.clear();
-            for (ALittleInstanceNameDec dec : decList) {
+            for (ALittleVarAssignNameDec dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
         }
@@ -234,8 +232,8 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference {
         }
         // 处理单例
         {
-            List<ALittleInstanceNameDec> decList = ALittleTreeChangeListener.findInstanceNameDecList(project, mNamespace, "", true);
-            for (ALittleInstanceNameDec dec : decList) {
+            List<ALittleVarAssignNameDec> decList = ALittleTreeChangeListener.findInstanceNameDecList(project, mNamespace, "", true);
+            for (ALittleVarAssignNameDec dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.INSTANCE).
                         withTypeText(dec.getContainingFile().getName())

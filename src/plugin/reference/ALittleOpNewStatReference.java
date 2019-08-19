@@ -10,19 +10,17 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleOpNewStatReference extends ALittleReference {
-    public ALittleOpNewStatReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat> {
+    public ALittleOpNewStatReference(@NotNull ALittleOpNewStat element, TextRange textRange) {
         super(element, textRange);
     }
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        ALittleOpNewStat opNewStat = (ALittleOpNewStat)myElement;
-
-        if (opNewStat.getCustomType() != null) {
-            return opNewStat.getCustomType().guessTypes();
-        } else if (opNewStat.getGenericType() != null) {
-            return opNewStat.getGenericType().guessTypes();
+        if (myElement.getCustomType() != null) {
+            return myElement.getCustomType().guessTypes();
+        } else if (myElement.getGenericType() != null) {
+            return myElement.getGenericType().guessTypes();
         }
 
         return new ArrayList<>();

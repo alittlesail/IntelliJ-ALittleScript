@@ -6,20 +6,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import plugin.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
-import plugin.ALittleUtil;
-import plugin.psi.ALittleClassNameDec;
-import plugin.psi.ALittleFile;
 import plugin.psi.ALittleStructDec;
 import plugin.psi.ALittleStructNameDec;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleStructNameDecReference extends ALittleReference {
-    public ALittleStructNameDecReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittleStructNameDecReference extends ALittleReference<ALittleStructNameDec> {
+    public ALittleStructNameDecReference(@NotNull ALittleStructNameDec element, TextRange textRange) {
         super(element, textRange);
 
     }
@@ -30,7 +26,6 @@ public class ALittleStructNameDecReference extends ALittleReference {
         ResolveResult[] resultList = multiResolve(false);
         for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
-
             if (element instanceof ALittleStructNameDec) {
                 guessList.add(((ALittleStructDec)element.getParent()).guessType());
             }

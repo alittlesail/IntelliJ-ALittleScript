@@ -8,18 +8,17 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleGenericTypeReference extends ALittleReference {
-    public ALittleGenericTypeReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittleGenericTypeReference extends ALittleReference<ALittleGenericType> {
+    public ALittleGenericTypeReference(@NotNull ALittleGenericType element, TextRange textRange) {
         super(element, textRange);
     }
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        ALittleGenericType genericType = (ALittleGenericType)myElement;
 
-        if (genericType.getGenericListType() != null) {
-            ALittleGenericListType dec = genericType.getGenericListType();
+        if (myElement.getGenericListType() != null) {
+            ALittleGenericListType dec = myElement.getGenericListType();
             ALittleAllType allType = dec.getAllType();
             if (allType == null) return guessList;
             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
@@ -30,10 +29,11 @@ public class ALittleGenericTypeReference extends ALittleReference {
             info.element = myElement;
             info.listSubType = GuessInfo;
             guessList.add(info);
-        } else if (genericType.getGenericMapType() != null) {
-            ALittleGenericMapType dec = genericType.getGenericMapType();
+        } else if (myElement.getGenericMapType() != null) {
+            ALittleGenericMapType dec = myElement.getGenericMapType();
             List<ALittleAllType> allTypeList = dec.getAllTypeList();
             if (allTypeList.size() != 2) return guessList;
+
             ALittleReferenceUtil.GuessTypeInfo keyGuessInfo = allTypeList.get(0).guessType();
             ALittleReferenceUtil.GuessTypeInfo valueGuessInfo = allTypeList.get(1).guessType();
 
@@ -44,8 +44,8 @@ public class ALittleGenericTypeReference extends ALittleReference {
             info.mapKeyType = keyGuessInfo;
             info.mapValueType = valueGuessInfo;
             guessList.add(info);
-        } else if (genericType.getGenericFunctorType() != null) {
-            ALittleGenericFunctorType dec = genericType.getGenericFunctorType();
+        } else if (myElement.getGenericFunctorType() != null) {
+            ALittleGenericFunctorType dec = myElement.getGenericFunctorType();
             ALittleGenericFunctorParamType paramType = dec.getGenericFunctorParamType();
 
             ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
@@ -81,5 +81,7 @@ public class ALittleGenericTypeReference extends ALittleReference {
             info.value += ">";
             guessList.add(info);
         }
+
+        return guessList;
     }
 }

@@ -11,6 +11,12 @@ public class ALittlePsiImplUtil {
         return ALittleReferenceUtil.create(element);
     }
 
+    public static void checkError(PsiElement element) throws ALittleReferenceUtil.ALittleReferenceException {
+        ALittleReference ref = ALittleReferenceUtil.create(element);
+        if (ref == null) return;
+        ref.checkError();
+    }
+
     @NotNull
     public static ALittleReferenceUtil.GuessTypeInfo guessType(PsiElement element) throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes(element);

@@ -37,11 +37,12 @@ public class ALittleOp2ValueImpl extends ASTWrapperPsiElement implements ALittle
 
   @Override
   @NotNull
-  public ALittleValueFactor getValueFactor() {
-    return findNotNullChildByClass(ALittleValueFactor.class);
+  public ALittleValueFactorStat getValueFactorStat() {
+    return findNotNullChildByClass(ALittleValueFactorStat.class);
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -55,6 +56,11 @@ public class ALittleOp2ValueImpl extends ASTWrapperPsiElement implements ALittle
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

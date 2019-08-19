@@ -30,6 +30,7 @@ public class ALittleOp2Impl extends ASTWrapperPsiElement implements ALittleOp2 {
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -43,6 +44,11 @@ public class ALittleOp2Impl extends ASTWrapperPsiElement implements ALittleOp2 {
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

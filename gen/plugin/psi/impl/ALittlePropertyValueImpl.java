@@ -31,29 +31,18 @@ public class ALittlePropertyValueImpl extends ASTWrapperPsiElement implements AL
 
   @Override
   @NotNull
+  public ALittlePropertyValueFirstType getPropertyValueFirstType() {
+    return findNotNullChildByClass(ALittlePropertyValueFirstType.class);
+  }
+
+  @Override
+  @NotNull
   public List<ALittlePropertyValueSuffix> getPropertyValueSuffixList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittlePropertyValueSuffix.class);
   }
 
   @Override
-  @Nullable
-  public ALittlePropertyValueCastType getPropertyValueCastType() {
-    return findChildByClass(ALittlePropertyValueCastType.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittlePropertyValueCustomType getPropertyValueCustomType() {
-    return findChildByClass(ALittlePropertyValueCustomType.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittlePropertyValueThisType getPropertyValueThisType() {
-    return findChildByClass(ALittlePropertyValueThisType.class);
-  }
-
-  @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -67,6 +56,11 @@ public class ALittlePropertyValueImpl extends ASTWrapperPsiElement implements AL
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

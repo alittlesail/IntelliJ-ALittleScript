@@ -31,8 +31,8 @@ public class ALittleReturnExprImpl extends ASTWrapperPsiElement implements ALitt
 
   @Override
   @Nullable
-  public ALittleCoroutineYield getCoroutineYield() {
-    return findChildByClass(ALittleCoroutineYield.class);
+  public ALittleReturnYield getReturnYield() {
+    return findChildByClass(ALittleReturnYield.class);
   }
 
   @Override
@@ -42,6 +42,7 @@ public class ALittleReturnExprImpl extends ASTWrapperPsiElement implements ALitt
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -55,6 +56,11 @@ public class ALittleReturnExprImpl extends ASTWrapperPsiElement implements ALitt
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }

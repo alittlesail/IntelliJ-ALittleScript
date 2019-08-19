@@ -14,25 +14,22 @@ public interface ALittleStructDec extends PsiElement {
   ALittleAccessModifier getAccessModifier();
 
   @Nullable
-  ALittleStructExtendsNameDec getStructExtendsNameDec();
+  ALittleStructExtendsDec getStructExtendsDec();
 
   @Nullable
-  ALittleStructExtendsNamespaceNameDec getStructExtendsNamespaceNameDec();
-
-  @NotNull
   ALittleStructNameDec getStructNameDec();
-
-  @Nullable
-  ALittleStructProtocolDec getStructProtocolDec();
 
   @NotNull
   List<ALittleStructVarDec> getStructVarDecList();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

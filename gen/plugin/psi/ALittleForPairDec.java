@@ -19,11 +19,14 @@ public interface ALittleForPairDec extends PsiElement {
   @Nullable
   ALittleVarAssignNameDec getVarAssignNameDec();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

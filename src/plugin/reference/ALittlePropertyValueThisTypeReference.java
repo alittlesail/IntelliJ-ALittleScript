@@ -13,7 +13,7 @@ import com.intellij.openapi.util.Key;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittlePropertyValueThisTypeReference extends ALittleReference {
+public class ALittlePropertyValueThisTypeReference extends ALittleReference<ALittlePropertyValueThisType> {
     private ALittleClassDec mClassDec = null;
     private ALittleClassCtorDec mClassCtorDec = null;
     private ALittleClassSetterDec mClassSetterDec = null;
@@ -21,7 +21,7 @@ public class ALittlePropertyValueThisTypeReference extends ALittleReference {
     private ALittleClassStaticDec mClassStaticDec = null;
     private ALittleGlobalMethodDec mGlobalMethodDec = null;
 
-    public ALittlePropertyValueThisTypeReference(@NotNull PsiElement element, TextRange textRange) {
+    public ALittlePropertyValueThisTypeReference(@NotNull ALittlePropertyValueThisType element, TextRange textRange) {
         super(element, textRange);
         reloadInfo();
     }
@@ -84,13 +84,5 @@ public class ALittlePropertyValueThisTypeReference extends ALittleReference {
             results.add(new PsiElementResolveResult(dec));
         }
         return results.toArray(new ResolveResult[results.size()]);
-    }
-
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-        List<LookupElement> variants = new ArrayList<>();
-        variants.add(LookupElementBuilder.create("this"));
-        return variants.toArray();
     }
 }

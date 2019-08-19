@@ -13,11 +13,14 @@ public interface ALittleElseExpr extends PsiElement {
   @NotNull
   List<ALittleAllExpr> getAllExprList();
 
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
+
+  void checkError() throws ALittleReferenceException;
 
 }

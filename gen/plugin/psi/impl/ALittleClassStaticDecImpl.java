@@ -37,8 +37,8 @@ public class ALittleClassStaticDecImpl extends ASTWrapperPsiElement implements A
 
   @Override
   @Nullable
-  public ALittleCoroutineModifier getCoroutineModifier() {
-    return findChildByClass(ALittleCoroutineModifier.class);
+  public ALittleCoModifier getCoModifier() {
+    return findChildByClass(ALittleCoModifier.class);
   }
 
   @Override
@@ -66,6 +66,7 @@ public class ALittleClassStaticDecImpl extends ASTWrapperPsiElement implements A
   }
 
   @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }
@@ -79,6 +80,11 @@ public class ALittleClassStaticDecImpl extends ASTWrapperPsiElement implements A
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
+  }
+
+  @Override
+  public void checkError() throws ALittleReferenceException {
+    ALittlePsiImplUtil.checkError(this);
   }
 
 }
