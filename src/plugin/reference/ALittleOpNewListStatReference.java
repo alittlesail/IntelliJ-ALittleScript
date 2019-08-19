@@ -1,24 +1,21 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.psi.ALittleAllType;
-import plugin.psi.ALittleOpNewList;
+import plugin.psi.ALittleOpNewListStat;
 import plugin.psi.ALittleValueStat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittleOpNewListReference extends ALittleReference {
-    public ALittleOpNewListReference(@NotNull PsiElement element, TextRange textRange) {
+public class ALittleOpNewListStatReference extends ALittleReference<ALittleOpNewListStat> {
+    public ALittleOpNewListStatReference(@NotNull ALittleOpNewListStat element, TextRange textRange) {
         super(element, textRange);
     }
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        ALittleOpNewList opNewList = (ALittleOpNewList)myElement;
-        List<ALittleValueStat> valueStatList = opNewList.getValueStatList();
+        List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
             throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "List列表不能为空");
         }
