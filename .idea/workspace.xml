@@ -14,33 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleForExprReference.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1560">
-              <caret line="111" column="47" lean-forward="true" selection-start-line="111" selection-start-column="47" selection-end-line="111" selection-end-column="47" />
-              <folding>
-                <element signature="e#392#393#0" expanded="true" />
-                <element signature="e#433#434#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleForPairDecReference.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="21" column="56" lean-forward="true" selection-start-line="21" selection-start-column="56" selection-end-line="21" selection-end-column="56" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-5145">
-              <caret line="78" column="5" selection-start-line="78" selection-start-column="5" selection-end-line="78" selection-end-column="5" />
+            <state relative-caret-position="340">
+              <caret line="228" column="25" selection-start-line="228" selection-start-column="25" selection-end-line="228" selection-end-column="25" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -51,29 +29,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueMethodCallReference.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="690">
-              <caret line="94" column="146" selection-start-line="94" selection-start-column="146" selection-end-line="94" selection-end-column="146" />
+            <state relative-caret-position="354">
+              <caret line="86" column="16" selection-start-line="86" selection-start-column="16" selection-end-line="87" selection-end-column="16" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleReturnExprReference.java">
+        <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCustomTypeReference.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="653">
-              <caret line="119" column="30" lean-forward="true" selection-start-line="119" selection-start-column="30" selection-end-line="120" selection-end-column="146" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueBracketValueReference.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="719">
-              <caret line="86" column="9" selection-start-line="86" selection-start-column="9" selection-end-line="86" selection-end-column="9" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="1875">
+              <caret line="138" column="85" selection-start-line="138" selection-start-column="85" selection-end-line="138" selection-end-column="85" />
             </state>
           </provider>
         </entry>
@@ -92,8 +58,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>classDec</find>
-      <find>CustomType</find>
       <find>customType</find>
       <find>enumName</find>
       <find>valueFactor</find>
@@ -122,6 +86,8 @@
       <find>pair_decList</find>
       <find>pair_dec</find>
       <find>return_type_list</find>
+      <find>new</find>
+      <find>Param</find>
     </findStrings>
     <replaceStrings>
       <replace>classGuessInfo</replace>
@@ -176,10 +142,7 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleGenericTypeReference.java" />
-        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleClassNameDecReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleMethodNameDecReference.java" />
-        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamNameDecReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleNamespaceDecReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleNamespaceNameDecReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittlePrimitiveTypeReference.java" />
@@ -199,7 +162,6 @@
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleTreeChangeListener.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleAllTypeReference.java" />
-        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleOpNewStatReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleOpNewListReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleOp2ValueReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleOpCommonSuffixReference.java" />
@@ -208,9 +170,6 @@
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleOp4StatReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceIoUtil.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignDecReference.java" />
-        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleReference.java" />
-        <option value="$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java" />
-        <option value="$PROJECT_DIR$/src/plugin/ALittle.bnf" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleReflectValueReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleStructDecReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleEnumVarDecReference.java" />
@@ -221,11 +180,18 @@
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignExprReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleOpAssignExprReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleValueStatReference.java" />
-        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceUtil.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleForPairDecReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittleForExprReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueBracketValueReference.java" />
         <option value="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueMethodCallReference.java" />
+        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleOpNewStatReference.java" />
+        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleOpNewListStatReference.java" />
+        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleBindStatReference.java" />
+        <option value="$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java" />
+        <option value="$PROJECT_DIR$/src/plugin/ALittle.bnf" />
+        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleReference.java" />
+        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamNameDecReference.java" />
+        <option value="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceUtil.java" />
         <option value="$PROJECT_DIR$/src/plugin/ALittleAnnotator.java" />
       </list>
     </option>
@@ -254,6 +220,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -324,8 +292,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -357,8 +323,12 @@
     <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="plugin.parser" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
+      <recent name="D:\ALittleScript\trunk\resources\std\Lua" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\ALittle" />
+      <recent name="D:\ALittleScript\trunk\resources\std" />
+      <recent name="D:\Users\IGG\Desktop\Test\Client\Win32\bin\Module\ALittleScript\Other\ALittleScript\src\plugin" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="plugin.psi" />
@@ -379,12 +349,8 @@
       <recent name="plugin.action" />
       <recent name="plugin" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
-      <recent name="D:\ALittleScript\trunk\resources\std\Lua" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\ALittle" />
-      <recent name="D:\ALittleScript\trunk\resources\std" />
-      <recent name="D:\Users\IGG\Desktop\Test\Client\Win32\bin\Module\ALittleScript\Other\ALittleScript\src\plugin" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="plugin.parser" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -434,10 +400,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1015" extended-state="6" />
+    <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.31979167" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23645681" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -457,7 +423,7 @@
       <window_info anchor="bottom" id="Version Control" order="10" />
       <window_info anchor="bottom" id="Tool Output" order="11" sideWeight="0.49924356" weight="0.21472393" />
       <window_info anchor="bottom" id="ANTLR Preview" order="12" weight="0.54141104" />
-      <window_info active="true" anchor="bottom" id="Messages" order="13" sideWeight="0.49583334" visible="true" weight="0.3119469" />
+      <window_info anchor="bottom" id="Messages" order="13" sideWeight="0.49583334" weight="0.3119469" />
       <window_info anchor="bottom" id="PVS-Studio" order="14" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -485,23 +451,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleMethodNameDecReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="574">
-          <caret line="252" column="58" lean-forward="true" selection-start-line="252" selection-start-column="58" selection-end-line="252" selection-end-column="58" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueThisTypeReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-255">
-          <caret line="33" column="31" lean-forward="true" selection-start-line="33" selection-start-column="31" selection-end-line="33" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCastTypeReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -509,16 +458,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueFirstTypeReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueFirstTypeReference.java" />
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -533,13 +473,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCustomTypeReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="138" column="85" selection-start-line="138" selection-start-column="85" selection-end-line="138" selection-end-column="85" />
         </state>
       </provider>
     </entry>
@@ -561,84 +494,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOpNewListStatReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="34" lean-forward="true" selection-start-line="12" selection-start-column="34" selection-end-line="12" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOpNewStatReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="26" column="5" lean-forward="true" selection-start-line="26" selection-start-column="5" selection-end-line="26" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleValueFactorStatReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOpCommonSuffixReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOp2StatReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="34" column="36" lean-forward="true" selection-start-line="34" selection-start-column="36" selection-end-line="34" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOp4StatReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="74" selection-start-line="74" selection-end-line="74" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOp2ValueReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOp3StatReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="20" column="62" lean-forward="true" selection-start-line="20" selection-start-column="62" selection-end-line="20" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleWrapValueStatReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleValueFactorStatReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOpCommonSuffixReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOp2StatReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOp4StatReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOp2ValueReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOp3StatReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleWrapValueStatReference.java" />
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignNameDecReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -649,13 +511,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignDecReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="43" selection-start-line="2" selection-start-column="43" selection-end-line="2" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignDecReference.java" />
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleAutoTypeReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="134">
@@ -666,26 +522,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleBindStatReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="35" column="32" selection-start-line="35" selection-start-column="32" selection-end-line="35" selection-end-column="32" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleClassDecReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="73" selection-start-line="27" selection-start-column="73" selection-end-line="27" selection-end-column="73" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleClassDecReference.java" />
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleClassNameDecReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="420">
@@ -696,16 +533,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleClassVarDecReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="34" selection-start-line="10" selection-start-column="34" selection-end-line="10" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleClassVarDecReference.java" />
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleConstValueReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
@@ -716,16 +544,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="44" column="12" selection-start-line="44" selection-start-column="12" selection-end-line="44" selection-end-column="12" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeReference.java" />
     <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleClassMethodDec.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -740,23 +559,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="33" selection-start-line="33" selection-end-line="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="389">
-          <caret line="256" column="35" lean-forward="true" selection-start-line="256" selection-start-column="35" selection-end-line="256" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_191/src.zip!/java/util/Set.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="429">
@@ -764,27 +566,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleEnumVarDecReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="454">
-          <caret line="42" column="9" lean-forward="true" selection-start-line="42" selection-start-column="9" selection-end-line="42" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleEnumDecReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="49" lean-forward="true" selection-start-line="49" selection-end-line="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="41" column="12" lean-forward="true" selection-start-line="41" selection-start-column="12" selection-end-line="41" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleEnumVarDecReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleEnumDecReference.java" />
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleAllTypeReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
@@ -802,16 +585,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleStructDecReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="92" lean-forward="true" selection-start-line="23" selection-start-column="92" selection-end-line="23" selection-end-column="92" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleStructDecReference.java" />
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittleUtil.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="734">
@@ -822,16 +596,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleReferenceOpUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="745" column="49" lean-forward="true" selection-start-line="745" selection-start-column="49" selection-end-line="745" selection-end-column="49" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleReferenceOpUtil.java" />
     <entry file="file://$PROJECT_DIR$/gen/plugin/psi/ALittleValueStat.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="660">
@@ -839,30 +604,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleReferenceUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="140" column="97" selection-start-line="140" selection-start-column="97" selection-end-line="140" selection-end-column="97" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignExprReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="13" column="5" lean-forward="true" selection-start-line="13" selection-start-column="5" selection-end-line="13" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOpAssignExprReference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1290">
-          <caret line="98" column="5" lean-forward="true" selection-start-line="98" selection-start-column="5" selection-end-line="98" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOpAssignExprReference.java" />
     <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleValueStatReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="719">
@@ -873,52 +615,108 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleForPairDecReference.java">
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleForPairDecReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleForExprReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueBracketValueReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleReturnExprReference.java" />
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignExprReference.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="21" column="56" lean-forward="true" selection-start-line="21" selection-start-column="56" selection-end-line="21" selection-end-column="56" />
+        <state relative-caret-position="510">
+          <caret line="40" column="12" selection-start-line="40" selection-start-column="12" selection-end-line="70" selection-end-column="13" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleForExprReference.java">
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCustomTypeReference.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1560">
-          <caret line="111" column="47" lean-forward="true" selection-start-line="111" selection-start-column="47" selection-end-line="111" selection-end-column="47" />
-          <folding>
-            <element signature="e#392#393#0" expanded="true" />
-            <element signature="e#433#434#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="1875">
+          <caret line="138" column="85" selection-start-line="138" selection-start-column="85" selection-end-line="138" selection-end-column="85" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueBracketValueReference.java">
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueMethodCallReference.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="719">
-          <caret line="86" column="9" selection-start-line="86" selection-start-column="9" selection-end-line="86" selection-end-column="9" />
+        <state relative-caret-position="354">
+          <caret line="86" column="16" selection-start-line="86" selection-start-column="16" selection-end-line="87" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOpNewListStatReference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="279">
+          <caret line="37" column="76" selection-start-line="37" selection-start-column="76" selection-end-line="37" selection-end-column="76" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittleGenerateLua.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="207" column="29" lean-forward="true" selection-start-line="207" selection-start-column="29" selection-end-line="207" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleReference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="27" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleReferenceUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="236">
+          <caret line="129" column="49" selection-start-line="129" selection-start-column="49" selection-end-line="129" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleOpNewStatReference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="369">
+          <caret line="90" column="21" lean-forward="true" selection-start-line="90" selection-start-column="21" selection-end-line="90" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleBindStatReference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="655">
+          <caret line="102" column="5" lean-forward="true" selection-start-line="102" selection-start-column="5" selection-end-line="102" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleReturnExprReference.java">
+    <entry file="file://$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="653">
-          <caret line="119" column="30" lean-forward="true" selection-start-line="119" selection-start-column="30" selection-end-line="120" selection-end-column="146" />
+        <state relative-caret-position="255">
+          <caret line="19" column="5" lean-forward="true" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueMethodCallReference.java">
+    <entry file="file://$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamNameDecReference.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="690">
-          <caret line="94" column="146" selection-start-line="94" selection-start-column="146" selection-end-line="94" selection-end-column="146" />
+        <state relative-caret-position="120">
+          <caret line="26" lean-forward="true" selection-start-line="26" selection-end-line="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin/ALittle.bnf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="111" column="17" selection-start-line="111" selection-end-line="111" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#2051#0" expanded="true" />
+            <element signature="e#164#199#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/plugin/ALittleAnnotator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-5145">
-          <caret line="78" column="5" selection-start-line="78" selection-start-column="5" selection-end-line="78" selection-end-column="5" />
+        <state relative-caret-position="340">
+          <caret line="228" column="25" selection-start-line="228" selection-start-column="25" selection-end-line="228" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

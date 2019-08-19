@@ -1,7 +1,9 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.ALittleUtil;
 import plugin.psi.ALittleBindStat;
 import plugin.psi.ALittleValueStat;
 
@@ -64,5 +66,39 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
         guessList.add(info);
         return guessList;
+    }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleValueStat> valueStatList = myElement.getValueStatList();
+        if (valueStatList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "bind表达式不能没有参数");
+        }
+
+        ALittleValueStat valueStat = valueStatList.get(0);
+        // 第一个参数必须是函数
+        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
+        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "bind表达式第一个参数必须是一个函数");
+        }
+
+        // 后面跟的参数数量不能超过这个函数的参数个数
+        if (valueStatList.size() - 1 > guessInfo.functorParamList.size()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "bind表达式参数太多了");
+        }
+
+        // 遍历所有的表达式，看下是否符合
+        for (int i = 1; i < valueStatList.size(); ++i) {
+            ALittleReferenceUtil.GuessTypeInfo param_guess_info = guessInfo.functorParamList.get(i - 1);
+
+            try {
+                boolean result = ALittleReferenceOpUtil.guessTypeEqual(myElement, param_guess_info,
+                        valueStatList.get(i), valueStatList.get(i).guessType());
+                if (!result) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(valueStatList.get(i), "第" + i + "个参数类型和函数定义的参数类型不同");
+                }
+            } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
+            }
+        }
     }
 }

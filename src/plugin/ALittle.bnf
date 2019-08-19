@@ -3,7 +3,7 @@
   parserUtilClass="plugin.parser.ALittleParserUtil"
 
   mixin="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  methods=[guessType guessTypes getReference checkError]
+  methods=[guessType guessTypes getReference]
   psiClassPrefix="ALittle"
   psiImplClassSuffix="Impl"
   psiPackage="plugin.psi"

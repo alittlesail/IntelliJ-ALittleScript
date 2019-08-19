@@ -1,5 +1,6 @@
 package plugin.psi;
 
+import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.reference.*;
@@ -9,12 +10,6 @@ import java.util.List;
 public class ALittlePsiImplUtil {
     public static PsiReference getReference(PsiElement element) {
         return ALittleReferenceUtil.create(element);
-    }
-
-    public static void checkError(PsiElement element) throws ALittleReferenceUtil.ALittleReferenceException {
-        ALittleReference ref = ALittleReferenceUtil.create(element);
-        if (ref == null) return;
-        ref.checkError();
     }
 
     @NotNull

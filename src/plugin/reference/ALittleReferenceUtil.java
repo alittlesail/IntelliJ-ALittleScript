@@ -53,22 +53,6 @@ public class ALittleReferenceUtil {
         public List<GuessTypeInfo> functorParamList;      // type="Functor"时, 表示参数列表
         public List<GuessTypeInfo> functorReturnList;     // type="Functor"时, 表示返回值列表
         boolean functorAwait;                             // type="Functor"时, 表示是否是await
-        boolean callAwait;                                // 当调用了"Functor"时, 表示是否是这个functor是否是await修饰
-    }
-
-    public static GuessTypeInfo DeepCopyGuessTypeInfo(@NotNull GuessTypeInfo info) {
-        GuessTypeInfo copy = new GuessTypeInfo();
-        copy.type = info.type;
-        copy.value = info.value;
-        copy.element = info.element;
-        copy.listSubType = info.listSubType;
-        copy.mapKeyType = info.mapKeyType;
-        copy.mapValueType = info.mapValueType;
-        copy.functorParamList = info.functorParamList;
-        copy.functorReturnList = info.functorReturnList;
-        copy.functorAwait = info.functorAwait;
-        copy.callAwait = info.callAwait;
-        return copy;
     }
 
     // 计算表达式需要使用什么样的变量方式
@@ -141,6 +125,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleForExpr) return new ALittleForExprReference((ALittleForExpr)element, range);
         if (element instanceof ALittleGenericType) return new ALittleGenericTypeReference((ALittleGenericType)element, range);
         if (element instanceof ALittleMethodNameDec) return new ALittleMethodNameDecReference((ALittleMethodNameDec)element, range);
+        if (element instanceof ALittleMethodParamNameDec) return new ALittleMethodParamNameDecReference((ALittleMethodParamNameDec)element, range);
 
         if (element instanceof ALittleNamespaceDec) return new ALittleNamespaceDecReference((ALittleNamespaceDec)element, range);
         if (element instanceof ALittleNamespaceNameDec) return new ALittleNamespaceNameDecReference((ALittleNamespaceNameDec)element, range);

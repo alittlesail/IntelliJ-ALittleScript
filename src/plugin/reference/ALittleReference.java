@@ -1,6 +1,7 @@
 package plugin.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,9 @@ public abstract class ALittleReference<T extends PsiElement> extends PsiReferenc
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    }
+
+    public void colorAnnotator(@NotNull AnnotationHolder holder) {
     }
 
     @NotNull
