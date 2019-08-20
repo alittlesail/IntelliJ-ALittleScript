@@ -1,5 +1,10 @@
 package plugin.reference;
 
+import com.intellij.execution.process.ConsoleHighlighter;
+import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.ALittleUtil;
@@ -46,5 +51,26 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
             guessList.add(info);
         }
         return guessList;
+    }
+
+    public void colorAnnotator(@NotNull AnnotationHolder holder) {
+        if (myElement.getDigitContent() != null) {
+            Annotation anno = holder.createInfoAnnotation(myElement, null);
+            anno.setTextAttributes(DefaultLanguageHighlighterColors.NUMBER);
+            return;
+        }
+
+        if (myElement.getStringContent() != null) {
+            Annotation anno = holder.createInfoAnnotation(myElement, null);
+            anno.setTextAttributes(DefaultLanguageHighlighterColors.STRING);
+            return;
+        }
+
+        if (myElement.getText().equals("true") || myElement.getText().equals("false") || myElement.getText().equals("null")) {
+            Annotation anno = holder.createInfoAnnotation(myElement, null);
+            anno.setTextAttributes(ConsoleHighlighter.CYAN_BRIGHT);
+            return;
+        }
+        return;
     }
 }

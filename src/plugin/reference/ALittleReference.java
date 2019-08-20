@@ -1,5 +1,6 @@
 package plugin.reference;
 
+import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import plugin.ALittleUtil;
 import plugin.psi.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ALittleReference<T extends PsiElement> extends PsiReferenceBase<T> implements PsiPolyVariantReference {
@@ -25,6 +27,11 @@ public abstract class ALittleReference<T extends PsiElement> extends PsiReferenc
     }
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
+    }
+
+    @NotNull
+    public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
+        return new ArrayList<>();
     }
 
     @NotNull

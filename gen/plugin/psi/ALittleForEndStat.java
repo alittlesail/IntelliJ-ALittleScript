@@ -21,6 +21,4 @@ public interface ALittleForEndStat extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

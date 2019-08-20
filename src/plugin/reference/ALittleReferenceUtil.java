@@ -33,12 +33,16 @@ public class ALittleReferenceUtil {
         GT_CONST,
         GT_PRIMITIVE,
         GT_CLASS,
+        GT_CLASS_NAME,
         GT_STRUCT,
+        GT_STRUCT_NAME,
         GT_ENUM,
+        GT_ENUM_NAME,
         GT_MAP,
         GT_LIST,
         GT_FUNCTOR,
         GT_NAMESPACE,
+        GT_NAMESPACE_NAME,
     }
 
     // 类型信息
@@ -51,6 +55,7 @@ public class ALittleReferenceUtil {
         public GuessTypeInfo mapKeyType;                  // type="Map"时, 表示Map的Key
         public GuessTypeInfo mapValueType;                // type="Map"时, 表示Map的Value
         public List<GuessTypeInfo> functorParamList;      // type="Functor"时, 表示参数列表
+        public List<String> functorParamNameList;         // type="Functor"时, 表示参数名列表
         public List<GuessTypeInfo> functorReturnList;     // type="Functor"时, 表示返回值列表
         boolean functorAwait;                             // type="Functor"时, 表示是否是await
     }
@@ -130,6 +135,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleNamespaceDec) return new ALittleNamespaceDecReference((ALittleNamespaceDec)element, range);
         if (element instanceof ALittleNamespaceNameDec) return new ALittleNamespaceNameDecReference((ALittleNamespaceNameDec)element, range);
 
+        if (element instanceof ALittleOpAssignExpr) return new ALittleOpAssignExprReference((ALittleOpAssignExpr)element, range);
         if (element instanceof ALittleOpNewListStat) return new ALittleOpNewListStatReference((ALittleOpNewListStat)element, range);
         if (element instanceof ALittleOpNewStat) return new ALittleOpNewStatReference((ALittleOpNewStat)element, range);
         if (element instanceof ALittlePrimitiveType) return new ALittlePrimitiveTypeReference((ALittlePrimitiveType)element, range);
@@ -137,7 +143,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittlePropertyValueBracketValue) return new ALittlePropertyValueBracketValueReference((ALittlePropertyValueBracketValue)element, range);
         if (element instanceof ALittlePropertyValueCastType) return new ALittlePropertyValueCastTypeReference((ALittlePropertyValueCastType)element, range);
         if (element instanceof ALittlePropertyValueCustomType) return new ALittlePropertyValueCustomTypeReference((ALittlePropertyValueCustomType)element, range);
-        if (element instanceof ALittlePropertyValueDotIdName) return new ALittlePropertyValueDotIdNameReference((ALittlePropertyValueDotIdName)element, range);
+        if (element instanceof ALittlePropertyValueDotId) return new ALittlePropertyValueDotIdReference((ALittlePropertyValueDotId)element, range);
         if (element instanceof ALittlePropertyValueFirstType) return new ALittlePropertyValueFirstTypeReference((ALittlePropertyValueFirstType)element, range);
         if (element instanceof ALittlePropertyValueMethodCall) return new ALittlePropertyValueMethodCallReference((ALittlePropertyValueMethodCall)element, range);
         if (element instanceof ALittlePropertyValue) return new ALittlePropertyValueReference((ALittlePropertyValue)element, range);

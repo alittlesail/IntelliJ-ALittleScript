@@ -27,6 +27,4 @@ public interface ALittleEnumVarDec extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

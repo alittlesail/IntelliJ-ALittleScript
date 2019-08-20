@@ -2,6 +2,9 @@ package plugin.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -84,5 +87,20 @@ public class ALittlePropertyValueThisTypeReference extends ALittleReference<ALit
             results.add(new PsiElementResolveResult(dec));
         }
         return results.toArray(new ResolveResult[results.size()]);
+    }
+
+
+    public void colorAnnotator(@NotNull AnnotationHolder holder) {
+        Annotation anno = holder.createInfoAnnotation(myElement, null);
+        anno.setTextAttributes(CustomHighlighterColors.CUSTOM_KEYWORD2_ATTRIBUTES);
+    }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+        } else if (guessList.size() != 1) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+        }
     }
 }

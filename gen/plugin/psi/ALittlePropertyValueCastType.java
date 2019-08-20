@@ -14,7 +14,7 @@ public interface ALittlePropertyValueCastType extends PsiElement {
   ALittleAllType getAllType();
 
   @Nullable
-  ALittleValueStat getValueStat();
+  ALittleValueFactorStat getValueFactorStat();
 
   @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
@@ -23,7 +23,5 @@ public interface ALittlePropertyValueCastType extends PsiElement {
   List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
 
   PsiReference getReference();
-
-  void checkError() throws ALittleReferenceException;
 
 }

@@ -29,7 +29,7 @@ public class ALittleCompletionContributor extends CompletionContributor {
                                                @NotNull CompletionResultSet resultSet) {
                         PsiElement element = parameters.getPosition();
                         PsiElement parent = element.getParent();
-                        if (parent instanceof ALittlePropertyValueDotIdName) {
+                        if (parent instanceof ALittlePropertyValueDotId) {
                             return;
                         }
                         for (String keyword : KEYWORD_LIST) {

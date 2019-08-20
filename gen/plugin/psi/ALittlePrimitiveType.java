@@ -18,6 +18,4 @@ public interface ALittlePrimitiveType extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

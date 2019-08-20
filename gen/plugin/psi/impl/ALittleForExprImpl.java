@@ -64,9 +64,4 @@ public class ALittleForExprImpl extends ASTWrapperPsiElement implements ALittleF
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

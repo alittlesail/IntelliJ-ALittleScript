@@ -52,9 +52,4 @@ public class ALittleForEndStatImpl extends ASTWrapperPsiElement implements ALitt
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

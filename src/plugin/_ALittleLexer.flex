@@ -81,6 +81,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "class"               { return CLASS; }
   "struct"              { return STRUCT; }
   "enum"                { return ENUM; }
+  "Ctor"                { return CTOR; }
   "get"                 { return GET; }
   "set"                 { return SET; }
   "fun"                 { return FUN; }
@@ -95,6 +96,9 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "return"              { return RETURN; }
   "yield"               { return YIELD; }
   "break"               { return BREAK; }
+  "Map"                 { return MAP; }
+  "List"                { return LIST; }
+  "Functor"             { return FUNCTOR; }
   "bool"                { return BOOL; }
   "double"              { return DOUBLE; }
   "int"                 { return INT; }

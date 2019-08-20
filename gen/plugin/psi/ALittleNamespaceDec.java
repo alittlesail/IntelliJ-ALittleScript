@@ -39,6 +39,4 @@ public interface ALittleNamespaceDec extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

@@ -54,6 +54,4 @@ public interface ALittleAllExpr extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

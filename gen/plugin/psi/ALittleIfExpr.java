@@ -30,6 +30,4 @@ public interface ALittleIfExpr extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

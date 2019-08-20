@@ -28,4 +28,13 @@ public class ALittlePropertyValueCastTypeReference extends ALittleReference<ALit
 
         return new ArrayList<>();
     }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+        } else if (guessList.size() != 1) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+        }
+    }
 }

@@ -102,7 +102,6 @@ public interface ALittleTypes {
   IElementType PROPERTY_VALUE_CAST_TYPE = new ALittleElementType("PROPERTY_VALUE_CAST_TYPE");
   IElementType PROPERTY_VALUE_CUSTOM_TYPE = new ALittleElementType("PROPERTY_VALUE_CUSTOM_TYPE");
   IElementType PROPERTY_VALUE_DOT_ID = new ALittleElementType("PROPERTY_VALUE_DOT_ID");
-  IElementType PROPERTY_VALUE_DOT_ID_NAME = new ALittleElementType("PROPERTY_VALUE_DOT_ID_NAME");
   IElementType PROPERTY_VALUE_EXPR = new ALittleElementType("PROPERTY_VALUE_EXPR");
   IElementType PROPERTY_VALUE_FIRST_TYPE = new ALittleElementType("PROPERTY_VALUE_FIRST_TYPE");
   IElementType PROPERTY_VALUE_METHOD_CALL = new ALittleElementType("PROPERTY_VALUE_METHOD_CALL");
@@ -143,6 +142,7 @@ public interface ALittleTypes {
   IElementType CONCAT = new ALittleTokenType("..");
   IElementType COND_AND = new ALittleTokenType("&&");
   IElementType COND_OR = new ALittleTokenType("||");
+  IElementType CTOR = new ALittleTokenType("Ctor");
   IElementType DIGIT_CONTENT = new ALittleTokenType("DIGIT_CONTENT");
   IElementType DO = new ALittleTokenType("do");
   IElementType DOT = new ALittleTokenType(".");
@@ -154,6 +154,7 @@ public interface ALittleTypes {
   IElementType FALSE = new ALittleTokenType("false");
   IElementType FOR = new ALittleTokenType("for");
   IElementType FUN = new ALittleTokenType("fun");
+  IElementType FUNCTOR = new ALittleTokenType("Functor");
   IElementType GET = new ALittleTokenType("get");
   IElementType GREATER = new ALittleTokenType(">");
   IElementType GREATER_OR_EQUAL = new ALittleTokenType(">=");
@@ -166,7 +167,9 @@ public interface ALittleTypes {
   IElementType LBRACK = new ALittleTokenType("[");
   IElementType LESS = new ALittleTokenType("<");
   IElementType LESS_OR_EQUAL = new ALittleTokenType("<=");
+  IElementType LIST = new ALittleTokenType("List");
   IElementType LPAREN = new ALittleTokenType("(");
+  IElementType MAP = new ALittleTokenType("Map");
   IElementType MINUS = new ALittleTokenType("-");
   IElementType MINUS_ASSIGN = new ALittleTokenType("-=");
   IElementType MINUS_MINUS = new ALittleTokenType("--");
@@ -489,9 +492,6 @@ public interface ALittleTypes {
       }
       else if (type == PROPERTY_VALUE_DOT_ID) {
         return new ALittlePropertyValueDotIdImpl(node);
-      }
-      else if (type == PROPERTY_VALUE_DOT_ID_NAME) {
-        return new ALittlePropertyValueDotIdNameImpl(node);
       }
       else if (type == PROPERTY_VALUE_EXPR) {
         return new ALittlePropertyValueExprImpl(node);

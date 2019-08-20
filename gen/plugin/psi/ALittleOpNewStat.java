@@ -27,6 +27,4 @@ public interface ALittleOpNewStat extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

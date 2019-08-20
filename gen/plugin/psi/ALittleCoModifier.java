@@ -18,6 +18,4 @@ public interface ALittleCoModifier extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

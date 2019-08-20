@@ -21,6 +21,4 @@ public interface ALittleMethodBodyDec extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

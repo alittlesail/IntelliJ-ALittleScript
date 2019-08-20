@@ -27,6 +27,4 @@ public interface ALittleForStepCondition extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

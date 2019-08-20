@@ -64,9 +64,4 @@ public class ALittleOp6SuffixExImpl extends ASTWrapperPsiElement implements ALit
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

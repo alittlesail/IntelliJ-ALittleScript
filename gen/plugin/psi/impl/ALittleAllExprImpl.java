@@ -118,9 +118,4 @@ public class ALittleAllExprImpl extends ASTWrapperPsiElement implements ALittleA
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

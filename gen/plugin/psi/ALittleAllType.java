@@ -27,6 +27,4 @@ public interface ALittleAllType extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

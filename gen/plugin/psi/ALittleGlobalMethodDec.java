@@ -36,6 +36,4 @@ public interface ALittleGlobalMethodDec extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

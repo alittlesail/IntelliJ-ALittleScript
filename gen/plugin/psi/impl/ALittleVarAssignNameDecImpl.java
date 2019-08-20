@@ -52,9 +52,4 @@ public class ALittleVarAssignNameDecImpl extends ASTWrapperPsiElement implements
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

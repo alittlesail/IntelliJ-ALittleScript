@@ -18,6 +18,4 @@ public interface ALittleAccessModifier extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

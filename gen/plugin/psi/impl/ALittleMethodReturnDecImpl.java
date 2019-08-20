@@ -52,9 +52,4 @@ public class ALittleMethodReturnDecImpl extends ASTWrapperPsiElement implements 
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

@@ -6,11 +6,14 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.FileHelper;
 import plugin.psi.*;
+import plugin.reference.ALittleReference;
+import plugin.reference.ALittleReferenceUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,14 +22,12 @@ import java.util.HashSet;
 import java.util.List;
 
 public class ALittleGenerateLua {
-    private String m_namespace_name = "";
-    private List<String> m_json_list;
-    private List<String> m_cpp_list;
-    private List<String> m_enum_list;
-    private List<String> m_class_list;
+    private String mNamespaceName = "";
+    private List<String> mEnumList;
+    private List<String> mClassList;
 
-    private boolean m_open_rawset = false;
-    private int m_rawset_use_count = 0;
+    private boolean mOpenRawSet = false;
+    private int mRawsetUseCount = 0;
 
     private void copyStdLibrary(String module_base_path) throws Exception {
         File file = new File(module_base_path + "/std");
@@ -54,105 +55,45 @@ public class ALittleGenerateLua {
         }
     }
 
-    private PsiErrorElement checkErrorElement(PsiElement element, boolean full_check) {
+    private void checkErrorElement(PsiElement element, boolean full_check) throws ALittleReferenceUtil.ALittleReferenceException {
         for(PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof PsiErrorElement) {
-                return (PsiErrorElement)child;
+                throw new ALittleReferenceUtil.ALittleReferenceException(child, ((PsiErrorElement) child).getErrorDescription());
             }
 
             if (full_check) {
-                // 获取对应的定义
-                List<PsiElement> guessList = ALittleAnnotator.GetGuessList(element);
-
-                // 检查未定义或者重复定义
-                ALittleAnnotator.CheckErrorForGuessList(element, null, guessList);
-
-                // 检查反射操作
-                ALittleAnnotator.CheckErrorForReflect(element, null, guessList);
-
-                // 枚举类型错误检查
-                ALittleAnnotator.CheckErrorForEnum(element, null, guessList);
-
-                // 结构体类型错误检查
-                ALittleAnnotator.CheckErrorForStruct(element, null, guessList);
-
-                // return语句返回的内容和函数定义的返回值相符
-                ALittleAnnotator.CheckErrorForReturn(element, null, guessList);
-
-                // 赋值语句左右两方那个的类型检查
-                ALittleAnnotator.CheckErrorForVarAssign(element, null, guessList);
-
-                // 赋值语句左右两方那个的类型检查
-                ALittleAnnotator.CheckErrorForOpAssign(element, null, guessList);
-
-                // if elseif while dowhile 条件表达式检查
-                ALittleAnnotator.CheckErrorForIfAndElseIfAndWhileAndDoWhile(element, null, guessList);
-
-                // for语句内部局部变量的类型
-                ALittleAnnotator.CheckErrorForFor(element, null, guessList);
-
-                // 检查函数调用时参数个数，和参数类型
-                ALittleAnnotator.CheckErrorForMethodCall(element, null, guessList);
-
-                // 检查中括号内部值的类型检查
-                ALittleAnnotator.CheckErrorForBrackValue(element, null, guessList);
-
-                // 检查new表达式的参数
-                ALittleAnnotator.CheckErrorForOpNewStat(element, null, guessList);
-
-                // 检查bind表达式
-                ALittleAnnotator.CheckErrorForBindStat(element, null, guessList);
-
-                // 检查变量名
-                ALittleAnnotator.CheckErrorForName(element, null, guessList);
-
-                // 检查便捷List表达式
-                ALittleAnnotator.CheckErrorForOpNewList(element, null, guessList);
+                // 检查错误，给元素上色
+                PsiReference ref = element.getReference();
+                if (ref instanceof ALittleReference) {
+                    ((ALittleReference) ref).checkError();
+                }
             }
 
-            PsiErrorElement error = checkErrorElement(child, full_check);
-            if (error != null) {
-                return error;
-            }
+            checkErrorElement(child, full_check);
         }
-        return null;
     }
 
     public void GenerateLua(ALittleFile alittleFile, boolean full_check) throws Exception {
         // 获取语法错误
-        PsiErrorElement error = checkErrorElement(alittleFile, full_check);
-        if (error != null) throw new Exception("有语法错误:" + error.getErrorDescription());
+        try {
+            checkErrorElement(alittleFile, full_check);
+        } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+            throw new Exception(e.getElement().getContainingFile().getName() + "有语法错误:" + e.getError());
+        }
 
-        m_json_list = new ArrayList<>();
-        m_cpp_list = new ArrayList<>();
-        m_enum_list = new ArrayList<>();
-        m_class_list = new ArrayList<>();
+        mEnumList = new ArrayList<>();
+        mClassList = new ArrayList<>();
 
-        List<ALittleNamespaceDec> namespace_list = ALittleUtil.getNamespaceDec(alittleFile);
-        if (namespace_list.isEmpty()) throw new Exception("没有定义命名域 namespace");
-        if (namespace_list.size() > 1) throw new Exception("代码生成失败 每个文件只有有一个命名域");
+        ALittleNamespaceDec namespaceDec = ALittleUtil.getNamespaceDec(alittleFile);
+        if (namespaceDec == null) throw new Exception("没有定义命名域 namespace");
 
         // 如果命名域有register标记，那么就不需要生成
-        ALittleNamespaceDec namespaceDec = namespace_list.get(0);
-        if (namespaceDec.getNamespaceRegisterDec() != null) {
+        if (namespaceDec.getRegisterModifier() != null) {
             return;
         }
 
         // 生成代码
         String content = GenerateNamespace(namespaceDec);
-
-        String json_content = null;
-        if (!m_json_list.isEmpty())
-            json_content = "[" + String.join(",", m_json_list) + "]";
-
-        String cpp_content = null;
-        if (!m_cpp_list.isEmpty()) {
-            if (!m_enum_list.isEmpty())
-                cpp_content = "\n" + String.join("\n", m_enum_list) + "\n\n";
-            if (!m_class_list.isEmpty())
-                cpp_content = "\n" + String.join("\n", m_class_list) + "\n\n";
-            cpp_content += String.join("\n", m_cpp_list);
-        }
 
         // 保存到文件
         FileIndexFacade facade = FileIndexFacade.getInstance(alittleFile.getProject());
@@ -161,25 +102,8 @@ public class ALittleGenerateLua {
             return;
         }
 
-        String alittle_rel_path = FileHelper.calcALittleRelPath(module, alittleFile.getVirtualFile());
-
-        FileHelper.writeFile(FileHelper.calcScriptPath(module) + alittle_rel_path + "lua", content);
-
-        if (json_content != null)
-            FileHelper.writeFile(FileHelper.calcProtocolPath(module) + alittle_rel_path + "json", json_content);
-
-        if (cpp_content != null) {
-            String cpp_rel_path = alittle_rel_path + "h";
-            String file_name = new File( cpp_rel_path).getName().replace('.', '_').toUpperCase();
-            cpp_content = "\n#ifndef ALITTLE_CPPPROTO_" + file_name
-                    + "\n#define ALITTLE_CPPPROTO_" + file_name + "\n"
-                    + "\n#include <ALittleBase/Protocol/Json_ALL.h>"
-                    + "\n#include <ALittleBase/Protocol/Message.h>"
-                    + "\ntypedef long long I64;"
-                    + "\n" + cpp_content + "\n"
-                    + "\n#endif // ALITTLE_CPPPROTO_" + file_name + "\n";
-            FileHelper.writeFile(FileHelper.calcCPPProtoPath(module) + cpp_rel_path, cpp_content);
-        }
+        String alittleRelPath = FileHelper.calcALittleRelPath(module, alittleFile.getVirtualFile());
+        FileHelper.writeFile(FileHelper.calcScriptPath(module) + alittleRelPath + "lua", content);
 
         // 复制标准库
         copyStdLibrary(FileHelper.calcScriptPath(module));
@@ -202,7 +126,7 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateOpNewList(ALittleOpNewList op_new_list) throws Exception {
+    private String GenerateOpNewListStat(ALittleOpNewListStat op_new_list) throws Exception {
         List<ALittleValueStat> value_stat_list = op_new_list.getValueStatList();
 
         String content = "{";
@@ -237,18 +161,18 @@ public class ALittleGenerateLua {
         // 自定义类型
         ALittleCustomType custom_type = op_new_stat.getCustomType();
         if (custom_type != null) {
-            PsiElement guessType = custom_type.getCustomTypeNameDec().guessType();
+            ALittleReferenceUtil.GuessTypeInfo guessType = custom_type.guessType();
             // 如果是结构体名，那么就当表来处理
-            if (guessType instanceof ALittleStructDec) {
+            if (guessType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
                 return "{}";
             // 如果是类名
-            } else if (guessType instanceof ALittleClassDec) {
+            } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                 // 如果是类名
                 String content = "";
-                ALittleCustomTypeNamespaceNameDec namespace_name_dec = custom_type.getCustomTypeNamespaceNameDec();
-                if (namespace_name_dec != null)
-                    content = namespace_name_dec.getIdContent().getText() + ".";
-                content += custom_type.getCustomTypeNameDec().getIdContent().getText() + "(";
+                ALittleNamespaceNameDec namespace_nameDec = custom_type.getNamespaceNameDec();
+                if (namespace_nameDec != null)
+                    content = namespace_nameDec.getIdContent().getText() + ".";
+                content += custom_type.getIdContent().getText() + "(";
 
                 List<String> param_list = new ArrayList<>();
                 List<ALittleValueStat> value_stat_list = op_new_stat.getValueStatList();
@@ -273,8 +197,8 @@ public class ALittleGenerateLua {
         }
 
         String value_factor_result = null;
-        if (suffix.getValueFactor() != null) {
-            value_factor_result = GenerateValueFactor(suffix.getValueFactor());
+        if (suffix.getValueFactorStat() != null) {
+            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
             value_factor_result = GenerateOp2Value(suffix.getOp2Value());
         }
@@ -318,7 +242,7 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateOp8Stat(ALittleOp8Stat op_8_stat) throws Exception {
-        String value_factor_result = GenerateValueFactor(op_8_stat.getValueFactor());
+        String value_factor_result = GenerateValueFactorStat(op_8_stat.getValueFactorStat());
 
         ALittleOp8Suffix suffix = op_8_stat.getOp8Suffix();
         String suffix_result = GenerateOp8Suffix(suffix);
@@ -341,8 +265,8 @@ public class ALittleGenerateLua {
         }
 
         String value_factor_result = null;
-        if (suffix.getValueFactor() != null) {
-            value_factor_result = GenerateValueFactor(suffix.getValueFactor());
+        if (suffix.getValueFactorStat() != null) {
+            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
             value_factor_result = GenerateOp2Value(suffix.getOp2Value());
         }
@@ -385,7 +309,7 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateOp7Stat(ALittleOp7Stat op_7_stat) throws Exception {
-        String value_factor_result = GenerateValueFactor(op_7_stat.getValueFactor());
+        String value_factor_result = GenerateValueFactorStat(op_7_stat.getValueFactorStat());
 
         ALittleOp7Suffix suffix = op_7_stat.getOp7Suffix();
         String suffix_result = GenerateOp7Suffix(suffix);
@@ -408,8 +332,8 @@ public class ALittleGenerateLua {
         }
 
         String value_factor_result = null;
-        if (suffix.getValueFactor() != null) {
-            value_factor_result = GenerateValueFactor(suffix.getValueFactor());
+        if (suffix.getValueFactorStat() != null) {
+            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
             value_factor_result = GenerateOp2Value(suffix.getOp2Value());
         }
@@ -452,7 +376,7 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateOp6Stat(ALittleOp6Stat op_6_stat) throws Exception {
-        String value_factor_result = GenerateValueFactor(op_6_stat.getValueFactor());
+        String value_factor_result = GenerateValueFactorStat(op_6_stat.getValueFactorStat());
 
         ALittleOp6Suffix suffix = op_6_stat.getOp6Suffix();
         String suffix_result = GenerateOp6Suffix(suffix);
@@ -472,8 +396,8 @@ public class ALittleGenerateLua {
         String op_string = suffix.getOp5().getText();
 
         String value_factor_result = null;
-        if (suffix.getValueFactor() != null) {
-            value_factor_result = GenerateValueFactor(suffix.getValueFactor());
+        if (suffix.getValueFactorStat() != null) {
+            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
             value_factor_result = GenerateOp2Value(suffix.getOp2Value());
         }
@@ -516,7 +440,7 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateOp5Stat(ALittleOp5Stat op_5_stat) throws Exception {
-        String value_factor_result = GenerateValueFactor(op_5_stat.getValueFactor());
+        String value_factor_result = GenerateValueFactorStat(op_5_stat.getValueFactorStat());
 
         ALittleOp5Suffix suffix = op_5_stat.getOp5Suffix();
         String suffix_result = GenerateOp5Suffix(suffix);
@@ -536,8 +460,8 @@ public class ALittleGenerateLua {
         String op_string = suffix.getOp4().getText();
 
         String value_factor_result = null;
-        if (suffix.getValueFactor() != null) {
-            value_factor_result = GenerateValueFactor(suffix.getValueFactor());
+        if (suffix.getValueFactorStat() != null) {
+            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
             value_factor_result = GenerateOp2Value(suffix.getOp2Value());
         }
@@ -580,7 +504,7 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateOp4Stat(ALittleOp4Stat op_4_stat) throws Exception {
-        String value_factor_result = GenerateValueFactor(op_4_stat.getValueFactor());
+        String value_factor_result = GenerateValueFactorStat(op_4_stat.getValueFactorStat());
 
         ALittleOp4Suffix suffix = op_4_stat.getOp4Suffix();
         String suffix_result = GenerateOp4Suffix(suffix);
@@ -600,8 +524,8 @@ public class ALittleGenerateLua {
         String op_string = suffix.getOp3().getText();
 
         String value_result;
-        if (suffix.getValueFactor() != null) {
-            value_result = GenerateValueFactor(suffix.getValueFactor());
+        if (suffix.getValueFactorStat() != null) {
+            value_result = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
             value_result = GenerateOp2Value(suffix.getOp2Value());
         } else {
@@ -632,7 +556,7 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateOp3Stat(ALittleOp3Stat op_3_stat) throws Exception {
-        String value_factor_result = GenerateValueFactor(op_3_stat.getValueFactor());
+        String value_factor_result = GenerateValueFactorStat(op_3_stat.getValueFactorStat());
 
         ALittleOp3Suffix suffix = op_3_stat.getOp3Suffix();
         String suffix_result = GenerateOp3Suffix(suffix);
@@ -670,17 +594,17 @@ public class ALittleGenerateLua {
     private String GenerateOp2Value(ALittleOp2Value op_2_value) throws Exception {
         String content = "";
 
-        ALittleValueFactor value_factor = op_2_value.getValueFactor();
+        ALittleValueFactorStat value_factor = op_2_value.getValueFactorStat();
         if (value_factor == null) {
             throw new Exception("GenerateOp2Stat单目运算没有操作对象");
         }
 
-        String value_stat_result = GenerateValueFactor(value_factor);
+        String valueStatResult = GenerateValueFactorStat(value_factor);
         String op_string = op_2_value.getOp2().getText();
         if (op_string.equals("!")) {
-            content += "not " + value_stat_result;
+            content += "not " + valueStatResult;
         } else if (op_string.equals("-")) {
-            content += "-" + value_stat_result;
+            content += "-" + valueStatResult;
         } else {
             throw new Exception("GenerateOp2Stat出现未知类型");
         }
@@ -703,8 +627,8 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateValueStat(ALittleValueStat root_stat) throws Exception {
-        ALittleValueFactor value_factor = root_stat.getValueFactor();
-        if (value_factor != null) return GenerateValueFactor(value_factor);
+        ALittleValueFactorStat value_factor = root_stat.getValueFactorStat();
+        if (value_factor != null) return GenerateValueFactorStat(value_factor);
 
         ALittleOp2Stat op_2_stat = root_stat.getOp2Stat();
         if (op_2_stat != null) return GenerateOp2Stat(op_2_stat);
@@ -730,8 +654,8 @@ public class ALittleGenerateLua {
         ALittleOpNewStat op_new_stat = root_stat.getOpNewStat();
         if (op_new_stat != null) return GenerateOpNewStat(op_new_stat);
 
-        ALittleOpNewList op_new_list = root_stat.getOpNewList();
-        if (op_new_list != null) return GenerateOpNewList(op_new_list);
+        ALittleOpNewListStat op_new_listStat = root_stat.getOpNewListStat();
+        if (op_new_listStat != null) return GenerateOpNewListStat(op_new_listStat);
 
         ALittleBindStat bind_stat = root_stat.getBindStat();
         if (bind_stat != null) return GenerateBindStat(bind_stat);
@@ -740,7 +664,7 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateValueFactor(ALittleValueFactor value_factor) throws Exception {
+    private String GenerateValueFactorStat(ALittleValueFactorStat value_factor) throws Exception {
         ALittleConstValue const_value = value_factor.getConstValue();
         if (const_value != null) {
             return GenerateConstValue(const_value);
@@ -756,10 +680,9 @@ public class ALittleGenerateLua {
             return GeneratePropertyValue(prop_value);
         }
 
-        ALittleValueStatParen value_stat_paren = value_factor.getValueStatParen();
+        ALittleWrapValueStat value_stat_paren = value_factor.getWrapValueStat();
         if (value_stat_paren != null) {
             String result = GenerateValueStat(value_stat_paren.getValueStat());
-            if (result == null) return null;
             return "(" + result + ")";
         }
 
@@ -782,182 +705,176 @@ public class ALittleGenerateLua {
         String content = "";
         ALittleCustomType custom_type = reflect_value.getCustomType();
         if (custom_type == null) return content;
-        ALittleCustomTypeNameDec name_dec = custom_type.getCustomTypeNameDec();
-        if (name_dec == null) return content;
-        PsiElement element = name_dec.guessType();
+        ALittleReferenceUtil.GuessTypeInfo guessType = custom_type.guessType();
 
-        List<String> error_content_list = new ArrayList<>();
-        List<PsiElement> error_element_list = new ArrayList<>();
-        HashSet<PsiElement> deep_guess = new HashSet<>();
-        ALittleUtil.GuessTypeInfo info = ALittleUtil.guessTypeString(reflect_value, element, deep_guess, error_content_list, error_element_list);
-        if (!error_content_list.isEmpty()) return "\"" + error_content_list.get(0) + "\"";
-        if (info == null) return null;
+        // 把获取到的对象转为Json
 
-        content = ALittleUtil.saveGuessTypeInfoToJson(info);
         return "\"" + content.replace("\"", "\\\"") + "\"";
     }
 
     @NotNull
     private String GeneratePropertyValue(ALittlePropertyValue prop_value) throws Exception {
-        StringBuilder content = new StringBuilder();
+        try {
+            StringBuilder content = new StringBuilder();
 
-        // 用来标记第一个变量是不是lua命名域
-        boolean is_lua_namespace = false;
+            // 用来标记第一个变量是不是lua命名域
+            boolean is_lua_namespace = false;
 
-        // 通用类型的类型猜测
-        PsiElement custom_guessType = null;
+            // 通用类型的类型猜测
+            ALittleReferenceUtil.GuessTypeInfo custom_guessType = null;
 
-        // 获取开头的属性信息
-        ALittlePropertyValueCustomType custom_type = prop_value.getPropertyValueCustomType();
-        ALittlePropertyValueThisType this_type = prop_value.getPropertyValueThisType();
-        ALittlePropertyValueCastType cast_type = prop_value.getPropertyValueCastType();
-        if (custom_type != null) {
-            String custom_type_content = custom_type.getText();
-            custom_guessType = custom_type.guessType();
-            if (custom_guessType instanceof ALittleNamespaceNameDec && custom_type_content.equals("lua"))
-                is_lua_namespace = true;
+            // 获取开头的属性信息
+            ALittlePropertyValueFirstType firstType = prop_value.getPropertyValueFirstType();
+            ALittlePropertyValueCustomType custom_type = firstType.getPropertyValueCustomType();
+            ALittlePropertyValueThisType this_type = firstType.getPropertyValueThisType();
+            ALittlePropertyValueCastType cast_type = firstType.getPropertyValueCastType();
+            if (custom_type != null) {
+                String custom_type_content = custom_type.getText();
+                custom_guessType = custom_type.guessType();
+                if (custom_guessType instanceof ALittleNamespaceNameDec && custom_type_content.equals("lua"))
+                    is_lua_namespace = true;
 
-            // 如果是lua命名域，那么就忽略
-            if (!is_lua_namespace)
-                content.append(custom_type_content);
-        // 如果是this，那么就变为self
-        } else if (this_type != null) {
-            content.append("self");
-        } else if (cast_type != null) {
-            content.append(GenerateValueFactor(cast_type.getValueFactor()));
-        }
-
-        // 后面跟着后缀属性
-        List<ALittlePropertyValueSuffix> suffixList = prop_value.getPropertyValueSuffixList();
-        for (int index = 0; index < suffixList.size(); ++index)
-        {
-            // 获取当前后缀
-            ALittlePropertyValueSuffix suffix = suffixList.get(index);
-            // 获取上一个后缀
-            ALittlePropertyValueSuffix pre_suffix = null;
-            if (index - 1 >= 0) pre_suffix = suffixList.get(index - 1);
-            // 获取下一个后缀
-            ALittlePropertyValueSuffix next_suffix = null;
-            if (index + 1 < suffixList.size()) next_suffix = suffixList.get(index + 1);
-
-            // 如果当前是
-            ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
-            if (dotId != null) {
-                // 获取类型
-                PsiElement guess = dotId.getPropertyValueDotIdName().guessType();
-                if (guess == null) {
-                    throw new Exception("未知的属性类型");
-                }
-
-                // 如果是lua命名域下的，判断当前后缀的类型。决定使用.还是:
+                // 如果是lua命名域，那么就忽略
                 if (!is_lua_namespace)
-                {
-                    String split = ".";
+                    content.append(custom_type_content);
+                // 如果是this，那么就变为self
+            } else if (this_type != null) {
+                content.append("self");
+            } else if (cast_type != null) {
+                ALittleValueFactorStat valueFactorStat = cast_type.getValueFactorStat();
+                if (valueFactorStat == null) throw new Exception("cast没有填写转换对象");
+                content.append(GenerateValueFactorStat(valueFactorStat));
+            }
 
-                    // 如果是函数名
-                    if (guess instanceof ALittleMethodNameDec) {
-                        ALittleMethodNameDec method_name_dec = (ALittleMethodNameDec)guess;
-                        // 1. 是成员函数
-                        // 2. 使用的是调用
-                        // 3. 前一个后缀是类实例对象
-                        // 那么就要改成使用语法糖
-                        if (method_name_dec.getParent() instanceof ALittleClassMethodDec) {
-                            if (next_suffix != null && next_suffix.getPropertyValueMethodCallStat() != null) {
-                                // 获取前一个后缀的类型
-                                PsiElement pre_guess = null;
-                                // pre_suffix为空，说明前面是（CustomType或者ThisType）
-                                // 如果是ThisType说明一定是语法糖
-                                // 如果是CustomType那么就判断下类型
-                                if (pre_suffix == null) {
-                                    if (custom_type != null) {
-                                        if (custom_guessType == null) {
-                                            custom_guessType = custom_type.guessType();
+            // 后面跟着后缀属性
+            List<ALittlePropertyValueSuffix> suffixList = prop_value.getPropertyValueSuffixList();
+            for (int index = 0; index < suffixList.size(); ++index) {
+                // 获取当前后缀
+                ALittlePropertyValueSuffix suffix = suffixList.get(index);
+                // 获取上一个后缀
+                ALittlePropertyValueSuffix pre_suffix = null;
+                if (index - 1 >= 0) pre_suffix = suffixList.get(index - 1);
+                // 获取下一个后缀
+                ALittlePropertyValueSuffix next_suffix = null;
+                if (index + 1 < suffixList.size()) next_suffix = suffixList.get(index + 1);
+
+                // 如果当前是
+                ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
+                if (dotId != null) {
+                    // 获取类型
+                    ALittleReferenceUtil.GuessTypeInfo guess = dotId.guessType();
+
+                    // 如果是lua命名域下的，判断当前后缀的类型。决定使用.还是:
+                    if (!is_lua_namespace) {
+                        String split = ".";
+
+                        // 如果是函数名
+                        if (guess instanceof ALittleMethodNameDec) {
+                            ALittleMethodNameDec method_nameDec = (ALittleMethodNameDec) guess;
+                            // 1. 是成员函数
+                            // 2. 使用的是调用
+                            // 3. 前一个后缀是类实例对象
+                            // 那么就要改成使用语法糖
+                            if (method_nameDec.getParent() instanceof ALittleClassMethodDec) {
+                                if (next_suffix != null && next_suffix.getPropertyValueMethodCall() != null) {
+                                    // 获取前一个后缀的类型
+                                    ALittleReferenceUtil.GuessTypeInfo pre_guess = null;
+                                    // pre_suffix为空，说明前面是（CustomType或者ThisType）
+                                    // 如果是ThisType说明一定是语法糖
+                                    // 如果是CustomType那么就判断下类型
+                                    if (pre_suffix == null) {
+                                        if (custom_type != null) {
+                                            pre_guess = custom_guessType;
                                         }
-                                        pre_guess = custom_guessType;
-                                    }
-                                } else if (pre_suffix.getPropertyValueDotId() != null)
-                                    pre_guess = pre_suffix.getPropertyValueDotId().getPropertyValueDotIdName().guessType();
-                                else if (pre_suffix.getPropertyValueMethodCallStat() != null)
-                                    pre_guess = pre_suffix.getPropertyValueMethodCallStat().guessType();
-                                else if (pre_suffix.getPropertyValueBrackValueStat() != null)
-                                    pre_guess = pre_suffix.getPropertyValueBrackValueStat().guessType();
+                                    } else if (pre_suffix.getPropertyValueDotId() != null)
+                                        pre_guess = pre_suffix.getPropertyValueDotId().guessType();
+                                    else if (pre_suffix.getPropertyValueMethodCall() != null)
+                                        pre_guess = pre_suffix.getPropertyValueMethodCall().guessType();
+                                    else if (pre_suffix.getPropertyValueBracketValue() != null)
+                                        pre_guess = pre_suffix.getPropertyValueBracketValue().guessType();
 
-                                // 只要不是类名，那么肯定就是类实例对象，就是用语法糖
-                                if (!(pre_guess instanceof ALittleClassNameDec))
-                                    split = ":";
-                            }
-                        // setter和getter需要特殊处理
-                        } else if (method_name_dec.getParent() instanceof ALittleClassSetterDec
-                                    || method_name_dec.getParent() instanceof ALittleClassGetterDec) {
-                            if (next_suffix != null && next_suffix.getPropertyValueMethodCallStat() != null) {
-                                PsiElement pre_guess = null;
-                                // pre_suffix为空，说明前面是（CustomType或者ThisType）
-                                // 如果是ThisType说明一定是语法糖
-                                // 如果是CustomType那么就判断下类型
-                                if (pre_suffix == null) {
-                                    if (custom_type != null) {
-                                        if (custom_guessType == null) {
-                                            custom_guessType = custom_type.guessType();
+                                    // 只要不是类名，那么肯定就是类实例对象，就是用语法糖
+                                    if (!(pre_guess instanceof ALittleClassNameDec))
+                                        split = ":";
+                                }
+                                // setter和getter需要特殊处理
+                            } else if (method_nameDec.getParent() instanceof ALittleClassSetterDec
+                                    || method_nameDec.getParent() instanceof ALittleClassGetterDec) {
+                                if (next_suffix != null && next_suffix.getPropertyValueMethodCall() != null) {
+                                    ALittleReferenceUtil.GuessTypeInfo pre_guess = null;
+                                    // pre_suffix为空，说明前面是（CustomType或者ThisType）
+                                    // 如果是ThisType说明一定是语法糖
+                                    // 如果是CustomType那么就判断下类型
+                                    if (pre_suffix == null) {
+                                        if (custom_type != null) {
+                                            pre_guess = custom_guessType;
                                         }
-                                        pre_guess = custom_guessType;
-                                    }
-                                } else if (pre_suffix.getPropertyValueDotId() != null)
-                                    pre_guess = pre_suffix.getPropertyValueDotId().getPropertyValueDotIdName().guessType();
-                                else if (pre_suffix.getPropertyValueMethodCallStat() != null)
-                                    pre_guess = pre_suffix.getPropertyValueMethodCallStat().guessType();
-                                else if (pre_suffix.getPropertyValueBrackValueStat() != null)
-                                    pre_guess = pre_suffix.getPropertyValueBrackValueStat().guessType();
+                                    } else if (pre_suffix.getPropertyValueDotId() != null)
+                                        pre_guess = pre_suffix.getPropertyValueDotId().guessType();
+                                    else if (pre_suffix.getPropertyValueMethodCall() != null)
+                                        pre_guess = pre_suffix.getPropertyValueMethodCall().guessType();
+                                    else if (pre_suffix.getPropertyValueBracketValue() != null)
+                                        pre_guess = pre_suffix.getPropertyValueBracketValue().guessType();
 
-                                // 如果前一个后缀是类名，那么那么就需要获取setter或者getter来获取
-                                if (pre_guess instanceof ALittleClassNameDec) {
-                                    // 如果是getter，那么一定是一个参数，比如ClassName.disabled(self)
-                                    // 如果是setter，那么一定是两个参数，比如ClassName.width(self, 100)
-                                    if (next_suffix.getPropertyValueMethodCallStat().getValueStatList().size() == 1)
-                                        split = ".__getter.";
-                                    else
-                                        split = ".__setter.";
+                                    // 如果前一个后缀是类名，那么那么就需要获取setter或者getter来获取
+                                    if (pre_guess instanceof ALittleClassNameDec) {
+                                        // 如果是getter，那么一定是一个参数，比如ClassName.disabled(self)
+                                        // 如果是setter，那么一定是两个参数，比如ClassName.width(self, 100)
+                                        if (next_suffix.getPropertyValueMethodCall().getValueStatList().size() == 1)
+                                            split = ".__getter.";
+                                        else
+                                            split = ".__setter.";
+                                    }
                                 }
                             }
                         }
+
+                        content.append(split);
                     }
 
-                    content.append(split);
+                    if (dotId.getIdContent() == null) {
+                        throw new Exception("点后面没有内容");
+                    }
+
+                    String name_content = dotId.getIdContent().getText();
+                    // 因为lua中自带的string模块名和关键字string一样，所以把lua自动的改成String（大些开头）
+                    // 然后再翻译的时候，把String改成string
+                    if (is_lua_namespace && name_content.equals("String"))
+                        name_content = "string";
+                    content.append(name_content);
+
+                    // 置为false，表示不是命名域
+                    is_lua_namespace = false;
+                    continue;
                 }
 
-                String name_content = dotId.getPropertyValueDotIdName().getIdContent().getText();
-                // 因为lua中自带的string模块名和关键字string一样，所以把lua自动的改成String（大些开头）
-                // 然后再翻译的时候，把String改成string
-                if (is_lua_namespace && name_content.equals("String"))
-                    name_content = "string";
-                content.append(name_content);
-
-                // 置为false，表示不是命名域
-                is_lua_namespace = false;
-                continue;
-            }
-
-            ALittlePropertyValueBrackValueStat brackValue_stat = suffix.getPropertyValueBrackValueStat();
-            if (brackValue_stat != null) {
-                ALittleValueStat value_stat = brackValue_stat.getValueStat();
-                content.append("[").append(GenerateValueStat(value_stat)).append("]");
-                continue;
-            }
-
-            ALittlePropertyValueMethodCallStat methodCall_stat = suffix.getPropertyValueMethodCallStat();
-            if (methodCall_stat != null) {
-                List<ALittleValueStat> value_stat_list = methodCall_stat.getValueStatList();
-                List<String> param_list = new ArrayList<>();
-                for (ALittleValueStat value_stat : value_stat_list) {
-                    param_list.add(GenerateValueStat(value_stat));
+                ALittlePropertyValueBracketValue bracketValue = suffix.getPropertyValueBracketValue();
+                if (bracketValue != null) {
+                    ALittleValueStat value_stat = bracketValue.getValueStat();
+                    if (value_stat != null) {
+                        content.append("[").append(GenerateValueStat(value_stat)).append("]");
+                    }
+                    continue;
                 }
-                content.append("(").append(String.join(", ", param_list)).append(")");
-                continue;
+
+                ALittlePropertyValueMethodCall methodCall = suffix.getPropertyValueMethodCall();
+                if (methodCall != null) {
+                    List<ALittleValueStat> value_stat_list = methodCall.getValueStatList();
+                    List<String> param_list = new ArrayList<>();
+                    for (ALittleValueStat value_stat : value_stat_list) {
+                        param_list.add(GenerateValueStat(value_stat));
+                    }
+                    content.append("(").append(String.join(", ", param_list)).append(")");
+                    continue;
+                }
+
+                throw new Exception("GeneratePropertyValue出现未知类型");
             }
 
-            throw new Exception("GeneratePropertyValue出现未知类型");
+            return content.toString();
+        } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+            throw new Exception(e.getError());
         }
-
-        return content.toString();
     }
 
     @NotNull
@@ -973,29 +890,29 @@ public class ALittleGenerateLua {
         }
         ALittleOp1 op_1 = root.getOp1();
 
-        String value_stat_result = GenerateValueStat(value_stat);
+        String valueStatResult = GenerateValueStat(value_stat);
 
         String op_1_string = op_1.getText();
         if (op_1_string.equals("++"))
-            return pre_tab + value_stat_result + " = " + value_stat_result + " + 1\n";
+            return pre_tab + valueStatResult + " = " + valueStatResult + " + 1\n";
 
         if (op_1_string.equals("--"))
-            return pre_tab + value_stat_result + " = " + value_stat_result + " - 1\n";
+            return pre_tab + valueStatResult + " = " + valueStatResult + " - 1\n";
 
         throw new Exception("GenerateOp1Expr未知类型:" + op_1_string);
     }
 
     @NotNull
-    private String GenerateVarAssignExpr(ALittleVarAssignExpr root, String pre_tab) throws Exception {
-        List<ALittleVarAssignPairDec> pair_decList = root.getVarAssignPairDecList();
+    private String GenerateVarAssignExpr(ALittleVarAssignExpr root, String pre_tab, String preString) throws Exception {
+        List<ALittleVarAssignDec> pair_decList = root.getVarAssignDecList();
         if (pair_decList.isEmpty()) {
             throw new Exception("局部变量没有变量名:" + root.getText());
         }
 
-        String content = pre_tab + "local ";
+        String content = pre_tab + preString;
 
         List<String> name_list = new ArrayList<>();
-        for (ALittleVarAssignPairDec pair_dec : pair_decList) {
+        for (ALittleVarAssignDec pair_dec : pair_decList) {
             name_list.add(pair_dec.getVarAssignNameDec().getIdContent().getText());
         }
         content += String.join(", ", name_list);
@@ -1009,9 +926,9 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateOpAssignExpr(ALittleOpAssignExpr root, String pre_tab) throws Exception {
-        List<ALittlePropertyValue> prop_value_list = root.getPropertyValueList();
+        List<ALittlePropertyValue> propValueList = root.getPropertyValueList();
         List<String> content_list = new ArrayList<>();
-        for (ALittlePropertyValue prop_value : prop_value_list) {
+        for (ALittlePropertyValue prop_value : propValueList) {
             content_list.add(GeneratePropertyValue(prop_value));
         }
 
@@ -1022,37 +939,39 @@ public class ALittleGenerateLua {
         if (op_assign == null || value_stat == null)
             return pre_tab + prop_value_result + "\n";
 
-        String value_stat_result = GenerateValueStat(value_stat);
+        String valueStatResult = GenerateValueStat(value_stat);
 
         if (op_assign.getText().equals("=")) {
             // 这里做优化
             // 把 self._attr = value 优化为  rawset(self, "_attr", value)
-            if (m_open_rawset && prop_value_list.size() == 1) {
-                ALittlePropertyValue prop_value = prop_value_list.get(0);
-                ALittlePropertyValueThisType this_type = prop_value.getPropertyValueThisType();
+            if (mOpenRawSet && propValueList.size() == 1) {
+                ALittlePropertyValue prop_value = propValueList.get(0);
+                ALittlePropertyValueThisType this_type = prop_value.getPropertyValueFirstType().getPropertyValueThisType();
                 if (this_type != null && prop_value.getPropertyValueSuffixList().size() == 1) {
                     ALittlePropertyValueSuffix suffix = prop_value.getPropertyValueSuffixList().get(0);
                     if (suffix.getPropertyValueDotId() != null) {
                         ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
-                        String attr_name = dotId.getPropertyValueDotIdName().getText();
-                        PsiElement this_element = this_type.guessType();
-                        if (this_element instanceof ALittleClassDec) {
-                            List<ALittleClassVarNameDec> var_name_list = new ArrayList<>();
-                            ALittleUtil.findClassVarNameDecList(this_element.getProject()
-                                    , ALittleUtil.getNamespaceName((ALittleFile) this_element.getContainingFile())
-                                    , (ALittleClassDec) this_element
-                                    , attr_name
-                                    , var_name_list, 100);
-                            if (!var_name_list.isEmpty()) {
-                                ++m_rawset_use_count;
-                                return pre_tab + "___rawset(self, \"" + attr_name + "\", " + value_stat_result + ")\n";
+                        if (dotId != null && dotId.getIdContent() != null) {
+                            String attrName = dotId.getIdContent().getText();
+                            ALittleReferenceUtil.GuessTypeInfo thisGuessType = this_type.guessType();
+                            if (thisGuessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+                                List<ALittleClassVarDec> varNameList = new ArrayList<>();
+                                ALittleUtil.findClassVarNameDecList(thisGuessType.element.getProject()
+                                        , ALittleUtil.getNamespaceName((ALittleFile) thisGuessType.element.getContainingFile())
+                                        , (ALittleClassDec) thisGuessType.element
+                                        , attrName
+                                        , varNameList, 100);
+                                if (!varNameList.isEmpty()) {
+                                    ++mRawsetUseCount;
+                                    return pre_tab + "___rawset(self, \"" + attrName + "\", " + valueStatResult + ")\n";
+                                }
                             }
                         }
                     }
                 }
             }
 
-            return pre_tab + prop_value_result + " = " + value_stat_result + "\n";
+            return pre_tab + prop_value_result + " = " + valueStatResult + "\n";
         }
 
         String op_assign_string = op_assign.getText();
@@ -1069,7 +988,7 @@ public class ALittleGenerateLua {
             case "/=":
             case "%=":
                 String op_string = op_assign_string.substring(0, 1);
-                content = pre_tab + prop_value_result + " = " + prop_value_result + " " + op_string + " (" + value_stat_result + ")\n";
+                content = pre_tab + prop_value_result + " = " + prop_value_result + " " + op_string + " (" + valueStatResult + ")\n";
                 break;
             default:
                 throw new Exception("未知的赋值操作类型:" + op_assign_string);
@@ -1094,12 +1013,12 @@ public class ALittleGenerateLua {
         if (value_stat == null) {
             throw new Exception("elseif (?) elseif没有条件值:" + root.getText());
         }
-        String value_stat_result = GenerateValueStat(value_stat);
+        String valueStatResult = GenerateValueStat(value_stat);
 
         StringBuilder content = new StringBuilder(pre_tab);
         content.append("elseif")
                 .append(" ")
-                .append(value_stat_result)
+                .append(valueStatResult)
                 .append(" then\n");
 
         List<ALittleAllExpr> all_expr_list = root.getAllExprList();
@@ -1115,12 +1034,12 @@ public class ALittleGenerateLua {
         if (value_stat == null) {
             throw new Exception("if (?) if没有条件值:" + root.getText());
         }
-        String value_stat_result = GenerateValueStat(value_stat);
+        String valueStatResult = GenerateValueStat(value_stat);
 
         StringBuilder content = new StringBuilder(pre_tab);
         content.append("if")
                 .append(" ")
-                .append(value_stat_result)
+                .append(valueStatResult)
                 .append(" then\n");
 
         List<ALittleAllExpr> all_expr_list = root.getAllExprList();
@@ -1156,18 +1075,18 @@ public class ALittleGenerateLua {
             if (start_value_stat == null) {
                 throw new Exception("for 没有初始表达式:" + root.getText());
             }
-            String start_value_stat_result = GenerateValueStat(start_value_stat);
+            String start_valueStatResult = GenerateValueStat(start_value_stat);
 
-            ALittleVarAssignNameDec name_dec = for_start_stat.getForPairDec().getVarAssignNameDec();
-            if (name_dec == null) {
+            ALittleVarAssignNameDec nameDec = for_start_stat.getForPairDec().getVarAssignNameDec();
+            if (nameDec == null) {
                 throw new Exception("for 初始表达式没有变量名:" + root.getText());
             }
-            String start_var_name = name_dec.getText();
+            String start_var_name = nameDec.getText();
 
             content.append("for ")
                     .append(start_var_name)
                     .append(" = ")
-                    .append(start_value_stat_result)
+                    .append(start_valueStatResult)
                     .append(", ");
 
             ALittleForEndStat for_end_stat = for_step_condition.getForEndStat();
@@ -1186,18 +1105,18 @@ public class ALittleGenerateLua {
                 throw new Exception("for in 没有遍历的对象:" + root.getText());
             }
 
-            String value_stat_result = GenerateValueStat(value_stat);
+            String valueStatResult = GenerateValueStat(value_stat);
 
             List<ALittleForPairDec> pair_list = for_in_condition.getForPairDecList();
             List<String> pair_string_list = new ArrayList<>();
             for (ALittleForPairDec pair : pair_list) {
-                ALittleVarAssignNameDec name_dec = pair.getVarAssignNameDec();
-                if (name_dec == null)
+                ALittleVarAssignNameDec nameDec = pair.getVarAssignNameDec();
+                if (nameDec == null)
                     throw new Exception("for in 没有变量名");
-                pair_string_list.add(name_dec.getText());
+                pair_string_list.add(nameDec.getText());
             }
 
-            String pair_type = ALittleUtil.CalcPairsType(value_stat);
+            String pair_type = ALittleReferenceUtil.CalcPairsType(value_stat);
             if (pair_type == null) {
                 throw new Exception("for in 的遍历对象表达式错误:" + root.getText());
             }
@@ -1207,7 +1126,7 @@ public class ALittleGenerateLua {
                 content.append("for ")
                         .append(String.join(", ", pair_string_list))
                         .append(" in ")
-                        .append(value_stat_result)
+                        .append(valueStatResult)
                         .append(" do\n");
             } else {
                 content.append("for ")
@@ -1215,7 +1134,7 @@ public class ALittleGenerateLua {
                         .append(" in ")
                         .append(pair_type)
                         .append("(")
-                        .append(value_stat_result)
+                        .append(valueStatResult)
                         .append(") do\n");
             }
         } else {
@@ -1237,9 +1156,9 @@ public class ALittleGenerateLua {
         if (value_stat == null) {
             throw new Exception("while (?) { ... } while中没有条件值");
         }
-        String value_stat_result = GenerateValueStat(value_stat);
+        String valueStatResult = GenerateValueStat(value_stat);
 
-        StringBuilder content = new StringBuilder(pre_tab + "while " + value_stat_result + " do\n");
+        StringBuilder content = new StringBuilder(pre_tab + "while " + valueStatResult + " do\n");
         List<ALittleAllExpr> all_expr_list = root.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
             String result = GenerateAllExpr(all_expr, pre_tab + "\t");
@@ -1256,7 +1175,7 @@ public class ALittleGenerateLua {
         if (value_stat == null) {
             throw new Exception("do { ... } while(?) while中没有条件值");
         }
-        String value_stat_result = GenerateValueStat(value_stat);
+        String valueStatResult = GenerateValueStat(value_stat);
 
         StringBuilder content = new StringBuilder(pre_tab + "repeat\n");
         List<ALittleAllExpr> all_expr_list = root_expr.getAllExprList();
@@ -1267,7 +1186,7 @@ public class ALittleGenerateLua {
         }
         content.append(pre_tab)
                 .append("until not(")
-                .append(value_stat_result)
+                .append(valueStatResult)
                 .append(")\n");
 
         return content.toString();
@@ -1289,7 +1208,7 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateReturnExpr(ALittleReturnExpr root_expr, String pre_tab) throws Exception {
-        if (root_expr.getCoroutineYield() != null) {
+        if (root_expr.getReturnYield() != null) {
             return pre_tab + "return ___coroutine.yield()\n";
         }
 
@@ -1298,11 +1217,11 @@ public class ALittleGenerateLua {
         for (ALittleValueStat value_stat : value_stat_list) {
             content_list.add(GenerateValueStat(value_stat));
         }
-        String value_stat_result = "";
+        String valueStatResult = "";
         if (!content_list.isEmpty())
-            value_stat_result = " " + String.join(", ", content_list);
+            valueStatResult = " " + String.join(", ", content_list);
 
-        return pre_tab + "return" + value_stat_result + "\n";
+        return pre_tab + "return" + valueStatResult + "\n";
     }
 
     @NotNull
@@ -1335,7 +1254,7 @@ public class ALittleGenerateLua {
             } else if (child instanceof ALittleOpAssignExpr) {
                 expr_list.add(GenerateOpAssignExpr((ALittleOpAssignExpr)child, pre_tab));
             } else if (child instanceof ALittleVarAssignExpr) {
-                expr_list.add(GenerateVarAssignExpr((ALittleVarAssignExpr)child, pre_tab));
+                expr_list.add(GenerateVarAssignExpr((ALittleVarAssignExpr)child, pre_tab, "local "));
             } else if (child instanceof ALittleOp1Expr) {
                 expr_list.add(GenerateOp1Expr((ALittleOp1Expr)child, pre_tab));
             } else if (child instanceof ALittleWrapExpr) {
@@ -1350,48 +1269,42 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateEnum(ALittleEnumDec root, String pre_tab) throws Exception {
-        // 如果带有协议标志的，那么就不生成
-        if (root.getEnumProtocolDec() != null) return "";
-
-        ALittleEnumNameDec name_dec = root.getEnumNameDec();
-        if (name_dec == null)
-            throw new Exception(root.getText() + "没有定义枚举名");
+        ALittleEnumNameDec nameDec = root.getEnumNameDec();
+        if (nameDec == null) throw new Exception(root.getText() + "没有定义枚举名");
 
         StringBuilder content = new StringBuilder();
         content.append(pre_tab)
-                .append(name_dec.getIdContent().getText())
+                .append(nameDec.getIdContent().getText())
                 .append(" = {\n");
 
-        List<ALittleEnumVarDec> var_decList = root.getEnumVarDecList();
-        int enum_value = -1;
-        String enum_string = "-1";
-        for (ALittleEnumVarDec var_dec : var_decList) {
-            ALittleEnumVarNameDec var_name_dec = var_dec.getEnumVarNameDec();
-            ALittleEnumVarValueDec var_value_dec = var_dec.getEnumVarValueDec();
-            if (var_value_dec == null) {
-                ++ enum_value;
-                enum_string = "" + enum_value;
-            } else {
-                if (var_value_dec.getDigitContent() != null) {
-                    String value = var_value_dec.getDigitContent().getText();
-                    if (!ALittleUtil.isInt(value)) {
-                        throw new Exception(var_name_dec.getIdContent().getText() + "对应的枚举值必须是整数");
-                    }
-                    String number_content = var_value_dec.getText();
-                    if (number_content.startsWith("0x"))
-                        enum_value = Integer.parseInt(number_content.substring(2), 16);
-                    else
-                        enum_value = Integer.parseInt(number_content);
-                    enum_string = number_content;
-                } else if (var_value_dec.getStringContent() != null) {
-                    enum_string = var_value_dec.getStringContent().getText();
+        int enumValue = -1;
+        String enumString = "-1";
+
+        List<ALittleEnumVarDec> varDecList = root.getEnumVarDecList();
+        for (ALittleEnumVarDec varDec : varDecList) {
+            if (varDec.getDigitContent() != null) {
+                String value = varDec.getDigitContent().getText();
+                if (!ALittleUtil.isInt(value)) {
+                    throw new Exception(varDec.getIdContent().getText() + "对应的枚举值必须是整数");
                 }
+                String number_content = varDec.getText();
+                if (number_content.startsWith("0x"))
+                    enumValue = Integer.parseInt(number_content.substring(2), 16);
+                else
+                    enumValue = Integer.parseInt(number_content);
+                enumString = number_content;
+            } else if (varDec.getStringContent() != null) {
+                enumString = varDec.getStringContent().getText();
+            } else {
+                ++ enumValue;
+                enumString = "" + enumValue;
             }
+            
             content.append(pre_tab)
                     .append("\t")
-                    .append(var_name_dec.getIdContent().getText())
+                    .append(varDec.getIdContent().getText())
                     .append(" = ")
-                    .append(enum_string)
+                    .append(enumString)
                     .append(",\n");
         }
 
@@ -1402,26 +1315,27 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateClass(ALittleClassDec root, String pre_tab) throws Exception {
-        ALittleClassNameDec name_dec = root.getClassNameDec();
-        if (name_dec == null) {
+        ALittleClassNameDec nameDec = root.getClassNameDec();
+        if (nameDec == null) {
             throw new Exception("类没有定义类名");
         }
 
         //类声明//////////////////////////////////////////////////////////////////////////////////////////
-        String class_name = name_dec.getIdContent().getText();
+        String class_name = nameDec.getIdContent().getText();
         StringBuilder content = new StringBuilder(pre_tab + class_name);
 
         String namespace_pre = "ALittle.";
-        if (m_namespace_name.equals("ALittle")) namespace_pre = "";
+        if (mNamespaceName.equals("ALittle")) namespace_pre = "";
 
-        ALittleClassExtendsNameDec extends_name_dec = root.getClassExtendsNameDec();
-        ALittleClassExtendsNamespaceNameDec extends_namespace_name_dec = root.getClassExtendsNamespaceNameDec();
+        ALittleClassExtendsDec extendsDec = root.getClassExtendsDec();
         String extends_name = "";
-        if (extends_namespace_name_dec != null) {
-            extends_name += extends_namespace_name_dec.getText() + ".";
-        }
-        if (extends_name_dec != null) {
-            extends_name += extends_name_dec.getText();
+        if (extendsDec != null) {
+            if (extendsDec.getNamespaceNameDec() != null) {
+                extends_name += extendsDec.getNamespaceNameDec().getText() + ".";
+            }
+            if (extendsDec.getClassNameDec() != null) {
+                extends_name += extendsDec.getClassNameDec().getText();
+            }
         }
         if (extends_name.equals("")) {
             extends_name = "nil";
@@ -1430,35 +1344,35 @@ public class ALittleGenerateLua {
         content.append(" = ").append(namespace_pre).append("Class(").append(extends_name).append(", \"").append(class_name).append("\")\n\n");
 
         //构建构造函数//////////////////////////////////////////////////////////////////////////////////////////
-        String ctor_param_list = "";
-        List<ALittleClassCtorDec> ctor_decList = root.getClassCtorDecList();
-        if (ctor_decList.size() > 1) {
+        String ctorParamList = "";
+        List<ALittleClassCtorDec> ctorDecList = root.getClassCtorDecList();
+        if (ctorDecList.size() > 1) {
             throw new Exception("class " + class_name + " 最多只能有一个构造函数");
         }
-        if (ctor_decList.size() > 0) {
-            ALittleClassCtorDec ctor_dec = ctor_decList.get(0);
+        if (ctorDecList.size() > 0) {
+            ALittleClassCtorDec ctorDec = ctorDecList.get(0);
             List<String> param_name_list = new ArrayList<>();
 
-            ALittleMethodParamDec param_dec = ctor_dec.getMethodParamDec();
+            ALittleMethodParamDec param_dec = ctorDec.getMethodParamDec();
             if (param_dec != null) {
                 List<ALittleMethodParamOneDec> param_one_decList = param_dec.getMethodParamOneDecList();
                 for (ALittleMethodParamOneDec param_one_dec : param_one_decList) {
-                    ALittleMethodParamNameDec param_name_dec = param_one_dec.getMethodParamNameDec();
-                    if (param_name_dec == null) {
+                    ALittleMethodParamNameDec param_nameDec = param_one_dec.getMethodParamNameDec();
+                    if (param_nameDec == null) {
                         throw new Exception("class " + class_name + " 的构造函数没有参数名");
                     }
-                    param_name_list.add(param_name_dec.getIdContent().getText());
+                    param_name_list.add(param_nameDec.getIdContent().getText());
                 }
             }
-            ctor_param_list = String.join(", ", param_name_list);
+            ctorParamList = String.join(", ", param_name_list);
             content.append(pre_tab)
                     .append("function ")
                     .append(class_name)
-                    .append(":Ctor(").append(ctor_param_list).append(")\n");
+                    .append(":Ctor(").append(ctorParamList).append(")\n");
 
-            m_open_rawset = true;
+            mOpenRawSet = true;
 
-            ALittleMethodBodyDec body_dec = ctor_dec.getMethodBodyDec();
+            ALittleMethodBodyDec body_dec = ctorDec.getMethodBodyDec();
             StringBuilder all_expr_content = new StringBuilder();
             if (body_dec != null) {
                 List<ALittleAllExpr> all_expr_list = body_dec.getAllExprList();
@@ -1467,7 +1381,7 @@ public class ALittleGenerateLua {
                 }
             }
 
-            m_open_rawset = false;
+            mOpenRawSet = false;
 
             content.append(all_expr_content);
             content.append(pre_tab).append("end\n");
@@ -1477,15 +1391,15 @@ public class ALittleGenerateLua {
         //构建getter函数///////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassGetterDec> class_getter_decList = root.getClassGetterDecList();
         for (ALittleClassGetterDec class_getter_dec : class_getter_decList) {
-            ALittleMethodNameDec class_method_name_dec = class_getter_dec.getMethodNameDec();
-            if (class_method_name_dec == null) {
+            ALittleMethodNameDec class_method_nameDec = class_getter_dec.getMethodNameDec();
+            if (class_method_nameDec == null) {
                 throw new Exception("class " + class_name + " getter函数没有函数名");
             }
             content.append(pre_tab)
                     .append("function ")
                     .append(class_name)
                     .append(".__getter:")
-                    .append(class_method_name_dec.getIdContent().getText())
+                    .append(class_method_nameDec.getIdContent().getText())
                     .append("()\n");
 
             ALittleMethodBodyDec class_method_body_dec = class_getter_dec.getMethodBodyDec();
@@ -1503,25 +1417,25 @@ public class ALittleGenerateLua {
         //构建setter函数///////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassSetterDec> class_setter_decList = root.getClassSetterDecList();
         for (ALittleClassSetterDec class_setter_dec : class_setter_decList) {
-            ALittleMethodNameDec class_method_name_dec = class_setter_dec.getMethodNameDec();
-            if (class_method_name_dec == null) {
+            ALittleMethodNameDec class_method_nameDec = class_setter_dec.getMethodNameDec();
+            if (class_method_nameDec == null) {
                 throw new Exception("class " + class_name + " setter函数没有函数名");
             }
             ALittleMethodParamOneDec param_dec = class_setter_dec.getMethodParamOneDec();
             if (param_dec == null) {
                 throw new Exception("class " + class_name + " setter函数必须要有一个参数");
             }
-            ALittleMethodParamNameDec param_name_dec = param_dec.getMethodParamNameDec();
-            if (param_name_dec == null) {
+            ALittleMethodParamNameDec param_nameDec = param_dec.getMethodParamNameDec();
+            if (param_nameDec == null) {
                 throw new Exception("class " + class_name + " 函数没有定义函数名");
             }
             content.append(pre_tab)
                     .append("function ")
                     .append(class_name)
                     .append(".__setter:")
-                    .append(class_method_name_dec.getIdContent().getText())
+                    .append(class_method_nameDec.getIdContent().getText())
                     .append("(")
-                    .append(param_name_dec.getIdContent().getText())
+                    .append(param_nameDec.getIdContent().getText())
                     .append(")\n");
 
             ALittleMethodBodyDec class_method_body_dec = class_setter_dec.getMethodBodyDec();
@@ -1539,8 +1453,8 @@ public class ALittleGenerateLua {
         //构建成员函数//////////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassMethodDec> class_method_decList = root.getClassMethodDecList();
         for (ALittleClassMethodDec class_method_dec : class_method_decList) {
-            ALittleMethodNameDec class_method_name_dec = class_method_dec.getMethodNameDec();
-            if (class_method_name_dec == null) {
+            ALittleMethodNameDec class_method_nameDec = class_method_dec.getMethodNameDec();
+            if (class_method_nameDec == null) {
                 throw new Exception("class " + class_name + " 成员函数没有函数名");
             }
 
@@ -1549,11 +1463,11 @@ public class ALittleGenerateLua {
             if (param_dec != null) {
                 List<ALittleMethodParamOneDec> param_one_decList = param_dec.getMethodParamOneDecList();
                 for (ALittleMethodParamOneDec param_one_dec : param_one_decList) {
-                    ALittleMethodParamNameDec param_name_dec = param_one_dec.getMethodParamNameDec();
-                    if (param_name_dec == null) {
+                    ALittleMethodParamNameDec param_nameDec = param_one_dec.getMethodParamNameDec();
+                    if (param_nameDec == null) {
                         throw new Exception("class " + class_name + " 成员函数没有参数名");
                     }
-                    param_name_list.add(param_name_dec.getIdContent().getText());
+                    param_name_list.add(param_nameDec.getIdContent().getText());
                 }
             }
             String method_param_list = String.join(", ", param_name_list);
@@ -1561,7 +1475,7 @@ public class ALittleGenerateLua {
                     .append("function ")
                     .append(class_name)
                     .append(":")
-                    .append(class_method_name_dec.getText())
+                    .append(class_method_nameDec.getText())
                     .append("(")
                     .append(method_param_list)
                     .append(")\n");
@@ -1576,11 +1490,11 @@ public class ALittleGenerateLua {
             }
             content.append(pre_tab).append("end\n");
 
-            if (class_method_dec.getCoroutineModifier() != null && class_method_dec.getCoroutineModifier().getText().equals("async")) {
+            if (class_method_dec.getCoModifier() != null && class_method_dec.getCoModifier().getText().equals("async")) {
                 content.append(pre_tab)
-                        .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
+                        .append(class_name).append(".").append(class_method_nameDec.getIdContent().getText())
                         .append(" = ").append(namespace_pre).append("CoWrap(")
-                        .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
+                        .append(class_name).append(".").append(class_method_nameDec.getIdContent().getText())
                         .append(")\n");
             }
 
@@ -1589,8 +1503,8 @@ public class ALittleGenerateLua {
         //构建静态函数//////////////////////////////////////////////////////////////////////////////////////////
         List<ALittleClassStaticDec> class_static_decList = root.getClassStaticDecList();
         for (ALittleClassStaticDec class_static_dec : class_static_decList) {
-            ALittleMethodNameDec class_method_name_dec = class_static_dec.getMethodNameDec();
-            if (class_method_name_dec == null) {
+            ALittleMethodNameDec class_method_nameDec = class_static_dec.getMethodNameDec();
+            if (class_method_nameDec == null) {
                 throw new Exception("class " + class_name + " 静态函数没有函数名");
             }
             List<String> param_name_list = new ArrayList<>();
@@ -1598,11 +1512,11 @@ public class ALittleGenerateLua {
             if (param_dec != null) {
                 List<ALittleMethodParamOneDec> param_one_decList = param_dec.getMethodParamOneDecList();
                 for (ALittleMethodParamOneDec param_one_dec : param_one_decList) {
-                    ALittleMethodParamNameDec param_name_dec = param_one_dec.getMethodParamNameDec();
-                    if (param_name_dec == null) {
+                    ALittleMethodParamNameDec param_nameDec = param_one_dec.getMethodParamNameDec();
+                    if (param_nameDec == null) {
                         throw new Exception("class " + class_name + " 静态函数没有参数名");
                     }
-                    param_name_list.add(param_name_dec.getIdContent().getText());
+                    param_name_list.add(param_nameDec.getIdContent().getText());
                 }
             }
 
@@ -1611,7 +1525,7 @@ public class ALittleGenerateLua {
                     .append("function ")
                     .append(class_name)
                     .append(".")
-                    .append(class_method_name_dec.getText())
+                    .append(class_method_nameDec.getText())
                     .append("(")
                     .append(method_param_list)
                     .append(")\n");
@@ -1626,11 +1540,11 @@ public class ALittleGenerateLua {
             }
             content.append(pre_tab).append("end\n");
 
-            if (class_static_dec.getCoroutineModifier() != null && class_static_dec.getCoroutineModifier().getText().equals("async")) {
+            if (class_static_dec.getCoModifier() != null && class_static_dec.getCoModifier().getText().equals("async")) {
                 content.append(pre_tab)
-                        .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
+                        .append(class_name).append(".").append(class_method_nameDec.getIdContent().getText())
                         .append(" = ").append(namespace_pre).append("CoWrap(")
-                        .append(class_name).append(".").append(class_method_name_dec.getIdContent().getText())
+                        .append(class_name).append(".").append(class_method_nameDec.getIdContent().getText())
                         .append(")\n");
             }
             content.append("\n");
@@ -1642,57 +1556,36 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateInstance(ALittleInstanceDec root, String pre_tab) throws Exception {
-        ALittleInstanceNameDec name_dec = root.getInstanceNameDec();
-        if (name_dec == null) {
-            throw new Exception("单例没有定义名称");
+        String globalPreString = "";
+        ALittleAccessModifier access_modifier_dec = root.getAccessModifier();
+        if (access_modifier_dec != null && access_modifier_dec.getText().equals("public")) {
+            globalPreString = "_G.";
         }
-
-        StringBuilder content = new StringBuilder();
-
-        ALittleInstanceClassNameDec class_name_dec = root.getInstanceClassNameDec();
-        if (class_name_dec != null) {
-            content.append(pre_tab);
-
-            ALittleAccessModifier access_modifier_dec = root.getAccessModifier();
-            if (access_modifier_dec != null && access_modifier_dec.getText().equals("public")) {
-                content.append("_G.");
-            }
-
-            content.append(name_dec.getIdContent().getText()).append(" = ");
-            content.append(class_name_dec.getIdContent().getText()).append("(");
-            List<String> param_list = new ArrayList<>();
-            List<ALittleValueStat> value_stat_list = root.getValueStatList();
-            for (ALittleValueStat value_stat_dec : value_stat_list) {
-                param_list.add(GenerateValueStat(value_stat_dec));
-            }
-            content.append(String.join(", ", param_list));
-            content.append(")\n");
-        }
-        return content.toString();
+        return GenerateVarAssignExpr(root.getVarAssignExpr(), pre_tab, globalPreString);
     }
 
     @NotNull
     private String GenerateGlobalMethod(ALittleGlobalMethodDec root, String pre_tab) throws Exception {
-        ALittleMethodNameDec global_method_name_dec = root.getMethodNameDec();
-        if (global_method_name_dec == null) {
+        ALittleMethodNameDec global_method_nameDec = root.getMethodNameDec();
+        if (global_method_nameDec == null) {
             throw new Exception("全局函数没有函数名");
         }
 
         String namespace_pre = "ALittle.";
-        if (m_namespace_name.equals("ALittle")) namespace_pre = "";
+        if (mNamespaceName.equals("ALittle")) namespace_pre = "";
 
-        String method_name = global_method_name_dec.getIdContent().getText();
+        String method_name = global_method_nameDec.getIdContent().getText();
 
         List<String> param_name_list = new ArrayList<>();
         ALittleMethodParamDec param_dec = root.getMethodParamDec();
         if (param_dec != null) {
             List<ALittleMethodParamOneDec> param_one_decList = param_dec.getMethodParamOneDecList();
             for (ALittleMethodParamOneDec param_one_dec : param_one_decList) {
-                ALittleMethodParamNameDec param_name_dec = param_one_dec.getMethodParamNameDec();
-                if (param_name_dec == null) {
+                ALittleMethodParamNameDec param_nameDec = param_one_dec.getMethodParamNameDec();
+                if (param_nameDec == null) {
                     throw new Exception("全局函数" + method_name + "没有参数名");
                 }
-                param_name_list.add(param_name_dec.getIdContent().getText());
+                param_name_list.add(param_nameDec.getIdContent().getText());
             }
         }
 
@@ -1716,7 +1609,7 @@ public class ALittleGenerateLua {
         content.append(pre_tab).append("end\n");
 
         // 协程判定
-        if (root.getCoroutineModifier() != null && root.getCoroutineModifier().getText().equals("async")) {
+        if (root.getCoModifier() != null && root.getCoModifier().getText().equals("async")) {
             content.append(pre_tab).append(method_name)
                     .append(" = ").append(namespace_pre).append("CoWrap(")
                     .append(method_name).append(")\n");
@@ -1729,64 +1622,46 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateNamespace(ALittleNamespaceDec root) throws Exception {
-        ALittleNamespaceNameDec name_dec = root.getNamespaceNameDec();
-        if (name_dec == null) {
+        ALittleNamespaceNameDec nameDec = root.getNamespaceNameDec();
+        if (nameDec == null) {
             throw new Exception("命名域没有定义名字");
         }
-        m_namespace_name = name_dec.getIdContent().getText();
+        mNamespaceName = nameDec.getIdContent().getText();
 
-        StringBuilder content = null;
-        if (m_namespace_name.equals("lua"))
+        StringBuilder content;
+        if (mNamespaceName.equals("lua"))
             content = new StringBuilder("\n");
         else
-            content = new StringBuilder("\nmodule(\"" + m_namespace_name + "\", package.seeall)\n\n");
+            content = new StringBuilder("\nmodule(\"" + mNamespaceName + "\", package.seeall)\n\n");
 
-        StringBuilder other_content = new StringBuilder();
+        StringBuilder otherContent = new StringBuilder();
         PsiElement[] child_list = root.getChildren();
         for (PsiElement child : child_list) {
             // 处理结构体
             if (child instanceof ALittleStructDec) {
-                {
-                    String result = ALittleUtil.GenerateStructForJsonProto((ALittleStructDec) child, "");
-                    if (!result.isEmpty())
-                        m_json_list.add(result);
-                }
-                {
-                    String result = ALittleUtil.GenerateStructForCPPProto((ALittleStructDec) child, m_class_list, "");
-                    if (!result.isEmpty()) {
-                        m_cpp_list.add(result);
-                    }
-                }
             // 处理enum
             } else if (child instanceof ALittleEnumDec) {
-                {
-                    String result = ALittleUtil.GenerateEnumForCPPProto((ALittleEnumDec) child, "");
-                    if (!result.isEmpty()) {
-                        m_cpp_list.add(result);
-                    }
-                }
-
-                other_content.append(GenerateEnum((ALittleEnumDec) child, ""));
+                otherContent.append(GenerateEnum((ALittleEnumDec) child, ""));
             // 处理class
             } else if (child instanceof ALittleClassDec) {
-                other_content.append(GenerateClass((ALittleClassDec) child, ""));
+                otherContent.append(GenerateClass((ALittleClassDec) child, ""));
             // 处理instance
             } else if (child instanceof ALittleInstanceDec) {
-                other_content.append(GenerateInstance((ALittleInstanceDec)child, ""));
+                otherContent.append(GenerateInstance((ALittleInstanceDec)child, ""));
             // 处理全局函数
             } else if (child instanceof ALittleGlobalMethodDec) {
-                other_content.append(GenerateGlobalMethod((ALittleGlobalMethodDec)child, ""));
+                otherContent.append(GenerateGlobalMethod((ALittleGlobalMethodDec)child, ""));
             }
         }
 
-        if (m_rawset_use_count > 0)
+        if (mRawsetUseCount > 0)
             content.append("local ___rawset = rawset\n");
         content.append("local ___pairs = pairs\n");
         content.append("local ___ipairs = ipairs\n");
         content.append("local ___coroutine = coroutine\n");
         content.append("\n");
 
-        content.append(other_content);
+        content.append(otherContent);
 
         return content.toString();
     }

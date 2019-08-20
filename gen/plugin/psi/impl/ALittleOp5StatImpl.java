@@ -64,9 +64,4 @@ public class ALittleOp5StatImpl extends ASTWrapperPsiElement implements ALittleO
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

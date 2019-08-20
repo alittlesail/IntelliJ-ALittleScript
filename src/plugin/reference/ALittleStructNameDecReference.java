@@ -60,4 +60,17 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
         }
         return variants.toArray();
     }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        if (myElement.getText().startsWith("___")) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "结构体名不能以3个下划线开头");
+        }
+
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+        } else if (guessList.size() != 1) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+        }
+    }
 }

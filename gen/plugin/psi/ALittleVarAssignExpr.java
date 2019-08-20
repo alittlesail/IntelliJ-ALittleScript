@@ -24,6 +24,4 @@ public interface ALittleVarAssignExpr extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

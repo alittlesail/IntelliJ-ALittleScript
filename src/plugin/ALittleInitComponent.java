@@ -73,15 +73,15 @@ public class ALittleInitComponent implements BaseComponent {
                     @Override
                     public void projectOpened(@NotNull Project project) {
                         ALittleTreeChangeListener listener = new ALittleTreeChangeListener(project);
-                        ALittleTreeChangeListener.s_map.put(project, listener);
+                        ALittleTreeChangeListener.sMap.put(project, listener);
                     }
 
                     @Override
                     public void projectClosed(@NotNull Project project) {
-                        ALittleTreeChangeListener listener = ALittleTreeChangeListener.s_map.get(project);
+                        ALittleTreeChangeListener listener = ALittleTreeChangeListener.sMap.get(project);
                         if (listener == null) return;
                         PsiManager.getInstance(project).removePsiTreeChangeListener(listener);
-                        ALittleTreeChangeListener.s_map.remove(project);
+                        ALittleTreeChangeListener.sMap.remove(project);
                     }
 
                     @Override

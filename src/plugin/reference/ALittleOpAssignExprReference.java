@@ -38,38 +38,6 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
                 throw new ALittleReferenceUtil.ALittleReferenceException(value_stat, "调用的函数返回值数量少于定义的变量数量");
             }
 
-            ALittleReferenceUtil.GuessTypeInfo guessType = methodCallGuessList.get(0);
-            // 检查这个函数是不是await
-            if (guessType.callAwait) {
-                // 检查这次所在的函数必须要有await或者async修饰
-                PsiElement parent = myElement;
-                while (parent != null) {
-                    if (parent instanceof ALittleClassCtorDec) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "构造函数内不能调用带有await的函数");
-                    } else if (parent instanceof ALittleClassGetterDec) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "getter函数内不能调用带有await的函数");
-                    } else if (parent instanceof ALittleClassSetterDec) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "setter函数内不能调用带有await的函数");
-                    } else if (parent instanceof ALittleClassMethodDec) {
-                        if (((ALittleClassMethodDec)parent).getCoModifier() == null) {
-                            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
-                        }
-                        break;
-                    } else if (parent instanceof ALittleClassStaticDec) {
-                        if (((ALittleClassStaticDec)parent).getCoModifier() == null) {
-                            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
-                        }
-                        break;
-                    } else if (parent instanceof ALittleGlobalMethodDec) {
-                        if (((ALittleGlobalMethodDec)parent).getCoModifier() == null) {
-                            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
-                        }
-                        break;
-                    }
-                    parent = parent.getParent();
-                }
-            }
-
             for (int i = 0; i < propertyValueList.size(); ++i) {
                 ALittlePropertyValue pairDec = propertyValueList.get(i);
                 try {

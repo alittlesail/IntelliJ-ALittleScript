@@ -18,6 +18,4 @@ public interface ALittleFlowExpr extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

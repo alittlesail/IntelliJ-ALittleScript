@@ -64,9 +64,4 @@ public class ALittleEnumDecImpl extends ASTWrapperPsiElement implements ALittleE
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

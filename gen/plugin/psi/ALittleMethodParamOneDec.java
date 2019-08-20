@@ -24,6 +24,4 @@ public interface ALittleMethodParamOneDec extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

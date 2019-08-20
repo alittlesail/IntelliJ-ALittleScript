@@ -58,9 +58,4 @@ public class ALittleReturnExprImpl extends ASTWrapperPsiElement implements ALitt
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

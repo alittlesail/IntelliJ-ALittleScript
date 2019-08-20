@@ -2,6 +2,10 @@ package plugin.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -40,6 +44,20 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
         }
 
         return guessList;
+    }
+
+    public void colorAnnotator(@NotNull AnnotationHolder holder) {
+        Annotation anno = holder.createInfoAnnotation(myElement.getIdContent(), null);
+        anno.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_REFERENCE);
+    }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+        } else if (guessList.size() != 1) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+        }
     }
 
     @NotNull

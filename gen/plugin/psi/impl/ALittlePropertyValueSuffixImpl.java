@@ -64,9 +64,4 @@ public class ALittlePropertyValueSuffixImpl extends ASTWrapperPsiElement impleme
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

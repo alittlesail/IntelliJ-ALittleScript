@@ -24,6 +24,4 @@ public interface ALittleConstValue extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

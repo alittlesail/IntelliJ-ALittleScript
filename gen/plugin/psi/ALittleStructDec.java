@@ -30,6 +30,4 @@ public interface ALittleStructDec extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

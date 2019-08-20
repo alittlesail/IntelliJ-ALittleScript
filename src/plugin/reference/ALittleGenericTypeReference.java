@@ -53,15 +53,17 @@ public class ALittleGenericTypeReference extends ALittleReference<ALittleGeneric
             info.value = "Functor<(";
             info.element = myElement;
             info.functorParamList = new ArrayList<>();
+            info.functorParamNameList = new ArrayList<>();
             info.functorReturnList = new ArrayList<>();
 
             if (paramType != null) {
                 List<String> nameList = new ArrayList<>();
                 List<ALittleAllType> allTypeList = paramType.getAllTypeList();
                 for (ALittleAllType allType : allTypeList) {
-                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
-                    nameList.add(GuessInfo.value);
-                    info.functorParamList.add(GuessInfo);
+                    ALittleReferenceUtil.GuessTypeInfo guessInfo = allType.guessType();
+                    nameList.add(guessInfo.value);
+                    info.functorParamList.add(guessInfo);
+                    info.functorParamNameList.add(guessInfo.value);
                 }
                 info.value += String.join(",", nameList);
             }

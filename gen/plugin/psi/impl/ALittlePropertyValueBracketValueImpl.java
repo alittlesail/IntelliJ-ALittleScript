@@ -52,9 +52,4 @@ public class ALittlePropertyValueBracketValueImpl extends ASTWrapperPsiElement i
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

@@ -2,21 +2,20 @@ package plugin.parameter;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.lang.parameterInfo.*;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.alittle.PsiHelper;
 import plugin.psi.*;
-import plugin.reference.ALittlePropertyValueMethodCallStatReference;
+import plugin.reference.ALittlePropertyValueMethodCallReference;
+import plugin.reference.ALittleReferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittlePropertyValueMethodCallStat, String> {
+public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittlePropertyValueMethodCall, String> {
     @Override
     public boolean couldShowInLookup() {
         return true;
@@ -29,100 +28,43 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
     }
 
     @Override
-    public ALittlePropertyValueMethodCallStat findElementForParameterInfo(CreateParameterInfoContext context) {
+    public ALittlePropertyValueMethodCall findElementForParameterInfo(CreateParameterInfoContext context) {
         PsiFile file = context.getFile();
-        ALittlePropertyValueMethodCallStat stat = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittlePropertyValueMethodCallStat.class, false);
-        if (stat != null) {
-            do {
-                PsiReference ref = stat.getReference();
-                if (!(ref instanceof ALittlePropertyValueMethodCallStatReference)) break;
-                ALittlePropertyValueMethodCallStatReference reference = (ALittlePropertyValueMethodCallStatReference)ref;
+        ALittlePropertyValueMethodCall stat = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittlePropertyValueMethodCall.class, false);
+        if (stat == null) return null;
 
-                PsiElement preType = reference.guessTypesForPreType();
-                if (!(preType instanceof ALittleMethodNameDec)) break;
-                ALittleMethodNameDec method_name_dec = (ALittleMethodNameDec) preType;
-                PsiElement method_dec = method_name_dec.getParent();
+        PsiReference ref = stat.getReference();
+        if (!(ref instanceof ALittlePropertyValueMethodCallReference)) return null;
+        ALittlePropertyValueMethodCallReference reference = (ALittlePropertyValueMethodCallReference)ref;
 
-                List<String> param_name_list = new ArrayList<>();
-                // getter函数使用()来调用，只有这种情况 Class.getter_x(object)
-                if (method_dec instanceof ALittleClassGetterDec) {
-                    // 第一个参数就是getter所在的类
-                    ALittleClassDec classDec = PsiHelper.findClassDecFromParent(method_dec);
-                    if (classDec != null) {
-                        ALittleClassNameDec class_name_dec = classDec.getClassNameDec();
-                        if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
-                    }
-                    // setter函数使用()来调用，只有这种情况 Class.setter_x(object, value)
-                } else if (method_dec instanceof ALittleClassSetterDec) {
-                    // 第一个参数就是setter所在的类
-                    ALittleClassDec classDec = PsiHelper.findClassDecFromParent(method_dec);
-                    if (classDec != null) {
-                        ALittleClassNameDec class_name_dec = classDec.getClassNameDec();
-                        if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
-                    }
-                    ALittleClassSetterDec dec = (ALittleClassSetterDec) method_dec;
-                    ALittleMethodParamOneDec one_dec = dec.getMethodParamOneDec();
-                    if (one_dec != null) {
-                        param_name_list.add(one_dec.getText());
-                    }
-                } else if (method_dec instanceof ALittleClassMethodDec) {
-                    ALittleClassMethodDec dec = (ALittleClassMethodDec) method_dec;
-
-                    // 如果是使用类的方式调用，那么还需要加上一个参数
-                    ALittleClassDec classDec = reference.guessClassNameInvoke();
-                    if (classDec != null) {
-                        ALittleClassNameDec class_name_dec = classDec.getClassNameDec();
-                        if (class_name_dec != null) param_name_list.add("this:" + class_name_dec.getText());
-                    }
-
-                    ALittleMethodParamDec param_dec = dec.getMethodParamDec();
-                    if (param_dec != null) {
-                        List<ALittleMethodParamOneDec> one_decList = param_dec.getMethodParamOneDecList();
-                        for (ALittleMethodParamOneDec one_dec : one_decList) {
-                            param_name_list.add(one_dec.getText());
-                        }
-                    }
-                } else if (method_dec instanceof ALittleClassStaticDec) {
-                    ALittleClassStaticDec dec = (ALittleClassStaticDec) method_dec;
-                    ALittleMethodParamDec param_dec = dec.getMethodParamDec();
-                    if (param_dec != null) {
-                        List<ALittleMethodParamOneDec> one_decList = param_dec.getMethodParamOneDecList();
-                        for (ALittleMethodParamOneDec one_dec : one_decList) {
-                            param_name_list.add(one_dec.getText());
-                        }
-                    }
-                } else if (method_dec instanceof ALittleGlobalMethodDec) {
-                    ALittleGlobalMethodDec dec = (ALittleGlobalMethodDec) method_dec;
-                    ALittleMethodParamDec param_dec = dec.getMethodParamDec();
-                    if (param_dec != null) {
-                        List<ALittleMethodParamOneDec> one_decList = param_dec.getMethodParamOneDecList();
-                        for (ALittleMethodParamOneDec one_dec : one_decList) {
-                            param_name_list.add(one_dec.getText());
-                        }
-                    }
-                }
-                List<String> list = new ArrayList<>();
-                list.add(String.join(", ", param_name_list));
-                context.setItemsToShow(list.toArray());
-            } while (false);
-            return stat;
+        try {
+            ALittleReferenceUtil.GuessTypeInfo preType = reference.guessPreType();
+            if (preType.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+                return null;
+            }
+            List<String> list = new ArrayList<>();
+            list.add(String.join(", ", preType.functorParamNameList));
+            context.setItemsToShow(list.toArray());
+        } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+            return null;
         }
-        return null;
+
+        return stat;
     }
 
     @Override
-    public void showParameterInfo(@NotNull ALittlePropertyValueMethodCallStat element, CreateParameterInfoContext context) {
+    public void showParameterInfo(@NotNull ALittlePropertyValueMethodCall element, CreateParameterInfoContext context) {
         context.showHint(element, element.getTextRange().getStartOffset(), this);
     }
 
     @Override
-    public ALittlePropertyValueMethodCallStat findElementForUpdatingParameterInfo(UpdateParameterInfoContext context) {
+    public ALittlePropertyValueMethodCall findElementForUpdatingParameterInfo(UpdateParameterInfoContext context) {
         PsiFile file = context.getFile();
-        return PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittlePropertyValueMethodCallStat.class, false);
+        return PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittlePropertyValueMethodCall.class, false);
     }
 
     @Override
-    public void updateParameterInfo(ALittlePropertyValueMethodCallStat element, UpdateParameterInfoContext context) {
+    public void updateParameterInfo(ALittlePropertyValueMethodCall element, UpdateParameterInfoContext context) {
         int index = ParameterInfoUtils.getCurrentParameterIndex(element.getNode(), context.getOffset(), ALittleTypes.COMMA);
         context.setCurrentParameter(index);
     }

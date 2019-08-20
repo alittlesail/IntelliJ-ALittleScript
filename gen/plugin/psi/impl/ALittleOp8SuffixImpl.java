@@ -70,9 +70,4 @@ public class ALittleOp8SuffixImpl extends ASTWrapperPsiElement implements ALittl
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

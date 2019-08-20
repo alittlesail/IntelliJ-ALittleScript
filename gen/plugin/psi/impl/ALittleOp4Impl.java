@@ -46,9 +46,4 @@ public class ALittleOp4Impl extends ASTWrapperPsiElement implements ALittleOp4 {
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

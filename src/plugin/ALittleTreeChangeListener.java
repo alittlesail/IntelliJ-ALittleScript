@@ -18,7 +18,7 @@ import java.io.FileOutputStream;
 import java.util.*;
 
 public class ALittleTreeChangeListener implements PsiTreeChangeListener {
-    private static Map<Project, ALittleTreeChangeListener> sMap = new HashMap<>();
+    public static Map<Project, ALittleTreeChangeListener> sMap = new HashMap<>();
 
     public static List<ALittleNamespaceNameDec> findNamespaceNameDecList(Project project, String namespaceName) {
         List<ALittleNamespaceNameDec> result = new ArrayList<>();
@@ -165,7 +165,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         return result;
     }
 
-    private static void handleDirDelete(Project project, VirtualFile virtualFile) {
+    public static void handleDirDelete(Project project, VirtualFile virtualFile) {
         if (virtualFile.isDirectory()) {
             VirtualFile[] file_list = virtualFile.getChildren();
             if (file_list != null) {
@@ -197,7 +197,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         listener.removeNamespaceName(namespaceNameDec.getText(), namespaceNameDec);
     }
 
-    private static void handleDirCreated(Project project, VirtualFile virtualFile) {
+    public static void handleDirCreated(Project project, VirtualFile virtualFile) {
         if (virtualFile.isDirectory()) {
             VirtualFile[] file_list = virtualFile.getChildren();
             if (file_list != null) {

@@ -112,9 +112,4 @@ public class ALittleValueStatImpl extends ASTWrapperPsiElement implements ALittl
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

@@ -70,18 +70,6 @@ public class FileHelper {
         return out_path + "Script/";
     }
 
-    // 获取lua协议路径
-    public static String calcProtocolPath(Module module) throws Exception {
-        String out_path = calcOutPath(module);
-        return out_path + "Protocol/";
-    }
-
-    // 获取C++协议路径
-    public static String calcCPPProtoPath(Module module) throws Exception {
-        String out_path = calcOutPath(module);
-        return out_path + "CPPProto/";
-    }
-
     // 计算文件路径
     public static String calcALittleRelPath(Module module, VirtualFile file) throws Exception {
         String module_name = module.getName();

@@ -18,6 +18,4 @@ public interface ALittleOp1 extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

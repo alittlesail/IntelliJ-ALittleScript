@@ -37,8 +37,8 @@ public class ALittlePropertyValueCastTypeImpl extends ASTWrapperPsiElement imple
 
   @Override
   @Nullable
-  public ALittleValueStat getValueStat() {
-    return findChildByClass(ALittleValueStat.class);
+  public ALittleValueFactorStat getValueFactorStat() {
+    return findChildByClass(ALittleValueFactorStat.class);
   }
 
   @Override
@@ -56,11 +56,6 @@ public class ALittlePropertyValueCastTypeImpl extends ASTWrapperPsiElement imple
   @Override
   public PsiReference getReference() {
     return ALittlePsiImplUtil.getReference(this);
-  }
-
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
   }
 
 }

@@ -18,6 +18,4 @@ public interface ALittleReturnYield extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

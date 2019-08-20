@@ -1,8 +1,10 @@
 package plugin.reference;
 
+import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -81,5 +83,29 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
         }
 
         return guessList;
+    }
+
+    @NotNull
+    public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<InlayInfo> result = new ArrayList<>();
+        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = guessTypes();
+        if (guessTypeList.isEmpty()) return result;
+        ALittleReferenceUtil.GuessTypeInfo guessType = guessTypeList.get(0);
+
+        if (myElement.getParent() instanceof ALittleVarAssignDec) {
+            ALittleVarAssignDec dec = (ALittleVarAssignDec) myElement.getParent();
+            ALittleVarAssignNameDec nameDec = dec.getVarAssignNameDec();
+            if (nameDec == null) return result;
+
+            result.add(new InlayInfo(guessType.value, nameDec.getNode().getStartOffset()));
+        } else if (myElement.getParent() instanceof  ALittleForPairDec) {
+            ALittleForPairDec dec = (ALittleForPairDec) myElement.getParent();
+            ALittleVarAssignNameDec nameDec = dec.getVarAssignNameDec();
+            if (nameDec == null) return result;
+
+            result.add(new InlayInfo(guessType.value, nameDec.getNode().getStartOffset()));
+        }
+
+        return result;
     }
 }

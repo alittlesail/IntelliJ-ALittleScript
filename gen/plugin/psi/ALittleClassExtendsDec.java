@@ -27,6 +27,4 @@ public interface ALittleClassExtendsDec extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

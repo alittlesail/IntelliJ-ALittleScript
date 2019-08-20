@@ -21,6 +21,4 @@ public interface ALittleWrapExpr extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

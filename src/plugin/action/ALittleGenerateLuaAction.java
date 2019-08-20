@@ -46,8 +46,6 @@ public class ALittleGenerateLuaAction extends AnAction {
             Module[] modules = ModuleManager.getInstance(project).getModules();
             for (Module module : modules) {
                 FileHelper.rebuildPath(FileHelper.calcScriptPath(module));
-                FileHelper.rebuildPath(FileHelper.calcProtocolPath(module));
-                FileHelper.rebuildPath(FileHelper.calcCPPProtoPath(module));
             }
 
             PsiManager psi_mgr = PsiManager.getInstance(project);

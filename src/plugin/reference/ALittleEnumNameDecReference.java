@@ -6,10 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import plugin.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
-import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -59,5 +57,18 @@ public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNam
             );
         }
         return variants.toArray();
+    }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        if (myElement.getText().startsWith("___")) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "枚举名不能以3个下划线开头");
+        }
+
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+        } else if (guessList.size() != 1) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+        }
     }
 }

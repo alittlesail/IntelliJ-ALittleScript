@@ -85,5 +85,14 @@ public class ALittlePropertyValueBracketValueReference extends ALittleReference<
                 throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "索引值的类型不能是:" + keyGuessType.value + " :" + e.getError());
             }
         }
+
+        {
+            List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+            if (guessList.isEmpty()) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+            } else if (guessList.size() != 1) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+            }
+        }
     }
 }

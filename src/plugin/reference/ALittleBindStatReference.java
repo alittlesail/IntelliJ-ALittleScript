@@ -38,12 +38,17 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         if (info.functorAwait) {
             info.value = "Functor<await(";
         }
-        info.functorParamList = GuessInfo.functorParamList;
-        info.functorReturnList = GuessInfo.functorReturnList;
+        info.functorParamList = new ArrayList<>();
+        info.functorParamList.addAll(GuessInfo.functorParamList);
+        info.functorParamNameList = new ArrayList<>();
+        info.functorParamNameList.addAll(GuessInfo.functorParamNameList);
+        info.functorReturnList = new ArrayList<>();
+        info.functorReturnList.addAll(GuessInfo.functorReturnList);
         // 移除掉以填写的参数
         int paramCount = valueStatList.size() - 1;
         while (paramCount > 0) {
             info.functorParamList.remove(0);
+            info.functorParamNameList.remove(0);
             --paramCount;
         }
         // 计算参数类型名列表

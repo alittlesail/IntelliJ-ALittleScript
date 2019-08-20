@@ -38,11 +38,13 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                     info.element = classGetterDec;
                     info.functorAwait = false;
                     info.functorParamList = new ArrayList<>();
+                    info.functorParamNameList = new ArrayList<>();
                     info.functorReturnList = new ArrayList<>();
 
                     // 第一个参数是类
                     ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classGetterDec.getParent()).guessType();
                     info.functorParamList.add(classGuessInfo);
+                    info.functorParamNameList.add(classGuessInfo.value);
                     info.value += classGuessInfo.value + ")";
 
                     List<String> typeList = new ArrayList<>();
@@ -72,6 +74,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                     ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classSetterDec.getParent()).guessType();
                     typeList.add(classGuessInfo.value);
                     info.functorParamList.add(classGuessInfo);
+                    info.functorParamNameList.add(classGuessInfo.value);
 
                     // 添加参数列表
                     ALittleMethodParamOneDec oneDec = classSetterDec.getMethodParamOneDec();
@@ -81,6 +84,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                     ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                     typeList.add(GuessInfo.value);
                     info.functorParamList.add(GuessInfo);
+                    if (oneDec.getMethodParamNameDec() != null) {
+                        info.functorParamNameList.add(oneDec.getMethodParamNameDec().getIdContent().getText());
+                    } else {
+                        info.functorParamNameList.add("");
+                    }
 
                     info.value += String.join(",", typeList) + ")";
                     info.value += ">";
@@ -97,6 +105,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                         info.value = "Functor<await(";
                     }
                     info.functorParamList = new ArrayList<>();
+                    info.functorParamNameList = new ArrayList<>();
                     info.functorReturnList = new ArrayList<>();
 
                     List<String> typeList = new ArrayList<>();
@@ -104,6 +113,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                     ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classMethodDec.getParent()).guessType();
                     typeList.add(classGuessInfo.value);
                     info.functorParamList.add(classGuessInfo);
+                    info.functorParamNameList.add(classGuessInfo.value);
 
                     // 添加参数列表
                     ALittleMethodParamDec paramDec = classMethodDec.getMethodParamDec();
@@ -114,6 +124,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                             typeList.add(GuessInfo.value);
                             info.functorParamList.add(GuessInfo);
+                            if (oneDec.getMethodParamNameDec() != null) {
+                                info.functorParamNameList.add(oneDec.getMethodParamNameDec().getIdContent().getText());
+                            } else {
+                                info.functorParamNameList.add("");
+                            }
                         }
                     }
                     info.value += String.join(",", typeList) + ")";
@@ -143,6 +158,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                         info.value = "Functor<await(";
                     }
                     info.functorParamList = new ArrayList<>();
+                    info.functorParamNameList = new ArrayList<>();
                     info.functorReturnList = new ArrayList<>();
 
                     List<String> typeList = new ArrayList<>();
@@ -154,6 +170,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                             typeList.add(GuessInfo.value);
                             info.functorParamList.add(GuessInfo);
+                            if (oneDec.getMethodParamNameDec() != null) {
+                                info.functorParamNameList.add(oneDec.getMethodParamNameDec().getIdContent().getText());
+                            } else {
+                                info.functorParamNameList.add("");
+                            }
                         }
                     }
                     info.value += String.join(",", typeList) + ")";
@@ -182,6 +203,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                         info.value = "Functor<await(";
                     }
                     info.functorParamList = new ArrayList<>();
+                    info.functorParamNameList = new ArrayList<>();
                     info.functorReturnList = new ArrayList<>();
 
                     List<String> typeList = new ArrayList<>();
@@ -193,6 +215,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                             ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
                             typeList.add(GuessInfo.value);
                             info.functorParamList.add(GuessInfo);
+                            if (oneDec.getMethodParamNameDec() != null) {
+                                info.functorParamNameList.add(oneDec.getMethodParamNameDec().getIdContent().getText());
+                            } else {
+                                info.functorParamNameList.add("");
+                            }
                         }
                     }
                     info.value += String.join(",", typeList) + ")";

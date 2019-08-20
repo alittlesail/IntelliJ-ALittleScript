@@ -27,6 +27,4 @@ public interface ALittlePropertyValueSuffix extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

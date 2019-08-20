@@ -2,6 +2,10 @@ package plugin.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -13,12 +17,17 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALittlePropertyValueDotIdName> {
+public class ALittlePropertyValueDotIdReference extends ALittleReference<ALittlePropertyValueDotId> {
     private List<ALittleMethodNameDec> m_getter_list;
     private List<ALittleMethodNameDec> m_setter_list;
 
-    public ALittlePropertyValueDotIdNameReference(@NotNull ALittlePropertyValueDotIdName element, TextRange textRange) {
+    public ALittlePropertyValueDotIdReference(@NotNull ALittlePropertyValueDotId element, TextRange textRange) {
         super(element, textRange);
+
+        mKey = "";
+        if (element.getIdContent() != null) {
+            mKey = element.getText();
+        }
     }
 
     @NotNull
@@ -71,6 +80,42 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
         m_getter_list = null;
         m_setter_list = null;
         return guessList;
+    }
+
+    public void colorAnnotator(@NotNull AnnotationHolder holder) {
+        PsiElement element = myElement.getIdContent();
+        if (element == null) return;
+
+        PsiElement resolve = resolve();
+        if (resolve instanceof ALittleMethodParamNameDec) {
+            Annotation anno = holder.createInfoAnnotation(element, null);
+            anno.setTextAttributes(CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
+            return;
+        }
+
+        if (resolve instanceof ALittleVarAssignNameDec) {
+            PsiElement parent = resolve.getParent();
+            if (parent instanceof ALittleForPairDec) {
+                Annotation anno = holder.createInfoAnnotation(element, null);
+                anno.setTextAttributes(CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
+            }
+            return;
+        }
+
+        if (resolve instanceof ALittleMethodNameDec) {
+            Annotation anno = holder.createInfoAnnotation(element, null);
+            anno.setTextAttributes(DefaultLanguageHighlighterColors.STATIC_METHOD);
+            return;
+        }
+    }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+        } else if (guessList.size() != 1) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+        }
     }
 
     @NotNull
@@ -213,8 +258,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleEnumDec enumDec = (ALittleEnumDec) preType.element;
                 List<ALittleEnumVarDec> varDecList = new ArrayList<>();
                 ALittleUtil.findEnumVarNameDecList(enumDec, mKey, varDecList);
-                for (ALittleEnumVarDec var_name_dec : varDecList) {
-                    results.add(new PsiElementResolveResult(var_name_dec));
+                for (ALittleEnumVarDec var_nameDec : varDecList) {
+                    results.add(new PsiElementResolveResult(var_nameDec));
                 }
             }
         } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
@@ -253,10 +298,10 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 List<ALittleClassVarDec> classVarDecList = new ArrayList<>();
                 // 所有成员变量
                 ALittleUtil.findClassVarNameDecList(myElement.getProject(), namespaceName, classDec, "", classVarDecList, 10);
-                for (ALittleClassVarDec class_var_name_dec : classVarDecList) {
-                    variants.add(LookupElementBuilder.create(class_var_name_dec.getText()).
+                for (ALittleClassVarDec class_var_nameDec : classVarDecList) {
+                    variants.add(LookupElementBuilder.create(class_var_nameDec.getText()).
                             withIcon(ALittleIcons.PROPERTY).
-                            withTypeText(class_var_name_dec.getContainingFile().getName())
+                            withTypeText(class_var_nameDec.getContainingFile().getName())
                     );
                 }
 
@@ -395,10 +440,10 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleEnumDec enumDec = (ALittleEnumDec) preType.element;
                 List<ALittleEnumVarDec> varDecList = new ArrayList<>();
                 ALittleUtil.findEnumVarNameDecList(enumDec, "", varDecList);
-                for (ALittleEnumVarDec var_name_dec : varDecList) {
-                    variants.add(LookupElementBuilder.create(var_name_dec.getText()).
+                for (ALittleEnumVarDec var_nameDec : varDecList) {
+                    variants.add(LookupElementBuilder.create(var_nameDec.getText()).
                             withIcon(ALittleIcons.PROPERTY).
-                            withTypeText(var_name_dec.getContainingFile().getName())
+                            withTypeText(var_nameDec.getContainingFile().getName())
                     );
                 }
             }

@@ -2,6 +2,9 @@ package plugin.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -68,5 +71,23 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
             );
         }
         return variants.toArray();
+    }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        if (myElement.getText().startsWith("___")) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "类名不能以3个下划线开头");
+        }
+
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+        } else if (guessList.size() != 1) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+        }
+    }
+
+    public void colorAnnotator(@NotNull AnnotationHolder holder) {
+        Annotation anno = holder.createInfoAnnotation(myElement, null);
+        anno.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_NAME);
     }
 }

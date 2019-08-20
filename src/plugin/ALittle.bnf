@@ -121,7 +121,7 @@ methodNameDec ::= ID_CONTENT
 methodReturnDec ::= COLON allType (COMMA allType)* {pin=1}
 
 // 类构造函数定义
-classCtorDec ::= accessModifier? 'Ctor' methodParamDec methodBodyDec {pin=2}
+classCtorDec ::= accessModifier? Ctor methodParamDec methodBodyDec {pin=2}
 // 类getter函数
 classGetterDec ::= accessModifier? get methodNameDec LPAREN RPAREN COLON allType methodBodyDec {pin=2}
 // 类setter函数
@@ -226,9 +226,9 @@ customType ::= (namespaceNameDec DOT)? ID_CONTENT
 
 // 通用类型
 genericType ::= genericListType | genericMapType | genericFunctorType
-genericMapType ::= 'Map' LESS allType COMMA allType GREATER {pin=1}
-genericListType ::= 'List' LESS allType GREATER {pin=1}
-genericFunctorType ::= 'Functor' LESS LPAREN genericFunctorParamType? RPAREN genericFunctorReturnType? GREATER {pin=1}
+genericMapType ::= Map LESS allType COMMA allType GREATER {pin=1}
+genericListType ::= List LESS allType GREATER {pin=1}
+genericFunctorType ::= Functor LESS LPAREN genericFunctorParamType? RPAREN genericFunctorReturnType? GREATER {pin=1}
 genericFunctorParamType ::= allType (COMMA allType)* {pin=1}
 genericFunctorReturnType ::=  COLON allType (COMMA allType)* {pin=1}
 
@@ -259,13 +259,12 @@ reflectValue ::= reflect LESS customType GREATER {pin=1}
 propertyValue ::= propertyValueFirstType propertyValueSuffix*
 
 propertyValueFirstType ::= propertyValueCustomType | propertyValueThisType | propertyValueCastType
-propertyValueCastType ::= cast LESS allType GREATER LPAREN valueStat RPAREN {pin=1}
+propertyValueCastType ::= cast LESS allType GREATER LPAREN valueFactorStat RPAREN {pin=1}
 propertyValueCustomType ::= ID_CONTENT
 propertyValueThisType ::= this
 
 propertyValueSuffix ::= propertyValueDotId | propertyValueBracketValue | propertyValueMethodCall
-propertyValueDotId ::= DOT propertyValueDotIdName {pin=1}
-propertyValueDotIdName ::= ID_CONTENT
+propertyValueDotId ::= DOT ID_CONTENT {pin=1}
 propertyValueBracketValue ::= LBRACK valueStat RBRACK {pin=1}
 propertyValueMethodCall ::= LPAREN (valueStat (COMMA valueStat)*)? RPAREN {pin=1}
 

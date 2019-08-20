@@ -383,10 +383,6 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitPropertyValueDotIdName(@NotNull ALittlePropertyValueDotIdName o) {
-    visitPsiElement(o);
-  }
-
   public void visitPropertyValueExpr(@NotNull ALittlePropertyValueExpr o) {
     visitPsiElement(o);
   }

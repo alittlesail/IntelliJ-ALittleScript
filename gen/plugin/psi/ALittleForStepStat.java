@@ -21,6 +21,4 @@ public interface ALittleForStepStat extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

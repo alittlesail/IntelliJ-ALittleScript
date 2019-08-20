@@ -18,6 +18,4 @@ public interface ALittleRegisterModifier extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

@@ -21,6 +21,4 @@ public interface ALittleGenericMapType extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

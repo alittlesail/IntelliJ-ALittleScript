@@ -211,13 +211,13 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // accessModifier? 'Ctor' methodParamDec methodBodyDec
+  // accessModifier? Ctor methodParamDec methodBodyDec
   public static boolean classCtorDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "classCtorDec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_CTOR_DEC, "<class ctor dec>");
     r = classCtorDec_0(b, l + 1);
-    r = r && consumeToken(b, "Ctor");
+    r = r && consumeToken(b, CTOR);
     p = r; // pin = 2
     r = r && report_error_(b, methodParamDec(b, l + 1));
     r = p && methodBodyDec(b, l + 1) && r;
@@ -1156,15 +1156,15 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'Functor' LESS LPAREN genericFunctorParamType? RPAREN genericFunctorReturnType? GREATER
+  // Functor LESS LPAREN genericFunctorParamType? RPAREN genericFunctorReturnType? GREATER
   public static boolean genericFunctorType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "genericFunctorType")) return false;
+    if (!nextTokenIs(b, FUNCTOR)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, GENERIC_FUNCTOR_TYPE, "<generic functor type>");
-    r = consumeToken(b, "Functor");
+    Marker m = enter_section_(b, l, _NONE_, GENERIC_FUNCTOR_TYPE, null);
+    r = consumeTokens(b, 1, FUNCTOR, LESS, LPAREN);
     p = r; // pin = 1
-    r = r && report_error_(b, consumeTokens(b, -1, LESS, LPAREN));
-    r = p && report_error_(b, genericFunctorType_3(b, l + 1)) && r;
+    r = r && report_error_(b, genericFunctorType_3(b, l + 1));
     r = p && report_error_(b, consumeToken(b, RPAREN)) && r;
     r = p && report_error_(b, genericFunctorType_5(b, l + 1)) && r;
     r = p && consumeToken(b, GREATER) && r;
@@ -1187,30 +1187,30 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'List' LESS allType GREATER
+  // List LESS allType GREATER
   public static boolean genericListType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "genericListType")) return false;
+    if (!nextTokenIs(b, LIST)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, GENERIC_LIST_TYPE, "<generic list type>");
-    r = consumeToken(b, "List");
+    Marker m = enter_section_(b, l, _NONE_, GENERIC_LIST_TYPE, null);
+    r = consumeTokens(b, 1, LIST, LESS);
     p = r; // pin = 1
-    r = r && report_error_(b, consumeToken(b, LESS));
-    r = p && report_error_(b, allType(b, l + 1)) && r;
+    r = r && report_error_(b, allType(b, l + 1));
     r = p && consumeToken(b, GREATER) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
   /* ********************************************************** */
-  // 'Map' LESS allType COMMA allType GREATER
+  // Map LESS allType COMMA allType GREATER
   public static boolean genericMapType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "genericMapType")) return false;
+    if (!nextTokenIs(b, MAP)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, GENERIC_MAP_TYPE, "<generic map type>");
-    r = consumeToken(b, "Map");
+    Marker m = enter_section_(b, l, _NONE_, GENERIC_MAP_TYPE, null);
+    r = consumeTokens(b, 1, MAP, LESS);
     p = r; // pin = 1
-    r = r && report_error_(b, consumeToken(b, LESS));
-    r = p && report_error_(b, allType(b, l + 1)) && r;
+    r = r && report_error_(b, allType(b, l + 1));
     r = p && report_error_(b, consumeToken(b, COMMA)) && r;
     r = p && report_error_(b, allType(b, l + 1)) && r;
     r = p && consumeToken(b, GREATER) && r;
@@ -2504,7 +2504,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // cast LESS allType GREATER LPAREN valueStat RPAREN
+  // cast LESS allType GREATER LPAREN valueFactorStat RPAREN
   public static boolean propertyValueCastType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "propertyValueCastType")) return false;
     if (!nextTokenIs(b, CAST)) return false;
@@ -2514,7 +2514,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     p = r; // pin = 1
     r = r && report_error_(b, allType(b, l + 1));
     r = p && report_error_(b, consumeTokens(b, -1, GREATER, LPAREN)) && r;
-    r = p && report_error_(b, valueStat(b, l + 1)) && r;
+    r = p && report_error_(b, valueFactorStat(b, l + 1)) && r;
     r = p && consumeToken(b, RPAREN) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -2533,29 +2533,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // DOT propertyValueDotIdName
+  // DOT ID_CONTENT
   public static boolean propertyValueDotId(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "propertyValueDotId")) return false;
     if (!nextTokenIs(b, DOT)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_DOT_ID, null);
-    r = consumeToken(b, DOT);
+    r = consumeTokens(b, 1, DOT, ID_CONTENT);
     p = r; // pin = 1
-    r = r && propertyValueDotIdName(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  /* ********************************************************** */
-  // ID_CONTENT
-  public static boolean propertyValueDotIdName(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "propertyValueDotIdName")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, ID_CONTENT);
-    exit_section_(b, m, PROPERTY_VALUE_DOT_ID_NAME, r);
-    return r;
   }
 
   /* ********************************************************** */

@@ -58,9 +58,4 @@ public class ALittlePropertyValueImpl extends ASTWrapperPsiElement implements AL
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

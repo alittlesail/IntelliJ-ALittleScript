@@ -21,6 +21,4 @@ public interface ALittlePropertyValueBracketValue extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

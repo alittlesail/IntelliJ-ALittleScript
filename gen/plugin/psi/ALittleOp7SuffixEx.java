@@ -24,6 +24,4 @@ public interface ALittleOp7SuffixEx extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

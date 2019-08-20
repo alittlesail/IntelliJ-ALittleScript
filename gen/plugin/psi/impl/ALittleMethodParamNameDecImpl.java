@@ -52,9 +52,4 @@ public class ALittleMethodParamNameDecImpl extends ASTWrapperPsiElement implemen
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

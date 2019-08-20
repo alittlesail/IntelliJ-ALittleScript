@@ -52,9 +52,4 @@ public class ALittleGenericFunctorReturnTypeImpl extends ASTWrapperPsiElement im
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

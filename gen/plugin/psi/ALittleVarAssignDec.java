@@ -27,6 +27,4 @@ public interface ALittleVarAssignDec extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

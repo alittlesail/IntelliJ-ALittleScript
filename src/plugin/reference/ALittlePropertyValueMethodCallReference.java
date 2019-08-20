@@ -1,12 +1,10 @@
 package plugin.reference;
 
+import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiPolyVariantReference;
-import com.intellij.psi.PsiReferenceBase;
-import com.intellij.psi.ResolveResult;
+import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.ALittleIcons;
@@ -21,10 +19,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         super(element, textRange);
     }
 
-    @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-
+    public ALittleReferenceUtil.GuessTypeInfo guessPreType() throws ALittleReferenceUtil.ALittleReferenceException {
         // 获取父节点
         ALittlePropertyValueSuffix propertyValueSuffix = (ALittlePropertyValueSuffix)myElement.getParent();
         ALittlePropertyValue propertyValue = (ALittlePropertyValue)propertyValueSuffix.getParent();
@@ -33,7 +28,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
 
         // 获取所在位置
         int index = suffixList.indexOf(propertyValueSuffix);
-        if (index == -1) return guessList;
+        if (index == -1) return null;
 
         // 获取前一个类型
         ALittleReferenceUtil.GuessTypeInfo preType;
@@ -41,6 +36,18 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             preType = propertyValueFirstType.guessType();
         } else {
             preType = suffixList.get(index - 1).guessType();
+        }
+
+        return preType;
+    }
+
+    @NotNull
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+
+        ALittleReferenceUtil.GuessTypeInfo preType = guessPreType();
+        if (preType == null) {
+            return guessList;
         }
 
         if (preType.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
@@ -51,22 +58,9 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
-        // 获取父节点
-        ALittlePropertyValueSuffix propertyValueSuffix = (ALittlePropertyValueSuffix)myElement.getParent();
-        ALittlePropertyValue propertyValue = (ALittlePropertyValue)propertyValueSuffix.getParent();
-        ALittlePropertyValueFirstType propertyValueFirstType = propertyValue.getPropertyValueFirstType();
-        List<ALittlePropertyValueSuffix> suffixList = propertyValue.getPropertyValueSuffixList();
-
-        // 获取所在位置
-        int index = suffixList.indexOf(propertyValueSuffix);
-        if (index == -1) return;
-
-        // 获取前一个类型
-        ALittleReferenceUtil.GuessTypeInfo preType;
-        if (index == 0) {
-            preType = propertyValueFirstType.guessType();
-        } else {
-            preType = suffixList.get(index - 1).guessType();
+        ALittleReferenceUtil.GuessTypeInfo preType = guessPreType();
+        if (preType == null) {
+            return;
         }
 
         // 如果需要处理
@@ -119,5 +113,23 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                 }
             }
         }
+    }
+
+    @NotNull
+    public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<InlayInfo> result = new ArrayList<>();
+        // 获取函数对象
+        ALittleReferenceUtil.GuessTypeInfo preType = guessPreType();
+        if (preType.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) return result;
+
+        // 构建对象
+        List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
+        for (int i = 0; i < value_stat_list.size(); ++i) {
+            if (i >= preType.functorParamNameList.size()) break;
+            String name = preType.functorParamNameList.get(i);
+            ALittleValueStat value_stat = value_stat_list.get(i);
+            result.add(new InlayInfo(name, value_stat.getNode().getStartOffset()));
+        }
+        return result;
     }
 }

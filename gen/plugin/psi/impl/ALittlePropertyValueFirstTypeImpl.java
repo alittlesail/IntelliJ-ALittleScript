@@ -64,9 +64,4 @@ public class ALittlePropertyValueFirstTypeImpl extends ASTWrapperPsiElement impl
     return ALittlePsiImplUtil.getReference(this);
   }
 
-  @Override
-  public void checkError() throws ALittleReferenceException {
-    ALittlePsiImplUtil.checkError(this);
-  }
-
 }

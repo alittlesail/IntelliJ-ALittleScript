@@ -33,6 +33,17 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
         return guessList;
     }
 
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        if (myElement.getText().startsWith("___")) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "命名域不能以3个下划线开头");
+        }
+
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+        }
+    }
+
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {

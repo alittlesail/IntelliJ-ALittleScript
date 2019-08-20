@@ -51,6 +51,4 @@ public interface ALittleValueStat extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

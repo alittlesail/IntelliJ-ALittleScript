@@ -21,6 +21,4 @@ public interface ALittleGenericFunctorReturnType extends PsiElement {
 
   PsiReference getReference();
 
-  void checkError() throws ALittleReferenceException;
-
 }

@@ -2,6 +2,9 @@ package plugin.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -68,12 +71,20 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
             ALittleReferenceUtil.GuessTypeInfo guess = null;
             if (element instanceof ALittleNamespaceNameDec) {
                 guess = ((ALittleNamespaceNameDec)element).guessType();
+                guess.type = ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME;
+                guess.element = element;
             } else if (element instanceof ALittleClassNameDec) {
                 guess = ((ALittleClassNameDec)element).guessType();
+                guess.type = ALittleReferenceUtil.GuessType.GT_CLASS_NAME;
+                guess.element = element;
             } else if (element instanceof ALittleStructNameDec) {
                 guess = ((ALittleStructNameDec)element).guessType();
+                guess.type = ALittleReferenceUtil.GuessType.GT_STRUCT_NAME;
+                guess.element = element;
             } else if (element instanceof ALittleEnumNameDec) {
                 guess = ((ALittleEnumNameDec)element).guessType();
+                guess.type = ALittleReferenceUtil.GuessType.GT_ENUM_NAME;
+                guess.element = element;
             } else if (element instanceof ALittleMethodParamDec) {
                 guess = ((ALittleMethodParamNameDec) element).guessType();
             } else if (element instanceof ALittleVarAssignNameDec) {
@@ -86,6 +97,30 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         }
 
         return guessList;
+    }
+
+    public void colorAnnotator(@NotNull AnnotationHolder holder) {
+        try {
+            List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = guessTypes();
+            if (guessTypeList.isEmpty()) return;
+
+            ALittleReferenceUtil.GuessTypeInfo guessType = guessTypeList.get(0);
+            if (guessType.element instanceof ALittleClassMethodDec) {
+                Annotation anno = holder.createInfoAnnotation(myElement.getIdContent(), null);
+                anno.setTextAttributes(DefaultLanguageHighlighterColors.STATIC_METHOD);
+            }
+        } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+
+        }
+    }
+
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+        } else if (guessList.size() != 1) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+        }
     }
 
     @NotNull
