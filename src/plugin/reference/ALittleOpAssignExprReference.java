@@ -1,7 +1,6 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
 
@@ -41,10 +40,7 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
             for (int i = 0; i < propertyValueList.size(); ++i) {
                 ALittlePropertyValue pairDec = propertyValueList.get(i);
                 try {
-                    boolean result = ALittleReferenceOpUtil.guessTypeEqual(pairDec, pairDec.guessType(), value_stat, methodCallGuessList.get(i));
-                    if (!result) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(pairDec, "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等");
-                    }
+                    ALittleReferenceOpUtil.guessTypeEqual(pairDec, pairDec.guessType(), value_stat, methodCallGuessList.get(i));
                 } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等:" + e.getError());
                 }
@@ -57,10 +53,7 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
         ALittleReferenceUtil.GuessTypeInfo valueGuessType = value_stat.guessType();
 
         try {
-            boolean result = ALittleReferenceOpUtil.guessTypeEqual(propertyValueList.get(0), pairGuessType, value_stat, valueGuessType);
-            if (!result) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(propertyValueList.get(0), "等号左边的变量和表达式的类型不同");
-            }
+            ALittleReferenceOpUtil.guessTypeEqual(propertyValueList.get(0), pairGuessType, value_stat, valueGuessType);
         } catch (ALittleReferenceUtil.ALittleReferenceException e) {
             throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "等号左边的变量和表达式的类型不同:" + e.getError());
         }

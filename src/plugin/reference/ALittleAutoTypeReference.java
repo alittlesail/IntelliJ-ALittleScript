@@ -4,7 +4,6 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.ArrayList;

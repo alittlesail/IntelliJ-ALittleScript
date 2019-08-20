@@ -9,4 +9,4 @@ class Package
     public Map<string, any> loaded;
 }
 
-protected instance Package package = new Package();
+protected Package package = new Package();

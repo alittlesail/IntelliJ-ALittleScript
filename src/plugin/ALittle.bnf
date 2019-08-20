@@ -53,9 +53,9 @@
       BACK                 =  '\'
 
       WHITE_SPACE          = 'regexp:\s+'
-      COMMENT              = 'regexp:(//.*|/\*.*\*/)'
+      COMMENT              = 'regexp://.*'
       DIGIT_CONTENT        = 'regexp:0x[0-9a-fA-F]+|\d+(\.\d*)?'
-      STRING_CONTENT       = 'regexp:("([^"\\]|\\.)*")'
+      STRING_CONTENT       = 'regexp:"([^"\\]|\\.)*"'
       ID_CONTENT           = 'regexp:[_a-zA-Z][_a-zA-Z0-9]*'
   ]
 }

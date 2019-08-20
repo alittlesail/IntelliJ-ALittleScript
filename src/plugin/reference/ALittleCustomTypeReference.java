@@ -2,7 +2,6 @@ package plugin.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
@@ -25,6 +24,7 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
         if (namespaceNameDec != null) {
             mNamespace = namespaceNameDec.getIdContent().getText();
         }
+        mKey = element.getIdContent().getText();
     }
 
     @NotNull

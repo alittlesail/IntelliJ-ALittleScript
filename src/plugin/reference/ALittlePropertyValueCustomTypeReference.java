@@ -85,7 +85,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
                 guess = ((ALittleEnumNameDec)element).guessType();
                 guess.type = ALittleReferenceUtil.GuessType.GT_ENUM_NAME;
                 guess.element = element;
-            } else if (element instanceof ALittleMethodParamDec) {
+            } else if (element instanceof ALittleMethodParamNameDec) {
                 guess = ((ALittleMethodParamNameDec) element).guessType();
             } else if (element instanceof ALittleVarAssignNameDec) {
                 guess = ((ALittleVarAssignNameDec) element).guessType();

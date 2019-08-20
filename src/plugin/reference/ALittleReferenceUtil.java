@@ -2,9 +2,7 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.List;
@@ -128,6 +126,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleEnumVarDec) return new ALittleEnumVarDecReference((ALittleEnumVarDec)element, range);
 
         if (element instanceof ALittleForExpr) return new ALittleForExprReference((ALittleForExpr)element, range);
+        if (element instanceof ALittleForPairDec) return new ALittleForPairDecReference((ALittleForPairDec)element, range);
         if (element instanceof ALittleGenericType) return new ALittleGenericTypeReference((ALittleGenericType)element, range);
         if (element instanceof ALittleMethodNameDec) return new ALittleMethodNameDecReference((ALittleMethodNameDec)element, range);
         if (element instanceof ALittleMethodParamNameDec) return new ALittleMethodParamNameDecReference((ALittleMethodParamNameDec)element, range);
@@ -147,6 +146,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittlePropertyValueFirstType) return new ALittlePropertyValueFirstTypeReference((ALittlePropertyValueFirstType)element, range);
         if (element instanceof ALittlePropertyValueMethodCall) return new ALittlePropertyValueMethodCallReference((ALittlePropertyValueMethodCall)element, range);
         if (element instanceof ALittlePropertyValue) return new ALittlePropertyValueReference((ALittlePropertyValue)element, range);
+        if (element instanceof ALittlePropertyValueSuffix) return new ALittlePropertyValueSuffixReference((ALittlePropertyValueSuffix)element, range);
         if (element instanceof ALittlePropertyValueThisType) return new ALittlePropertyValueThisTypeReference((ALittlePropertyValueThisType)element, range);
 
         if (element instanceof ALittleReflectValue) return new ALittleReflectValueReference((ALittleReflectValue)element, range);

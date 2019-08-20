@@ -20,6 +20,74 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         super(element, textRange);
     }
 
+    public ALittleReferenceUtil.GuessTypeInfo guessTypeForGetter() throws ALittleReferenceUtil.ALittleReferenceException {
+        ALittleClassGetterDec classGetterDec = (ALittleClassGetterDec) myElement.getParent();
+
+        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+        info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
+        info.value = "Functor<(";
+        info.element = classGetterDec;
+        info.functorAwait = false;
+        info.functorParamList = new ArrayList<>();
+        info.functorParamNameList = new ArrayList<>();
+        info.functorReturnList = new ArrayList<>();
+
+        // 第一个参数是类
+        ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classGetterDec.getParent()).guessType();
+        info.functorParamList.add(classGuessInfo);
+        info.functorParamNameList.add(classGuessInfo.value);
+        info.value += classGuessInfo.value + ")";
+
+        List<String> typeList = new ArrayList<>();
+        // 添加返回值列表
+        ALittleAllType allType = classGetterDec.getAllType();
+        if (allType == null) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "指向的getter函数没有定义返回值");
+        ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+        typeList.add(GuessInfo.value);
+        info.functorReturnList.add(GuessInfo);
+
+        if (!typeList.isEmpty()) info.value += ":";
+        info.value += String.join(",", typeList) + ">";
+        return info;
+    }
+
+    public ALittleReferenceUtil.GuessTypeInfo guessTypeForSetter() throws ALittleReferenceUtil.ALittleReferenceException {
+        ALittleClassSetterDec classSetterDec = (ALittleClassSetterDec) myElement.getParent();
+
+        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+        info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
+        info.value = "Functor<(";
+        info.element = classSetterDec;
+        info.functorAwait = false;
+        info.functorParamList = new ArrayList<>();
+        info.functorParamNameList = new ArrayList<>();
+        info.functorReturnList = new ArrayList<>();
+
+        List<String> typeList = new ArrayList<>();
+        // 第一个参数是类
+        ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classSetterDec.getParent()).guessType();
+        typeList.add(classGuessInfo.value);
+        info.functorParamList.add(classGuessInfo);
+        info.functorParamNameList.add(classGuessInfo.value);
+
+        // 添加参数列表
+        ALittleMethodParamOneDec oneDec = classSetterDec.getMethodParamOneDec();
+        if (oneDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "指向的setter函数没有定义参数");
+
+        ALittleReferenceUtil.GuessTypeInfo guessInfo = oneDec.getAllType().guessType();
+        typeList.add(guessInfo.value);
+        info.functorParamList.add(guessInfo);
+        if (oneDec.getMethodParamNameDec() != null) {
+            info.functorParamNameList.add(oneDec.getMethodParamNameDec().getIdContent().getText());
+        } else {
+            info.functorParamNameList.add("");
+        }
+
+        info.value += String.join(",", typeList) + ")";
+        info.value += ">";
+        return info;
+    }
+
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
@@ -30,69 +98,9 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 PsiElement parent = element.getParent();
                 // 处理getter
                 if (parent instanceof ALittleClassGetterDec) {
-                    ALittleClassGetterDec classGetterDec = (ALittleClassGetterDec) parent;
-
-                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-                    info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
-                    info.value = "Functor<(";
-                    info.element = classGetterDec;
-                    info.functorAwait = false;
-                    info.functorParamList = new ArrayList<>();
-                    info.functorParamNameList = new ArrayList<>();
-                    info.functorReturnList = new ArrayList<>();
-
-                    // 第一个参数是类
-                    ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classGetterDec.getParent()).guessType();
-                    info.functorParamList.add(classGuessInfo);
-                    info.functorParamNameList.add(classGuessInfo.value);
-                    info.value += classGuessInfo.value + ")";
-
-                    List<String> typeList = new ArrayList<>();
-                    // 添加返回值列表
-                    ALittleAllType allType = classGetterDec.getAllType();
-                    if (allType == null) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "指向的getter函数没有定义返回值");
-                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
-                    typeList.add(GuessInfo.value);
-                    info.functorReturnList.add(GuessInfo);
-
-                    if (!typeList.isEmpty()) info.value += ":";
-                    info.value += String.join(",", typeList) + ">";
-                    guessList.add(info);
+                    guessList.add(guessTypeForGetter());
                 } else if (parent instanceof ALittleClassSetterDec) {
-                    ALittleClassSetterDec classSetterDec = (ALittleClassSetterDec) parent;
-
-                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-                    info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
-                    info.value = "Functor<(";
-                    info.element = classSetterDec;
-                    info.functorAwait = false;
-                    info.functorParamList = new ArrayList<>();
-                    info.functorReturnList = new ArrayList<>();
-
-                    List<String> typeList = new ArrayList<>();
-                    // 第一个参数是类
-                    ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classSetterDec.getParent()).guessType();
-                    typeList.add(classGuessInfo.value);
-                    info.functorParamList.add(classGuessInfo);
-                    info.functorParamNameList.add(classGuessInfo.value);
-
-                    // 添加参数列表
-                    ALittleMethodParamOneDec oneDec = classSetterDec.getMethodParamOneDec();
-                    if (oneDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "指向的setter函数没有定义参数");
-
-                    ALittleAllType allType = oneDec.getAllType();
-                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
-                    typeList.add(GuessInfo.value);
-                    info.functorParamList.add(GuessInfo);
-                    if (oneDec.getMethodParamNameDec() != null) {
-                        info.functorParamNameList.add(oneDec.getMethodParamNameDec().getIdContent().getText());
-                    } else {
-                        info.functorParamNameList.add("");
-                    }
-
-                    info.value += String.join(",", typeList) + ")";
-                    info.value += ">";
-                    guessList.add(info);
+                    guessList.add(guessTypeForSetter());
                 } else if (parent instanceof ALittleClassMethodDec) {
                     ALittleClassMethodDec classMethodDec = (ALittleClassMethodDec) parent;
 

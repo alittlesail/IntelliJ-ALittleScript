@@ -26,7 +26,7 @@ public class ALittlePropertyValueDotIdReference extends ALittleReference<ALittle
 
         mKey = "";
         if (element.getIdContent() != null) {
-            mKey = element.getText();
+            mKey = element.getIdContent().getText();
         }
     }
 
@@ -51,27 +51,39 @@ public class ALittlePropertyValueDotIdReference extends ALittleReference<ALittle
             } else if (element instanceof ALittleMethodNameDec) {
                 ALittleMethodNameDec dec = (ALittleMethodNameDec)element;
                 // 如果是getter，那么就返回getter的返回值
-                if (m_getter_list.indexOf(element) >= 0) {
-                    ALittleReferenceUtil.GuessTypeInfo getterType = dec.guessType();
+                if (m_getter_list != null && m_getter_list.indexOf(element) >= 0) {
+                    ALittleMethodNameDecReference ref = (ALittleMethodNameDecReference)dec.getReference();
+                    if (ref == null) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleMethodNameDecReference创建失败");
+                    ALittleReferenceUtil.GuessTypeInfo getterType = ref.guessTypeForGetter();
                     if (!getterType.functorReturnList.isEmpty()) {
                         guess = getterType.functorReturnList.get(0);
                     }
                 // 如果是setter，那么就返回setter的第一个参数
-                } else if (m_setter_list.indexOf(element) >= 0) {
-                    ALittleReferenceUtil.GuessTypeInfo setterType = dec.guessType();
-                    if (!setterType.functorParamList.isEmpty()) {
-                        guess = setterType.functorParamList.get(0);
+                } else if (m_setter_list != null && m_setter_list.indexOf(element) >= 0) {
+                    ALittleMethodNameDecReference ref = (ALittleMethodNameDecReference)dec.getReference();
+                    if (ref == null) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleMethodNameDecReference创建失败");
+                    ALittleReferenceUtil.GuessTypeInfo setterType = ref.guessTypeForSetter();
+                    if (setterType.functorParamList.size() == 2) {
+                        guess = setterType.functorParamList.get(1);
                     }
                 // 如果是其他，那么就返回对应的Functor
                 } else {
                     guess = dec.guessType();
                 }
-            } else if (element instanceof ALittleEnumNameDec) {
-                guess = ((ALittleEnumNameDec) element).guessType();
             } else if (element instanceof ALittleVarAssignNameDec) {
                 guess = ((ALittleVarAssignNameDec) element).guessType();
+            } else if (element instanceof ALittleEnumNameDec) {
+                guess = ((ALittleEnumNameDec) element).guessType();
+                guess.type = ALittleReferenceUtil.GuessType.GT_ENUM_NAME;
+                guess.element = element;
+            } else if (element instanceof ALittleStructNameDec) {
+                guess = ((ALittleStructNameDec) element).guessType();
+                guess.type = ALittleReferenceUtil.GuessType.GT_STRUCT_NAME;
+                guess.element = element;
             } else if (element instanceof ALittleClassNameDec) {
                 guess = ((ALittleClassNameDec) element).guessType();
+                guess.type = ALittleReferenceUtil.GuessType.GT_CLASS_NAME;
+                guess.element = element;
             }
 
             if (guess != null) guessList.add(guess);
@@ -102,7 +114,7 @@ public class ALittlePropertyValueDotIdReference extends ALittleReference<ALittle
             return;
         }
 
-        if (resolve instanceof ALittleMethodNameDec) {
+        if (resolve instanceof ALittleMethodNameDec && resolve.getParent() instanceof ALittleClassStaticDec) {
             Annotation anno = holder.createInfoAnnotation(element, null);
             anno.setTextAttributes(DefaultLanguageHighlighterColors.STATIC_METHOD);
             return;
@@ -178,8 +190,8 @@ public class ALittlePropertyValueDotIdReference extends ALittleReference<ALittle
                 // 过滤掉重复的函数名
                 classMethodNameDecList = ALittleUtil.filterSameMethodName(classMethodNameDecList);
 
-                for (ALittleMethodNameDec class_methodNameDec : classMethodNameDecList) {
-                    results.add(new PsiElementResolveResult(class_methodNameDec));
+                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                    results.add(new PsiElementResolveResult(classMethodNameDec));
                 }
                 // 处理结构体的实例对象
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
@@ -249,17 +261,18 @@ public class ALittlePropertyValueDotIdReference extends ALittleReference<ALittle
                 // 过滤掉重复的函数名
                 classMethodNameDecList = ALittleUtil.filterSameMethodName(classMethodNameDecList);
 
-                for (ALittleMethodNameDec class_methodNameDec : classMethodNameDecList) {
-                    results.add(new PsiElementResolveResult(class_methodNameDec));
+                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                    results.add(new PsiElementResolveResult(classMethodNameDec));
                 }
                 // 比如 AEnum.Var
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_ENUM) {
+            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_ENUM_NAME) {
                 // 所有枚举字段
-                ALittleEnumDec enumDec = (ALittleEnumDec) preType.element;
+                ALittleEnumNameDec enumNameDec = (ALittleEnumNameDec) preType.element;
+                ALittleEnumDec enumDec = (ALittleEnumDec) enumNameDec.getParent();
                 List<ALittleEnumVarDec> varDecList = new ArrayList<>();
                 ALittleUtil.findEnumVarNameDecList(enumDec, mKey, varDecList);
-                for (ALittleEnumVarDec var_nameDec : varDecList) {
-                    results.add(new PsiElementResolveResult(var_nameDec));
+                for (ALittleEnumVarDec varNameDec : varDecList) {
+                    results.add(new PsiElementResolveResult(varNameDec));
                 }
             }
         } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
@@ -298,40 +311,40 @@ public class ALittlePropertyValueDotIdReference extends ALittleReference<ALittle
                 List<ALittleClassVarDec> classVarDecList = new ArrayList<>();
                 // 所有成员变量
                 ALittleUtil.findClassVarNameDecList(myElement.getProject(), namespaceName, classDec, "", classVarDecList, 10);
-                for (ALittleClassVarDec class_var_nameDec : classVarDecList) {
-                    variants.add(LookupElementBuilder.create(class_var_nameDec.getText()).
+                for (ALittleClassVarDec class_varNameDec : classVarDecList) {
+                    variants.add(LookupElementBuilder.create(class_varNameDec.getText()).
                             withIcon(ALittleIcons.PROPERTY).
-                            withTypeText(class_var_nameDec.getContainingFile().getName())
+                            withTypeText(class_varNameDec.getContainingFile().getName())
                     );
                 }
 
                 // 所有setter
                 List<ALittleMethodNameDec> classMethodNameDecList = new ArrayList<>();
                 ALittleUtil.findMethodNameDecListForSetter(myElement.getProject(), namespaceName, classDec, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec class_methodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(class_methodNameDec.getText()).
+                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.SETTER_METHOD).
-                            withTypeText(class_methodNameDec.getContainingFile().getName())
+                            withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
                 }
 
                 // 所有getter
                 classMethodNameDecList = new ArrayList<>();
                 ALittleUtil.findMethodNameDecListForGetter(myElement.getProject(), namespaceName, classDec, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec class_methodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(class_methodNameDec.getText()).
+                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.GETTER_METHOD).
-                            withTypeText(class_methodNameDec.getContainingFile().getName())
+                            withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
                 }
 
                 // 所有成员函数
                 classMethodNameDecList = new ArrayList<>();
                 ALittleUtil.findMethodNameDecListForFun(myElement.getProject(), namespaceName, classDec, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec class_methodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(class_methodNameDec.getText()).
+                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.MEMBER_METHOD).
-                            withTypeText(class_methodNameDec.getContainingFile().getName())
+                            withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
                 }
                 // 处理结构体的实例对象
@@ -399,51 +412,52 @@ public class ALittlePropertyValueDotIdReference extends ALittleReference<ALittle
                 // 所有静态函数
                 List<ALittleMethodNameDec> classMethodNameDecList = new ArrayList<>();
                 ALittleUtil.findMethodNameDecListForStatic(myElement.getProject(), namespaceName, classDec, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec class_methodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(class_methodNameDec.getText()).
+                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.STATIC_METHOD).
-                            withTypeText(class_methodNameDec.getContainingFile().getName())
+                            withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
                 }
                 // 所有成员函数
                 classMethodNameDecList = new ArrayList<>();
                 ALittleUtil.findMethodNameDecListForFun(myElement.getProject(), namespaceName, classDec, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec class_methodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(class_methodNameDec.getText()).
+                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.MEMBER_METHOD).
-                            withTypeText(class_methodNameDec.getContainingFile().getName())
+                            withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
                 }
 
                 // 所有setter
                 classMethodNameDecList = new ArrayList<>();
                 ALittleUtil.findMethodNameDecListForSetter(myElement.getProject(), namespaceName, classDec, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec class_methodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(class_methodNameDec.getText()).
+                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.SETTER_METHOD).
-                            withTypeText(class_methodNameDec.getContainingFile().getName())
+                            withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
                 }
 
                 // 所有getter
                 classMethodNameDecList = new ArrayList<>();
                 ALittleUtil.findMethodNameDecListForGetter(myElement.getProject(), namespaceName, classDec, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec class_methodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(class_methodNameDec.getText()).
+                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.GETTER_METHOD).
-                            withTypeText(class_methodNameDec.getContainingFile().getName())
+                            withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
                 }
                 // 比如 AEnum.Var
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_ENUM) {
+            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_ENUM_NAME) {
                 // 所有枚举字段
-                ALittleEnumDec enumDec = (ALittleEnumDec) preType.element;
+                ALittleEnumNameDec enumNameDec = (ALittleEnumNameDec) preType.element;
+                ALittleEnumDec enumDec = (ALittleEnumDec) enumNameDec.getParent();
                 List<ALittleEnumVarDec> varDecList = new ArrayList<>();
                 ALittleUtil.findEnumVarNameDecList(enumDec, "", varDecList);
-                for (ALittleEnumVarDec var_nameDec : varDecList) {
-                    variants.add(LookupElementBuilder.create(var_nameDec.getText()).
+                for (ALittleEnumVarDec varNameDec : varDecList) {
+                    variants.add(LookupElementBuilder.create(varNameDec.getText()).
                             withIcon(ALittleIcons.PROPERTY).
-                            withTypeText(var_nameDec.getContainingFile().getName())
+                            withTypeText(varNameDec.getContainingFile().getName())
                     );
                 }
             }

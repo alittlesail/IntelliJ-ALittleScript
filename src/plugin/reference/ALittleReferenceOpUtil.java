@@ -2,7 +2,6 @@ package plugin.reference;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import java.util.List;
@@ -40,7 +39,7 @@ public class ALittleReferenceOpUtil {
             suffixGuessType = valueFactorStat.guessType();
             lastSrc = valueFactorStat;
         } else if (op2Value != null) {
-            suffixGuessType = op2Value.guessType();
+            suffixGuessType = guessTypeForOp2Value(op2Value);
             lastSrc = op2Value;
         }
 
@@ -98,7 +97,7 @@ public class ALittleReferenceOpUtil {
             suffixGuessType = valueFactorStat.guessType();
             lastSrc = valueFactorStat;
         } else if (op2Value != null) {
-            suffixGuessType = op2Value.guessType();
+            suffixGuessType = guessTypeForOp2Value(op2Value);
             lastSrc = op2Value;
         }
 
@@ -175,7 +174,7 @@ public class ALittleReferenceOpUtil {
             suffixGuessType = valueFactorStat.guessType();
             lastSrc = valueFactorStat;
         } else if (op2Value != null) {
-            suffixGuessType = op2Value.guessType();
+            suffixGuessType = guessTypeForOp2Value(op2Value);
             lastSrc = op2Value;
         }
 
@@ -232,7 +231,7 @@ public class ALittleReferenceOpUtil {
             suffixGuessType = valueFactorStat.guessType();
             lastSrc = valueFactorStat;
         } else if (op2Value != null) {
-            suffixGuessType = op2Value.guessType();
+            suffixGuessType = guessTypeForOp2Value(op2Value);
             lastSrc = op2Value;
         }
 
@@ -293,7 +292,7 @@ public class ALittleReferenceOpUtil {
             suffixGuessType = valueFactorStat.guessType();
             lastSrc = valueFactorStat;
         } else if (op2Value != null) {
-            suffixGuessType = op2Value.guessType();
+            suffixGuessType = guessTypeForOp2Value(op2Value);
             lastSrc = op2Value;
         }
 
@@ -323,7 +322,7 @@ public class ALittleReferenceOpUtil {
             rightGuessType = valueFactorStat.guessType();
             rightSrc = valueFactorStat;
         } else if (op2Value != null) {
-            rightGuessType = op2Value.guessType();
+            rightGuessType = guessTypeForOp2Value(op2Value);
             rightSrc = op2Value;
         } else {
             throw new ALittleReferenceUtil.ALittleReferenceException(op3Suffix, "未知的表达式");
@@ -587,12 +586,12 @@ public class ALittleReferenceOpUtil {
     }
 
     @NotNull
-    public static ALittleReferenceUtil.GuessTypeInfo guessType(ALittleOp2Stat op_2_stat) throws ALittleReferenceUtil.ALittleReferenceException {
-        ALittleOp2Value op2Value = op_2_stat.getOp2Value();
+    public static ALittleReferenceUtil.GuessTypeInfo guessType(ALittleOp2Stat op2Stat) throws ALittleReferenceUtil.ALittleReferenceException {
+        ALittleOp2Value op2Value = op2Stat.getOp2Value();
         ALittleReferenceUtil.GuessTypeInfo suffixGuessType = guessType(op2Value);
 
         PsiElement lastSrc = op2Value;
-        List<ALittleOp2SuffixEx> suffixEx_list = op_2_stat.getOp2SuffixExList();
+        List<ALittleOp2SuffixEx> suffixEx_list = op2Stat.getOp2SuffixExList();
         for (ALittleOp2SuffixEx suffixEx : suffixEx_list) {
             if (suffixEx.getOp3Suffix() != null) {
                 suffixGuessType = guessTypeForOp3(lastSrc, suffixGuessType, suffixEx.getOp3Suffix());
@@ -620,15 +619,36 @@ public class ALittleReferenceOpUtil {
         return suffixGuessType;
     }
 
-    public static boolean guessTypeEqual(PsiElement leftSrc, ALittleReferenceUtil.GuessTypeInfo leftGuessInfo
-            , PsiElement rightSrc, ALittleReferenceUtil.GuessTypeInfo rightGuessInfo) throws ALittleReferenceUtil.ALittleReferenceException {
+    public static ALittleReferenceUtil.GuessTypeInfo guessTypeForOp2Value(ALittleOp2Value op2Value) throws ALittleReferenceUtil.ALittleReferenceException {
+        ALittleReferenceUtil.GuessTypeInfo guessType = op2Value.getValueFactorStat().guessType();
+        String opString = op2Value.getOp2().getText();
+
+        if (opString.equals("!")) {
+            if (!guessType.value.equals("bool")) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(op2Value.getValueFactorStat(), "!运算符的右边必须是bool类型，不能是:" + guessType.value);
+            }
+            return guessType;
+        }
+
+        if (opString.equals("-")) {
+            if (!guessType.value.equals("int") && !guessType.value.equals("I64") && !guessType.value.equals("double")) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(op2Value.getValueFactorStat(), "-运算符的右边必须是int,I64,double类型，不能是:" + guessType.value);
+            }
+            return guessType;
+        }
+
+        throw new ALittleReferenceUtil.ALittleReferenceException(op2Value.getOp2(), "未知的运算符");
+    }
+
+    public static void guessTypeEqual(@NotNull PsiElement leftSrc, @NotNull ALittleReferenceUtil.GuessTypeInfo leftGuessInfo
+            , @NotNull PsiElement rightSrc, @NotNull ALittleReferenceUtil.GuessTypeInfo rightGuessInfo) throws ALittleReferenceUtil.ALittleReferenceException {
         // 如果字符串直接相等，那么就直接返回成功
-        if (leftGuessInfo.value.equals(rightGuessInfo.value)) return true;
+        if (leftGuessInfo.value.equals(rightGuessInfo.value)) return;
 
         // 如果任何一方是any，那么就认为可以相等
-        if (leftGuessInfo.value.equals("any") || rightGuessInfo.value.equals("any")) return true;
+        if (leftGuessInfo.value.equals("any") || rightGuessInfo.value.equals("any")) return;
         // 如果值等于null，那么可以赋值
-        if (rightGuessInfo.value.equals("null")) return true;
+        if (rightGuessInfo.value.equals("null")) return;
 
         if (leftGuessInfo.value.equals("bool")) {
             throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是bool,不能是:" + rightGuessInfo.value);
@@ -642,126 +662,95 @@ public class ALittleReferenceOpUtil {
             if (rightGuessInfo.value.equals("double")) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "double赋值给int，需要使用cast<int>()做强制类型转换");
             }
+
             throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是int, 不能是:" + rightGuessInfo.value);
         }
 
         if (leftGuessInfo.value.equals("I64")) {
-            if (rightGuessInfo.value.equals("int")) return true;
+            if (rightGuessInfo.value.equals("int")) return;
 
             if (rightGuessInfo.value.equals("double")) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "double赋值给I64，需要使用cast<I64>()做强制类型转换");
             }
+
             throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是I64, 不能是:" + rightGuessInfo.value);
         }
 
         if (leftGuessInfo.value.equals("double")) {
-            if (rightGuessInfo.value.equals("int") || rightGuessInfo.value.equals("I64")) return true;
-            throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是I64, 不能是:" + rightGuessInfo.value);
+            if (rightGuessInfo.value.equals("int") || rightGuessInfo.value.equals("I64")) return;
+            throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是double, 不能是:" + rightGuessInfo.value);
         }
 
         if (leftGuessInfo.value.equals("string")) {
             throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是string,不能是:" + rightGuessInfo.value);
         }
 
-        // 通用类型Map
         if (leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_MAP) {
-            if (rightGuessInfo.type == ALittleReferenceUtil.GuessType.GT_MAP) {
-                if (guessTypeEqual(leftSrc, leftGuessInfo.mapKeyType, rightSrc, rightGuessInfo.mapKeyType)
-                        && guessTypeEqual(leftSrc, leftGuessInfo.mapValueType, rightSrc, rightGuessInfo.mapValueType))
-                    return true;
+            if (rightGuessInfo.type != ALittleReferenceUtil.GuessType.GT_MAP) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
             }
+            try {
+                guessTypeEqual(leftSrc, leftGuessInfo.mapKeyType, rightSrc, rightGuessInfo.mapKeyType);
+                guessTypeEqual(leftSrc, leftGuessInfo.mapValueType, rightSrc, rightGuessInfo.mapValueType);
+            } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
+            }
+            return;
         }
 
-        // 通用类型List
         if (leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_LIST) {
-            if (rightGuessInfo.type == ALittleReferenceUtil.GuessType.GT_LIST) {
-                if (guessTypeEqual(leftSrc, leftGuessInfo.listSubType, rightSrc, rightGuessInfo.listSubType))
-                    return true;
+            if (rightGuessInfo.type != ALittleReferenceUtil.GuessType.GT_LIST) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
             }
+            try {
+                guessTypeEqual(leftSrc, leftGuessInfo.listSubType, rightSrc, rightGuessInfo.listSubType);
+            } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
+            }
+            return;
         }
 
-        // 通用类型Functor
         if (leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-            if (rightGuessInfo.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-                if (leftGuessInfo.functorParamList.size() == rightGuessInfo.functorParamList.size()
-                        && leftGuessInfo.functorReturnList.size() == rightGuessInfo.functorReturnList.size()
-                        && leftGuessInfo.functorAwait == rightGuessInfo.functorAwait) {
-                    boolean result = true;
-                    if (result) {
-                        for (int i = 0; i < leftGuessInfo.functorParamList.size(); ++i) {
-                            if (!guessTypeEqual(leftSrc, leftGuessInfo.functorParamList.get(i)
-                                    , rightSrc, rightGuessInfo.functorParamList.get(i))) {
-                                result = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (result) {
-                        for (int i = 0; i < leftGuessInfo.functorReturnList.size(); ++i) {
-                            if (!guessTypeEqual(leftSrc, leftGuessInfo.functorReturnList.get(i)
-                                    , rightSrc, rightGuessInfo.functorReturnList.get(i))) {
-                                result = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (result) return true;
-                }
+            if (rightGuessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR
+                || leftGuessInfo.functorParamList.size() != rightGuessInfo.functorParamList.size()
+                || leftGuessInfo.functorReturnList.size() != rightGuessInfo.functorReturnList.size()
+                || leftGuessInfo.functorAwait != rightGuessInfo.functorAwait) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
             }
+            for (int i = 0; i < leftGuessInfo.functorParamList.size(); ++i) {
+                guessTypeEqual(leftSrc, leftGuessInfo.functorParamList.get(i), rightSrc, rightGuessInfo.functorParamList.get(i));
+            }
+
+            for (int i = 0; i < leftGuessInfo.functorReturnList.size(); ++i) {
+                guessTypeEqual(leftSrc, leftGuessInfo.functorReturnList.get(i), rightSrc, rightGuessInfo.functorReturnList.get(i));
+            }
+            return;
         }
 
-        if (leftSrc == null && leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-            String[] left_type = leftGuessInfo.value.split("\\.");
-            if (left_type.length == 2) {
-                List<ALittleClassNameDec> list = ALittleTreeChangeListener.findClassNameDecList(leftSrc.getProject(), left_type[0], left_type[1]);
-                if (list != null && list.size() == 1) leftSrc = list.get(0).getParent();
-            }
-        }
-
-        if (leftSrc == null && leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
-            String[] left_type = leftGuessInfo.value.split("\\.");
-            if (left_type.length == 2) {
-                List<ALittleStructNameDec> list = ALittleTreeChangeListener.findStructNameDecList(leftSrc.getProject(), left_type[0], left_type[1]);
-                if (list != null && list.size() == 1) leftSrc = list.get(0).getParent();
-            }
-        }
-
-        if (rightSrc == null && rightGuessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-            String[] right_type = rightGuessInfo.value.split("\\.");
-            if (right_type.length == 2) {
-                List<ALittleClassNameDec> list = ALittleTreeChangeListener.findClassNameDecList(rightSrc.getProject(), right_type[0], right_type[1]);
-                if (list != null && list.size() == 1) rightSrc = list.get(0).getParent();
-            }
-        }
-
-        if (rightSrc == null && rightGuessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
-            String[] right_type = rightGuessInfo.value.split("\\.");
-            if (right_type.length == 2) {
-                List<ALittleStructNameDec> list = ALittleTreeChangeListener.findStructNameDecList(rightSrc.getProject(), right_type[0], right_type[1]);
-                if (list != null && list.size() == 1) rightSrc = list.get(0).getParent();
-            }
-        }
-
-        // 自定义类型 (只有left继承了right，或者right继承了left，才可以赋值)
-        if (leftSrc instanceof ALittleClassDec) {
-            if (!(rightSrc instanceof ALittleClassDec)) {
+        if (leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+            if (rightGuessInfo.type != ALittleReferenceUtil.GuessType.GT_CLASS) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
             }
 
-            if (leftSrc.equals(rightSrc)) return true;
+            if (leftGuessInfo.element.equals(rightGuessInfo.element)) return;
 
-            if (ALittleReferenceUtil.IsClassSuper(leftSrc, rightSrc)) return true;
-            if (ALittleReferenceUtil.IsClassSuper(rightSrc, leftSrc)) return true;
+            if (ALittleReferenceUtil.IsClassSuper(leftGuessInfo.element, rightGuessInfo.element)) return;
+            if (ALittleReferenceUtil.IsClassSuper(rightGuessInfo.element, leftGuessInfo.element)) return;
 
-        } else if (leftSrc instanceof ALittleStructDec) {
-            if (!(rightSrc instanceof ALittleStructDec)) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
+        }
+
+        if (leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
+            if (rightGuessInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
             }
 
-            if (leftSrc.equals(rightSrc)) return true;
+            if (leftGuessInfo.element.equals(rightGuessInfo.element)) return;
 
-            if (ALittleReferenceUtil.IsStructSuper(leftSrc, rightSrc)) return true;
-            if (ALittleReferenceUtil.IsStructSuper(rightSrc, leftSrc)) return true;
+            if (ALittleReferenceUtil.IsStructSuper(leftGuessInfo.element, rightGuessInfo.element)) return;
+            if (ALittleReferenceUtil.IsStructSuper(rightGuessInfo.element, leftGuessInfo.element)) return;
+
+            throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
         }
 
         throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);

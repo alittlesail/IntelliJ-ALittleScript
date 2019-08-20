@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVarAssignNameDec> {
@@ -17,8 +18,13 @@ public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVa
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        ALittleVarAssignDec varAssignDec = (ALittleVarAssignDec)myElement.getParent();
-        return varAssignDec.guessTypes();
+        PsiElement parent = myElement.getParent();
+        if (parent instanceof ALittleVarAssignDec) {
+            return ((ALittleVarAssignDec) parent).guessTypes();
+        } else if (parent instanceof ALittleForPairDec) {
+            return ((ALittleForPairDec) parent).guessTypes();
+        }
+        return new ArrayList<>();
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {

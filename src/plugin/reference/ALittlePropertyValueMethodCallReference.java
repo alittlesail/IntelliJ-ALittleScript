@@ -1,14 +1,9 @@
 package plugin.reference;
 
 import com.intellij.codeInsight.hints.InlayInfo;
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import plugin.ALittleIcons;
-import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -32,10 +27,42 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
 
         // 获取前一个类型
         ALittleReferenceUtil.GuessTypeInfo preType;
+        ALittleReferenceUtil.GuessTypeInfo prePreType = null;
         if (index == 0) {
             preType = propertyValueFirstType.guessType();
+        } else if (index == 1) {
+            preType = suffixList.get(index - 1).guessType();
+            prePreType = propertyValueFirstType.guessType();
         } else {
             preType = suffixList.get(index - 1).guessType();
+            prePreType = suffixList.get(index - 2).guessType();
+        }
+
+        // 如果是Functor
+        if (preType.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+            // 如果再往前一个是一个Class实例对象，那么就要去掉第一个参数
+            if (prePreType != null && prePreType.type == ALittleReferenceUtil.GuessType.GT_CLASS && !preType.functorParamList.isEmpty()) {
+                preType.functorParamList.remove(0);
+                preType.functorParamNameList.remove(0);
+                preType.value = "Functor<(";
+                if (preType.functorAwait) {
+                    preType.value = "Functor<await(";
+                }
+                List<String> paramList = new ArrayList<>();
+                for (ALittleReferenceUtil.GuessTypeInfo guessTypeInfo : preType.functorParamList) {
+                    paramList.add(guessTypeInfo.value);
+                }
+                preType.value += String.join(",", paramList);
+                preType.value += ")";
+                List<String> returnList = new ArrayList<>();
+                for (ALittleReferenceUtil.GuessTypeInfo guessTypeInfo : preType.functorReturnList) {
+                    returnList.add(guessTypeInfo.value);
+                }
+                String returnString = String.join(",", returnList);
+                if (!returnString.isEmpty()) preType.value += ":";
+                preType.value += returnString;
+                preType.value += ">";
+            }
         }
 
         return preType;
@@ -73,10 +100,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             for (int i = 0; i < valueStatList.size(); ++i) {
                 ALittleReferenceUtil.GuessTypeInfo guessTypeInfo = valueStatList.get(i).guessType();
                 try {
-                    boolean result = ALittleReferenceOpUtil.guessTypeEqual(myElement, preType.functorParamList.get(i), valueStatList.get(i), guessTypeInfo);
-                    if (!result) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(valueStatList.get(i), "第" + (i + 1) + "个参数类型和函数定义的参数类型不同");
-                    }
+                    ALittleReferenceOpUtil.guessTypeEqual(myElement, preType.functorParamList.get(i), valueStatList.get(i), guessTypeInfo);
                 } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "第" + (i + 1) + "个参数类型和函数定义的参数类型不同:" + e.getError());
                 }

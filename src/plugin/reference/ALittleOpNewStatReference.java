@@ -1,11 +1,7 @@
 package plugin.reference;
 
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -81,11 +77,8 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
 
                 for (int i = 0; i < valueStatList.size(); ++i) {
                     try {
-                        boolean result = ALittleReferenceOpUtil.guessTypeEqual(param_one_decList.get(i), param_type_list.get(i),
+                        ALittleReferenceOpUtil.guessTypeEqual(param_one_decList.get(i), param_type_list.get(i),
                                 valueStatList.get(i), valueStatList.get(i).guessType());
-                        if (!result) {
-                            throw new ALittleReferenceUtil.ALittleReferenceException(valueStatList.get(i), "第" + (i + 1) + "个参数类型和函数定义的参数类型不同");
-                        }
                     } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                         throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "第" + (i + 1) + "个参数类型和函数定义的参数类型不同:" + e.getError());
                     }

@@ -1,9 +1,7 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.psi.ALittleAllType;
 import plugin.psi.ALittleCustomType;
 import plugin.psi.ALittleReflectValue;
 

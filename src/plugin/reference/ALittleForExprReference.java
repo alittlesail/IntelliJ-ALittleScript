@@ -1,9 +1,7 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -44,7 +42,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
             ALittleForEndStat endStat = step_expr.getForEndStat();
             ALittleForStepStat stepStat = step_expr.getForStepStat();
             if (endStat != null) {
-                guessType = endStat.guessType();
+                guessType = endStat.getValueStat().guessType();
                 if (!guessType.value.equals("int") && !guessType.value.equals("I64") && !guessType.value.equals("double") && !guessType.value.equals("any")) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(endStat, "for的结束条件表达式类型必须是int,I64,double,any, 不能是:" + guessType.value);
                 }
@@ -52,7 +50,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
 
             // 步长表达式
             if (stepStat != null) {
-                guessType = stepStat.guessType();
+                guessType = stepStat.getValueStat().guessType();
                 if (!guessType.value.equals("int") && !guessType.value.equals("I64") && !guessType.value.equals("double") && !guessType.value.equals("any")) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(stepStat, "for的步长条件表达式类型必须是int,I64,double,any, 不能是:" + guessType.value);
                 }
@@ -79,14 +77,12 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
 
                 ALittleReferenceUtil.GuessTypeInfo valueGuessType = pair_decList.get(1).guessType();
                 try {
-                    boolean result = ALittleReferenceOpUtil.guessTypeEqual(value_stat, guessType.listSubType, pair_decList.get(1), valueGuessType);
-                    if (!result) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(pair_decList.get(1), "变量格式错误，不能是:" + valueGuessType.value);
-                    }
-
+                    ALittleReferenceOpUtil.guessTypeEqual(value_stat, guessType.listSubType, pair_decList.get(1), valueGuessType);
                 } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "变量格式错误，不能是:" + valueGuessType.value + " :" + e.getError());
                 }
+
+                return;
             }
 
             if (guessType.type == ALittleReferenceUtil.GuessType.GT_MAP) {
@@ -96,10 +92,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
 
                 ALittleReferenceUtil.GuessTypeInfo keyGuessType = pair_decList.get(0).guessType();
                 try {
-                    boolean result = ALittleReferenceOpUtil.guessTypeEqual(value_stat, guessType.mapKeyType, pair_decList.get(0), keyGuessType);
-                    if (!result) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(pair_decList.get(0), "key变量格式错误，不能是:" + keyGuessType.value);
-                    }
+                    ALittleReferenceOpUtil.guessTypeEqual(value_stat, guessType.mapKeyType, pair_decList.get(0), keyGuessType);
                 } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "key变量格式错误，不能是:" + keyGuessType.value + " :" + e.getError());
                 }
@@ -107,13 +100,12 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
 
                 ALittleReferenceUtil.GuessTypeInfo valueGuessType = pair_decList.get(1).guessType();
                 try {
-                    boolean result = ALittleReferenceOpUtil.guessTypeEqual(value_stat, guessType.mapValueType, pair_decList.get(1), valueGuessType);
-                    if (!result) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(pair_decList.get(1), "value变量格式错误，不能是:" + valueGuessType.value);
-                    }
+                    ALittleReferenceOpUtil.guessTypeEqual(value_stat, guessType.mapValueType, pair_decList.get(1), valueGuessType);
                 } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "value变量格式错误，不能是:" + valueGuessType.value + " :" + e.getError());
                 }
+
+                return;
             }
 
             throw new ALittleReferenceUtil.ALittleReferenceException(value_stat, "遍历对象类型必须是List,Map,any");

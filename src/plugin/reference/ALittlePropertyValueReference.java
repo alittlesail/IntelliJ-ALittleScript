@@ -1,13 +1,10 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.psi.ALittleAllType;
 import plugin.psi.ALittlePropertyValue;
 import plugin.psi.ALittlePropertyValueSuffix;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ALittlePropertyValueReference extends ALittleReference<ALittlePropertyValue> {

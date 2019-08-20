@@ -36,7 +36,7 @@ public class ALittleUtil {
             ALittleNamespaceNameDec structExtendsNamespaceNameDec = structExtendsDec.getNamespaceNameDec();
             String namespaceName = namespace;
             if (structExtendsNamespaceNameDec != null) namespaceName = structExtendsNamespaceNameDec.getText();
-            ALittleStructNameDec structNameDec = structDec.getStructNameDec();
+            ALittleStructNameDec structNameDec = structExtendsDec.getStructNameDec();
             if (structNameDec != null) {
                 findStructVarNameDecList(project, namespaceName, structNameDec.getText(), varName, result, deep - 1);
             }
@@ -126,7 +126,7 @@ public class ALittleUtil {
             ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
             String namespaceName = namespace;
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classDec.getClassNameDec();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
                 findMethodNameDecList(project, namespaceName, classNameDec.getText(), methodName, result, icon, deep - 1);
             }
@@ -199,7 +199,7 @@ public class ALittleUtil {
             ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
             String namespaceName = namespace;
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classDec.getClassNameDec();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
                 findClassVarNameDecList(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }
@@ -254,7 +254,7 @@ public class ALittleUtil {
             ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
             String namespaceName = namespace;
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classDec.getClassNameDec();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
                 findMethodNameDecListForSetter(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }
@@ -293,7 +293,7 @@ public class ALittleUtil {
             ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
             String namespaceName = namespace;
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classDec.getClassNameDec();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
                 findMethodNameDecListForGetter(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }
@@ -332,7 +332,7 @@ public class ALittleUtil {
             ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
             String namespaceName = namespace;
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classDec.getClassNameDec();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
                 findMethodNameDecListForFun(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }
@@ -370,7 +370,7 @@ public class ALittleUtil {
             ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
             String namespaceName = namespace;
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classDec.getClassNameDec();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
                 findMethodNameDecListForStatic(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }

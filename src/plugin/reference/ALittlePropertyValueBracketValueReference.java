@@ -1,10 +1,7 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -77,10 +74,7 @@ public class ALittlePropertyValueBracketValueReference extends ALittleReference<
             }
         } else if (preType.type == ALittleReferenceUtil.GuessType.GT_MAP) {
             try {
-                boolean result = ALittleReferenceOpUtil.guessTypeEqual(myElement, preType.mapKeyType, value_stat, keyGuessType);
-                if (!result) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(value_stat, "索引值的类型不能是:" + keyGuessType.value);
-                }
+                ALittleReferenceOpUtil.guessTypeEqual(myElement, preType.mapKeyType, value_stat, keyGuessType);
             } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "索引值的类型不能是:" + keyGuessType.value + " :" + e.getError());
             }
@@ -89,7 +83,7 @@ public class ALittlePropertyValueBracketValueReference extends ALittleReference<
         {
             List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
             if (guessList.isEmpty()) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "该元素不能直接使用[]取值，请先cast");
             } else if (guessList.size() != 1) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
             }

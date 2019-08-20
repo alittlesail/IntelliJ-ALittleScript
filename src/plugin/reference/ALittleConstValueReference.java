@@ -1,7 +1,6 @@
 package plugin.reference;
 
 import com.intellij.execution.process.ConsoleHighlighter;
-import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;

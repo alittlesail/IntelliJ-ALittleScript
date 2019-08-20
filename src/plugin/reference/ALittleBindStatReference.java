@@ -1,9 +1,7 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.psi.ALittleBindStat;
 import plugin.psi.ALittleValueStat;
 
@@ -96,11 +94,8 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
             ALittleReferenceUtil.GuessTypeInfo param_guess_info = guessInfo.functorParamList.get(i - 1);
 
             try {
-                boolean result = ALittleReferenceOpUtil.guessTypeEqual(myElement, param_guess_info,
+                ALittleReferenceOpUtil.guessTypeEqual(myElement, param_guess_info,
                         valueStatList.get(i), valueStatList.get(i).guessType());
-                if (!result) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(valueStatList.get(i), "第" + i + "个参数类型和函数定义的参数类型不同");
-                }
             } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
             }

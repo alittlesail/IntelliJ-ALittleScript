@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import plugin.psi.ALittleEnumDec;
 import plugin.psi.ALittleEnumNameDec;
 import plugin.psi.ALittleEnumVarDec;
-import plugin.psi.ALittleStructVarDec;
 
 import java.util.ArrayList;
 import java.util.HashSet;

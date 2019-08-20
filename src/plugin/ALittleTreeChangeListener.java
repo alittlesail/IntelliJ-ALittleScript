@@ -152,11 +152,11 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         // 从全局找
         if (find_in_global) {
             if (src_name.isEmpty()) {
-                for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry : listener.m_instanceMap.entrySet()) {
+                for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry : listener.mInstanceMap.entrySet()) {
                     result.addAll(entry.getValue());
                 }
             } else {
-                Set<ALittleVarAssignNameDec> set = listener.m_instanceMap.get(src_name);
+                Set<ALittleVarAssignNameDec> set = listener.mInstanceMap.get(src_name);
                 if (set != null)
                     result.addAll(set);
             }
@@ -372,7 +372,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     private Map<String, Map<ALittleNamespaceNameDec, Data>> mNamespaceMap;
     private Map<String, Data> mDataMap;
     // 全局命名域下的单例
-    private Map<String, Set<ALittleVarAssignNameDec>> m_instanceMap;
+    private Map<String, Set<ALittleVarAssignNameDec>> mInstanceMap;
     // 已加载的文件列表
     boolean mReloading = false;
     boolean mReloaded = false;
@@ -413,7 +413,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     public void reload() {
         mNamespaceMap = new HashMap<>();
         mDataMap = new HashMap<>();
-        m_instanceMap = new HashMap<>();
+        mInstanceMap = new HashMap<>();
         mReloading = true;
 
         PsiManager psi_mgr = PsiManager.getInstance(mProject);
@@ -485,24 +485,29 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                 if (nameDec == null) continue;
                 data.addALittleGlobalMethodNameDec(nameDec);
                 fast_data.addALittleGlobalMethodNameDec(nameDec);
-            } else if (child instanceof ALittleVarAssignNameDec) {
-                ALittleVarAssignNameDec nameDec = (ALittleVarAssignNameDec)child;
-                ALittleVarAssignDec varNameDec = (ALittleVarAssignDec)nameDec.getParent();
-                ALittleInstanceDec dec = (ALittleInstanceDec)varNameDec.getParent();
-
-                ALittleAccessModifier access = dec.getAccessModifier();
+            } else if (child instanceof ALittleInstanceDec) {
+                ALittleInstanceDec instanceDec = (ALittleInstanceDec) child;
+                boolean isPublic = false;
+                ALittleAccessModifier access = instanceDec.getAccessModifier();
                 if (access != null && access.getText().equals("public")) {
-                    String name_text = nameDec.getText();
-                    Set<ALittleVarAssignNameDec> set = m_instanceMap.get(name_text);
-                    if (set == null) {
-                        set = new HashSet<>();
-                        m_instanceMap.put(name_text, set);
-                    }
-                    set.add(nameDec);
-                } else {
-                    fast_data.addALittleInstanceNameDec(nameDec);
+                    isPublic = true;
                 }
-                data.addALittleInstanceNameDec(nameDec);
+
+                List<ALittleVarAssignDec> varAssignDecList = instanceDec.getVarAssignExpr().getVarAssignDecList();
+                for (ALittleVarAssignDec varAssignDec : varAssignDecList) {
+                    if (isPublic) {
+                        String name_text = varAssignDec.getVarAssignNameDec().getText();
+                        Set<ALittleVarAssignNameDec> set = mInstanceMap.get(name_text);
+                        if (set == null) {
+                            set = new HashSet<>();
+                            mInstanceMap.put(name_text, set);
+                        }
+                        set.add(varAssignDec.getVarAssignNameDec());
+                    } else{
+                        fast_data.addALittleInstanceNameDec(varAssignDec.getVarAssignNameDec());
+                    }
+                    data.addALittleInstanceNameDec(varAssignDec.getVarAssignNameDec());
+                }
             }
         }
         map.put(element, data);
@@ -551,10 +556,10 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                             fast_data.removeALittleInstanceNameDec(nameDec);
 
                             String name_text = nameDec.getText();
-                            Set<ALittleVarAssignNameDec> set = m_instanceMap.get(name_text);
+                            Set<ALittleVarAssignNameDec> set = mInstanceMap.get(name_text);
                             if (set != null) {
                                 set.remove(nameDec);
-                                if (set.isEmpty()) m_instanceMap.remove(name_text);
+                                if (set.isEmpty()) mInstanceMap.remove(name_text);
                             }
                         }
                     }

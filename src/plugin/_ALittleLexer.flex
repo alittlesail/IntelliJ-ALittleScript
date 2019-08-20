@@ -26,9 +26,9 @@ EOL=\R
 WHITE_SPACE=\s+
 
 WHITE_SPACE=[ \t\n\x0B\f\r]+
-COMMENT=("//".*|"/"\*.*\*"/")
+COMMENT="//".*
 DIGIT_CONTENT=0x[0-9a-fA-F]+|[0-9]+(\.[0-9]*)?
-STRING_CONTENT=(\"([^\"\\]|\\.)*\")
+STRING_CONTENT=\"([^\"\\]|\\.)*\"
 ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
 
 %%

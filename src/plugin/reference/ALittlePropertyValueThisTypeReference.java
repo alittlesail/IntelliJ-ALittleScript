@@ -1,17 +1,12 @@
 package plugin.reference;
 
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import plugin.ALittleUtil;
 import plugin.psi.*;
-import com.intellij.openapi.util.Key;
 
 import java.util.ArrayList;
 import java.util.List;

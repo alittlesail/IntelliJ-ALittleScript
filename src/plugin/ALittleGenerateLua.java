@@ -731,7 +731,7 @@ public class ALittleGenerateLua {
             if (custom_type != null) {
                 String custom_type_content = custom_type.getText();
                 custom_guessType = custom_type.guessType();
-                if (custom_guessType instanceof ALittleNamespaceNameDec && custom_type_content.equals("lua"))
+                if (custom_guessType.type == ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME && custom_type_content.equals("lua"))
                     is_lua_namespace = true;
 
                 // 如果是lua命名域，那么就忽略
@@ -769,7 +769,7 @@ public class ALittleGenerateLua {
                         String split = ".";
 
                         // 如果是函数名
-                        if (guess instanceof ALittleMethodNameDec) {
+                        if (guess.element instanceof ALittleMethodNameDec) {
                             ALittleMethodNameDec method_nameDec = (ALittleMethodNameDec) guess;
                             // 1. 是成员函数
                             // 2. 使用的是调用
@@ -794,7 +794,7 @@ public class ALittleGenerateLua {
                                         pre_guess = pre_suffix.getPropertyValueBracketValue().guessType();
 
                                     // 只要不是类名，那么肯定就是类实例对象，就是用语法糖
-                                    if (!(pre_guess instanceof ALittleClassNameDec))
+                                    if (pre_guess.type != ALittleReferenceUtil.GuessType.GT_CLASS_NAME)
                                         split = ":";
                                 }
                                 // setter和getter需要特殊处理
@@ -817,7 +817,7 @@ public class ALittleGenerateLua {
                                         pre_guess = pre_suffix.getPropertyValueBracketValue().guessType();
 
                                     // 如果前一个后缀是类名，那么那么就需要获取setter或者getter来获取
-                                    if (pre_guess instanceof ALittleClassNameDec) {
+                                    if (pre_guess.type == ALittleReferenceUtil.GuessType.GT_CLASS_NAME) {
                                         // 如果是getter，那么一定是一个参数，比如ClassName.disabled(self)
                                         // 如果是setter，那么一定是两个参数，比如ClassName.width(self, 100)
                                         if (next_suffix.getPropertyValueMethodCall().getValueStatList().size() == 1)

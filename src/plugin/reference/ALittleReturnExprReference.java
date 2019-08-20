@@ -3,7 +3,6 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -116,10 +115,7 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
         for (int i = 0; i < guessTypeList.size(); ++i) {
             ALittleValueStat value_stat = valueStatList.get(i);
             try {
-                boolean result = ALittleReferenceOpUtil.guessTypeEqual(returnTypeList.get(i), guessTypeList.get(i), value_stat, value_stat.guessType());
-                if (!result) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(returnTypeList.get(i), "return的第" + (i + 1) + "个返回值数量和函数定义的返回值类型不同");
-                }
+                ALittleReferenceOpUtil.guessTypeEqual(returnTypeList.get(i), guessTypeList.get(i), value_stat, value_stat.guessType());
             } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "return的第" + (i + 1) + "个返回值数量和函数定义的返回值类型不同:" + e.getError());
             }
