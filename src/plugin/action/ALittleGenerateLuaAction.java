@@ -16,19 +16,19 @@ import plugin.alittle.SendLogRunnable;
 import plugin.psi.ALittleFile;
 
 public class ALittleGenerateLuaAction extends AnAction {
-    private void generateDir(PsiManager psi_mgr, VirtualFile root) throws Exception {
+    private void generateDir(PsiManager psiMgr, VirtualFile root) throws Exception {
         if (root.isDirectory()) {
             VirtualFile[] files = root.getChildren();
             if (files != null) {
                 for (VirtualFile file : files) {
-                    generateDir(psi_mgr, file);
+                    generateDir(psiMgr, file);
                 }
             }
         } else {
-            PsiFile psi_file = psi_mgr.findFile(root);
-            if (psi_file instanceof ALittleFile) {
+            PsiFile psiFile = psiMgr.findFile(root);
+            if (psiFile instanceof ALittleFile) {
                 ALittleGenerateLua lua = new ALittleGenerateLua();
-                lua.GenerateLua((ALittleFile)psi_file, true);
+                lua.GenerateLua((ALittleFile)psiFile, true);
             }
         }
     }
@@ -48,10 +48,10 @@ public class ALittleGenerateLuaAction extends AnAction {
                 FileHelper.rebuildPath(FileHelper.calcScriptPath(module));
             }
 
-            PsiManager psi_mgr = PsiManager.getInstance(project);
+            PsiManager psiMgr = PsiManager.getInstance(project);
             VirtualFile[] roots = ProjectRootManager.getInstance(project).getContentRoots();
             for (VirtualFile root : roots) {
-                generateDir(psi_mgr, root);
+                generateDir(psiMgr, root);
             }
         } catch (Exception e) {
             Messages.showMessageDialog(project, e.getMessage(), "提示", Messages.getInformationIcon());

@@ -1,6 +1,5 @@
 package plugin;
 
-import com.intellij.ide.ui.EditorOptionsTopHitProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -19,19 +18,16 @@ import plugin.reference.ALittleReferenceUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class ALittleGenerateLua {
     private String mNamespaceName = "";
-    private List<String> mEnumList;
-    private List<String> mClassList;
 
     private boolean mOpenRawSet = false;
     private int mRawsetUseCount = 0;
 
-    private void copyStdLibrary(String module_base_path) throws Exception {
-        File file = new File(module_base_path + "/std");
+    private void copyStdLibrary(String moduleBasePath) throws Exception {
+        File file = new File(moduleBasePath + "/std");
         if (file.exists()) return;
         if (!file.mkdirs())
             throw new Exception("文件夹创建失败:" + file.getPath());
@@ -45,24 +41,24 @@ public class ALittleGenerateLua {
             dir = VfsUtil.findFileByIoFile(new File(jarPath +"/adapter/Lua"), true);
 
         if (dir != null) {
-            VirtualFile[] file_list = dir.getChildren();
-            if (file_list != null) {
-                for (VirtualFile virtualFile : file_list) {
-                    FileOutputStream file_out = new FileOutputStream(new File(module_base_path + "/std/" + virtualFile.getName()));
-                    file_out.write(virtualFile.contentsToByteArray());
-                    file_out.close();
+            VirtualFile[] fileList = dir.getChildren();
+            if (fileList != null) {
+                for (VirtualFile virtualFile : fileList) {
+                    FileOutputStream fileOut = new FileOutputStream(new File(moduleBasePath + "/std/" + virtualFile.getName()));
+                    fileOut.write(virtualFile.contentsToByteArray());
+                    fileOut.close();
                 }
             }
         }
     }
 
-    private void checkErrorElement(PsiElement element, boolean full_check) throws ALittleReferenceUtil.ALittleReferenceException {
+    private void checkErrorElement(PsiElement element, boolean fullCheck) throws ALittleReferenceUtil.ALittleReferenceException {
         for(PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof PsiErrorElement) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(child, ((PsiErrorElement) child).getErrorDescription());
             }
 
-            if (full_check) {
+            if (fullCheck) {
                 // 检查错误，给元素上色
                 PsiReference ref = element.getReference();
                 if (ref instanceof ALittleReference) {
@@ -70,20 +66,20 @@ public class ALittleGenerateLua {
                 }
             }
 
-            checkErrorElement(child, full_check);
+            checkErrorElement(child, fullCheck);
         }
     }
 
-    public void GenerateLua(ALittleFile alittleFile, boolean full_check) throws Exception {
+    public void GenerateLua(ALittleFile alittleFile, boolean fullCheck) throws Exception {
         // 获取语法错误
         try {
-            checkErrorElement(alittleFile, full_check);
+            checkErrorElement(alittleFile, fullCheck);
         } catch (ALittleReferenceUtil.ALittleReferenceException e) {
             throw new Exception(e.getElement().getContainingFile().getName() + "有语法错误:" + e.getError());
         }
 
-        mEnumList = new ArrayList<>();
-        mClassList = new ArrayList<>();
+        List<String> mEnumList = new ArrayList<>();
+        List<String> mClassList = new ArrayList<>();
 
         ALittleNamespaceDec namespaceDec = ALittleUtil.getNamespaceDec(alittleFile);
         if (namespaceDec == null) throw new Exception("没有定义命名域 namespace");
@@ -111,56 +107,56 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateBindStat(ALittleBindStat bind_stat) throws Exception {
-        List<ALittleValueStat> valueStat_list = bind_stat.getValueStatList();
+    private String GenerateBindStat(ALittleBindStat bindStat) throws Exception {
+        List<ALittleValueStat> valueStatList = bindStat.getValueStatList();
 
         String content = "ALittle.Bind(";
-        if (ALittleUtil.getNamespaceName((ALittleFile)bind_stat.getContainingFile()).equals("ALittle"))
+        if (ALittleUtil.getNamespaceName((ALittleFile)bindStat.getContainingFile()).equals("ALittle"))
             content = "Bind(";
-        List<String> param_list = new ArrayList<>();
-        for (ALittleValueStat valueStat : valueStat_list) {
-            param_list.add(GenerateValueStat(valueStat));
+        List<String> paramList = new ArrayList<>();
+        for (ALittleValueStat valueStat : valueStatList) {
+            paramList.add(GenerateValueStat(valueStat));
         }
-        content += String.join(", ", param_list);
+        content += String.join(", ", paramList);
         content += ")";
         return content;
     }
 
     @NotNull
-    private String GenerateOpNewListStat(ALittleOpNewListStat op_new_list) throws Exception {
-        List<ALittleValueStat> valueStat_list = op_new_list.getValueStatList();
+    private String GenerateOpNewListStat(ALittleOpNewListStat opNewList) throws Exception {
+        List<ALittleValueStat> valueStatList = opNewList.getValueStatList();
 
         String content = "{";
-        List<String> param_list = new ArrayList<>();
-        for (ALittleValueStat valueStat : valueStat_list) {
-            param_list.add(GenerateValueStat(valueStat));
+        List<String> paramList = new ArrayList<>();
+        for (ALittleValueStat valueStat : valueStatList) {
+            paramList.add(GenerateValueStat(valueStat));
         }
-        content += String.join(", ", param_list);
+        content += String.join(", ", paramList);
         content += "}";
         return content;
     }
 
     @NotNull
-    private String GenerateOpNewStat(ALittleOpNewStat op_new_stat) throws Exception {
+    private String GenerateOpNewStat(ALittleOpNewStat opNewStat) throws Exception {
         // 如果是通用类型
-        ALittleGenericType genericType = op_new_stat.getGenericType();
+        ALittleGenericType genericType = opNewStat.getGenericType();
         if (genericType != null) {
             // 如果是Map，那么直接返回{}
-            ALittleGenericMapType map_type = genericType.getGenericMapType();
-            if (map_type != null) return "{}";
+            ALittleGenericMapType mapType = genericType.getGenericMapType();
+            if (mapType != null) return "{}";
 
             // 如果是List，那么直接返回{}
-            ALittleGenericListType list_type = genericType.getGenericListType();
-            if (list_type != null) return "{}";
+            ALittleGenericListType listType = genericType.getGenericListType();
+            if (listType != null) return "{}";
 
-            ALittleGenericFunctorType functor_type = genericType.getGenericFunctorType();
-            if (functor_type != null) {
+            ALittleGenericFunctorType functorType = genericType.getGenericFunctorType();
+            if (functorType != null) {
                 throw new Exception("Functor不能使用new来创建");
             }
         }
 
         // 自定义类型
-        ALittleCustomType customType = op_new_stat.getCustomType();
+        ALittleCustomType customType = opNewStat.getCustomType();
         if (customType != null) {
             ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
             // 如果是结构体名，那么就当表来处理
@@ -170,17 +166,17 @@ public class ALittleGenerateLua {
             } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                 // 如果是类名
                 String content = "";
-                ALittleNamespaceNameDec namespace_nameDec = customType.getNamespaceNameDec();
-                if (namespace_nameDec != null)
-                    content = namespace_nameDec.getIdContent().getText() + ".";
+                ALittleNamespaceNameDec namespaceNameDec = customType.getNamespaceNameDec();
+                if (namespaceNameDec != null)
+                    content = namespaceNameDec.getIdContent().getText() + ".";
                 content += customType.getIdContent().getText() + "(";
 
-                List<String> param_list = new ArrayList<>();
-                List<ALittleValueStat> valueStat_list = op_new_stat.getValueStatList();
-                for (ALittleValueStat valueStat : valueStat_list) {
-                    param_list.add(GenerateValueStat(valueStat));
+                List<String> paramList = new ArrayList<>();
+                List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
+                for (ALittleValueStat valueStat : valueStatList) {
+                    paramList.add(GenerateValueStat(valueStat));
                 }
-                content += String.join(", ", param_list);
+                content += String.join(", ", paramList);
 
                 content += ")";
                 return content;
@@ -192,26 +188,26 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateOp8Suffix(ALittleOp8Suffix suffix) throws Exception {
-        String op_string = suffix.getOp8().getText();
-        if (op_string.equals("||")) {
-            op_string = "or";
+        String opString = suffix.getOp8().getText();
+        if (opString.equals("||")) {
+            opString = "or";
         }
 
-        String value_factor_result = null;
+        String valueFactorResult = null;
         if (suffix.getValueFactorStat() != null) {
-            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
+            valueFactorResult = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
-            value_factor_result = GenerateOp2Value(suffix.getOp2Value());
+            valueFactorResult = GenerateOp2Value(suffix.getOp2Value());
         }
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp8SuffixEe> suffix_ee_list = suffix.getOp8SuffixEeList();
-        for (ALittleOp8SuffixEe suffix_ee : suffix_ee_list) {
-            String suffix_ee_result = GenerateOp8SuffixEe(suffix_ee);
-            suffix_content_list.add(suffix_ee_result);
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp8SuffixEe> suffixEeList = suffix.getOp8SuffixEeList();
+        for (ALittleOp8SuffixEe suffixEe : suffixEeList) {
+            String suffixEeResult = GenerateOp8SuffixEe(suffixEe);
+            suffixContentList.add(suffixEeResult);
         }
-        String content = op_string + " " + value_factor_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = opString + " " + valueFactorResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
@@ -242,43 +238,43 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateOp8Stat(ALittleOp8Stat op_8_stat) throws Exception {
-        String value_factor_result = GenerateValueFactorStat(op_8_stat.getValueFactorStat());
+    private String GenerateOp8Stat(ALittleOp8Stat op8Stat) throws Exception {
+        String valueFactorResult = GenerateValueFactorStat(op8Stat.getValueFactorStat());
 
-        ALittleOp8Suffix suffix = op_8_stat.getOp8Suffix();
-        String suffix_result = GenerateOp8Suffix(suffix);
+        ALittleOp8Suffix suffix = op8Stat.getOp8Suffix();
+        String suffixResult = GenerateOp8Suffix(suffix);
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp8SuffixEx> suffix_ex_list = op_8_stat.getOp8SuffixExList();
-        for (ALittleOp8SuffixEx suffix_ex : suffix_ex_list) {
-            suffix_content_list.add(GenerateOp8SuffixEx(suffix_ex));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp8SuffixEx> suffixExList = op8Stat.getOp8SuffixExList();
+        for (ALittleOp8SuffixEx suffixEx : suffixExList) {
+            suffixContentList.add(GenerateOp8SuffixEx(suffixEx));
         }
-        String content = value_factor_result + " " + suffix_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = valueFactorResult + " " + suffixResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
     @NotNull
     private String GenerateOp7Suffix(ALittleOp7Suffix suffix) throws Exception {
-        String op_string = suffix.getOp7().getText();
-        if (op_string.equals("&&")) {
-            op_string = "and";
+        String opString = suffix.getOp7().getText();
+        if (opString.equals("&&")) {
+            opString = "and";
         }
 
-        String value_factor_result = null;
+        String valueFactorResult = null;
         if (suffix.getValueFactorStat() != null) {
-            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
+            valueFactorResult = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
-            value_factor_result = GenerateOp2Value(suffix.getOp2Value());
+            valueFactorResult = GenerateOp2Value(suffix.getOp2Value());
         }
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp7SuffixEe> suffix_ee_list = suffix.getOp7SuffixEeList();
-        for (ALittleOp7SuffixEe suffix_ee : suffix_ee_list) {
-            suffix_content_list.add(GenerateOp7SuffixEe(suffix_ee));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp7SuffixEe> suffixEeList = suffix.getOp7SuffixEeList();
+        for (ALittleOp7SuffixEe suffixEe : suffixEeList) {
+            suffixContentList.add(GenerateOp7SuffixEe(suffixEe));
         }
-        String content = op_string + " " + value_factor_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = opString + " " + valueFactorResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
@@ -309,43 +305,43 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateOp7Stat(ALittleOp7Stat op_7_stat) throws Exception {
-        String value_factor_result = GenerateValueFactorStat(op_7_stat.getValueFactorStat());
+    private String GenerateOp7Stat(ALittleOp7Stat op7Stat) throws Exception {
+        String valueFactorResult = GenerateValueFactorStat(op7Stat.getValueFactorStat());
 
-        ALittleOp7Suffix suffix = op_7_stat.getOp7Suffix();
-        String suffix_result = GenerateOp7Suffix(suffix);
+        ALittleOp7Suffix suffix = op7Stat.getOp7Suffix();
+        String suffixResult = GenerateOp7Suffix(suffix);
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp7SuffixEx> suffix_ex_list = op_7_stat.getOp7SuffixExList();
-        for (ALittleOp7SuffixEx suffix_ex : suffix_ex_list) {
-            suffix_content_list.add(GenerateOp7SuffixEx(suffix_ex));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp7SuffixEx> suffixExList = op7Stat.getOp7SuffixExList();
+        for (ALittleOp7SuffixEx suffixEx : suffixExList) {
+            suffixContentList.add(GenerateOp7SuffixEx(suffixEx));
         }
-        String content = value_factor_result + " " + suffix_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = valueFactorResult + " " + suffixResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
     @NotNull
     private String GenerateOp6Suffix(ALittleOp6Suffix suffix) throws Exception {
-        String op_string = suffix.getOp6().getText();
-        if (op_string.equals("!=")) {
-            op_string = "~=";
+        String opString = suffix.getOp6().getText();
+        if (opString.equals("!=")) {
+            opString = "~=";
         }
 
-        String value_factor_result = null;
+        String valueFactorResult = null;
         if (suffix.getValueFactorStat() != null) {
-            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
+            valueFactorResult = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
-            value_factor_result = GenerateOp2Value(suffix.getOp2Value());
+            valueFactorResult = GenerateOp2Value(suffix.getOp2Value());
         }
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp6SuffixEe> suffix_ee_list = suffix.getOp6SuffixEeList();
-        for (ALittleOp6SuffixEe suffix_ee : suffix_ee_list) {
-            suffix_content_list.add(GenerateOp6SuffixEe(suffix_ee));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp6SuffixEe> suffixEeList = suffix.getOp6SuffixEeList();
+        for (ALittleOp6SuffixEe suffixEe : suffixEeList) {
+            suffixContentList.add(GenerateOp6SuffixEe(suffixEe));
         }
-        String content = op_string + " " + value_factor_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = opString + " " + valueFactorResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
@@ -376,40 +372,40 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateOp6Stat(ALittleOp6Stat op_6_stat) throws Exception {
-        String value_factor_result = GenerateValueFactorStat(op_6_stat.getValueFactorStat());
+    private String GenerateOp6Stat(ALittleOp6Stat op6Stat) throws Exception {
+        String valueFactorResult = GenerateValueFactorStat(op6Stat.getValueFactorStat());
 
-        ALittleOp6Suffix suffix = op_6_stat.getOp6Suffix();
-        String suffix_result = GenerateOp6Suffix(suffix);
+        ALittleOp6Suffix suffix = op6Stat.getOp6Suffix();
+        String suffixResult = GenerateOp6Suffix(suffix);
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp6SuffixEx> suffix_ex_list = op_6_stat.getOp6SuffixExList();
-        for (ALittleOp6SuffixEx suffix_ex : suffix_ex_list) {
-            suffix_content_list.add(GenerateOp6SuffixEx(suffix_ex));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp6SuffixEx> suffixExList = op6Stat.getOp6SuffixExList();
+        for (ALittleOp6SuffixEx suffixEx : suffixExList) {
+            suffixContentList.add(GenerateOp6SuffixEx(suffixEx));
         }
-        String content = value_factor_result + " " + suffix_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = valueFactorResult + " " + suffixResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
     @NotNull
     private String GenerateOp5Suffix(ALittleOp5Suffix suffix) throws Exception {
-        String op_string = suffix.getOp5().getText();
+        String opString = suffix.getOp5().getText();
 
-        String value_factor_result = null;
+        String valueFactorResult = null;
         if (suffix.getValueFactorStat() != null) {
-            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
+            valueFactorResult = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
-            value_factor_result = GenerateOp2Value(suffix.getOp2Value());
+            valueFactorResult = GenerateOp2Value(suffix.getOp2Value());
         }
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp5SuffixEe> suffix_ee_list = suffix.getOp5SuffixEeList();
-        for (ALittleOp5SuffixEe suffix_ee : suffix_ee_list) {
-            suffix_content_list.add(GenerateOp5SuffixEe(suffix_ee));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp5SuffixEe> suffixEeList = suffix.getOp5SuffixEeList();
+        for (ALittleOp5SuffixEe suffixEe : suffixEeList) {
+            suffixContentList.add(GenerateOp5SuffixEe(suffixEe));
         }
-        String content = op_string + " " + value_factor_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = opString + " " + valueFactorResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
@@ -440,40 +436,40 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateOp5Stat(ALittleOp5Stat op_5_stat) throws Exception {
-        String value_factor_result = GenerateValueFactorStat(op_5_stat.getValueFactorStat());
+    private String GenerateOp5Stat(ALittleOp5Stat op5Stat) throws Exception {
+        String valueFactorResult = GenerateValueFactorStat(op5Stat.getValueFactorStat());
 
-        ALittleOp5Suffix suffix = op_5_stat.getOp5Suffix();
-        String suffix_result = GenerateOp5Suffix(suffix);
+        ALittleOp5Suffix suffix = op5Stat.getOp5Suffix();
+        String suffixResult = GenerateOp5Suffix(suffix);
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp5SuffixEx> suffix_ex_list = op_5_stat.getOp5SuffixExList();
-        for (ALittleOp5SuffixEx suffix_ex : suffix_ex_list) {
-            suffix_content_list.add(GenerateOp5SuffixEx(suffix_ex));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp5SuffixEx> suffixExList = op5Stat.getOp5SuffixExList();
+        for (ALittleOp5SuffixEx suffixEx : suffixExList) {
+            suffixContentList.add(GenerateOp5SuffixEx(suffixEx));
         }
-        String content = value_factor_result + " " + suffix_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = valueFactorResult + " " + suffixResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
     @NotNull
     private String GenerateOp4Suffix(ALittleOp4Suffix suffix) throws Exception {
-        String op_string = suffix.getOp4().getText();
+        String opString = suffix.getOp4().getText();
 
-        String value_factor_result = null;
+        String valueFactorResult = null;
         if (suffix.getValueFactorStat() != null) {
-            value_factor_result = GenerateValueFactorStat(suffix.getValueFactorStat());
+            valueFactorResult = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
-            value_factor_result = GenerateOp2Value(suffix.getOp2Value());
+            valueFactorResult = GenerateOp2Value(suffix.getOp2Value());
         }
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp4SuffixEe> suffix_ee_list = suffix.getOp4SuffixEeList();
-        for (ALittleOp4SuffixEe suffix_ee : suffix_ee_list) {
-            suffix_content_list.add(GenerateOp4SuffixEe(suffix_ee));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp4SuffixEe> suffixEeList = suffix.getOp4SuffixEeList();
+        for (ALittleOp4SuffixEe suffixEe : suffixEeList) {
+            suffixContentList.add(GenerateOp4SuffixEe(suffixEe));
         }
-        String content = op_string + " " + value_factor_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = opString + " " + valueFactorResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
@@ -504,36 +500,36 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateOp4Stat(ALittleOp4Stat op_4_stat) throws Exception {
-        String value_factor_result = GenerateValueFactorStat(op_4_stat.getValueFactorStat());
+    private String GenerateOp4Stat(ALittleOp4Stat op4Stat) throws Exception {
+        String valueFactorResult = GenerateValueFactorStat(op4Stat.getValueFactorStat());
 
-        ALittleOp4Suffix suffix = op_4_stat.getOp4Suffix();
-        String suffix_result = GenerateOp4Suffix(suffix);
+        ALittleOp4Suffix suffix = op4Stat.getOp4Suffix();
+        String suffixResult = GenerateOp4Suffix(suffix);
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp4SuffixEx> suffix_ex_list = op_4_stat.getOp4SuffixExList();
-        for (ALittleOp4SuffixEx suffix_ex : suffix_ex_list) {
-            suffix_content_list.add(GenerateOp4SuffixEx(suffix_ex));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp4SuffixEx> suffixExList = op4Stat.getOp4SuffixExList();
+        for (ALittleOp4SuffixEx suffixEx : suffixExList) {
+            suffixContentList.add(GenerateOp4SuffixEx(suffixEx));
         }
-        String content = value_factor_result + " " + suffix_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = valueFactorResult + " " + suffixResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
     @NotNull
     private String GenerateOp3Suffix(ALittleOp3Suffix suffix) throws Exception {
-        String op_string = suffix.getOp3().getText();
+        String opString = suffix.getOp3().getText();
 
-        String value_result;
+        String valueResult;
         if (suffix.getValueFactorStat() != null) {
-            value_result = GenerateValueFactorStat(suffix.getValueFactorStat());
+            valueResult = GenerateValueFactorStat(suffix.getValueFactorStat());
         } else if (suffix.getOp2Value() != null) {
-            value_result = GenerateOp2Value(suffix.getOp2Value());
+            valueResult = GenerateOp2Value(suffix.getOp2Value());
         } else {
             throw new Exception("GenerateOp3Suffix出现未知的表达式");
         }
 
-        return op_string + " " + value_result;
+        return opString + " " + valueResult;
     }
 
     @NotNull
@@ -556,19 +552,19 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateOp3Stat(ALittleOp3Stat op_3_stat) throws Exception {
-        String value_factor_result = GenerateValueFactorStat(op_3_stat.getValueFactorStat());
+    private String GenerateOp3Stat(ALittleOp3Stat op3Stat) throws Exception {
+        String valueFactorResult = GenerateValueFactorStat(op3Stat.getValueFactorStat());
 
-        ALittleOp3Suffix suffix = op_3_stat.getOp3Suffix();
-        String suffix_result = GenerateOp3Suffix(suffix);
+        ALittleOp3Suffix suffix = op3Stat.getOp3Suffix();
+        String suffixResult = GenerateOp3Suffix(suffix);
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp3SuffixEx> suffix_ex_list = op_3_stat.getOp3SuffixExList();
-        for (ALittleOp3SuffixEx suffix_ex : suffix_ex_list) {
-            suffix_content_list.add(GenerateOp3SuffixEx(suffix_ex));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp3SuffixEx> suffixExList = op3Stat.getOp3SuffixExList();
+        for (ALittleOp3SuffixEx suffixEx : suffixExList) {
+            suffixContentList.add(GenerateOp3SuffixEx(suffixEx));
         }
-        String content = value_factor_result + " " + suffix_result;
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        String content = valueFactorResult + " " + suffixResult;
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
@@ -592,19 +588,19 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateOp2Value(ALittleOp2Value op_2_value) throws Exception {
+    private String GenerateOp2Value(ALittleOp2Value op2Value) throws Exception {
         String content = "";
 
-        ALittleValueFactorStat value_factor = op_2_value.getValueFactorStat();
-        if (value_factor == null) {
+        ALittleValueFactorStat valueFactor = op2Value.getValueFactorStat();
+        if (valueFactor == null) {
             throw new Exception("GenerateOp2Stat单目运算没有操作对象");
         }
 
-        String valueStatResult = GenerateValueFactorStat(value_factor);
-        String op_string = op_2_value.getOp2().getText();
-        if (op_string.equals("!")) {
+        String valueStatResult = GenerateValueFactorStat(valueFactor);
+        String opString = op2Value.getOp2().getText();
+        if (opString.equals("!")) {
             content += "not " + valueStatResult;
-        } else if (op_string.equals("-")) {
+        } else if (opString.equals("-")) {
             content += "-" + valueStatResult;
         } else {
             throw new Exception("GenerateOp2Stat出现未知类型");
@@ -614,76 +610,76 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateOp2Stat(ALittleOp2Stat op_2_stat) throws Exception {
-        String content = GenerateOp2Value(op_2_stat.getOp2Value());
+    private String GenerateOp2Stat(ALittleOp2Stat op2Stat) throws Exception {
+        String content = GenerateOp2Value(op2Stat.getOp2Value());
 
-        List<String> suffix_content_list = new ArrayList<>();
-        List<ALittleOp2SuffixEx> suffix_ex_list = op_2_stat.getOp2SuffixExList();
-        for (ALittleOp2SuffixEx suffix_ex : suffix_ex_list) {
-            suffix_content_list.add(GenerateOp2SuffixEx(suffix_ex));
+        List<String> suffixContentList = new ArrayList<>();
+        List<ALittleOp2SuffixEx> suffixExList = op2Stat.getOp2SuffixExList();
+        for (ALittleOp2SuffixEx suffixEx : suffixExList) {
+            suffixContentList.add(GenerateOp2SuffixEx(suffixEx));
         }
-        if (!suffix_content_list.isEmpty()) content += " " + String.join(" ", suffix_content_list);
+        if (!suffixContentList.isEmpty()) content += " " + String.join(" ", suffixContentList);
         return content;
     }
 
     @NotNull
-    private String GenerateValueStat(ALittleValueStat root_stat) throws Exception {
-        ALittleValueFactorStat value_factor = root_stat.getValueFactorStat();
-        if (value_factor != null) return GenerateValueFactorStat(value_factor);
+    private String GenerateValueStat(ALittleValueStat rootStat) throws Exception {
+        ALittleValueFactorStat valueFactor = rootStat.getValueFactorStat();
+        if (valueFactor != null) return GenerateValueFactorStat(valueFactor);
 
-        ALittleOp2Stat op_2_stat = root_stat.getOp2Stat();
-        if (op_2_stat != null) return GenerateOp2Stat(op_2_stat);
+        ALittleOp2Stat op2Stat = rootStat.getOp2Stat();
+        if (op2Stat != null) return GenerateOp2Stat(op2Stat);
 
-        ALittleOp3Stat op_3_stat = root_stat.getOp3Stat();
-        if (op_3_stat != null) return GenerateOp3Stat(op_3_stat);
+        ALittleOp3Stat op3Stat = rootStat.getOp3Stat();
+        if (op3Stat != null) return GenerateOp3Stat(op3Stat);
 
-        ALittleOp4Stat op_4_stat = root_stat.getOp4Stat();
-        if (op_4_stat != null) return GenerateOp4Stat(op_4_stat);
+        ALittleOp4Stat op4Stat = rootStat.getOp4Stat();
+        if (op4Stat != null) return GenerateOp4Stat(op4Stat);
 
-        ALittleOp5Stat op_5_stat = root_stat.getOp5Stat();
-        if (op_5_stat != null) return GenerateOp5Stat(op_5_stat);
+        ALittleOp5Stat op5Stat = rootStat.getOp5Stat();
+        if (op5Stat != null) return GenerateOp5Stat(op5Stat);
 
-        ALittleOp6Stat op_6_stat = root_stat.getOp6Stat();
-        if (op_6_stat != null) return GenerateOp6Stat(op_6_stat);
+        ALittleOp6Stat op6Stat = rootStat.getOp6Stat();
+        if (op6Stat != null) return GenerateOp6Stat(op6Stat);
 
-        ALittleOp7Stat op_7_stat = root_stat.getOp7Stat();
-        if (op_7_stat != null) return GenerateOp7Stat(op_7_stat);
+        ALittleOp7Stat op7Stat = rootStat.getOp7Stat();
+        if (op7Stat != null) return GenerateOp7Stat(op7Stat);
 
-        ALittleOp8Stat op_8_stat = root_stat.getOp8Stat();
-        if (op_8_stat != null) return GenerateOp8Stat(op_8_stat);
+        ALittleOp8Stat op8Stat = rootStat.getOp8Stat();
+        if (op8Stat != null) return GenerateOp8Stat(op8Stat);
 
-        ALittleOpNewStat op_new_stat = root_stat.getOpNewStat();
-        if (op_new_stat != null) return GenerateOpNewStat(op_new_stat);
+        ALittleOpNewStat opNewStat = rootStat.getOpNewStat();
+        if (opNewStat != null) return GenerateOpNewStat(opNewStat);
 
-        ALittleOpNewListStat op_new_listStat = root_stat.getOpNewListStat();
-        if (op_new_listStat != null) return GenerateOpNewListStat(op_new_listStat);
+        ALittleOpNewListStat opNewListStat = rootStat.getOpNewListStat();
+        if (opNewListStat != null) return GenerateOpNewListStat(opNewListStat);
 
-        ALittleBindStat bind_stat = root_stat.getBindStat();
-        if (bind_stat != null) return GenerateBindStat(bind_stat);
+        ALittleBindStat bindStat = rootStat.getBindStat();
+        if (bindStat != null) return GenerateBindStat(bindStat);
 
         return "";
     }
 
     @NotNull
-    private String GenerateValueFactorStat(ALittleValueFactorStat value_factor) throws Exception {
-        ALittleConstValue const_value = value_factor.getConstValue();
-        if (const_value != null) {
-            return GenerateConstValue(const_value);
+    private String GenerateValueFactorStat(ALittleValueFactorStat valueFactor) throws Exception {
+        ALittleConstValue constValue = valueFactor.getConstValue();
+        if (constValue != null) {
+            return GenerateConstValue(constValue);
         }
 
-        ALittleReflectValue reflect_value = value_factor.getReflectValue();
-        if (reflect_value != null) {
-            return GenerateReflectValue(reflect_value);
+        ALittleReflectValue reflectValue = valueFactor.getReflectValue();
+        if (reflectValue != null) {
+            return GenerateReflectValue(reflectValue);
         }
 
-        ALittlePropertyValue prop_value = value_factor.getPropertyValue();
-        if (prop_value != null) {
-            return GeneratePropertyValue(prop_value);
+        ALittlePropertyValue propValue = valueFactor.getPropertyValue();
+        if (propValue != null) {
+            return GeneratePropertyValue(propValue);
         }
 
-        ALittleWrapValueStat valueStat_paren = value_factor.getWrapValueStat();
-        if (valueStat_paren != null) {
-            String result = GenerateValueStat(valueStat_paren.getValueStat());
+        ALittleWrapValueStat wrapValueStat = valueFactor.getWrapValueStat();
+        if (wrapValueStat != null) {
+            String result = GenerateValueStat(wrapValueStat.getValueStat());
             return "(" + result + ")";
         }
 
@@ -691,20 +687,20 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateConstValue(ALittleConstValue const_value) throws Exception {
+    private String GenerateConstValue(ALittleConstValue constValue) throws Exception {
         String content = "";
-        String const_value_string = const_value.getText();
-        if (const_value_string.equals("null"))
+        String constValueString = constValue.getText();
+        if (constValueString.equals("null"))
             content += "nil";
         else
-            content += const_value_string;
+            content += constValueString;
         return content;
     }
 
     @NotNull
-    static public String GenerateReflectValue(ALittleReflectValue reflect_value) throws Exception {
+    static public String GenerateReflectValue(ALittleReflectValue reflectValue) throws Exception {
         String content = "";
-        ALittleCustomType customType = reflect_value.getCustomType();
+        ALittleCustomType customType = reflectValue.getCustomType();
         if (customType == null) return content;
         ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
 
@@ -714,7 +710,7 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GeneratePropertyValue(ALittlePropertyValue prop_value) throws Exception {
+    private String GeneratePropertyValue(ALittlePropertyValue propValue) throws Exception {
         try {
             StringBuilder content = new StringBuilder();
 
@@ -722,7 +718,7 @@ public class ALittleGenerateLua {
             boolean isLuaNamespace = false;
 
             // 获取开头的属性信息
-            ALittlePropertyValueFirstType firstType = prop_value.getPropertyValueFirstType();
+            ALittlePropertyValueFirstType firstType = propValue.getPropertyValueFirstType();
             ALittlePropertyValueCustomType customType = firstType.getPropertyValueCustomType();
             ALittlePropertyValueThisType thisType = firstType.getPropertyValueThisType();
             ALittlePropertyValueCastType castType = firstType.getPropertyValueCastType();
@@ -745,7 +741,7 @@ public class ALittleGenerateLua {
             }
 
             // 后面跟着后缀属性
-            List<ALittlePropertyValueSuffix> suffixList = prop_value.getPropertyValueSuffixList();
+            List<ALittlePropertyValueSuffix> suffixList = propValue.getPropertyValueSuffixList();
             for (int index = 0; index < suffixList.size(); ++index) {
                 // 获取当前后缀
                 ALittlePropertyValueSuffix suffix = suffixList.get(index);
@@ -810,12 +806,12 @@ public class ALittleGenerateLua {
                         throw new Exception("点后面没有内容");
                     }
 
-                    String name_content = dotId.getPropertyValueDotIdName().getText();
+                    String nameContent = dotId.getPropertyValueDotIdName().getText();
                     // 因为lua中自带的string模块名和关键字string一样，所以把lua自动的改成String（大些开头）
                     // 然后再翻译的时候，把String改成string
-                    if (isLuaNamespace && name_content.equals("String"))
-                        name_content = "string";
-                    content.append(name_content);
+                    if (isLuaNamespace && nameContent.equals("String"))
+                        nameContent = "string";
+                    content.append(nameContent);
 
                     // 置为false，表示不是命名域
                     isLuaNamespace = false;
@@ -833,12 +829,12 @@ public class ALittleGenerateLua {
 
                 ALittlePropertyValueMethodCall methodCall = suffix.getPropertyValueMethodCall();
                 if (methodCall != null) {
-                    List<ALittleValueStat> valueStat_list = methodCall.getValueStatList();
-                    List<String> param_list = new ArrayList<>();
-                    for (ALittleValueStat valueStat : valueStat_list) {
-                        param_list.add(GenerateValueStat(valueStat));
+                    List<ALittleValueStat> valueStatList = methodCall.getValueStatList();
+                    List<String> paramList = new ArrayList<>();
+                    for (ALittleValueStat valueStat : valueStatList) {
+                        paramList.add(GenerateValueStat(valueStat));
                     }
-                    content.append("(").append(String.join(", ", param_list)).append(")");
+                    content.append("(").append(String.join(", ", paramList)).append(")");
                     continue;
                 }
 
@@ -862,18 +858,18 @@ public class ALittleGenerateLua {
         if (valueStat == null) {
             throw new Exception("GenerateOp1Expr 没有操作值:" + root.getText());
         }
-        ALittleOp1 op_1 = root.getOp1();
+        ALittleOp1 op1 = root.getOp1();
 
         String valueStatResult = GenerateValueStat(valueStat);
 
-        String op_1_string = op_1.getText();
-        if (op_1_string.equals("++"))
+        String op1String = op1.getText();
+        if (op1String.equals("++"))
             return preTab + valueStatResult + " = " + valueStatResult + " + 1\n";
 
-        if (op_1_string.equals("--"))
+        if (op1String.equals("--"))
             return preTab + valueStatResult + " = " + valueStatResult + " - 1\n";
 
-        throw new Exception("GenerateOp1Expr未知类型:" + op_1_string);
+        throw new Exception("GenerateOp1Expr未知类型:" + op1String);
     }
 
     @NotNull
@@ -885,11 +881,11 @@ public class ALittleGenerateLua {
 
         String content = preTab + preString;
 
-        List<String> name_list = new ArrayList<>();
-        for (ALittleVarAssignDec pair_dec : pairDecList) {
-            name_list.add(pair_dec.getVarAssignNameDec().getIdContent().getText());
+        List<String> nameList = new ArrayList<>();
+        for (ALittleVarAssignDec pairDec : pairDecList) {
+            nameList.add(pairDec.getVarAssignNameDec().getIdContent().getText());
         }
-        content += String.join(", ", name_list);
+        content += String.join(", ", nameList);
 
         ALittleValueStat valueStat = root.getValueStat();
         if (valueStat == null)
@@ -901,28 +897,28 @@ public class ALittleGenerateLua {
     @NotNull
     private String GenerateOpAssignExpr(ALittleOpAssignExpr root, String preTab) throws Exception {
         List<ALittlePropertyValue> propValueList = root.getPropertyValueList();
-        List<String> content_list = new ArrayList<>();
-        for (ALittlePropertyValue prop_value : propValueList) {
-            content_list.add(GeneratePropertyValue(prop_value));
+        List<String> contentList = new ArrayList<>();
+        for (ALittlePropertyValue propValue : propValueList) {
+            contentList.add(GeneratePropertyValue(propValue));
         }
 
-        String prop_value_result = String.join(", ", content_list);
+        String propValueResult = String.join(", ", contentList);
 
-        ALittleOpAssign op_assign = root.getOpAssign();
+        ALittleOpAssign opAssign = root.getOpAssign();
         ALittleValueStat valueStat = root.getValueStat();
-        if (op_assign == null || valueStat == null)
-            return preTab + prop_value_result + "\n";
+        if (opAssign == null || valueStat == null)
+            return preTab + propValueResult + "\n";
 
         String valueStatResult = GenerateValueStat(valueStat);
 
-        if (op_assign.getText().equals("=")) {
+        if (opAssign.getText().equals("=")) {
             // 这里做优化
             // 把 self._attr = value 优化为  rawset(self, "_attr", value)
             if (mOpenRawSet && propValueList.size() == 1) {
-                ALittlePropertyValue prop_value = propValueList.get(0);
-                ALittlePropertyValueThisType thisType = prop_value.getPropertyValueFirstType().getPropertyValueThisType();
-                if (thisType != null && prop_value.getPropertyValueSuffixList().size() == 1) {
-                    ALittlePropertyValueSuffix suffix = prop_value.getPropertyValueSuffixList().get(0);
+                ALittlePropertyValue propValue = propValueList.get(0);
+                ALittlePropertyValueThisType thisType = propValue.getPropertyValueFirstType().getPropertyValueThisType();
+                if (thisType != null && propValue.getPropertyValueSuffixList().size() == 1) {
+                    ALittlePropertyValueSuffix suffix = propValue.getPropertyValueSuffixList().get(0);
                     if (suffix.getPropertyValueDotId() != null) {
                         ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
                         if (dotId != null && dotId.getPropertyValueDotIdName() != null) {
@@ -945,27 +941,27 @@ public class ALittleGenerateLua {
                 }
             }
 
-            return preTab + prop_value_result + " = " + valueStatResult + "\n";
+            return preTab + propValueResult + " = " + valueStatResult + "\n";
         }
 
-        String op_assign_string = op_assign.getText();
+        String opAssignString = opAssign.getText();
 
         // 如果出现多个前缀赋值，那么只能是=号
-        if (content_list.size() > 1)
+        if (contentList.size() > 1)
             throw new Exception("等号左边出现多个值的时候，只能使用=赋值符号:" + root.getText());
 
         String content = "";
-        switch (op_assign_string) {
+        switch (opAssignString) {
             case "+=":
             case "-=":
             case "*=":
             case "/=":
             case "%=":
-                String op_string = op_assign_string.substring(0, 1);
-                content = preTab + prop_value_result + " = " + prop_value_result + " " + op_string + " (" + valueStatResult + ")\n";
+                String opString = opAssignString.substring(0, 1);
+                content = preTab + propValueResult + " = " + propValueResult + " " + opString + " (" + valueStatResult + ")\n";
                 break;
             default:
-                throw new Exception("未知的赋值操作类型:" + op_assign_string);
+                throw new Exception("未知的赋值操作类型:" + opAssignString);
         }
         return content;
     }
@@ -1021,16 +1017,16 @@ public class ALittleGenerateLua {
             content.append(GenerateAllExpr(allExpr, preTab + "\t"));
         }
 
-        List<ALittleElseIfExpr> else_if_expr_list = root.getElseIfExprList();
-        for (ALittleElseIfExpr else_if_expr : else_if_expr_list) {
-            String result = GenerateElseIfExpr(else_if_expr, preTab);
+        List<ALittleElseIfExpr> elseIfExprList = root.getElseIfExprList();
+        for (ALittleElseIfExpr elseIfExpr : elseIfExprList) {
+            String result = GenerateElseIfExpr(elseIfExpr, preTab);
             if (result == null) return null;
             content.append(result);
         }
 
-        ALittleElseExpr else_expr = root.getElseExpr();
-        if (else_expr != null) {
-            content.append(GenerateElseExpr(else_expr, preTab));
+        ALittleElseExpr elseExpr = root.getElseExpr();
+        if (elseExpr != null) {
+            content.append(GenerateElseExpr(elseExpr, preTab));
         }
         content.append(preTab).append("end\n");
         return content.toString();
@@ -1038,81 +1034,81 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateForExpr(ALittleForExpr root, String preTab) throws Exception {
-        ALittleForStepCondition for_step_condition = root.getForStepCondition();
-        ALittleForInCondition for_in_condition = root.getForInCondition();
+        ALittleForStepCondition forStepCondition = root.getForStepCondition();
+        ALittleForInCondition forInCondition = root.getForInCondition();
 
         StringBuilder content = new StringBuilder(preTab);
-        if (for_step_condition != null) {
-            ALittleForStartStat for_start_stat = for_step_condition.getForStartStat();
+        if (forStepCondition != null) {
+            ALittleForStartStat forStartStat = forStepCondition.getForStartStat();
 
-            ALittleValueStat start_valueStat = for_start_stat.getValueStat();
-            if (start_valueStat == null) {
+            ALittleValueStat startValueStat = forStartStat.getValueStat();
+            if (startValueStat == null) {
                 throw new Exception("for 没有初始表达式:" + root.getText());
             }
-            String start_valueStatResult = GenerateValueStat(start_valueStat);
+            String startValueStatResult = GenerateValueStat(startValueStat);
 
-            ALittleVarAssignNameDec nameDec = for_start_stat.getForPairDec().getVarAssignNameDec();
+            ALittleVarAssignNameDec nameDec = forStartStat.getForPairDec().getVarAssignNameDec();
             if (nameDec == null) {
                 throw new Exception("for 初始表达式没有变量名:" + root.getText());
             }
-            String start_var_name = nameDec.getText();
+            String startVarName = nameDec.getText();
 
             content.append("for ")
-                    .append(start_var_name)
+                    .append(startVarName)
                     .append(" = ")
-                    .append(start_valueStatResult)
+                    .append(startValueStatResult)
                     .append(", ");
 
-            ALittleForEndStat for_end_stat = for_step_condition.getForEndStat();
-            if (for_end_stat == null) {
+            ALittleForEndStat forEndStat = forStepCondition.getForEndStat();
+            if (forEndStat == null) {
                 throw new Exception("for 没有结束表达式:" + root.getText());
             }
 
-            ALittleValueStat end_valueStat = for_end_stat.getValueStat();
-            content.append(GenerateValueStat(end_valueStat));
+            ALittleValueStat endValueStat = forEndStat.getValueStat();
+            content.append(GenerateValueStat(endValueStat));
 
-            ALittleForStepStat for_step_stat = for_step_condition.getForStepStat();
-            if (for_step_stat == null) {
+            ALittleForStepStat forStepStat = forStepCondition.getForStepStat();
+            if (forStepStat == null) {
                 throw new Exception("for 没有步长表达式");
             }
-            ALittleValueStat step_valueStat = for_step_stat.getValueStat();
-            content.append(", ").append(GenerateValueStat(step_valueStat));
+            ALittleValueStat stepValueStat = forStepStat.getValueStat();
+            content.append(", ").append(GenerateValueStat(stepValueStat));
 
             content.append(" do\n");
-        } else if (for_in_condition != null) {
-            ALittleValueStat valueStat = for_in_condition.getValueStat();
+        } else if (forInCondition != null) {
+            ALittleValueStat valueStat = forInCondition.getValueStat();
             if (valueStat == null) {
                 throw new Exception("for in 没有遍历的对象:" + root.getText());
             }
 
             String valueStatResult = GenerateValueStat(valueStat);
 
-            List<ALittleForPairDec> pair_list = for_in_condition.getForPairDecList();
-            List<String> pair_string_list = new ArrayList<>();
-            for (ALittleForPairDec pair : pair_list) {
+            List<ALittleForPairDec> pairList = forInCondition.getForPairDecList();
+            List<String> pairStringList = new ArrayList<>();
+            for (ALittleForPairDec pair : pairList) {
                 ALittleVarAssignNameDec nameDec = pair.getVarAssignNameDec();
                 if (nameDec == null)
                     throw new Exception("for in 没有变量名");
-                pair_string_list.add(nameDec.getText());
+                pairStringList.add(nameDec.getText());
             }
 
-            String pair_type = ALittleReferenceUtil.CalcPairsType(valueStat);
-            if (pair_type == null) {
+            String pairType = ALittleReferenceUtil.CalcPairsType(valueStat);
+            if (pairType == null) {
                 throw new Exception("for in 的遍历对象表达式错误:" + root.getText());
             }
 
-            // 如果foreach的参数数量不为2，那么就不用pair_type
-            if (pair_type.isEmpty()) {
+            // 如果foreach的参数数量不为2，那么就不用pairType
+            if (pairType.isEmpty()) {
                 content.append("for ")
-                        .append(String.join(", ", pair_string_list))
+                        .append(String.join(", ", pairStringList))
                         .append(" in ")
                         .append(valueStatResult)
                         .append(" do\n");
             } else {
                 content.append("for ")
-                        .append(String.join(", ", pair_string_list))
+                        .append(String.join(", ", pairStringList))
                         .append(" in ")
-                        .append(pair_type)
+                        .append(pairType)
                         .append("(")
                         .append(valueStatResult)
                         .append(") do\n");
@@ -1150,15 +1146,15 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateDoWhileExpr(ALittleDoWhileExpr root_expr, String preTab) throws Exception {
-        ALittleValueStat valueStat = root_expr.getValueStat();
+    private String GenerateDoWhileExpr(ALittleDoWhileExpr rootExpr, String preTab) throws Exception {
+        ALittleValueStat valueStat = rootExpr.getValueStat();
         if (valueStat == null) {
             throw new Exception("do { ... } while(?) while中没有条件值");
         }
         String valueStatResult = GenerateValueStat(valueStat);
 
         StringBuilder content = new StringBuilder(preTab + "repeat\n");
-        List<ALittleAllExpr> allExprList = root_expr.getAllExprList();
+        List<ALittleAllExpr> allExprList = rootExpr.getAllExprList();
         for (ALittleAllExpr allExpr : allExprList) {
             String result = GenerateAllExpr(allExpr, preTab + "\t");
             if (result == null) return null;
@@ -1173,9 +1169,9 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateWrapExpr(ALittleWrapExpr root_expr, String preTab) throws Exception {
+    private String GenerateWrapExpr(ALittleWrapExpr rootExpr, String preTab) throws Exception {
         StringBuilder content = new StringBuilder(preTab + "do\n");
-        List<ALittleAllExpr> allExprList = root_expr.getAllExprList();
+        List<ALittleAllExpr> allExprList = rootExpr.getAllExprList();
         for (ALittleAllExpr allExpr : allExprList) {
             String result = GenerateAllExpr(allExpr, preTab + "\t");
             if (result == null) return null;
@@ -1187,19 +1183,19 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateReturnExpr(ALittleReturnExpr root_expr, String preTab) throws Exception {
-        if (root_expr.getReturnYield() != null) {
+    private String GenerateReturnExpr(ALittleReturnExpr rootExpr, String preTab) throws Exception {
+        if (rootExpr.getReturnYield() != null) {
             return preTab + "return ___coroutine.yield()\n";
         }
 
-        List<ALittleValueStat> valueStat_list = root_expr.getValueStatList();
-        List<String> content_list = new ArrayList<>();
-        for (ALittleValueStat valueStat : valueStat_list) {
-            content_list.add(GenerateValueStat(valueStat));
+        List<ALittleValueStat> valueStatList = rootExpr.getValueStatList();
+        List<String> contentList = new ArrayList<>();
+        for (ALittleValueStat valueStat : valueStatList) {
+            contentList.add(GenerateValueStat(valueStat));
         }
         String valueStatResult = "";
-        if (!content_list.isEmpty())
-            valueStatResult = " " + String.join(", ", content_list);
+        if (!contentList.isEmpty())
+            valueStatResult = " " + String.join(", ", contentList);
 
         return preTab + "return" + valueStatResult + "\n";
     }
@@ -1215,36 +1211,36 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateAllExpr(ALittleAllExpr root, String preTab) throws Exception {
-        PsiElement[] child_list = root.getChildren();
+        PsiElement[] childList = root.getChildren();
 
-        List<String> expr_list = new ArrayList<>();
-        for (PsiElement child : child_list) {
+        List<String> exprList = new ArrayList<>();
+        for (PsiElement child : childList) {
             if (child instanceof ALittleFlowExpr) {
-                expr_list.add(GenerateFlowExpr((ALittleFlowExpr)child, preTab));
+                exprList.add(GenerateFlowExpr((ALittleFlowExpr)child, preTab));
             } else if (child instanceof ALittleReturnExpr) {
-                expr_list.add(GenerateReturnExpr((ALittleReturnExpr)child, preTab));
+                exprList.add(GenerateReturnExpr((ALittleReturnExpr)child, preTab));
             } else if (child instanceof ALittleDoWhileExpr) {
-                expr_list.add(GenerateDoWhileExpr((ALittleDoWhileExpr)child, preTab));
+                exprList.add(GenerateDoWhileExpr((ALittleDoWhileExpr)child, preTab));
             } else if (child instanceof ALittleWhileExpr) {
-                expr_list.add(GenerateWhileExpr((ALittleWhileExpr)child, preTab));
+                exprList.add(GenerateWhileExpr((ALittleWhileExpr)child, preTab));
             } else if (child instanceof ALittleForExpr) {
-                expr_list.add(GenerateForExpr((ALittleForExpr)child, preTab));
+                exprList.add(GenerateForExpr((ALittleForExpr)child, preTab));
             } else if (child instanceof ALittleIfExpr) {
-                expr_list.add(GenerateIfExpr((ALittleIfExpr)child, preTab));
+                exprList.add(GenerateIfExpr((ALittleIfExpr)child, preTab));
             } else if (child instanceof ALittleOpAssignExpr) {
-                expr_list.add(GenerateOpAssignExpr((ALittleOpAssignExpr)child, preTab));
+                exprList.add(GenerateOpAssignExpr((ALittleOpAssignExpr)child, preTab));
             } else if (child instanceof ALittleVarAssignExpr) {
-                expr_list.add(GenerateVarAssignExpr((ALittleVarAssignExpr)child, preTab, "local "));
+                exprList.add(GenerateVarAssignExpr((ALittleVarAssignExpr)child, preTab, "local "));
             } else if (child instanceof ALittleOp1Expr) {
-                expr_list.add(GenerateOp1Expr((ALittleOp1Expr)child, preTab));
+                exprList.add(GenerateOp1Expr((ALittleOp1Expr)child, preTab));
             } else if (child instanceof ALittleWrapExpr) {
-                expr_list.add(GenerateWrapExpr((ALittleWrapExpr)child, preTab));
+                exprList.add(GenerateWrapExpr((ALittleWrapExpr)child, preTab));
             } else if (child instanceof ALittlePropertyValueExpr) {
-                expr_list.add(GeneratePropertyValueExpr((ALittlePropertyValueExpr)child, preTab));
+                exprList.add(GeneratePropertyValueExpr((ALittlePropertyValueExpr)child, preTab));
             }
         }
 
-        return String.join("\n", expr_list);
+        return String.join("\n", exprList);
     }
 
     @NotNull
@@ -1394,8 +1390,8 @@ public class ALittleGenerateLua {
             content.append("\n");
         }
         //构建setter函数///////////////////////////////////////////////////////////////////////////////////////
-        List<ALittleClassSetterDec> class_setterDecList = root.getClassSetterDecList();
-        for (ALittleClassSetterDec classSetterDec : class_setterDecList) {
+        List<ALittleClassSetterDec> classSetterDecList = root.getClassSetterDecList();
+        for (ALittleClassSetterDec classSetterDec : classSetterDecList) {
             ALittleMethodNameDec classMethodNameDec = classSetterDec.getMethodNameDec();
             if (classMethodNameDec == null) {
                 throw new Exception("class " + className + " setter函数没有函数名");
@@ -1480,8 +1476,8 @@ public class ALittleGenerateLua {
             content.append("\n");
         }
         //构建静态函数//////////////////////////////////////////////////////////////////////////////////////////
-        List<ALittleClassStaticDec> class_staticDecList = root.getClassStaticDecList();
-        for (ALittleClassStaticDec classStaticDec : class_staticDecList) {
+        List<ALittleClassStaticDec> classStaticDecList = root.getClassStaticDecList();
+        for (ALittleClassStaticDec classStaticDec : classStaticDecList) {
             ALittleMethodNameDec classMethodNameDec = classStaticDec.getMethodNameDec();
             if (classMethodNameDec == null) {
                 throw new Exception("class " + className + " 静态函数没有函数名");
@@ -1536,8 +1532,8 @@ public class ALittleGenerateLua {
     @NotNull
     private String GenerateInstance(ALittleInstanceDec root, String preTab) throws Exception {
         String globalPreString = "";
-        ALittleAccessModifier access_modifier_dec = root.getAccessModifier();
-        if (access_modifier_dec != null && access_modifier_dec.getText().equals("public")) {
+        ALittleAccessModifier accessModifierDec = root.getAccessModifier();
+        if (accessModifierDec != null && accessModifierDec.getText().equals("public")) {
             globalPreString = "_G.";
         }
         return GenerateVarAssignExpr(root.getVarAssignExpr(), preTab, globalPreString);
@@ -1614,8 +1610,8 @@ public class ALittleGenerateLua {
             content = new StringBuilder("\nmodule(\"" + mNamespaceName + "\", package.seeall)\n\n");
 
         StringBuilder otherContent = new StringBuilder();
-        PsiElement[] child_list = root.getChildren();
-        for (PsiElement child : child_list) {
+        PsiElement[] childList = root.getChildren();
+        for (PsiElement child : childList) {
             // 处理结构体
             if (child instanceof ALittleStructDec) {
             // 处理enum

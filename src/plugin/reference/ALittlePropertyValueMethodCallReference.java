@@ -150,11 +150,11 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         if (preType.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) return result;
 
         // 构建对象
-        List<ALittleValueStat> valueStat_list = myElement.getValueStatList();
-        for (int i = 0; i < valueStat_list.size(); ++i) {
+        List<ALittleValueStat> valueStatList = myElement.getValueStatList();
+        for (int i = 0; i < valueStatList.size(); ++i) {
             if (i >= preType.functorParamNameList.size()) break;
             String name = preType.functorParamNameList.get(i);
-            ALittleValueStat valueStat = valueStat_list.get(i);
+            ALittleValueStat valueStat = valueStatList.get(i);
             result.add(new InlayInfo(name, valueStat.getNode().getStartOffset()));
         }
         return result;

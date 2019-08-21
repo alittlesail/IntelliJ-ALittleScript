@@ -229,11 +229,11 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 if (nextSuffix != null) {
                     ALittlePropertyValueMethodCall methodCallStat = nextSuffix.getPropertyValueMethodCall();
                     if (methodCallStat != null) {
-                        int param_count = methodCallStat.getValueStatList().size();
-                        if (param_count == 1) {
+                        int paramCount = methodCallStat.getValueStatList().size();
+                        if (paramCount == 1) {
                             // 所有getter
                             ALittleUtil.findMethodNameDecListForGetter(myElement.getProject(), namespaceName, classDec, mKey, classMethodNameDecList, 10);
-                        } else if (param_count == 2) {
+                        } else if (paramCount == 2) {
                             // 所有setter
                             ALittleUtil.findMethodNameDecListForSetter(myElement.getProject(), namespaceName, classDec, mKey, classMethodNameDecList, 10);
                         }

@@ -75,18 +75,18 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
                 break;
             } else if (parent instanceof ALittleClassMethodDec) {
                 ALittleClassMethodDec methodDec = (ALittleClassMethodDec) parent;
-                ALittleMethodReturnDec return_dec = methodDec.getMethodReturnDec();
-                if (return_dec != null) returnTypeList = return_dec.getAllTypeList();
+                ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
+                if (returnDec != null) returnTypeList = returnDec.getAllTypeList();
                 break;
             } else if (parent instanceof ALittleClassStaticDec) {
                 ALittleClassStaticDec methodDec = (ALittleClassStaticDec) parent;
-                ALittleMethodReturnDec return_dec = methodDec.getMethodReturnDec();
-                if (return_dec != null) returnTypeList = return_dec.getAllTypeList();
+                ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
+                if (returnDec != null) returnTypeList = returnDec.getAllTypeList();
                 break;
             } else if (parent instanceof ALittleGlobalMethodDec) {
                 ALittleGlobalMethodDec methodDec = (ALittleGlobalMethodDec) parent;
-                ALittleMethodReturnDec return_dec = methodDec.getMethodReturnDec();
-                if (return_dec != null) returnTypeList = return_dec.getAllTypeList();
+                ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
+                if (returnDec != null) returnTypeList = returnDec.getAllTypeList();
                 break;
             }
 

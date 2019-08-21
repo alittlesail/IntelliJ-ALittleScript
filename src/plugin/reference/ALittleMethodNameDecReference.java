@@ -242,11 +242,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        PsiElement method_dec = myElement.getParent();
+        PsiElement methodDec = myElement.getParent();
         List<LookupElement> variants = new ArrayList<>();
         // 类内部的函数
-        if (method_dec.getParent() instanceof ALittleClassDec) {
-            ALittleClassDec classDec = (ALittleClassDec) method_dec.getParent();
+        if (methodDec.getParent() instanceof ALittleClassDec) {
+            ALittleClassDec classDec = (ALittleClassDec) methodDec.getParent();
 
             List<ALittleMethodNameDec> decList = new ArrayList<>();
             List<Icon> iconList = new ArrayList<>();
@@ -261,7 +261,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 );
             }
         // 全局函数
-        } else if (method_dec.getParent() instanceof ALittleNamespaceDec) {
+        } else if (methodDec.getParent() instanceof ALittleNamespaceDec) {
             List<ALittleMethodNameDec> decList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, mNamespace, "");
             for (ALittleMethodNameDec dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
