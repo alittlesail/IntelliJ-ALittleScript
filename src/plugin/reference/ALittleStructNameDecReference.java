@@ -8,8 +8,7 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
-import plugin.psi.ALittleStructDec;
-import plugin.psi.ALittleStructNameDec;
+import plugin.psi.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +17,14 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     public ALittleStructNameDecReference(@NotNull ALittleStructNameDec element, TextRange textRange) {
         super(element, textRange);
 
+        // 如果父节点是extends，那么就获取指定的命名域
+        PsiElement parent = element.getParent();
+        if (parent instanceof ALittleStructExtendsDec) {
+            ALittleNamespaceNameDec namespaceNameDec = ((ALittleStructExtendsDec)parent).getNamespaceNameDec();
+            if (namespaceNameDec != null) {
+                mNamespace = namespaceNameDec.getText();
+            }
+        }
     }
 
     @NotNull

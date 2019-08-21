@@ -39,10 +39,10 @@ public class ALittleOpNewListStatReference extends ALittleReference<ALittleOpNew
         }
 
         // 列表里面的所有元素的类型必须和第一个元素一致
-        ALittleReferenceUtil.GuessTypeInfo value_stat_first = valueStatList.get(0).guessType();
+        ALittleReferenceUtil.GuessTypeInfo valueStat_first = valueStatList.get(0).guessType();
         for (int i = 1; i < valueStatList.size(); ++i) {
             ALittleReferenceUtil.GuessTypeInfo guessTypeInfo = valueStatList.get(i).guessType();
-            if (!value_stat_first.value.equals(guessTypeInfo.value)) {
+            if (!valueStat_first.value.equals(guessTypeInfo.value)) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(valueStatList.get(i), "列表内的元素类型，必须和第一个元素类型一致");
             }
         }

@@ -22,12 +22,10 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        ResolveResult[] resultList = multiResolve(false);
-        for (ResolveResult result : resultList) {
-            PsiElement element = result.getElement();
-            if (element instanceof ALittleNamespaceNameDec) {
-                guessList.add(((ALittleNamespaceDec)element.getParent()).guessType());
-            }
+
+        List<ALittleNamespaceNameDec> nameDecList = ALittleTreeChangeListener.findNamespaceNameDecList(myElement.getProject(), mKey);
+        for (ALittleNamespaceNameDec nameDec : nameDecList) {
+            guessList.add(((ALittleNamespaceDec)nameDec.getParent()).guessType());
         }
 
         return guessList;

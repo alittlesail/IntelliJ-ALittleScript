@@ -45,8 +45,8 @@ public class ALittlePropertyValueBracketValueReference extends ALittleReference<
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
-        ALittleValueStat value_stat = myElement.getValueStat();
-        if (value_stat == null) return;
+        ALittleValueStat valueStat = myElement.getValueStat();
+        if (valueStat == null) return;
 
         // 获取父节点
         ALittlePropertyValueSuffix propertyValueSuffix = (ALittlePropertyValueSuffix)myElement.getParent();
@@ -66,15 +66,15 @@ public class ALittlePropertyValueBracketValueReference extends ALittleReference<
             preType = suffixList.get(index - 1).guessType();
         }
 
-        ALittleReferenceUtil.GuessTypeInfo keyGuessType = value_stat.guessType();
+        ALittleReferenceUtil.GuessTypeInfo keyGuessType = valueStat.guessType();
         // 获取类型
         if (preType.type == ALittleReferenceUtil.GuessType.GT_LIST) {
             if (!keyGuessType.value.equals("int") && !keyGuessType.value.equals("I64")) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(value_stat, "索引值的类型必须是int或者是I64，不能是:" + keyGuessType.value);
+                throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "索引值的类型必须是int或者是I64，不能是:" + keyGuessType.value);
             }
         } else if (preType.type == ALittleReferenceUtil.GuessType.GT_MAP) {
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(myElement, preType.mapKeyType, value_stat, keyGuessType);
+                ALittleReferenceOpUtil.guessTypeEqual(myElement, preType.mapKeyType, valueStat, keyGuessType);
             } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "索引值的类型不能是:" + keyGuessType.value + " :" + e.getError());
             }

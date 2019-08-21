@@ -2533,16 +2533,29 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // DOT ID_CONTENT
+  // DOT propertyValueDotIdName
   public static boolean propertyValueDotId(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "propertyValueDotId")) return false;
     if (!nextTokenIs(b, DOT)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_DOT_ID, null);
-    r = consumeTokens(b, 1, DOT, ID_CONTENT);
+    r = consumeToken(b, DOT);
     p = r; // pin = 1
+    r = r && propertyValueDotIdName(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  /* ********************************************************** */
+  // ID_CONTENT
+  public static boolean propertyValueDotIdName(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueDotIdName")) return false;
+    if (!nextTokenIs(b, ID_CONTENT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, ID_CONTENT);
+    exit_section_(b, m, PROPERTY_VALUE_DOT_ID_NAME, r);
+    return r;
   }
 
   /* ********************************************************** */

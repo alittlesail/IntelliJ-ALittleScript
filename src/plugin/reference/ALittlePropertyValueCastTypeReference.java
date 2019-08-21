@@ -17,8 +17,7 @@ public class ALittlePropertyValueCastTypeReference extends ALittleReference<ALit
         if (myElement.getAllType() != null) {
             return myElement.getAllType().guessTypes();
         }
-
-        return new ArrayList<>();
+        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittlePropertyValueCastType出现未知的子节点");
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {

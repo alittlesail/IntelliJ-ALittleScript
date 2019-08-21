@@ -70,6 +70,5 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
             anno.setTextAttributes(ConsoleHighlighter.CYAN_BRIGHT);
             return;
         }
-        return;
     }
 }

@@ -15,6 +15,7 @@ import plugin.psi.ALittleClassDec;
 import plugin.psi.ALittleClassExtendsDec;
 import plugin.psi.ALittleClassNameDec;
 import plugin.psi.ALittleNamespaceNameDec;
+import plugin.psi.impl.ALittleClassDecImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +37,19 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        ResolveResult[] resultList = multiResolve(false);
-        for (ResolveResult result : resultList) {
-            PsiElement element = result.getElement();
-            if (element instanceof ALittleClassNameDec) {
-                guessList.add(((ALittleClassDec)element.getParent()).guessType());
+        PsiElement parent = myElement.getParent();
+
+        // 如果直接就是定义，那么直接获取
+        if (parent instanceof ALittleClassDec) {
+            guessList.add(((ALittleClassDec)parent).guessType());
+        // 如果是继承那么就从继承那边获取
+        } else if (parent instanceof ALittleClassExtendsDec) {
+            List<ALittleClassNameDec> classNameDecList = ALittleTreeChangeListener.findClassNameDecList(myElement.getProject(), mNamespace, mKey);
+            for (ALittleClassNameDec classNameDec : classNameDecList) {
+                guessList.add(classNameDec.guessType());
             }
         }
+
         return guessList;
     }
 

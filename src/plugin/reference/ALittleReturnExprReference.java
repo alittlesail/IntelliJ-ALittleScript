@@ -93,11 +93,12 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
             parent = parent.getParent();
         }
 
+        // 参数的类型
         List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = null;
         // 如果返回值只有一个函数调用
         if (valueStatList.size() == 1 && returnTypeList.size() > 1) {
-            ALittleValueStat value_stat = valueStatList.get(0);
-            guessTypeList = value_stat.guessTypes();
+            ALittleValueStat valueStat = valueStatList.get(0);
+            guessTypeList = valueStat.guessTypes();
             if (guessTypeList.size() != returnTypeList.size()) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "return的函数调用的返回值数量和函数定义的返回值数量不相等");
             }
@@ -106,18 +107,23 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
                 throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "return的返回值数量和函数定义的返回值数量不相等");
             }
             guessTypeList = new ArrayList<>();
-            for (ALittleAllType allType : returnTypeList) {
-                guessTypeList.add(allType.guessType());
+            for (ALittleValueStat valueStat : valueStatList) {
+                guessTypeList.add(valueStat.guessType());
             }
         }
 
         // 每个类型依次检查
         for (int i = 0; i < guessTypeList.size(); ++i) {
-            ALittleValueStat value_stat = valueStatList.get(i);
+            ALittleValueStat targetValueStat;
+            if (i < valueStatList.size()) {
+                targetValueStat = valueStatList.get(i);
+            } else {
+                targetValueStat = valueStatList.get(0);
+            }
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(returnTypeList.get(i), guessTypeList.get(i), value_stat, value_stat.guessType());
+                ALittleReferenceOpUtil.guessTypeEqual(returnTypeList.get(i), returnTypeList.get(i).guessType(), targetValueStat, guessTypeList.get(i));
             } catch (ALittleReferenceUtil.ALittleReferenceException e) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "return的第" + (i + 1) + "个返回值数量和函数定义的返回值类型不同:" + e.getError());
+                throw new ALittleReferenceUtil.ALittleReferenceException(targetValueStat, "return的第" + (i + 1) + "个返回值数量和函数定义的返回值类型不同:" + e.getError());
             }
         }
     }

@@ -20,13 +20,13 @@ public class ALittleGenericTypeReference extends ALittleReference<ALittleGeneric
             ALittleGenericListType dec = myElement.getGenericListType();
             ALittleAllType allType = dec.getAllType();
             if (allType == null) return guessList;
-            ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+            ALittleReferenceUtil.GuessTypeInfo guessInfo = allType.guessType();
 
             ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
             info.type = ALittleReferenceUtil.GuessType.GT_LIST;
-            info.value = "List<" + GuessInfo.value + ">";
+            info.value = "List<" + guessInfo.value + ">";
             info.element = myElement;
-            info.listSubType = GuessInfo;
+            info.listSubType = guessInfo;
             guessList.add(info);
         } else if (myElement.getGenericMapType() != null) {
             ALittleGenericMapType dec = myElement.getGenericMapType();

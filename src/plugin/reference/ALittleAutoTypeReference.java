@@ -17,43 +17,57 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        PsiElement parent = myElement.getParent();
 
+        PsiElement parent = myElement.getParent();
         // 处理定义并且赋值
         if (parent instanceof ALittleVarAssignDec) {
             // 获取父节点
             ALittleVarAssignDec varAssignDec = (ALittleVarAssignDec) parent;
             parent = varAssignDec.getParent();
-            if (!(parent instanceof ALittleVarAssignExpr)) return guessList;
+            if (!(parent instanceof ALittleVarAssignExpr)) {
+                return guessList;
+            }
             ALittleVarAssignExpr varAssignExpr = (ALittleVarAssignExpr) parent;
             // 获取等号右边的表达式
             ALittleValueStat valueStat = varAssignExpr.getValueStat();
-            if (valueStat == null) return guessList;
+            if (valueStat == null) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "auto 没有赋值对象，无法推导类型");
+            }
             // 获取等号坐标的变量定义列表
             List<ALittleVarAssignDec> pairDecList = varAssignExpr.getVarAssignDecList();
             // 计算当前是第几个参数
             int index = pairDecList.indexOf(varAssignDec);
-            if (index == -1) return guessList;
+            if (index == -1) {
+                return guessList;
+            }
             // 获取函数对应的那个返回值类型
             List<ALittleReferenceUtil.GuessTypeInfo> methodCallGuessList = valueStat.guessTypes();
-            if (index < methodCallGuessList.size()) {
-                guessList.add(methodCallGuessList.get(index));
+            if (index >= methodCallGuessList.size()) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "auto 没有赋值对象，无法推导类型");
             }
+
+            guessList.add(methodCallGuessList.get(index));
         // 处理for循环定义
         } else if (parent instanceof ALittleForPairDec) {
             // 获取父节点
             ALittleForPairDec forPairDec = (ALittleForPairDec) parent;
             parent = forPairDec.getParent();
-            if (!(parent instanceof ALittleForInCondition)) return guessList;
+            if (!(parent instanceof ALittleForInCondition)) {
+                return guessList;
+            }
             ALittleForInCondition inExpr = (ALittleForInCondition) parent;
             // 取出遍历的对象
             ALittleValueStat valueStat = inExpr.getValueStat();
-            if (valueStat == null) return guessList;
+            if (valueStat == null) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "For没有遍历对象，auto 无法推导类型");
+            }
 
             // 获取定义列表
             List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
             int index = pairDecList.indexOf(forPairDec);
-            if (index == -1) return guessList;
+            if (index == -1) {
+                return guessList;
+            }
 
             // 获取循环对象的类型
             ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
@@ -87,16 +101,19 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
     @NotNull
     public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
         List<InlayInfo> result = new ArrayList<>();
+        // 获取类型
         List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = guessTypes();
         if (guessTypeList.isEmpty()) return result;
         ALittleReferenceUtil.GuessTypeInfo guessType = guessTypeList.get(0);
 
+        // 如果是定义并赋值
         if (myElement.getParent() instanceof ALittleVarAssignDec) {
             ALittleVarAssignDec dec = (ALittleVarAssignDec) myElement.getParent();
             ALittleVarAssignNameDec nameDec = dec.getVarAssignNameDec();
             if (nameDec == null) return result;
 
             result.add(new InlayInfo(guessType.value, nameDec.getNode().getStartOffset()));
+        // 如果是for
         } else if (myElement.getParent() instanceof  ALittleForPairDec) {
             ALittleForPairDec dec = (ALittleForPairDec) myElement.getParent();
             ALittleVarAssignNameDec nameDec = dec.getVarAssignNameDec();

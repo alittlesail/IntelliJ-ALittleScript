@@ -19,8 +19,7 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
         } else if (myElement.getGenericType() != null) {
             return myElement.getGenericType().guessTypes();
         }
-
-        return new ArrayList<>();
+        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleOpNewStat出现未知的子节点");
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
@@ -45,19 +44,19 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
 
             if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                 ALittleClassDec classDec = (ALittleClassDec) guessType.element;
-                List<ALittleClassCtorDec> ctor_decList = classDec.getClassCtorDecList();
-                if (ctor_decList.size() > 1) {
+                List<ALittleClassCtorDec> ctorDecList = classDec.getClassCtorDecList();
+                if (ctorDecList.size() > 1) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "new的类的构造函数个数不能超过1个");
                 }
 
-                if (ctor_decList.size() == 0) {
+                if (ctorDecList.size() == 0) {
                     if (valueStatList.size() > 0) {
                         throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "new的类的构造函数没有参数");
                     }
                     return;
                 }
 
-                ALittleMethodParamDec param_dec = ctor_decList.get(0).getMethodParamDec();
+                ALittleMethodParamDec param_dec = ctorDecList.get(0).getMethodParamDec();
                 if (param_dec == null) {
                     if (valueStatList.size() > 0) {
                         throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "new的类的构造函数没有参数");
@@ -65,9 +64,9 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
                     return;
                 }
 
-                List<ALittleMethodParamOneDec> param_one_decList = param_dec.getMethodParamOneDecList();
+                List<ALittleMethodParamOneDec> param_oneDecList = param_dec.getMethodParamOneDecList();
                 List<ALittleReferenceUtil.GuessTypeInfo> param_type_list = new ArrayList<>();
-                for (ALittleMethodParamOneDec param_one_dec : param_one_decList) {
+                for (ALittleMethodParamOneDec param_one_dec : param_oneDecList) {
                     param_type_list.add(param_one_dec.getAllType().guessType());
                 }
 
@@ -76,11 +75,11 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
                 }
 
                 for (int i = 0; i < valueStatList.size(); ++i) {
+                    ALittleValueStat valueStat = valueStatList.get(i);
                     try {
-                        ALittleReferenceOpUtil.guessTypeEqual(param_one_decList.get(i), param_type_list.get(i),
-                                valueStatList.get(i), valueStatList.get(i).guessType());
+                        ALittleReferenceOpUtil.guessTypeEqual(param_oneDecList.get(i), param_type_list.get(i), valueStat, valueStat.guessType());
                     } catch (ALittleReferenceUtil.ALittleReferenceException e) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "第" + (i + 1) + "个参数类型和函数定义的参数类型不同:" + e.getError());
+                        throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "第" + (i + 1) + "个参数类型和函数定义的参数类型不同:" + e.getError());
                     }
                 }
                 return;

@@ -208,7 +208,7 @@ public class ALittleReferenceOpUtil {
 
         boolean right_check = rightGuessType.value.equals("int") || rightGuessType.value.equals("I64") || rightGuessType.value.equals("double") ||  rightGuessType.value.equals("string");
         if (!right_check) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(leftSrc, opString + "运算符右边必须是int,I64,double,string类型.不能是:" + rightGuessType.value);
+            throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, opString + "运算符右边必须是int,I64,double,string类型.不能是:" + rightGuessType.value);
         }
 
         ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();

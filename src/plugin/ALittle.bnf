@@ -264,7 +264,8 @@ propertyValueCustomType ::= ID_CONTENT
 propertyValueThisType ::= this
 
 propertyValueSuffix ::= propertyValueDotId | propertyValueBracketValue | propertyValueMethodCall
-propertyValueDotId ::= DOT ID_CONTENT {pin=1}
+propertyValueDotId ::= DOT propertyValueDotIdName {pin=1}
+propertyValueDotIdName ::= ID_CONTENT
 propertyValueBracketValue ::= LBRACK valueStat RBRACK {pin=1}
 propertyValueMethodCall ::= LPAREN (valueStat (COMMA valueStat)*)? RPAREN {pin=1}
 

@@ -8,10 +8,10 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public interface ALittlePropertyValueDotId extends PsiElement {
+public interface ALittlePropertyValueDotIdName extends PsiElement {
 
-  @Nullable
-  ALittlePropertyValueDotIdName getPropertyValueDotIdName();
+  @NotNull
+  PsiElement getIdContent();
 
   @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;

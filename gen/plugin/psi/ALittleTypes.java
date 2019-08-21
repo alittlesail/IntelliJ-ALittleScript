@@ -102,6 +102,7 @@ public interface ALittleTypes {
   IElementType PROPERTY_VALUE_CAST_TYPE = new ALittleElementType("PROPERTY_VALUE_CAST_TYPE");
   IElementType PROPERTY_VALUE_CUSTOM_TYPE = new ALittleElementType("PROPERTY_VALUE_CUSTOM_TYPE");
   IElementType PROPERTY_VALUE_DOT_ID = new ALittleElementType("PROPERTY_VALUE_DOT_ID");
+  IElementType PROPERTY_VALUE_DOT_ID_NAME = new ALittleElementType("PROPERTY_VALUE_DOT_ID_NAME");
   IElementType PROPERTY_VALUE_EXPR = new ALittleElementType("PROPERTY_VALUE_EXPR");
   IElementType PROPERTY_VALUE_FIRST_TYPE = new ALittleElementType("PROPERTY_VALUE_FIRST_TYPE");
   IElementType PROPERTY_VALUE_METHOD_CALL = new ALittleElementType("PROPERTY_VALUE_METHOD_CALL");
@@ -492,6 +493,9 @@ public interface ALittleTypes {
       }
       else if (type == PROPERTY_VALUE_DOT_ID) {
         return new ALittlePropertyValueDotIdImpl(node);
+      }
+      else if (type == PROPERTY_VALUE_DOT_ID_NAME) {
+        return new ALittlePropertyValueDotIdNameImpl(node);
       }
       else if (type == PROPERTY_VALUE_EXPR) {
         return new ALittlePropertyValueExprImpl(node);

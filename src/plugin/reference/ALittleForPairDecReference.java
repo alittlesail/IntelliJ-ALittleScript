@@ -19,6 +19,6 @@ public class ALittleForPairDecReference extends ALittleReference<ALittleForPairD
         } else if (myElement.getAutoType() != null) {
             return myElement.getAutoType().guessTypes();
         }
-        return new ArrayList<>();
+        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleForPairDec出现未知的子节点");
     }
 }

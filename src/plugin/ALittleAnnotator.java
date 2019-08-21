@@ -3,6 +3,7 @@ package plugin;
 import com.intellij.lang.annotation.*;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.psi.ALittleFile;
 import plugin.reference.ALittleReference;
 import plugin.reference.ALittleReferenceUtil;
 

@@ -14,14 +14,14 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public class ALittlePropertyValueDotIdImpl extends ASTWrapperPsiElement implements ALittlePropertyValueDotId {
+public class ALittlePropertyValueDotIdNameImpl extends ASTWrapperPsiElement implements ALittlePropertyValueDotIdName {
 
-  public ALittlePropertyValueDotIdImpl(@NotNull ASTNode node) {
+  public ALittlePropertyValueDotIdNameImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitPropertyValueDotId(this);
+    visitor.visitPropertyValueDotIdName(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -30,9 +30,9 @@ public class ALittlePropertyValueDotIdImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @Nullable
-  public ALittlePropertyValueDotIdName getPropertyValueDotIdName() {
-    return findChildByClass(ALittlePropertyValueDotIdName.class);
+  @NotNull
+  public PsiElement getIdContent() {
+    return findNotNullChildByType(ID_CONTENT);
   }
 
   @Override

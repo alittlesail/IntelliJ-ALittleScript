@@ -20,8 +20,8 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
             throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "bind表达式不能没有参数");
         }
 
-        ALittleValueStat valueStat = valueStatList.get(0);
         // 第一个参数必须是函数
+        ALittleValueStat valueStat = valueStatList.get(0);
         ALittleReferenceUtil.GuessTypeInfo GuessInfo = valueStat.guessType();
         if (GuessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
             throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "bind表达式第一个参数必须是一个函数");
@@ -30,11 +30,11 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         // 开始构建类型
         ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
         info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
-        info.value = "Functor<(";
+        info.value = "Functor<";
         info.element = myElement;
         info.functorAwait = GuessInfo.functorAwait;
         if (info.functorAwait) {
-            info.value = "Functor<await(";
+            info.value = "await";
         }
         info.functorParamList = new ArrayList<>();
         info.functorParamList.addAll(GuessInfo.functorParamList);
@@ -54,13 +54,14 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         for (ALittleReferenceUtil.GuessTypeInfo paramInfo : info.functorParamList) {
             nameList.add(paramInfo.value);
         }
+        info.value += "(";
         info.value += String.join(",", nameList);
         info.value += ")";
 
         // 计算返回值类型名列表
         nameList = new ArrayList<>();
-        for (ALittleReferenceUtil.GuessTypeInfo param_info : info.functorReturnList) {
-            nameList.add(param_info.value);
+        for (ALittleReferenceUtil.GuessTypeInfo returnInfo : info.functorReturnList) {
+            nameList.add(returnInfo.value);
         }
         if (!nameList.isEmpty()) info.value += ":";
         info.value += String.join(",", nameList);
@@ -92,12 +93,11 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         // 遍历所有的表达式，看下是否符合
         for (int i = 1; i < valueStatList.size(); ++i) {
             ALittleReferenceUtil.GuessTypeInfo param_guess_info = guessInfo.functorParamList.get(i - 1);
-
+            ALittleValueStat paramValueStat = valueStatList.get(i);
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(myElement, param_guess_info,
-                        valueStatList.get(i), valueStatList.get(i).guessType());
+                ALittleReferenceOpUtil.guessTypeEqual(myElement, param_guess_info, paramValueStat, paramValueStat.guessType());
             } catch (ALittleReferenceUtil.ALittleReferenceException e) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
+                throw new ALittleReferenceUtil.ALittleReferenceException(paramValueStat, "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
             }
         }
     }

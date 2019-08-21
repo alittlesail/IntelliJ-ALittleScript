@@ -20,16 +20,7 @@ public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNam
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        ResolveResult[] resultList = multiResolve(false);
-        for (ResolveResult result : resultList) {
-            PsiElement element = result.getElement();
-            if (element instanceof ALittleEnumNameDec) {
-                guessList.add(((ALittleEnumDec)element.getParent()).guessType());
-            }
-        }
-
-        return guessList;
+        return ((ALittleEnumDec)myElement.getParent()).guessTypes();
     }
 
     @NotNull

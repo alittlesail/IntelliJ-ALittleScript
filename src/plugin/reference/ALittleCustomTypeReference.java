@@ -30,16 +30,23 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        ResolveResult[] resultList = multiResolve(false);
-        for (ResolveResult result : resultList) {
-            PsiElement element = result.getElement();
 
-            if (element instanceof ALittleClassNameDec) {
-                guessList.add(((ALittleClassDec)element.getParent()).guessType());
-            } else if (element instanceof ALittleStructNameDec) {
-                guessList.add(((ALittleStructDec)element.getParent()).guessType());
-            } else if (element instanceof ALittleEnumNameDec) {
-                guessList.add(((ALittleEnumDec)element.getParent()).guessType());
+        {
+            List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(myElement.getProject(), mNamespace, mKey);
+            for (ALittleClassNameDec dec : decList) {
+                guessList.add(dec.guessType());
+            }
+        }
+        {
+            List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(myElement.getProject(), mNamespace, mKey);
+            for (ALittleStructNameDec dec : decList) {
+                guessList.add(dec.guessType());
+            }
+        }
+        {
+            List<ALittleEnumNameDec> decList = ALittleTreeChangeListener.findEnumNameDecList(myElement.getProject(), mNamespace, mKey);
+            for (ALittleEnumNameDec dec : decList) {
+                guessList.add(dec.guessType());
             }
         }
 
@@ -64,6 +71,7 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
+
         List<ResolveResult> results = new ArrayList<>();
         {
             List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, mNamespace, mKey);

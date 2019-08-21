@@ -21,6 +21,6 @@ public class ALittleAllTypeReference extends ALittleReference<ALittleAllType> {
         } else if (myElement.getPrimitiveType() != null) {
             return myElement.getPrimitiveType().guessTypes();
         }
-        return new ArrayList<>();
+        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleAllType出现未知的子节点");
     }
 }
