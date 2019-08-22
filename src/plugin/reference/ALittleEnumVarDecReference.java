@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import plugin.ALittleUtil;
 import plugin.psi.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleEnumVarDecReference extends ALittleReference<ALittleEnumVarDec> {
@@ -15,23 +14,11 @@ public class ALittleEnumVarDecReference extends ALittleReference<ALittleEnumVarD
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-
         if (myElement.getStringContent() != null) {
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-            info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-            info.value = "string";
-            info.element = myElement;
-            guessList.add(info);
+            return ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("string");
         } else {
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-            info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-            info.value = "int";
-            info.element = myElement;
-            guessList.add(info);
+            return ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("int");
         }
-
-        return guessList;
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {

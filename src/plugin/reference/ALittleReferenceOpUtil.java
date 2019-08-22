@@ -129,30 +129,18 @@ public class ALittleReferenceOpUtil {
             , PsiElement rightSrc, ALittleReferenceUtil.GuessTypeInfo rightGuessType
             , ALittleOp6Suffix op6Suffix) throws ALittleReferenceUtil.ALittleReferenceException {
         if (opString.equals("==") || opString.equals("!=")) {
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-            info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-            info.value = "bool";
-            info.element = op6Suffix;
-            return info;
+            return ALittleReferenceUtil.sBoolGuessTypeInfo;
         } else {
             if (leftGuessType.value.equals("int") || leftGuessType.value.equals("I64") || leftGuessType.value.equals("double")) {
                 if (rightGuessType.value.equals("int") || rightGuessType.value.equals("I64") || rightGuessType.value.equals("double")) {
-                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-                    info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-                    info.value = "bool";
-                    info.element = op6Suffix;
-                    return info;
+                    return ALittleReferenceUtil.sBoolGuessTypeInfo;
                 }
                 throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, opString + "运算符左边是数字，那么右边必须是int,I64,double类型.不能是:" + rightGuessType.value);
             }
 
             if (leftGuessType.value.equals("string")) {
                 if (rightGuessType.value.equals("string")) {
-                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-                    info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-                    info.value = "bool";
-                    info.element = op6Suffix;
-                    return info;
+                    return ALittleReferenceUtil.sBoolGuessTypeInfo;
                 }
                 throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, opString + "运算符左边是字符串，那么右边必须是string类型.不能是:" + rightGuessType.value);
             }
@@ -211,11 +199,7 @@ public class ALittleReferenceOpUtil {
             throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, opString + "运算符右边必须是int,I64,double,string类型.不能是:" + rightGuessType.value);
         }
 
-        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-        info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-        info.value = "string";
-        info.element = op5Suffix;
-        return info;
+        return ALittleReferenceUtil.sStringGuessTypeInfo;
     }
 
     @NotNull
@@ -332,21 +316,13 @@ public class ALittleReferenceOpUtil {
             if (rightGuessType.value.equals("int")) {
                 // 这个是特殊的
                 if (opString.equals("/")) {
-                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-                    info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-                    info.value = "double";
-                    info.element = op3Suffix;
-                    return info;
+                    return ALittleReferenceUtil.sDoubleGuessTypeInfo;
                 }
                 return leftGuessType;
             } else if (rightGuessType.value.equals("I64")) {
                 // 这个是特殊的
                 if (opString.equals("/")) {
-                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-                    info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-                    info.value = "double";
-                    info.element = op3Suffix;
-                    return info;
+                    return ALittleReferenceUtil.sDoubleGuessTypeInfo;
                 }
                 return rightGuessType;
             } else if (rightGuessType.value.equals("double")) {
@@ -360,11 +336,7 @@ public class ALittleReferenceOpUtil {
             if (rightGuessType.value.equals("int") || rightGuessType.value.equals("I64")) {
                 // 这个是特殊的
                 if (opString.equals("/")) {
-                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-                    info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-                    info.value = "double";
-                    info.element = op3Suffix;
-                    return info;
+                    return ALittleReferenceUtil.sDoubleGuessTypeInfo;
                 }
                 return leftGuessType;
             } else if (rightGuessType.value.equals("double")) {

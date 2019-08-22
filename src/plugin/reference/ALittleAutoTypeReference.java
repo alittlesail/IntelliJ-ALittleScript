@@ -75,11 +75,7 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
             if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_LIST) {
                 // 对于List的key使用auto，那么就默认是int类型
                 if (index == 0) {
-                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-                    info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-                    info.value = "int";
-                    info.element = myElement;
-                    guessList.add(info);
+                    return ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("int");
                 } else if (index == 1) {
                     guessList.add(guessInfo.listSubType);
                 }

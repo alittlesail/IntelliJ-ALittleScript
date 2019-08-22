@@ -1,11 +1,16 @@
 package plugin.reference;
 
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.ALittleTreeChangeListener;
 import plugin.psi.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ALittleReferenceUtil {
     // 定义异常
@@ -25,27 +30,79 @@ public class ALittleReferenceUtil {
         public PsiElement getElement() { return mElement; }
     }
 
+    // KEY
+    public static Key<List<GuessTypeInfo>> sGuessTypeListKey = new Key<>("GuessTypeList");
+
+    // 基本变量类型
+    public static GuessTypeInfo sIntGuessTypeInfo;
+    public static GuessTypeInfo sDoubleGuessTypeInfo;
+    public static GuessTypeInfo sStringGuessTypeInfo;
+    public static GuessTypeInfo sBoolGuessTypeInfo;
+    public static GuessTypeInfo sI64GuessTypeInfo;
+    public static GuessTypeInfo sAnyGuessTypeInfo;
+    public static Map<String, List<GuessTypeInfo>> sPrimitiveGuessTypeMap;
+    public static List<GuessTypeInfo> sConstNullGuessType;
+    static {
+        sPrimitiveGuessTypeMap = new HashMap<>();
+        List<GuessTypeInfo> tmp;
+        tmp = new ArrayList<>(); sIntGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "int"); tmp.add(sIntGuessTypeInfo); sPrimitiveGuessTypeMap.put("int", tmp);
+        tmp = new ArrayList<>(); sDoubleGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "double"); tmp.add(sDoubleGuessTypeInfo); sPrimitiveGuessTypeMap.put("double", tmp);
+        tmp = new ArrayList<>(); sStringGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "string"); tmp.add(sStringGuessTypeInfo); sPrimitiveGuessTypeMap.put("string", tmp);
+        tmp = new ArrayList<>(); sBoolGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "bool"); tmp.add(sBoolGuessTypeInfo); sPrimitiveGuessTypeMap.put("bool", tmp);
+        tmp = new ArrayList<>(); sI64GuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "I64"); tmp.add(sI64GuessTypeInfo); sPrimitiveGuessTypeMap.put("I64", tmp);
+        tmp = new ArrayList<>(); sAnyGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "any"); tmp.add(sAnyGuessTypeInfo); sPrimitiveGuessTypeMap.put("any", tmp);
+        sConstNullGuessType = new ArrayList<>(); sConstNullGuessType.add(new GuessTypeInfo(GuessType.GT_CONST, "null"));
+    }
+
     // 定义类型
     public enum GuessType
     {
         GT_CONST,
         GT_PRIMITIVE,
+        GT_MAP,
+        GT_LIST,
+        GT_FUNCTOR,
+        GT_NAMESPACE,
+        GT_NAMESPACE_NAME,
         GT_CLASS,
         GT_CLASS_NAME,
         GT_STRUCT,
         GT_STRUCT_NAME,
         GT_ENUM,
         GT_ENUM_NAME,
-        GT_MAP,
-        GT_LIST,
-        GT_FUNCTOR,
-        GT_NAMESPACE,
-        GT_NAMESPACE_NAME,
     }
 
     // 类型信息
     public static class GuessTypeInfo
     {
+        public GuessTypeInfo() {}
+        public GuessTypeInfo(GuessType t, String v) { type = t; value = v; }
+
+        public boolean isChanged() {
+            if (type == GuessType.GT_PRIMITIVE) {
+                return false;
+            } else if (type == GuessType.GT_CONST) {
+                return false;
+            } else if (type == GuessType.GT_LIST) {
+                return listSubType.isChanged();
+            } else if (type == GuessType.GT_MAP) {
+                return mapKeyType.isChanged() || mapValueType.isChanged();
+            } else if (type == GuessType.GT_FUNCTOR) {
+                for (ALittleReferenceUtil.GuessTypeInfo paramInfo : functorParamList) {
+                    if (paramInfo.isChanged()) return true;
+                }
+                for (ALittleReferenceUtil.GuessTypeInfo returnInfo : functorReturnList) {
+                    if (returnInfo.isChanged()) return true;
+                }
+                return false;
+            }
+
+            if (element != null && ALittleTreeChangeListener.isElementExist(element)) {
+                return element.getUserData(sGuessTypeListKey) == null;
+            }
+            return true;
+        }
+
         public GuessType type;
         public String value;                              // 完整类型的字符串
         public PsiElement element;                        // 指向的元素

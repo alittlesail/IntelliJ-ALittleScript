@@ -22,10 +22,24 @@ public class ALittlePsiImplUtil {
 
     @NotNull
     public static List<ALittleReferenceUtil.GuessTypeInfo> guessTypes(PsiElement element) throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeInfoList = element.getUserData(ALittleReferenceUtil.sGuessTypeListKey);
+        if (guessTypeInfoList != null) {
+            boolean isChanged = false;
+            for (ALittleReferenceUtil.GuessTypeInfo info : guessTypeInfoList) {
+                if (info.isChanged()) {
+                    isChanged = true;
+                    break;
+                }
+            }
+            if (!isChanged) return  guessTypeInfoList;
+        }
+
         ALittleReference ref = ALittleReferenceUtil.create(element);
         if (ref == null) {
             throw new ALittleReferenceUtil.ALittleReferenceException(element, "ALittleReference对象创建失败 element:" + element);
         }
-        return ref.guessTypes();
+        guessTypeInfoList = ref.guessTypes();
+        element.putUserData(ALittleReferenceUtil.sGuessTypeListKey, guessTypeInfoList);
+        return guessTypeInfoList;
     }
 }

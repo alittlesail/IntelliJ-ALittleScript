@@ -29,9 +29,9 @@ public class ALittleEnumDecReference extends ALittleReference<ALittleEnumDec> {
         info.value = mNamespace + "." + enumNameDec.getIdContent().getText();
         info.element = myElement;
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        guessList.add(info);
-        return guessList;
+        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = new ArrayList<>();
+        guessTypeList.add(info);
+        return guessTypeList;
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {

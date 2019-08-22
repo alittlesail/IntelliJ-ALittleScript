@@ -15,12 +15,7 @@ public class ALittleReflectValueReference extends ALittleReference<ALittleReflec
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-        info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-        info.value = "string";
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        guessList.add(info);
-        return guessList;
+        return ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("string");
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {

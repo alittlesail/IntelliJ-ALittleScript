@@ -59,15 +59,17 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             } else if (element instanceof ALittleVarAssignNameDec) {
                 guess = ((ALittleVarAssignNameDec) element).guessType();
             } else if (element instanceof ALittleEnumNameDec) {
-                guess = ((ALittleEnumNameDec) element).guessType();
+                guess = new ALittleReferenceUtil.GuessTypeInfo();
                 guess.type = ALittleReferenceUtil.GuessType.GT_ENUM_NAME;
+                guess.value = ((ALittleEnumNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleStructNameDec) {
-                guess = ((ALittleStructNameDec) element).guessType();
+                guess = new ALittleReferenceUtil.GuessTypeInfo();
                 guess.type = ALittleReferenceUtil.GuessType.GT_STRUCT_NAME;
+                guess.value = ((ALittleStructNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleClassNameDec) {
-                guess = ((ALittleClassNameDec) element).guessType();
+                guess = new ALittleReferenceUtil.GuessTypeInfo();
                 guess.type = ALittleReferenceUtil.GuessType.GT_CLASS_NAME;
                 guess.element = element;
             }
@@ -440,7 +442,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 List<ALittleEnumVarDec> varDecList = new ArrayList<>();
                 ALittleUtil.findEnumVarNameDecList(enumDec, "", varDecList);
                 for (ALittleEnumVarDec varNameDec : varDecList) {
-                    variants.add(LookupElementBuilder.create(varNameDec.getText()).
+                    variants.add(LookupElementBuilder.create(varNameDec.getIdContent().getText()).
                             withIcon(ALittleIcons.PROPERTY).
                             withTypeText(varNameDec.getContainingFile().getName())
                     );

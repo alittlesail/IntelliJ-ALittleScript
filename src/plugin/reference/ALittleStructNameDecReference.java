@@ -30,11 +30,16 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        ResolveResult[] resultList = multiResolve(false);
-        for (ResolveResult result : resultList) {
-            PsiElement element = result.getElement();
-            if (element instanceof ALittleStructNameDec) {
-                guessList.add(((ALittleStructDec)element.getParent()).guessType());
+        PsiElement parent = myElement.getParent();
+
+        // 如果直接就是定义，那么直接获取
+        if (parent instanceof ALittleStructDec) {
+            guessList.add(((ALittleStructDec)parent).guessType());
+            // 如果是继承那么就从继承那边获取
+        } else if (parent instanceof ALittleStructExtendsDec) {
+            List<ALittleStructNameDec> structNameDecList = ALittleTreeChangeListener.findStructNameDecList(myElement.getProject(), mNamespace, mKey);
+            for (ALittleStructNameDec structNameDec : structNameDecList) {
+                guessList.add(structNameDec.guessType());
             }
         }
 

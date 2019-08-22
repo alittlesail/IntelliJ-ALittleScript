@@ -44,6 +44,18 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             // 如果再往前一个是一个Class实例对象，那么就要去掉第一个参数
             if (prePreType != null && prePreType.type == ALittleReferenceUtil.GuessType.GT_CLASS && !preType.functorParamList.isEmpty()
                     && (preType.element instanceof ALittleClassMethodDec || preType.element instanceof ALittleClassGetterDec || preType.element instanceof ALittleClassSetterDec)) {
+                ALittleReferenceUtil.GuessTypeInfo newPreType = new ALittleReferenceUtil.GuessTypeInfo();
+                newPreType.type = preType.type;
+                newPreType.element = preType.element;
+                newPreType.functorAwait = preType.functorAwait;
+                newPreType.functorParamList = new ArrayList<>();
+                newPreType.functorParamList.addAll(preType.functorParamList);
+                newPreType.functorParamNameList = new ArrayList<>();
+                newPreType.functorParamNameList.addAll(preType.functorParamNameList);
+                newPreType.functorReturnList = new ArrayList<>();
+                newPreType.functorReturnList.addAll(preType.functorReturnList);
+                preType = newPreType;
+
                 preType.functorParamList.remove(0);
                 preType.functorParamNameList.remove(0);
                 preType.value = "Functor<(";

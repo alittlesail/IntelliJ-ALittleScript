@@ -70,20 +70,24 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
 
             ALittleReferenceUtil.GuessTypeInfo guess = null;
             if (element instanceof ALittleNamespaceNameDec) {
-                guess = ((ALittleNamespaceNameDec)element).guessType();
+                guess = new ALittleReferenceUtil.GuessTypeInfo();
                 guess.type = ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME;
+                guess.value = ((ALittleNamespaceNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleClassNameDec) {
-                guess = ((ALittleClassNameDec)element).guessType();
+                guess = new ALittleReferenceUtil.GuessTypeInfo();
                 guess.type = ALittleReferenceUtil.GuessType.GT_CLASS_NAME;
+                guess.value = ((ALittleClassNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleStructNameDec) {
-                guess = ((ALittleStructNameDec)element).guessType();
+                guess = new ALittleReferenceUtil.GuessTypeInfo();
                 guess.type = ALittleReferenceUtil.GuessType.GT_STRUCT_NAME;
+                guess.value = ((ALittleStructNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleEnumNameDec) {
-                guess = ((ALittleEnumNameDec)element).guessType();
+                guess = new ALittleReferenceUtil.GuessTypeInfo();
                 guess.type = ALittleReferenceUtil.GuessType.GT_ENUM_NAME;
+                guess.value = ((ALittleEnumNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleMethodParamNameDec) {
                 guess = ((ALittleMethodParamNameDec) element).guessType();

@@ -12,12 +12,16 @@ import com.intellij.util.SmartList;
 import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
+import plugin.reference.ALittleReferenceUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 
 public class ALittleTreeChangeListener implements PsiTreeChangeListener {
+    // 元素版本ID，用来标记内容变化
+    public static int sVersionId = 0;
+
     public static Map<Project, ALittleTreeChangeListener> sMap = new HashMap<>();
 
     public static List<ALittleNamespaceNameDec> findNamespaceNameDecList(Project project, String namespaceName) {
@@ -165,6 +169,14 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         return result;
     }
 
+    public static boolean isElementExist(PsiElement element) {
+        ALittleTreeChangeListener listener = sMap.get(element.getProject());
+        if (listener == null) return false;
+        if (!listener.mReloaded) listener.reload();
+
+        return listener.mElement.contains(element);
+    }
+
     public static void handleDirDelete(Project project, VirtualFile virtualFile) {
         if (virtualFile.isDirectory()) {
             VirtualFile[] fileList = virtualFile.getChildren();
@@ -231,8 +243,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     public static void handleRefresh(Project project) {
         ALittleTreeChangeListener listener = sMap.get(project);
         if (listener == null) return;
-        if (listener.mIsRefresh) return;
-        listener.mIsRefresh = true;
+        if (listener.mIsRefreshed) return;
+        listener.mIsRefreshed = true;
         listener.reload();
     }
 
@@ -368,18 +380,22 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
     }
 
-    // 用于保存命名域对应的命名域对象
+    // key是命名域名称，Map的Key是命名域对象，Data是这个命名域对象下的所有内容
     private Map<String, Map<ALittleNamespaceNameDec, Data>> mNamespaceMap;
+    // key是命名域名称，value是这个命名域下所有的内容
     private Map<String, Data> mDataMap;
     // 全局命名域下的单例
     private Map<String, Set<ALittleVarAssignNameDec>> mInstanceMap;
+    // 保存关键的元素对象
+    private Set<PsiElement> mElement;
     // 已加载的文件列表
-    boolean mReloading = false;
-    boolean mReloaded = false;
-    boolean mIsRefresh = false;
+    boolean mReloading = false;         // 是否正在加载
+    boolean mReloaded = false;          // 是否加载完成
+    boolean mIsRefreshed = false;       // 是否刷新过
 
     public ALittleTreeChangeListener(Project project) {
         mProject = project;
+        mElement = new HashSet<>();
     }
 
     private void loadDir(PsiManager psi_mgr, VirtualFile root) {
@@ -444,6 +460,13 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         mReloaded = true;
     }
 
+    private void clearUserData(@NotNull  PsiElement element) {
+        element.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
+        for(PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
+            clearUserData(child);
+        }
+    }
+
     private void addNamespaceName(String name, ALittleNamespaceNameDec element) {
         Map<ALittleNamespaceNameDec, Data> map = mNamespaceMap.get(name);
         if (map == null) {
@@ -452,49 +475,57 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
 
         Data data = new Data();
+        map.put(element, data);
 
-        Data fast_data = mDataMap.get(name);
-        if (fast_data == null) {
-            fast_data = new Data();
-            mDataMap.put(name, fast_data);
+        Data fastData = mDataMap.get(name);
+        if (fastData == null) {
+            fastData = new Data();
+            mDataMap.put(name, fastData);
         }
 
         ALittleNamespaceDec namespaceDec = (ALittleNamespaceDec)element.getParent();
+        clearUserData(namespaceDec);
         for(PsiElement child = namespaceDec.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleClassDec) {
                 ALittleClassDec dec = (ALittleClassDec)child;
+                mElement.add(dec);
                 ALittleClassNameDec nameDec = dec.getClassNameDec();
                 if (nameDec == null) continue;
                 data.addALittleClassNameDec(nameDec);
-                fast_data.addALittleClassNameDec(nameDec);
+                fastData.addALittleClassNameDec(nameDec);
             } else if (child instanceof ALittleEnumDec) {
                 ALittleEnumDec dec = (ALittleEnumDec)child;
+                mElement.add(dec);
+                dec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
                 ALittleEnumNameDec nameDec = dec.getEnumNameDec();
                 if (nameDec == null) continue;
                 data.addALittleEnumNameDec(nameDec);
-                fast_data.addALittleEnumNameDec(nameDec);
+                fastData.addALittleEnumNameDec(nameDec);
             } else if (child instanceof ALittleStructDec) {
                 ALittleStructDec dec = (ALittleStructDec)child;
+                mElement.add(dec);
+                dec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
                 ALittleStructNameDec nameDec = dec.getStructNameDec();
                 if (nameDec == null) continue;
                 data.addALittleStructNameDec(nameDec);
-                fast_data.addALittleStructNameDec(nameDec);
+                fastData.addALittleStructNameDec(nameDec);
             } else if (child instanceof ALittleGlobalMethodDec) {
                 ALittleGlobalMethodDec dec = (ALittleGlobalMethodDec)child;
+                mElement.add(dec);
+                dec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
                 ALittleMethodNameDec nameDec = dec.getMethodNameDec();
                 if (nameDec == null) continue;
                 data.addALittleGlobalMethodNameDec(nameDec);
-                fast_data.addALittleGlobalMethodNameDec(nameDec);
+                fastData.addALittleGlobalMethodNameDec(nameDec);
             } else if (child instanceof ALittleInstanceDec) {
-                ALittleInstanceDec instanceDec = (ALittleInstanceDec) child;
-                boolean isPublic = false;
-                ALittleAccessModifier access = instanceDec.getAccessModifier();
-                if (access != null && access.getText().equals("public")) {
-                    isPublic = true;
-                }
+                ALittleInstanceDec dec = (ALittleInstanceDec) child;
+                ALittleAccessModifier access = dec.getAccessModifier();
+                boolean isPublic = access != null && access.getText().equals("public");
 
-                List<ALittleVarAssignDec> varAssignDecList = instanceDec.getVarAssignExpr().getVarAssignDecList();
+                List<ALittleVarAssignDec> varAssignDecList = dec.getVarAssignExpr().getVarAssignDecList();
                 for (ALittleVarAssignDec varAssignDec : varAssignDecList) {
+                    varAssignDec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
+                    mElement.add(varAssignDec);
                     if (isPublic) {
                         String nameText = varAssignDec.getVarAssignNameDec().getText();
                         Set<ALittleVarAssignNameDec> set = mInstanceMap.get(nameText);
@@ -504,69 +535,74 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                         }
                         set.add(varAssignDec.getVarAssignNameDec());
                     } else{
-                        fast_data.addALittleInstanceNameDec(varAssignDec.getVarAssignNameDec());
+                        fastData.addALittleInstanceNameDec(varAssignDec.getVarAssignNameDec());
                     }
                     data.addALittleInstanceNameDec(varAssignDec.getVarAssignNameDec());
                 }
             }
         }
-        map.put(element, data);
     }
 
     private void removeNamespaceName(String name, ALittleNamespaceNameDec element) {
-        Data fast_data = mDataMap.get(name);
+        Data fastData = mDataMap.get(name);
         Map<ALittleNamespaceNameDec, Data> map = mNamespaceMap.get(name);
         if (map == null) return;
 
         Data data = map.get(element);
         if (data == null) return;
 
-            if (fast_data != null) {
-                if (data.classMap != null) {
-                    for (Map.Entry<String, Set<ALittleClassNameDec>> entry : data.classMap.entrySet()) {
-                        for (ALittleClassNameDec nameDec : entry .getValue()) {
-                            fast_data.removeALittleClassNameDec(nameDec);
-                        }
-                    }
-                }
-                if (data.enumMap != null) {
-                    for (Map.Entry<String, Set<ALittleEnumNameDec>> entry : data.enumMap.entrySet()) {
-                        for (ALittleEnumNameDec nameDec : entry .getValue()) {
-                            fast_data.removeALittleEnumNameDec(nameDec);
-                        }
-                    }
-                }
-                if (data.structMap != null) {
-                    for (Map.Entry<String, Set<ALittleStructNameDec>> entry : data.structMap.entrySet()) {
-                        for (ALittleStructNameDec nameDec : entry .getValue()) {
-                            fast_data.removeALittleStructNameDec(nameDec);
-                        }
-                    }
-                }
-                if (data.globalMethodMap != null) {
-                    for (Map.Entry<String, Set<ALittleMethodNameDec>> entry : data.globalMethodMap.entrySet()) {
-                        for (ALittleMethodNameDec nameDec : entry .getValue()) {
-                            fast_data.removeALittleGlobalMethodNameDec(nameDec);
-                        }
-                    }
-                }
-                if (data.instanceMap != null) {
-                    for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry_instance : data.instanceMap.entrySet()) {
-                        for (ALittleVarAssignNameDec nameDec : entry_instance.getValue()) {
-                            fast_data.removeALittleInstanceNameDec(nameDec);
+        map.remove(element);
+        if (map.isEmpty()) mNamespaceMap.remove(name);
 
-                            String nameText = nameDec.getText();
-                            Set<ALittleVarAssignNameDec> set = mInstanceMap.get(nameText);
-                            if (set != null) {
-                                set.remove(nameDec);
-                                if (set.isEmpty()) mInstanceMap.remove(nameText);
-                            }
-                        }
+        if (fastData == null) return;
+
+        if (data.classMap != null) {
+            for (Map.Entry<String, Set<ALittleClassNameDec>> entry : data.classMap.entrySet()) {
+                for (ALittleClassNameDec nameDec : entry.getValue()) {
+                    mElement.remove(nameDec.getParent());
+                    fastData.removeALittleClassNameDec(nameDec);
+                }
+            }
+        }
+        if (data.enumMap != null) {
+            for (Map.Entry<String, Set<ALittleEnumNameDec>> entry : data.enumMap.entrySet()) {
+                for (ALittleEnumNameDec nameDec : entry .getValue()) {
+                    mElement.remove(nameDec.getParent());
+                    fastData.removeALittleEnumNameDec(nameDec);
+                }
+            }
+        }
+        if (data.structMap != null) {
+            for (Map.Entry<String, Set<ALittleStructNameDec>> entry : data.structMap.entrySet()) {
+                for (ALittleStructNameDec nameDec : entry .getValue()) {
+                    mElement.remove(nameDec.getParent());
+                    fastData.removeALittleStructNameDec(nameDec);
+                }
+            }
+        }
+        if (data.globalMethodMap != null) {
+            for (Map.Entry<String, Set<ALittleMethodNameDec>> entry : data.globalMethodMap.entrySet()) {
+                for (ALittleMethodNameDec nameDec : entry .getValue()) {
+                    mElement.remove(nameDec.getParent());
+                    fastData.removeALittleGlobalMethodNameDec(nameDec);
+                }
+            }
+        }
+        if (data.instanceMap != null) {
+            for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry_instance : data.instanceMap.entrySet()) {
+                for (ALittleVarAssignNameDec nameDec : entry_instance.getValue()) {
+                    mElement.remove(nameDec.getParent());
+                    fastData.removeALittleInstanceNameDec(nameDec);
+
+                    String nameText = nameDec.getText();
+                    Set<ALittleVarAssignNameDec> set = mInstanceMap.get(nameText);
+                    if (set != null) {
+                        set.remove(nameDec);
+                        if (set.isEmpty()) mInstanceMap.remove(nameText);
                     }
                 }
             }
-        map.remove(element);
-        if (map.isEmpty()) mNamespaceMap.remove(name);
+        }
     }
 
     public void beforeChildAddition(@NotNull PsiTreeChangeEvent var1)

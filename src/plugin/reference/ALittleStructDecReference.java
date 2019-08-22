@@ -29,9 +29,9 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
         info.value = mNamespace + "." + structNameDec.getIdContent().getText();
         info.element = myElement;
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        guessList.add(info);
-        return guessList;
+        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = new ArrayList<>();
+        guessTypeList.add(info);
+        return guessTypeList;
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {

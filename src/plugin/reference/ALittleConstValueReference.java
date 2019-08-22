@@ -19,37 +19,21 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = new ArrayList<>();
         if (myElement.getDigitContent() != null) {
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-            info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-            String value = myElement.getDigitContent().getText();
-            if (ALittleUtil.isInt(value))
-                info.value = "int";
+            if (ALittleUtil.isInt(myElement.getDigitContent().getText()))
+                guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("int");
             else
-                info.value = "double";
-            info.element = myElement;
-            guessList.add(info);
+                guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("double");
         } else if (myElement.getStringContent() != null) {
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-            info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-            info.value = "string";
-            info.element = myElement;
-            guessList.add(info);
+            guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("string");
         } else if (myElement.getText().equals("true") || myElement.getText().equals("false")) {
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-            info.type = ALittleReferenceUtil.GuessType.GT_PRIMITIVE;
-            info.value = "bool";
-            info.element = myElement;
-            guessList.add(info);
+            guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("bool");
         } else if (myElement.getText().equals("null")) {
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-            info.type = ALittleReferenceUtil.GuessType.GT_CONST;
-            info.value = "null";
-            info.element = myElement;
-            guessList.add(info);
+            guessTypeList = ALittleReferenceUtil.sConstNullGuessType;
         }
-        return guessList;
+        if (guessTypeList == null) guessTypeList = new ArrayList<>();
+        return guessTypeList;
     }
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {

@@ -4,7 +4,6 @@ import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.ALittleAllType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleAllTypeReference extends ALittleReference<ALittleAllType> {
