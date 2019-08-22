@@ -23,11 +23,7 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
         if (parent instanceof ALittleVarAssignDec) {
             // 获取父节点
             ALittleVarAssignDec varAssignDec = (ALittleVarAssignDec) parent;
-            parent = varAssignDec.getParent();
-            if (!(parent instanceof ALittleVarAssignExpr)) {
-                return guessList;
-            }
-            ALittleVarAssignExpr varAssignExpr = (ALittleVarAssignExpr) parent;
+            ALittleVarAssignExpr varAssignExpr = (ALittleVarAssignExpr) varAssignDec.getParent();
             // 获取等号右边的表达式
             ALittleValueStat valueStat = varAssignExpr.getValueStat();
             if (valueStat == null) {
@@ -37,9 +33,6 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
             List<ALittleVarAssignDec> pairDecList = varAssignExpr.getVarAssignDecList();
             // 计算当前是第几个参数
             int index = pairDecList.indexOf(varAssignDec);
-            if (index == -1) {
-                return guessList;
-            }
             // 获取函数对应的那个返回值类型
             List<ALittleReferenceUtil.GuessTypeInfo> methodCallGuessList = valueStat.guessTypes();
             if (index >= methodCallGuessList.size()) {
@@ -51,11 +44,7 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
         } else if (parent instanceof ALittleForPairDec) {
             // 获取父节点
             ALittleForPairDec forPairDec = (ALittleForPairDec) parent;
-            parent = forPairDec.getParent();
-            if (!(parent instanceof ALittleForInCondition)) {
-                return guessList;
-            }
-            ALittleForInCondition inExpr = (ALittleForInCondition) parent;
+            ALittleForInCondition inExpr = (ALittleForInCondition)forPairDec.getParent();
             // 取出遍历的对象
             ALittleValueStat valueStat = inExpr.getValueStat();
             if (valueStat == null) {
@@ -65,10 +54,6 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
             // 获取定义列表
             List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
             int index = pairDecList.indexOf(forPairDec);
-            if (index == -1) {
-                return guessList;
-            }
-
             // 获取循环对象的类型
             ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
             // 处理List
@@ -89,6 +74,8 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
                     guessList.add(guessInfo.mapValueType);
                 }
             }
+        } else {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleAutoType出现未知的父节点");
         }
 
         return guessList;

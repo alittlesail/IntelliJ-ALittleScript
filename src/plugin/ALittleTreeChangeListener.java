@@ -10,17 +10,17 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.PathUtil;
 import com.intellij.util.SmartList;
 import com.intellij.util.io.URLUtil;
+import gherkin.lexer.Da;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.*;
 import plugin.reference.ALittleReferenceUtil;
 
+import javax.sound.midi.SysexMessage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 
 public class ALittleTreeChangeListener implements PsiTreeChangeListener {
-    // 元素版本ID，用来标记内容变化
-    public static int sVersionId = 0;
 
     public static Map<Project, ALittleTreeChangeListener> sMap = new HashMap<>();
 
@@ -32,137 +32,153 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         if (!listener.mReloaded) listener.reload();
 
         if (namespaceName.isEmpty()) {
-            for (Map.Entry<String, Map<ALittleNamespaceNameDec, Data>> entry : listener.mNamespaceMap.entrySet()) {
-                result.add(entry.getValue().keySet().iterator().next());
+            for (Map.Entry<String, Map<ALittleNamespaceNameDec, Data>> entry : listener.mAllDataMap.entrySet()) {
+                result.addAll(entry.getValue().keySet());
             }
         } else {
-            Map<ALittleNamespaceNameDec, Data> map = listener.mNamespaceMap.get(namespaceName);
+            Map<ALittleNamespaceNameDec, Data> map = listener.mAllDataMap.get(namespaceName);
             if (map != null)
-                result.add(map.keySet().iterator().next());
+                result.addAll(map.keySet());
         }
         return result;
     }
 
-    public static List<ALittleClassNameDec> findClassNameDecList(Project project, String namespaceName, String name) {
+    public static List<ALittleClassNameDec> findClassNameDecList(Project project, PsiFile psiFile, String namespaceName, String name) {
         List<ALittleClassNameDec> result = new ArrayList<>();
 
         ALittleTreeChangeListener listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
-        Data data = listener.mDataMap.get(namespaceName);
-        if (data == null || data.classMap == null) return result;
-
-        if (name.isEmpty()) {
-            for (Map.Entry<String, Set<ALittleClassNameDec>> entry : data.classMap.entrySet()) {
-                result.addAll(entry.getValue());
-            }
-        } else {
-            Set<ALittleClassNameDec> set = data.classMap.get(name);
-            if (set != null) {
-                result.addAll(set);
-            }
+        // 先查本文件的
+        Data data = listener.mFileAccessMap.get(psiFile);
+        if (data != null) {
+            data.findClassNameDecList(name, result);
         }
+
+        // 先查本命名域的
+        data = listener.mNamespaceAccessMap.get(namespaceName);
+        if (data != null) {
+            data.findClassNameDecList(name, result);
+        }
+
+        // 查全局下
+        data = listener.mGlobalAccessMap.get(namespaceName);
+        if (data != null) {
+            data.findClassNameDecList(name, result);
+        }
+
         return result;
     }
 
-    public static List<ALittleStructNameDec> findStructNameDecList(Project project, String namespaceName, String srcName) {
+    public static List<ALittleStructNameDec> findStructNameDecList(Project project, PsiFile psiFile, String namespaceName, String name) {
         List<ALittleStructNameDec> result = new ArrayList<>();
 
         ALittleTreeChangeListener listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
-        Data data = listener.mDataMap.get(namespaceName);
-        if (data == null || data.structMap == null) return result;
-
-        if (srcName.isEmpty()) {
-            for (Map.Entry<String, Set<ALittleStructNameDec>> entry : data.structMap.entrySet()) {
-                result.addAll(entry.getValue());
-            }
-        } else {
-            Set<ALittleStructNameDec> set = data.structMap.get(srcName);
-            if (set != null)
-                result.addAll(set);
+        // 先查本文件的
+        Data data = listener.mFileAccessMap.get(psiFile);
+        if (data != null) {
+            data.findStructNameDecList(name, result);
         }
+
+        // 先查本命名域的
+        data = listener.mNamespaceAccessMap.get(namespaceName);
+        if (data != null) {
+            data.findStructNameDecList(name, result);
+        }
+
+        // 查全局下
+        data = listener.mGlobalAccessMap.get(namespaceName);
+        if (data != null) {
+            data.findStructNameDecList(name, result);
+        }
+
         return result;
     }
 
-    public static List<ALittleEnumNameDec> findEnumNameDecList(Project project, String namespaceName, String srcName) {
+    public static List<ALittleEnumNameDec> findEnumNameDecList(Project project, PsiFile psiFile, String namespaceName, String name) {
         List<ALittleEnumNameDec> result = new ArrayList<>();
 
         ALittleTreeChangeListener listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
-        Data data = listener.mDataMap.get(namespaceName);
-        if (data == null || data.enumMap == null) return result;
-
-        if (srcName.isEmpty()) {
-            for (Map.Entry<String, Set<ALittleEnumNameDec>> entry : data.enumMap.entrySet()) {
-                result.addAll(entry.getValue());
-            }
-        } else {
-            Set<ALittleEnumNameDec> set = data.enumMap.get(srcName);
-            if (set != null)
-                result.addAll(set);
+        // 先查本文件的
+        Data data = listener.mFileAccessMap.get(psiFile);
+        if (data != null) {
+            data.findEnumNameDecList(name, result);
         }
+
+        // 先查本命名域的
+        data = listener.mNamespaceAccessMap.get(namespaceName);
+        if (data != null) {
+            data.findEnumNameDecList(name, result);
+        }
+
+        // 查全局下
+        data = listener.mGlobalAccessMap.get(namespaceName);
+        if (data != null) {
+            data.findEnumNameDecList(name, result);
+        }
+
         return result;
     }
 
-    public static List<ALittleMethodNameDec> findGlobalMethodNameDecList(Project project, String namespaceName, String srcName) {
+    public static List<ALittleMethodNameDec> findGlobalMethodNameDecList(Project project, PsiFile psiFile, String namespaceName, String name) {
         List<ALittleMethodNameDec> result = new ArrayList<>();
 
         ALittleTreeChangeListener listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
-        Data data = listener.mDataMap.get(namespaceName);
-        if (data == null || data.globalMethodMap == null) return result;
-
-        if (srcName.isEmpty()) {
-            for (Map.Entry<String, Set<ALittleMethodNameDec>> entry : data.globalMethodMap.entrySet()) {
-                result.addAll(entry.getValue());
-            }
-        } else {
-            Set<ALittleMethodNameDec> set = data.globalMethodMap.get(srcName);
-            if (set != null)
-                result.addAll(set);
+        // 先查本文件的
+        Data data = listener.mFileAccessMap.get(psiFile);
+        if (data != null) {
+            data.findGlobalMethodNameDecList(name, result);
         }
+
+        // 先查本命名域的
+        data = listener.mNamespaceAccessMap.get(namespaceName);
+        if (data != null) {
+            data.findGlobalMethodNameDecList(name, result);
+        }
+
+        // 查全局下
+        data = listener.mGlobalAccessMap.get(namespaceName);
+        if (data != null) {
+            data.findGlobalMethodNameDecList(name, result);
+        }
+
         return result;
     }
 
-    public static List<ALittleVarAssignNameDec> findInstanceNameDecList(Project project, String namespaceName, String srcName, boolean findInGlobal) {
+    public static List<ALittleVarAssignNameDec> findInstanceNameDecList(Project project, PsiFile psiFile, String namespaceName, String name, boolean findInGlobal) {
         List<ALittleVarAssignNameDec> result = new ArrayList<>();
 
         ALittleTreeChangeListener listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
-        // 先从指定模块中找
-        Data data = listener.mDataMap.get(namespaceName);
-        if (data != null && data.instanceMap != null) {
-            if (srcName.isEmpty()) {
-                for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry : data.instanceMap.entrySet()) {
-                    result.addAll(entry.getValue());
-                }
-            } else {
-                Set<ALittleVarAssignNameDec> set = data.instanceMap.get(srcName);
-                if (set != null)
-                    result.addAll(set);
-            }
+        // 先查本文件的
+        Data data = listener.mFileAccessMap.get(psiFile);
+        if (data != null) {
+            data.findInstanceNameDecList(name, result);
         }
 
-        // 从全局找
+        // 先查本命名域的
+        data = listener.mNamespaceAccessMap.get(namespaceName);
+        if (data != null) {
+            data.findInstanceNameDecList(name, result);
+        }
+
+        // 查全局下
         if (findInGlobal) {
-            if (srcName.isEmpty()) {
-                for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry : listener.mInstanceMap.entrySet()) {
-                    result.addAll(entry.getValue());
-                }
-            } else {
-                Set<ALittleVarAssignNameDec> set = listener.mInstanceMap.get(srcName);
-                if (set != null)
-                    result.addAll(set);
+            data = listener.mGlobalAccessMap.get(namespaceName);
+            if (data != null) {
+                data.findInstanceNameDecList(name, result);
             }
         }
 
@@ -256,6 +272,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     private Project mProject;
+
     private class Data
     {
         Map<String, Set<ALittleClassNameDec>> classMap;
@@ -264,10 +281,15 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         Map<String, Set<ALittleVarAssignNameDec>> instanceMap;
         Map<String, Set<ALittleMethodNameDec>> globalMethodMap;
 
-        void addALittleClassNameDec(ALittleClassNameDec nameDec) {
-            if (classMap == null) {
-                classMap = new HashMap<>();
-            }
+        public Data() {
+            classMap = new HashMap<>();
+            enumMap = new HashMap<>();
+            structMap = new HashMap<>();
+            instanceMap = new HashMap<>();
+            globalMethodMap = new HashMap<>();
+        }
+
+        public void addALittleClassNameDec(ALittleClassNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleClassNameDec> set = classMap.get(nameText);
             if (set == null) {
@@ -277,20 +299,28 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
             set.add(nameDec);
         }
 
-        void removeALittleClassNameDec(ALittleClassNameDec nameDec) {
-            if (classMap == null) return;
+        public void findClassNameDecList(String name, @NotNull List<ALittleClassNameDec> result) {
+            if (name.isEmpty()) {
+                for (Map.Entry<String, Set<ALittleClassNameDec>> entry : classMap.entrySet()) {
+                    result.addAll(entry.getValue());
+                }
+            } else {
+                Set<ALittleClassNameDec> set = classMap.get(name);
+                if (set != null) {
+                    result.addAll(set);
+                }
+            }
+        }
+
+        public void removeALittleClassNameDec(ALittleClassNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleClassNameDec> set = classMap.get(nameText);
             if (set == null) return;
-            set = classMap.get(nameText);
             set.remove(nameDec);
             if (set.isEmpty()) classMap.remove(nameText);
         }
 
-        void addALittleEnumNameDec(ALittleEnumNameDec nameDec) {
-            if (enumMap == null) {
-                enumMap = new HashMap<>();
-            }
+        public void addALittleEnumNameDec(ALittleEnumNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleEnumNameDec> set = enumMap.get(nameText);
             if (set == null) {
@@ -300,20 +330,28 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
             set.add(nameDec);
         }
 
-        void removeALittleEnumNameDec(ALittleEnumNameDec nameDec) {
-            if (classMap == null) return;
+        public void removeALittleEnumNameDec(ALittleEnumNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleEnumNameDec> set = enumMap.get(nameText);
             if (set == null) return;
-            set = enumMap.get(nameText);
             set.remove(nameDec);
             if (set.isEmpty()) enumMap.remove(nameText);
         }
 
-        void addALittleStructNameDec(ALittleStructNameDec nameDec) {
-            if (structMap == null) {
-                structMap = new HashMap<>();
+        public void findEnumNameDecList(String name, @NotNull List<ALittleEnumNameDec> result) {
+            if (name.isEmpty()) {
+                for (Map.Entry<String, Set<ALittleEnumNameDec>> entry : enumMap.entrySet()) {
+                    result.addAll(entry.getValue());
+                }
+            } else {
+                Set<ALittleEnumNameDec> set = enumMap.get(name);
+                if (set != null) {
+                    result.addAll(set);
+                }
             }
+        }
+
+        public void addALittleStructNameDec(ALittleStructNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleStructNameDec> set = structMap.get(nameText);
             if (set == null) {
@@ -323,20 +361,28 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
             set.add(nameDec);
         }
 
-        void removeALittleStructNameDec(ALittleStructNameDec nameDec) {
-            if (structMap == null) return;
+        public void removeALittleStructNameDec(ALittleStructNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleStructNameDec> set = structMap.get(nameText);
             if (set == null) return;
-            set = structMap.get(nameText);
             set.remove(nameDec);
             if (set.isEmpty()) structMap.remove(nameText);
         }
 
-        void addALittleGlobalMethodNameDec(ALittleMethodNameDec nameDec) {
-            if (globalMethodMap == null) {
-                globalMethodMap = new HashMap<>();
+        public void findStructNameDecList(String name, @NotNull List<ALittleStructNameDec> result) {
+            if (name.isEmpty()) {
+                for (Map.Entry<String, Set<ALittleStructNameDec>> entry : structMap.entrySet()) {
+                    result.addAll(entry.getValue());
+                }
+            } else {
+                Set<ALittleStructNameDec> set = structMap.get(name);
+                if (set != null) {
+                    result.addAll(set);
+                }
             }
+        }
+
+        public void addALittleGlobalMethodNameDec(ALittleMethodNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleMethodNameDec> set = globalMethodMap.get(nameText);
             if (set == null) {
@@ -346,20 +392,28 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
             set.add(nameDec);
         }
 
-        void removeALittleGlobalMethodNameDec(ALittleMethodNameDec nameDec) {
-            if (globalMethodMap == null) return;
+        public void removeALittleGlobalMethodNameDec(ALittleMethodNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleMethodNameDec> set = globalMethodMap.get(nameText);
             if (set == null) return;
-            set = globalMethodMap.get(nameText);
             set.remove(nameDec);
             if (set.isEmpty()) globalMethodMap.remove(nameText);
         }
 
-        void addALittleInstanceNameDec(ALittleVarAssignNameDec nameDec) {
-            if (instanceMap == null) {
-                instanceMap = new HashMap<>();
+        public void findGlobalMethodNameDecList(String name, @NotNull List<ALittleMethodNameDec> result) {
+            if (name.isEmpty()) {
+                for (Map.Entry<String, Set<ALittleMethodNameDec>> entry : globalMethodMap.entrySet()) {
+                    result.addAll(entry.getValue());
+                }
+            } else {
+                Set<ALittleMethodNameDec> set = globalMethodMap.get(name);
+                if (set != null) {
+                    result.addAll(set);
+                }
             }
+        }
+
+        public void addALittleInstanceNameDec(ALittleVarAssignNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleVarAssignNameDec> set = instanceMap.get(nameText);
             if (set == null) {
@@ -369,25 +423,40 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
             set.add(nameDec);
         }
 
-        void removeALittleInstanceNameDec(ALittleVarAssignNameDec nameDec) {
-            if (instanceMap == null) return;
+        public void removeALittleInstanceNameDec(ALittleVarAssignNameDec nameDec) {
             String nameText = nameDec.getText();
             Set<ALittleVarAssignNameDec> set = instanceMap.get(nameText);
             if (set == null) return;
-            set = instanceMap.get(nameText);
             set.remove(nameDec);
             if (set.isEmpty()) instanceMap.remove(nameText);
         }
-    }
 
-    // key是命名域名称，Map的Key是命名域对象，Data是这个命名域对象下的所有内容
-    private Map<String, Map<ALittleNamespaceNameDec, Data>> mNamespaceMap;
-    // key是命名域名称，value是这个命名域下所有的内容
-    private Map<String, Data> mDataMap;
-    // 全局命名域下的单例
-    private Map<String, Set<ALittleVarAssignNameDec>> mInstanceMap;
-    // 保存关键的元素对象
+        public void findInstanceNameDecList(String name, @NotNull List<ALittleVarAssignNameDec> result) {
+            if (name.isEmpty()) {
+                for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry : instanceMap.entrySet()) {
+                    result.addAll(entry.getValue());
+                }
+            } else {
+                Set<ALittleVarAssignNameDec> set = instanceMap.get(name);
+                if (set != null) {
+                    result.addAll(set);
+                }
+            }
+        }
+    }
+    // 保存关键的元素对象，用于快速语法树解析
     private Set<PsiElement> mElement;
+
+    // key是命名域名称，value是这个命名域下所有的内容，这里的数据是最全的
+    private Map<String, Map<ALittleNamespaceNameDec, Data>> mAllDataMap;
+
+    // 全局可访问，key是命名域
+    private Map<String, Data> mGlobalAccessMap;
+    // 某个命名域下可访问，key是命名域
+    private Map<String, Data> mNamespaceAccessMap;
+    // 某个文件下可访问
+    private Map<PsiFile, Data> mFileAccessMap;
+
     // 已加载的文件列表
     boolean mReloading = false;         // 是否正在加载
     boolean mReloaded = false;          // 是否加载完成
@@ -395,6 +464,10 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
     public ALittleTreeChangeListener(Project project) {
         mProject = project;
+        mAllDataMap = new HashMap<>();
+        mGlobalAccessMap = new HashMap<>();
+        mNamespaceAccessMap = new HashMap<>();
+        mFileAccessMap = new HashMap<>();
         mElement = new HashSet<>();
     }
 
@@ -427,9 +500,12 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public void reload() {
-        mNamespaceMap = new HashMap<>();
-        mDataMap = new HashMap<>();
-        mInstanceMap = new HashMap<>();
+        mAllDataMap = new HashMap<>();
+        mGlobalAccessMap = new HashMap<>();
+        mNamespaceAccessMap = new HashMap<>();
+        mFileAccessMap = new HashMap<>();
+        mElement = new HashSet<>();
+
         mReloading = true;
 
         PsiManager psi_mgr = PsiManager.getInstance(mProject);
@@ -468,19 +544,34 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     private void addNamespaceName(String name, ALittleNamespaceNameDec element) {
-        Map<ALittleNamespaceNameDec, Data> map = mNamespaceMap.get(name);
+        // 处理mNamespaceMap
+        Map<ALittleNamespaceNameDec, Data> map = mAllDataMap.get(name);
         if (map == null) {
             map = new HashMap<>();
-            mNamespaceMap.put(name, map);
+            mAllDataMap.put(name, map);
+        }
+        Data allData = new Data();
+        map.put(element, allData);
+
+        // 处理mGlobalAccessMap
+        Data globalData = mGlobalAccessMap.get(name);
+        if (globalData == null) {
+            globalData = new Data();
+            mGlobalAccessMap.put(name, globalData);
         }
 
-        Data data = new Data();
-        map.put(element, data);
+        // 处理mNamespaceAccessMap
+        Data namespaceData = mNamespaceAccessMap.get(name);
+        if (namespaceData == null) {
+            namespaceData = new Data();
+            mNamespaceAccessMap.put(name, namespaceData);
+        }
 
-        Data fastData = mDataMap.get(name);
-        if (fastData == null) {
-            fastData = new Data();
-            mDataMap.put(name, fastData);
+        // 处理mFileAccessMap
+        Data psiFileData = mFileAccessMap.get(element.getContainingFile());
+        if (psiFileData == null) {
+            psiFileData = new Data();
+            mFileAccessMap.put(element.getContainingFile(), psiFileData);
         }
 
         ALittleNamespaceDec namespaceDec = (ALittleNamespaceDec)element.getParent();
@@ -491,116 +582,169 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                 mElement.add(dec);
                 ALittleClassNameDec nameDec = dec.getClassNameDec();
                 if (nameDec == null) continue;
-                data.addALittleClassNameDec(nameDec);
-                fastData.addALittleClassNameDec(nameDec);
+
+                allData.addALittleClassNameDec(nameDec);
+
+                String access = "private";
+                if (dec.getAccessModifier() != null) {
+                    access = dec.getAccessModifier().getText();
+                }
+
+                if (access.equals("private")) {
+                    psiFileData.addALittleClassNameDec(nameDec);
+                } else if (access.equals("protected")) {
+                    namespaceData.addALittleClassNameDec(nameDec);
+                } else if (access.equals("public")) {
+                    globalData.addALittleClassNameDec(nameDec);
+                }
             } else if (child instanceof ALittleEnumDec) {
                 ALittleEnumDec dec = (ALittleEnumDec)child;
                 mElement.add(dec);
                 dec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
                 ALittleEnumNameDec nameDec = dec.getEnumNameDec();
                 if (nameDec == null) continue;
-                data.addALittleEnumNameDec(nameDec);
-                fastData.addALittleEnumNameDec(nameDec);
+
+                allData.addALittleEnumNameDec(nameDec);
+
+                String access = "private";
+                if (dec.getAccessModifier() != null) {
+                    access = dec.getAccessModifier().getText();
+                }
+
+                if (access.equals("private")) {
+                    psiFileData.addALittleEnumNameDec(nameDec);
+                } else if (access.equals("protected")) {
+                    namespaceData.addALittleEnumNameDec(nameDec);
+                } else if (access.equals("public")) {
+                    globalData.addALittleEnumNameDec(nameDec);
+                }
             } else if (child instanceof ALittleStructDec) {
                 ALittleStructDec dec = (ALittleStructDec)child;
                 mElement.add(dec);
                 dec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
                 ALittleStructNameDec nameDec = dec.getStructNameDec();
                 if (nameDec == null) continue;
-                data.addALittleStructNameDec(nameDec);
-                fastData.addALittleStructNameDec(nameDec);
+
+                allData.addALittleStructNameDec(nameDec);
+
+                String access = "private";
+                if (dec.getAccessModifier() != null) {
+                    access = dec.getAccessModifier().getText();
+                }
+
+                if (access.equals("private")) {
+                    psiFileData.addALittleStructNameDec(nameDec);
+                } else if (access.equals("protected")) {
+                    namespaceData.addALittleStructNameDec(nameDec);
+                } else if (access.equals("public")) {
+                    globalData.addALittleStructNameDec(nameDec);
+                }
             } else if (child instanceof ALittleGlobalMethodDec) {
                 ALittleGlobalMethodDec dec = (ALittleGlobalMethodDec)child;
                 mElement.add(dec);
-                dec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
                 ALittleMethodNameDec nameDec = dec.getMethodNameDec();
                 if (nameDec == null) continue;
-                data.addALittleGlobalMethodNameDec(nameDec);
-                fastData.addALittleGlobalMethodNameDec(nameDec);
+
+                allData.addALittleGlobalMethodNameDec(nameDec);
+
+                String access = "private";
+                if (dec.getAccessModifier() != null) {
+                    access = dec.getAccessModifier().getText();
+                }
+
+                if (access.equals("private")) {
+                    psiFileData.addALittleGlobalMethodNameDec(nameDec);
+                } else if (access.equals("protected")) {
+                    namespaceData.addALittleGlobalMethodNameDec(nameDec);
+                } else if (access.equals("public")) {
+                    globalData.addALittleGlobalMethodNameDec(nameDec);
+                }
             } else if (child instanceof ALittleInstanceDec) {
                 ALittleInstanceDec dec = (ALittleInstanceDec) child;
-                ALittleAccessModifier access = dec.getAccessModifier();
-                boolean isPublic = access != null && access.getText().equals("public");
+                String access = "private";
+                if (dec.getAccessModifier() != null) {
+                    access = dec.getAccessModifier().getText();
+                }
 
                 List<ALittleVarAssignDec> varAssignDecList = dec.getVarAssignExpr().getVarAssignDecList();
                 for (ALittleVarAssignDec varAssignDec : varAssignDecList) {
                     varAssignDec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
-                    mElement.add(varAssignDec);
-                    if (isPublic) {
-                        String nameText = varAssignDec.getVarAssignNameDec().getText();
-                        Set<ALittleVarAssignNameDec> set = mInstanceMap.get(nameText);
-                        if (set == null) {
-                            set = new HashSet<>();
-                            mInstanceMap.put(nameText, set);
-                        }
-                        set.add(varAssignDec.getVarAssignNameDec());
-                    } else{
-                        fastData.addALittleInstanceNameDec(varAssignDec.getVarAssignNameDec());
+                    ALittleVarAssignNameDec nameDec = varAssignDec.getVarAssignNameDec();
+
+                    allData.addALittleInstanceNameDec(nameDec);
+                    if (access.equals("private")) {
+                        psiFileData.addALittleInstanceNameDec(nameDec);
+                    } else if (access.equals("protected")) {
+                        namespaceData.addALittleInstanceNameDec(nameDec);
+                    } else if (access.equals("public")) {
+                        globalData.addALittleInstanceNameDec(nameDec);
                     }
-                    data.addALittleInstanceNameDec(varAssignDec.getVarAssignNameDec());
                 }
             }
         }
     }
 
     private void removeNamespaceName(String name, ALittleNamespaceNameDec element) {
-        Data fastData = mDataMap.get(name);
-        Map<ALittleNamespaceNameDec, Data> map = mNamespaceMap.get(name);
+        Map<ALittleNamespaceNameDec, Data> map = mAllDataMap.get(name);
         if (map == null) return;
 
-        Data data = map.get(element);
-        if (data == null) return;
+        Data allData = map.get(element);
+        if (allData == null) return;
+        Data tmp;
 
-        map.remove(element);
-        if (map.isEmpty()) mNamespaceMap.remove(name);
-
-        if (fastData == null) return;
-
-        if (data.classMap != null) {
-            for (Map.Entry<String, Set<ALittleClassNameDec>> entry : data.classMap.entrySet()) {
-                for (ALittleClassNameDec nameDec : entry.getValue()) {
-                    mElement.remove(nameDec.getParent());
-                    fastData.removeALittleClassNameDec(nameDec);
-                }
+        for (Map.Entry<String, Set<ALittleClassNameDec>> entry : allData.classMap.entrySet()) {
+            for (ALittleClassNameDec nameDec : entry.getValue()) {
+                mElement.remove(nameDec.getParent());
+                tmp = mFileAccessMap.get(element.getContainingFile());
+                if (tmp != null) tmp.removeALittleClassNameDec(nameDec);
+                tmp = mNamespaceAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleClassNameDec(nameDec);
+                tmp = mGlobalAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleClassNameDec(nameDec);
             }
         }
-        if (data.enumMap != null) {
-            for (Map.Entry<String, Set<ALittleEnumNameDec>> entry : data.enumMap.entrySet()) {
-                for (ALittleEnumNameDec nameDec : entry .getValue()) {
-                    mElement.remove(nameDec.getParent());
-                    fastData.removeALittleEnumNameDec(nameDec);
-                }
+        for (Map.Entry<String, Set<ALittleEnumNameDec>> entry : allData.enumMap.entrySet()) {
+            for (ALittleEnumNameDec nameDec : entry .getValue()) {
+                mElement.remove(nameDec.getParent());
+                tmp = mFileAccessMap.get(element.getContainingFile());
+                if (tmp != null) tmp.removeALittleEnumNameDec(nameDec);
+                tmp = mNamespaceAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleEnumNameDec(nameDec);
+                tmp = mGlobalAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleEnumNameDec(nameDec);
             }
         }
-        if (data.structMap != null) {
-            for (Map.Entry<String, Set<ALittleStructNameDec>> entry : data.structMap.entrySet()) {
-                for (ALittleStructNameDec nameDec : entry .getValue()) {
-                    mElement.remove(nameDec.getParent());
-                    fastData.removeALittleStructNameDec(nameDec);
-                }
+        for (Map.Entry<String, Set<ALittleStructNameDec>> entry : allData.structMap.entrySet()) {
+            for (ALittleStructNameDec nameDec : entry .getValue()) {
+                mElement.remove(nameDec.getParent());
+                tmp = mFileAccessMap.get(element.getContainingFile());
+                if (tmp != null) tmp.removeALittleStructNameDec(nameDec);
+                tmp = mNamespaceAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleStructNameDec(nameDec);
+                tmp = mGlobalAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleStructNameDec(nameDec);
             }
         }
-        if (data.globalMethodMap != null) {
-            for (Map.Entry<String, Set<ALittleMethodNameDec>> entry : data.globalMethodMap.entrySet()) {
-                for (ALittleMethodNameDec nameDec : entry .getValue()) {
-                    mElement.remove(nameDec.getParent());
-                    fastData.removeALittleGlobalMethodNameDec(nameDec);
-                }
+        for (Map.Entry<String, Set<ALittleMethodNameDec>> entry : allData.globalMethodMap.entrySet()) {
+            for (ALittleMethodNameDec nameDec : entry .getValue()) {
+                mElement.remove(nameDec.getParent());
+                tmp = mFileAccessMap.get(element.getContainingFile());
+                if (tmp != null) tmp.removeALittleGlobalMethodNameDec(nameDec);
+                tmp = mNamespaceAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleGlobalMethodNameDec(nameDec);
+                tmp = mGlobalAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleGlobalMethodNameDec(nameDec);
             }
         }
-        if (data.instanceMap != null) {
-            for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry_instance : data.instanceMap.entrySet()) {
-                for (ALittleVarAssignNameDec nameDec : entry_instance.getValue()) {
-                    mElement.remove(nameDec.getParent());
-                    fastData.removeALittleInstanceNameDec(nameDec);
-
-                    String nameText = nameDec.getText();
-                    Set<ALittleVarAssignNameDec> set = mInstanceMap.get(nameText);
-                    if (set != null) {
-                        set.remove(nameDec);
-                        if (set.isEmpty()) mInstanceMap.remove(nameText);
-                    }
-                }
+        for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry_instance : allData.instanceMap.entrySet()) {
+            for (ALittleVarAssignNameDec nameDec : entry_instance.getValue()) {
+                mElement.remove(nameDec.getParent());
+                tmp = mFileAccessMap.get(element.getContainingFile());
+                if (tmp != null) tmp.removeALittleInstanceNameDec(nameDec);
+                tmp = mNamespaceAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleInstanceNameDec(nameDec);
+                tmp = mGlobalAccessMap.get(name);
+                if (tmp != null) tmp.removeALittleInstanceNameDec(nameDec);
             }
         }
     }

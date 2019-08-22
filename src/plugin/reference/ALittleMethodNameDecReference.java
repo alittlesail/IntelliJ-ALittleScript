@@ -242,6 +242,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
+        PsiFile psiFile = myElement.getContainingFile();
         PsiElement methodDec = myElement.getParent();
         List<LookupElement> variants = new ArrayList<>();
         // 类内部的函数
@@ -250,7 +251,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
             List<ALittleMethodNameDec> decList = new ArrayList<>();
             List<Icon> iconList = new ArrayList<>();
-            ALittleUtil.findMethodNameDecList(project, mNamespace, classDec, "", decList, iconList, 100);
+            ALittleUtil.findMethodNameDecList(project, psiFile, mNamespace, classDec, "", decList, iconList, 100);
             for (int i = 0; i < decList.size(); ++i) {
                 ALittleMethodNameDec dec = decList.get(i);
                 Icon icon = null;
@@ -262,7 +263,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             }
         // 全局函数
         } else if (methodDec.getParent() instanceof ALittleNamespaceDec) {
-            List<ALittleMethodNameDec> decList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, mNamespace, "");
+            List<ALittleMethodNameDec> decList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, psiFile, mNamespace, "");
             for (ALittleMethodNameDec dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).

@@ -1,12 +1,12 @@
 
 register namespace lua;
 
-class thread
+public class thread
 {
 
 }
 
-class coroutine
+public class coroutine
 {
     // Creates a new coroutine, with body f. f must be a Lua function.
     // Returns this new coroutine, an object with type "thread".

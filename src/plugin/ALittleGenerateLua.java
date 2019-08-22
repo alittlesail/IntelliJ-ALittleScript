@@ -926,7 +926,7 @@ public class ALittleGenerateLua {
                             ALittleReferenceUtil.GuessTypeInfo thisGuessType = thisType.guessType();
                             if (thisGuessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                                 List<ALittleClassVarDec> varNameList = new ArrayList<>();
-                                ALittleUtil.findClassVarNameDecList(thisGuessType.element.getProject()
+                                ALittleUtil.findClassVarNameDecList(thisGuessType.element.getProject(), thisGuessType.element.getContainingFile()
                                         , ALittleUtil.getNamespaceName((ALittleFile) thisGuessType.element.getContainingFile())
                                         , (ALittleClassDec) thisGuessType.element
                                         , attrName
@@ -1093,9 +1093,6 @@ public class ALittleGenerateLua {
             }
 
             String pairType = ALittleReferenceUtil.CalcPairsType(valueStat);
-            if (pairType == null) {
-                throw new Exception("for in 的遍历对象表达式错误:" + root.getText());
-            }
 
             // 如果foreach的参数数量不为2，那么就不用pairType
             if (pairType.isEmpty()) {

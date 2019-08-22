@@ -13,19 +13,19 @@ import java.util.*;
 public class ALittleUtil {
 
     // 查找所有的变量名节点对象
-    private static void findStructVarNameDecList(Project project, String namespace, String structName, String varName, @NotNull List<ALittleStructVarDec> result, int deep)
+    private static void findStructVarNameDecList(Project project, PsiFile psiFile, String namespace, String structName, String varName, @NotNull List<ALittleStructVarDec> result, int deep)
     {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleStructNameDec> nameDecList = ALittleTreeChangeListener.findStructNameDecList(project, namespace, structName);
+        List<ALittleStructNameDec> nameDecList = ALittleTreeChangeListener.findStructNameDecList(project, psiFile, namespace, structName);
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleStructDec structDec = (ALittleStructDec)nameDecList.get(0).getParent();
 
-        findStructVarNameDecList(project, namespace, structDec, varName, result, deep);
+        findStructVarNameDecList(project, psiFile, namespace, structDec, varName, result, deep);
     }
 
-    public static void findStructVarNameDecList(Project project, String namespace, ALittleStructDec structDec, String varName, @NotNull List<ALittleStructVarDec> result, int deep) {
+    public static void findStructVarNameDecList(Project project, PsiFile psiFile, String namespace, ALittleStructDec structDec, String varName, @NotNull List<ALittleStructVarDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (structDec == null) return;
@@ -38,7 +38,7 @@ public class ALittleUtil {
             if (structExtendsNamespaceNameDec != null) namespaceName = structExtendsNamespaceNameDec.getText();
             ALittleStructNameDec structNameDec = structExtendsDec.getStructNameDec();
             if (structNameDec != null) {
-                findStructVarNameDecList(project, namespaceName, structNameDec.getText(), varName, result, deep - 1);
+                findStructVarNameDecList(project, psiFile, namespaceName, structNameDec.getText(), varName, result, deep - 1);
             }
         }
 
@@ -105,17 +105,17 @@ public class ALittleUtil {
     }
 
     // 查找所有的函数名节点对象
-    public static void findMethodNameDecList(Project project, String namespace, String className, String methodName, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep) {        // 这个用于跳出无限递归
+    public static void findMethodNameDecList(Project project, PsiFile psiFile, String namespace, String className, String methodName, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep) {        // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespace, className);
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecList(project, namespace, classDec, methodName, result, icon, deep);
+        findMethodNameDecList(project, psiFile, namespace, classDec, methodName, result, icon, deep);
     }
 
-    public static void findMethodNameDecList(Project project, String namespace, ALittleClassDec classDec, String methodName, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep) {
+    public static void findMethodNameDecList(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String methodName, @NotNull List<ALittleMethodNameDec> result, List<Icon> icon, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
@@ -128,7 +128,7 @@ public class ALittleUtil {
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
             ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
-                findMethodNameDecList(project, namespaceName, classNameDec.getText(), methodName, result, icon, deep - 1);
+                findMethodNameDecList(project, psiFile, namespaceName, classNameDec.getText(), methodName, result, icon, deep - 1);
             }
         }
 
@@ -178,17 +178,17 @@ public class ALittleUtil {
     }
 
     // 查找所有的变量名节点对象
-    private static void findClassVarNameDecList(Project project, String namespace, String className, String varName, @NotNull List<ALittleClassVarDec> result, int deep) {        // 这个用于跳出无限递归
+    private static void findClassVarNameDecList(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleClassVarDec> result, int deep) {        // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespace, className);
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findClassVarNameDecList(project, namespace, classDec, varName, result, deep);
+        findClassVarNameDecList(project, psiFile, namespace, classDec, varName, result, deep);
     }
 
-    public static void findClassVarNameDecList(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleClassVarDec> result, int deep) {
+    public static void findClassVarNameDecList(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleClassVarDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
@@ -201,7 +201,7 @@ public class ALittleUtil {
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
             ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
-                findClassVarNameDecList(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
+                findClassVarNameDecList(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }
         }
 
@@ -232,18 +232,18 @@ public class ALittleUtil {
     }
 
     // 查找所有的setter节点对象
-    private static void findMethodNameDecListForSetter(Project project, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    private static void findMethodNameDecListForSetter(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespace, className);
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecListForSetter(project, namespace, classDec, varName, result, deep);
+        findMethodNameDecListForSetter(project, psiFile, namespace, classDec, varName, result, deep);
     }
 
-    public static void findMethodNameDecListForSetter(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecListForSetter(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
@@ -256,7 +256,7 @@ public class ALittleUtil {
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
             ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
-                findMethodNameDecListForSetter(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
+                findMethodNameDecListForSetter(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }
         }
 
@@ -271,18 +271,18 @@ public class ALittleUtil {
     }
 
     // 查找所有的getter节点对象
-    private static void findMethodNameDecListForGetter(Project project, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    private static void findMethodNameDecListForGetter(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespace, className);
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecListForGetter(project, namespace, classDec, varName, result, deep);
+        findMethodNameDecListForGetter(project, psiFile, namespace, classDec, varName, result, deep);
     }
 
-    public static void findMethodNameDecListForGetter(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecListForGetter(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
@@ -295,7 +295,7 @@ public class ALittleUtil {
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
             ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
-                findMethodNameDecListForGetter(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
+                findMethodNameDecListForGetter(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }
         }
 
@@ -310,18 +310,18 @@ public class ALittleUtil {
     }
 
     // 查找所有的getter节点对象
-    private static void findMethodNameDecListForFun(Project project, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    private static void findMethodNameDecListForFun(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespace, className);
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecListForFun(project, namespace, classDec, varName, result, deep);
+        findMethodNameDecListForFun(project, psiFile, namespace, classDec, varName, result, deep);
     }
 
-    public static void findMethodNameDecListForFun(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecListForFun(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
@@ -334,7 +334,7 @@ public class ALittleUtil {
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
             ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
-                findMethodNameDecListForFun(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
+                findMethodNameDecListForFun(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }
         }
 
@@ -349,17 +349,17 @@ public class ALittleUtil {
     }
 
     // 查找所有的static节点对象
-    private static void findMethodNameDecListForStatic(Project project, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {        // 这个用于跳出无限递归
+    private static void findMethodNameDecListForStatic(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {        // 这个用于跳出无限递归
         if (deep <= 0) return;
 
-        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, namespace, className);
+        List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespace, className);
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecListForStatic(project, namespace, classDec, varName, result, deep);
+        findMethodNameDecListForStatic(project, psiFile, namespace, classDec, varName, result, deep);
     }
 
-    public static void findMethodNameDecListForStatic(Project project, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecListForStatic(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
@@ -372,7 +372,7 @@ public class ALittleUtil {
             if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
             ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
             if (classNameDec != null) {
-                findMethodNameDecListForStatic(project, namespaceName, classNameDec.getText(), varName, result, deep - 1);
+                findMethodNameDecListForStatic(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
             }
         }
 
@@ -553,6 +553,7 @@ public class ALittleUtil {
 
     // 从文件中获取AlittleNamespaceDec
     public static ALittleNamespaceDec getNamespaceDec(PsiFile psiFile) {
+        if (psiFile == null) return null;
         for(PsiElement child = psiFile.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleNamespaceDec) {
                 return (ALittleNamespaceDec)child;

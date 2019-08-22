@@ -124,6 +124,8 @@ public class ALittleReferenceUtil {
             return "___ipairs";
         } else if (guessType.type == GuessType.GT_MAP) {
             return "___pairs";
+        } else if (guessType.value.equals("any")) {
+            return "";
         }
 
         throw new ALittleReferenceException(valueStat, "该表达式不能遍历");

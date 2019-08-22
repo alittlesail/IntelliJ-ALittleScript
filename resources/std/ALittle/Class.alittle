@@ -1,4 +1,4 @@
-namespace ALittle;
+register namespace ALittle;
 
 // 是否是类
 public static IsClass(any object) : bool {}

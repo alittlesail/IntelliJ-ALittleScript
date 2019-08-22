@@ -1,12 +1,12 @@
-namespace ALittle;
+register namespace ALittle;
 
-struct ResultJson
+public struct ResultJson
 {
     bool result;
     string reason;
 }
 
-enum ReflectTypes
+public enum ReflectTypes
 {
     RMT_CLASS = "class",
     RMT_CONST = "const",
@@ -18,13 +18,13 @@ enum ReflectTypes
     RMT_STRUCT = "struct",
 }
 
-struct ReflectVarInfo
+public struct ReflectVarInfo
 {
     ReflectInfo type;               // 类型信息
     string name;                    // 变量名
 }
 
-struct ReflectInfo
+public struct ReflectInfo
 {
     string type;                    // 主类型
     string name;                    // 实际类型

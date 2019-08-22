@@ -44,10 +44,13 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
             guessList.add(((ALittleClassDec)parent).guessType());
         // 如果是继承那么就从继承那边获取
         } else if (parent instanceof ALittleClassExtendsDec) {
-            List<ALittleClassNameDec> classNameDecList = ALittleTreeChangeListener.findClassNameDecList(myElement.getProject(), mNamespace, mKey);
+            List<ALittleClassNameDec> classNameDecList = ALittleTreeChangeListener.findClassNameDecList(myElement.getProject(), myElement.getContainingFile(), mNamespace, mKey);
+            if (classNameDecList.isEmpty()) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "找不到类, namespace:" + mNamespace + ", key:" + mKey);
             for (ALittleClassNameDec classNameDec : classNameDecList) {
                 guessList.add(classNameDec.guessType());
             }
+        } else {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleClassNameDec出现未知的父节点");
         }
 
         return guessList;
@@ -57,7 +60,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        final List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, mNamespace, mKey);
+        final List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, myElement.getContainingFile(), mNamespace, mKey);
         List<ResolveResult> results = new ArrayList<>();
         for (ALittleClassNameDec dec : decList) {
             results.add(new PsiElementResolveResult(dec));
@@ -69,7 +72,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, mNamespace, "");
+        List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, myElement.getContainingFile(), mNamespace, "");
         List<LookupElement> variants = new ArrayList<>();
         for (ALittleClassNameDec dec : decList) {
             variants.add(LookupElementBuilder.create(dec.getText()).

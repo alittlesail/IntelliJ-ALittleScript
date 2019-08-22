@@ -1,8 +1,9 @@
-namespace ALittle;
+
+register namespace ALittle;
 
 // 设置自定义的日志函数，如果没有设置，那么默认使用lua的print
 // func回调的第一个参数是打印的内容，第二个参数是打印的等级参考LogLevel枚举
-enum LogLevel
+public enum LogLevel
 {
     INFO = 0,
     WARN = 1,

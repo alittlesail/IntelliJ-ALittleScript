@@ -1,7 +1,7 @@
 
 register namespace lua;
 
-class bit
+public class bit
 {
     // Normalizes a number to the numeric range for bit operations and returns it.
     // This function is usually not needed since all bit operations already normalize all of their input arguments

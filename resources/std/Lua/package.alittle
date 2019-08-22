@@ -1,7 +1,7 @@
 
 register namespace lua;
 
-class Package
+public class Package
 {
     // A table used by require to control which modules are already loaded.
     // When you require a module modname and package.loaded[modname] is not false,
@@ -9,4 +9,4 @@ class Package
     public Map<string, any> loaded;
 }
 
-protected Package package = new Package();
+protected Package package;

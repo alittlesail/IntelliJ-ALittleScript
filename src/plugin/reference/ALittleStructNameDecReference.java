@@ -37,7 +37,7 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
             guessList.add(((ALittleStructDec)parent).guessType());
             // 如果是继承那么就从继承那边获取
         } else if (parent instanceof ALittleStructExtendsDec) {
-            List<ALittleStructNameDec> structNameDecList = ALittleTreeChangeListener.findStructNameDecList(myElement.getProject(), mNamespace, mKey);
+            List<ALittleStructNameDec> structNameDecList = ALittleTreeChangeListener.findStructNameDecList(myElement.getProject(), myElement.getContainingFile(), mNamespace, mKey);
             for (ALittleStructNameDec structNameDec : structNameDecList) {
                 guessList.add(structNameDec.guessType());
             }
@@ -50,7 +50,7 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        final List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, mNamespace, mKey);
+        final List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, myElement.getContainingFile(), mNamespace, mKey);
         List<ResolveResult> results = new ArrayList<>();
         for (ALittleStructNameDec dec : decList) {
             results.add(new PsiElementResolveResult(dec));
@@ -62,7 +62,7 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, mNamespace, "");
+        List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, myElement.getContainingFile(), mNamespace, "");
         List<LookupElement> variants = new ArrayList<>();
         for (ALittleStructNameDec dec : decList) {
             variants.add(LookupElementBuilder.create(dec.getText()).

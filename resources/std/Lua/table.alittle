@@ -1,7 +1,7 @@
 
 register namespace lua;
 
-class table
+public class table
 {
     // Given an array where all elements are strings or numbers, returns table[i]..sep..table[i+1] ··· sep..table[j].
     // The default value for sep is the empty string, the default for i is 1, and the default for j is the length of the table.

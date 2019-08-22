@@ -1,7 +1,7 @@
 
 register namespace lua;
 
-struct DateInfo
+public struct DateInfo
 {
 	int year;
 	int month;
@@ -15,7 +15,7 @@ struct DateInfo
     int isdst;
 }
 
-class os
+public class os
 {
     // Returns an approximation of the amount in seconds of CPU time used by the program.
     public static clock() : int {}

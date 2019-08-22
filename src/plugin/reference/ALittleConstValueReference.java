@@ -31,8 +31,9 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
             guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("bool");
         } else if (myElement.getText().equals("null")) {
             guessTypeList = ALittleReferenceUtil.sConstNullGuessType;
+        } else {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知的常量类型:" + myElement.getText());
         }
-        if (guessTypeList == null) guessTypeList = new ArrayList<>();
         return guessTypeList;
     }
 

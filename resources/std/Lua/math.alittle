@@ -1,7 +1,7 @@
 
 register namespace lua;
 
-class math
+public class math
 {
     // Returns the absolute value of x.
     public static abs(double x) : double { }
