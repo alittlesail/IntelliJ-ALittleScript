@@ -185,12 +185,29 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         return result;
     }
 
-    public static boolean isElementExist(PsiElement element) {
+    public static List<ALittleReferenceUtil.GuessTypeInfo> getGuessTypeList(PsiElement element) {
         ALittleTreeChangeListener listener = sMap.get(element.getProject());
-        if (listener == null) return false;
+        if (listener == null) return null;
         if (!listener.mReloaded) listener.reload();
 
-        return listener.mElement.contains(element);
+        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(element.getContainingFile());
+        if (map == null) return null;
+
+        return map.get(element);
+    }
+
+    public static void putGuessTypeList(PsiElement element, @NotNull List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList) {
+        ALittleTreeChangeListener listener = sMap.get(element.getProject());
+        if (listener == null) return;
+        if (!listener.mReloaded) listener.reload();
+
+        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(element.getContainingFile());
+        if (map == null) {
+            map = new HashMap<>();
+            listener.mGuessTypeMap.put(element.getContainingFile(), map);
+        }
+
+        map.put(element, guessTypeList);
     }
 
     public static void handleDirDelete(Project project, VirtualFile virtualFile) {
@@ -445,7 +462,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
     }
     // 保存关键的元素对象，用于快速语法树解析
-    private Set<PsiElement> mElement;
+    private Map<PsiFile, Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>>> mGuessTypeMap;
 
     // key是命名域名称，value是这个命名域下所有的内容，这里的数据是最全的
     private Map<String, Map<ALittleNamespaceNameDec, Data>> mAllDataMap;
@@ -468,7 +485,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         mGlobalAccessMap = new HashMap<>();
         mNamespaceAccessMap = new HashMap<>();
         mFileAccessMap = new HashMap<>();
-        mElement = new HashSet<>();
+        mGuessTypeMap = new HashMap<>();
     }
 
     private void loadDir(PsiManager psi_mgr, VirtualFile root) {
@@ -504,7 +521,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         mGlobalAccessMap = new HashMap<>();
         mNamespaceAccessMap = new HashMap<>();
         mFileAccessMap = new HashMap<>();
-        mElement = new HashSet<>();
+        mGuessTypeMap = new HashMap<>();
 
         mReloading = true;
 
@@ -536,14 +553,9 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         mReloaded = true;
     }
 
-    private void clearUserData(@NotNull  PsiElement element) {
-        element.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
-        for(PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
-            clearUserData(child);
-        }
-    }
-
     private void addNamespaceName(String name, ALittleNamespaceNameDec element) {
+        // 清除标记
+        mGuessTypeMap.remove(element.getContainingFile());
         // 处理mNamespaceMap
         Map<ALittleNamespaceNameDec, Data> map = mAllDataMap.get(name);
         if (map == null) {
@@ -575,11 +587,9 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
 
         ALittleNamespaceDec namespaceDec = (ALittleNamespaceDec)element.getParent();
-        clearUserData(namespaceDec);
         for(PsiElement child = namespaceDec.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleClassDec) {
                 ALittleClassDec dec = (ALittleClassDec)child;
-                mElement.add(dec);
                 ALittleClassNameDec nameDec = dec.getClassNameDec();
                 if (nameDec == null) continue;
 
@@ -599,8 +609,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                 }
             } else if (child instanceof ALittleEnumDec) {
                 ALittleEnumDec dec = (ALittleEnumDec)child;
-                mElement.add(dec);
-                dec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
                 ALittleEnumNameDec nameDec = dec.getEnumNameDec();
                 if (nameDec == null) continue;
 
@@ -620,8 +628,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                 }
             } else if (child instanceof ALittleStructDec) {
                 ALittleStructDec dec = (ALittleStructDec)child;
-                mElement.add(dec);
-                dec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
                 ALittleStructNameDec nameDec = dec.getStructNameDec();
                 if (nameDec == null) continue;
 
@@ -641,7 +647,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
                 }
             } else if (child instanceof ALittleGlobalMethodDec) {
                 ALittleGlobalMethodDec dec = (ALittleGlobalMethodDec)child;
-                mElement.add(dec);
                 ALittleMethodNameDec nameDec = dec.getMethodNameDec();
                 if (nameDec == null) continue;
 
@@ -668,7 +673,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
                 List<ALittleVarAssignDec> varAssignDecList = dec.getVarAssignExpr().getVarAssignDecList();
                 for (ALittleVarAssignDec varAssignDec : varAssignDecList) {
-                    varAssignDec.putUserData(ALittleReferenceUtil.sGuessTypeListKey, null);
                     ALittleVarAssignNameDec nameDec = varAssignDec.getVarAssignNameDec();
 
                     allData.addALittleInstanceNameDec(nameDec);
@@ -685,16 +689,19 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     private void removeNamespaceName(String name, ALittleNamespaceNameDec element) {
+        // 清除标记
+        mGuessTypeMap.remove(element.getContainingFile());
+
         Map<ALittleNamespaceNameDec, Data> map = mAllDataMap.get(name);
         if (map == null) return;
 
         Data allData = map.get(element);
         if (allData == null) return;
+        map.remove(element);
         Data tmp;
 
         for (Map.Entry<String, Set<ALittleClassNameDec>> entry : allData.classMap.entrySet()) {
             for (ALittleClassNameDec nameDec : entry.getValue()) {
-                mElement.remove(nameDec.getParent());
                 tmp = mFileAccessMap.get(element.getContainingFile());
                 if (tmp != null) tmp.removeALittleClassNameDec(nameDec);
                 tmp = mNamespaceAccessMap.get(name);
@@ -705,7 +712,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
         for (Map.Entry<String, Set<ALittleEnumNameDec>> entry : allData.enumMap.entrySet()) {
             for (ALittleEnumNameDec nameDec : entry .getValue()) {
-                mElement.remove(nameDec.getParent());
                 tmp = mFileAccessMap.get(element.getContainingFile());
                 if (tmp != null) tmp.removeALittleEnumNameDec(nameDec);
                 tmp = mNamespaceAccessMap.get(name);
@@ -716,7 +722,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
         for (Map.Entry<String, Set<ALittleStructNameDec>> entry : allData.structMap.entrySet()) {
             for (ALittleStructNameDec nameDec : entry .getValue()) {
-                mElement.remove(nameDec.getParent());
                 tmp = mFileAccessMap.get(element.getContainingFile());
                 if (tmp != null) tmp.removeALittleStructNameDec(nameDec);
                 tmp = mNamespaceAccessMap.get(name);
@@ -727,7 +732,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
         for (Map.Entry<String, Set<ALittleMethodNameDec>> entry : allData.globalMethodMap.entrySet()) {
             for (ALittleMethodNameDec nameDec : entry .getValue()) {
-                mElement.remove(nameDec.getParent());
                 tmp = mFileAccessMap.get(element.getContainingFile());
                 if (tmp != null) tmp.removeALittleGlobalMethodNameDec(nameDec);
                 tmp = mNamespaceAccessMap.get(name);
@@ -738,7 +742,6 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
         }
         for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry_instance : allData.instanceMap.entrySet()) {
             for (ALittleVarAssignNameDec nameDec : entry_instance.getValue()) {
-                mElement.remove(nameDec.getParent());
                 tmp = mFileAccessMap.get(element.getContainingFile());
                 if (tmp != null) tmp.removeALittleInstanceNameDec(nameDec);
                 tmp = mNamespaceAccessMap.get(name);

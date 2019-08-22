@@ -30,9 +30,6 @@ public class ALittleReferenceUtil {
         public PsiElement getElement() { return mElement; }
     }
 
-    // KEY
-    public static Key<List<GuessTypeInfo>> sGuessTypeListKey = new Key<>("GuessTypeList");
-
     // 基本变量类型
     public static GuessTypeInfo sIntGuessTypeInfo;
     public static GuessTypeInfo sDoubleGuessTypeInfo;
@@ -97,8 +94,8 @@ public class ALittleReferenceUtil {
                 return false;
             }
 
-            if (element != null && ALittleTreeChangeListener.isElementExist(element)) {
-                return element.getUserData(sGuessTypeListKey) == null;
+            if (element != null && ALittleTreeChangeListener.getGuessTypeList(element) != null) {
+                return false;
             }
             return true;
         }

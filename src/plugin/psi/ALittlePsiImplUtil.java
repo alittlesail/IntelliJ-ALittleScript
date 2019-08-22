@@ -2,6 +2,7 @@ package plugin.psi;
 
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.ALittleTreeChangeListener;
 import plugin.reference.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class ALittlePsiImplUtil {
 
     @NotNull
     public static List<ALittleReferenceUtil.GuessTypeInfo> guessTypes(PsiElement element) throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeInfoList = element.getUserData(ALittleReferenceUtil.sGuessTypeListKey);
+        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeInfoList = ALittleTreeChangeListener.getGuessTypeList(element);
         if (guessTypeInfoList != null) {
             boolean isChanged = false;
             for (ALittleReferenceUtil.GuessTypeInfo info : guessTypeInfoList) {
@@ -39,7 +40,7 @@ public class ALittlePsiImplUtil {
             throw new ALittleReferenceUtil.ALittleReferenceException(element, "ALittleReference对象创建失败 element:" + element);
         }
         guessTypeInfoList = ref.guessTypes();
-        element.putUserData(ALittleReferenceUtil.sGuessTypeListKey, guessTypeInfoList);
+        ALittleTreeChangeListener.putGuessTypeList(element, guessTypeInfoList);
         return guessTypeInfoList;
     }
 }
