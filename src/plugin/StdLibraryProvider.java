@@ -18,9 +18,15 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class StdLibraryProvider extends AdditionalLibraryRootsProvider {
+    public static boolean isPluginSelf(@NotNull Project project) {
+        return project.getName().equals("ALittleScript");
+    }
+
     @Override
     @NotNull
     public Collection<SyntheticLibrary> getAdditionalProjectLibraries(@NotNull Project project) {
+        if (isPluginSelf(project)) return new ArrayList<>();
+
         ArrayList<SyntheticLibrary> result = new ArrayList<>();
 
         String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);

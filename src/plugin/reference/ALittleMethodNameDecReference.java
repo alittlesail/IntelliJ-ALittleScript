@@ -238,6 +238,43 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         return guessList;
     }
 
+    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+        PsiElement parent = myElement.getParent();
+        Project project = myElement.getProject();
+        PsiFile psiFile = myElement.getContainingFile();
+        if (!(parent.getParent() instanceof ALittleClassDec)) return;
+        ALittleClassDec classDec = (ALittleClassDec)parent.getParent();
+        if (classDec.getClassExtendsDec() == null) return;
+        ALittleClassExtendsDec extendsDec = classDec.getClassExtendsDec();
+        if (extendsDec == null) return;
+        ALittleClassNameDec classNameDec = extendsDec.getClassNameDec();
+        if (classNameDec == null) return;
+        ALittleReferenceUtil.GuessTypeInfo extendsGuess = classNameDec.guessType();
+
+        ALittleMethodNameDec methodNameDec = null;
+        if (parent instanceof ALittleClassMethodDec) {
+            methodNameDec = ALittleUtil.findFirstFunDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
+        } else if (parent instanceof ALittleClassStaticDec) {
+            methodNameDec = ALittleUtil.findFirstStaticDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
+
+        } else if (parent instanceof ALittleClassGetterDec) {
+            methodNameDec = ALittleUtil.findFirstGetterDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
+
+        } else if (parent instanceof ALittleClassSetterDec) {
+            methodNameDec = ALittleUtil.findFirstSetterDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
+        }
+        if (methodNameDec == null) return;
+
+        ALittleReferenceUtil.GuessTypeInfo myGuessTypeInfo = guessTypes().get(0);
+        if (myGuessTypeInfo == null) return;
+        ALittleReferenceUtil.GuessTypeInfo extendsGuessTypeInfo = methodNameDec.guessType();
+        try {
+            ALittleReferenceOpUtil.guessTypeEqual(methodNameDec, extendsGuessTypeInfo, myElement, myGuessTypeInfo);
+        } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "该函数是从父类继承下来，但是定义不一致");
+        }
+    }
+
     @NotNull
     @Override
     public Object[] getVariants() {

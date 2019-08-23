@@ -170,6 +170,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleAutoType) return new ALittleAutoTypeReference((ALittleAutoType)element, range);
         if (element instanceof ALittleBindStat) return new ALittleBindStatReference((ALittleBindStat)element, range);
 
+        if (element instanceof ALittleClassCtorDec) return new ALittleClassCtorDecReference((ALittleClassCtorDec)element, range);
         if (element instanceof ALittleClassDec) return new ALittleClassDecReference((ALittleClassDec)element, range);
         if (element instanceof ALittleClassNameDec) return new ALittleClassNameDecReference((ALittleClassNameDec)element, range);
         if (element instanceof ALittleClassVarDec) return new ALittleClassVarDecReference((ALittleClassVarDec)element, range);

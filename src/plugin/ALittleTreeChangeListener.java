@@ -529,19 +529,22 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
             loadDir(psi_mgr, root);
         }
 
-        try {
-            // 适配代码
-            String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
-            VirtualFile dir;
-            if (jarPath.endsWith(".jar"))
-                dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
-            else
-                dir = VfsUtil.findFileByIoFile(new File(jarPath + "/std"), true);
 
-            if (dir != null) {
-                loadDir(psi_mgr, dir);
+        if (!StdLibraryProvider.isPluginSelf(mProject)) {
+            try {
+                // 适配代码
+                String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
+                VirtualFile dir;
+                if (jarPath.endsWith(".jar"))
+                    dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
+                else
+                    dir = VfsUtil.findFileByIoFile(new File(jarPath + "/std"), true);
+
+                if (dir != null) {
+                    loadDir(psi_mgr, dir);
+                }
+            } catch (Exception e) {
             }
-        } catch (Exception e) {
         }
 
         mReloading = false;

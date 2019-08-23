@@ -63,6 +63,7 @@
     <codeInsight.parameterInfo language="ALittle" implementationClass="plugin.parameter.ALittleParameterInfoHandler"/>
     <moduleConfigurationEditorProvider implementation="plugin.module.ALittleModuleConfigurationEditorProvider"/>
     <moduleType id="ALittle" implementationClass="plugin.module.ALittleModuleType"/>
+    <codeInsight.lineMarkerProvider language="ALittle" implementationClass="plugin.ALittleLineMarkerProvider"/>
   </extensions>
 
   <application-components>

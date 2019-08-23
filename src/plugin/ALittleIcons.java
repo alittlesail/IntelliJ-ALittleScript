@@ -25,4 +25,6 @@ public class ALittleIcons {
     public static final Icon PARAM = AllIcons.Nodes.Parameter;
     public static final Icon VARIABLE = AllIcons.Nodes.Variable;
     public static final Icon PROPERTY = AllIcons.Nodes.Property;
+
+    public static final Icon OVERRIDE = AllIcons.Nodes.Interface;
 }
