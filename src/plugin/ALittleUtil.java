@@ -178,40 +178,43 @@ public class ALittleUtil {
     }
 
     // 查找所有的变量名节点对象
-    private static void findClassVarNameDecList(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleClassVarDec> result, int deep) {        // 这个用于跳出无限递归
+    private static void findClassVarNameDecList(Project project, PsiFile psiFile, String namespace, String className, int accessLevel, String varName, @NotNull List<ALittleClassVarDec> result, int deep) {        // 这个用于跳出无限递归
         if (deep <= 0) return;
 
         List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespace, className);
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findClassVarNameDecList(project, psiFile, namespace, classDec, varName, result, deep);
+        findClassVarNameDecList(project, psiFile, namespace, classDec, accessLevel, varName, result, deep);
     }
 
-    public static void findClassVarNameDecList(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleClassVarDec> result, int deep) {
+    public static void findClassVarNameDecList(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleClassVarDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
-
-        // 处理继承
-        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
-        if (classExtendsDec != null) {
-            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
-            String namespaceName = namespace;
-            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
-            if (classNameDec != null) {
-                findClassVarNameDecList(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
-            }
-        }
 
         // 处理成员变量
         List<ALittleClassVarDec> classVarDecList = classDec.getClassVarDecList();
         for (ALittleClassVarDec classVarDec : classVarDecList) {
             PsiElement varNameDec = classVarDec.getIdContent();
             if (varNameDec == null) continue;
-            if (varName.isEmpty() || varNameDec.getText().equals(varName))
-                result.add(classVarDec);
+            if ((varName.isEmpty() || varNameDec.getText().equals(varName))
+                && calcAccessSuccess(accessLevel, classVarDec.getAccessModifier())) {
+                    result.add(classVarDec);
+            }
+        }
+
+        // 处理继承
+        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
+        if (classExtendsDec != null) {
+            accessLevel = calcNewAccess(accessLevel, classExtendsDec.getAccessModifier());
+            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
+            if (classNameDec != null) {
+                findClassVarNameDecList(project, psiFile, namespaceName, classNameDec.getText(), accessLevel, varName, result, deep - 1);
+            }
         }
     }
 
@@ -229,6 +232,71 @@ public class ALittleUtil {
             newResult.add(result.get(i));
         }
         return newResult;
+    }
+
+    public static int sAccessPublic = 2;            // 可以访问public的属性和方法
+    public static int sAccessProtected = 3;         // 可以访问public protected的属性和方法
+    public static int sAccessPrivate = 4;           // 可以public protected private的属性和方法
+    // 根据对应的类，已经访问权限
+    public static int calcAccessLevel(@NotNull PsiElement srcElement, @NotNull PsiElement dstElement, int accessLevel) throws ALittleReferenceUtil.ALittleReferenceException {
+        // 如果就是自己
+        if (srcElement.equals(dstElement)) return accessLevel;
+        // 如果已经到权限极限了，那么就直接返回
+        if (accessLevel == sAccessPublic) return accessLevel;
+
+        if (!(srcElement instanceof ALittleClassDec)) return sAccessPublic;
+        ALittleClassDec srcClass = (ALittleClassDec)srcElement;
+
+        ALittleClassExtendsDec extendsDec = srcClass.getClassExtendsDec();
+        if (extendsDec == null) return sAccessPublic;
+
+        ALittleClassNameDec nameDec = extendsDec.getClassNameDec();
+        if (nameDec == null) return sAccessPublic;
+
+        ALittleAccessModifier accessModifier = extendsDec.getAccessModifier();
+        if (accessModifier == null || accessModifier.getText().equals("private")) {
+            accessLevel = sAccessPublic;
+        } else if (accessModifier.getText().equals("protected")) {
+            --accessLevel;
+        }
+
+        // 如果已经到权限极限了，那么就直接返回
+        if (accessLevel == sAccessPublic) return accessLevel;
+
+        // 使用父类来查
+        return calcAccessLevel(nameDec.guessType().element, dstElement, accessLevel);
+    }
+    // 根据访问权限，和目标的修饰符，判断是否可以接受
+    public static boolean calcAccessSuccess(int accessLevel, ALittleAccessModifier accessModifier) {
+        int targetLevel = sAccessPrivate;
+        if (accessModifier != null) {
+            if (accessModifier.getText().equals("protected")) {
+                targetLevel = sAccessProtected;
+            } else if (accessModifier.getText().equals("public")) {
+                targetLevel = sAccessPublic;
+            }
+        }
+        if (accessLevel == sAccessPublic) {
+            return targetLevel == sAccessPublic;
+        }
+        if (accessLevel == sAccessProtected) {
+            return targetLevel <= sAccessProtected;
+        }
+        if (accessLevel == sAccessPrivate) {
+            return true;
+        }
+        return false;
+    }
+    // 根据访问权限，和目标的修饰符，计算新的访问权限
+    public static int calcNewAccess(int accessLevel, ALittleAccessModifier accessModifier) {
+        if (accessLevel > sAccessPublic) {
+            if (accessModifier == null || accessModifier.getText().equals("private")) {
+                accessLevel = sAccessPublic;
+            } else if (accessModifier.getText().equals("protected")) {
+                --accessLevel;
+            }
+        }
+        return accessLevel;
     }
 
     // 查找所有的成员函数节点对象
@@ -270,7 +338,7 @@ public class ALittleUtil {
     }
 
     // 查找所有的setter节点对象
-    private static void findMethodNameDecListForSetter(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    private static void findMethodNameDecListForSetter(Project project, PsiFile psiFile, String namespace, String className, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
 
@@ -278,33 +346,35 @@ public class ALittleUtil {
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecListForSetter(project, psiFile, namespace, classDec, varName, result, deep);
+        findMethodNameDecListForSetter(project, psiFile, namespace, classDec, accessLevel, varName, result, deep);
     }
 
-    public static void findMethodNameDecListForSetter(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecListForSetter(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
-
-        // 处理继承
-        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
-        if (classExtendsDec != null) {
-            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
-            String namespaceName = namespace;
-            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
-            if (classNameDec != null) {
-                findMethodNameDecListForSetter(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
-            }
-        }
 
         // 处理setter函数
         List<ALittleClassSetterDec> classSetterDecList = classDec.getClassSetterDecList();
         for (ALittleClassSetterDec classSetterDec : classSetterDecList) {
             ALittleMethodNameDec methodNameDec = classSetterDec.getMethodNameDec();
             if (methodNameDec == null) continue;
-            if (varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+            if ((varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+                && calcAccessSuccess(accessLevel, classSetterDec.getAccessModifier()))
                 result.add(methodNameDec);
+        }
+
+        // 处理继承
+        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
+        if (classExtendsDec != null) {
+            accessLevel = calcNewAccess(accessLevel, classExtendsDec.getAccessModifier());
+            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
+            if (classNameDec != null) {
+                findMethodNameDecListForSetter(project, psiFile, namespaceName, classNameDec.getText(), accessLevel, varName, result, deep - 1);
+            }
         }
     }
 
@@ -350,7 +420,7 @@ public class ALittleUtil {
     }
 
     // 查找所有的getter节点对象
-    private static void findMethodNameDecListForGetter(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    private static void findMethodNameDecListForGetter(Project project, PsiFile psiFile, String namespace, String className, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
 
@@ -358,33 +428,35 @@ public class ALittleUtil {
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecListForGetter(project, psiFile, namespace, classDec, varName, result, deep);
+        findMethodNameDecListForGetter(project, psiFile, namespace, classDec, accessLevel, varName, result, deep);
     }
 
-    public static void findMethodNameDecListForGetter(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecListForGetter(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
-
-        // 处理继承
-        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
-        if (classExtendsDec != null) {
-            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
-            String namespaceName = namespace;
-            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
-            if (classNameDec != null) {
-                findMethodNameDecListForGetter(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
-            }
-        }
 
         // 处理getter函数
         List<ALittleClassGetterDec> classGetterDecList = classDec.getClassGetterDecList();
         for (ALittleClassGetterDec classGetterDec : classGetterDecList) {
             ALittleMethodNameDec methodNameDec = classGetterDec.getMethodNameDec();
             if (methodNameDec == null) continue;
-            if (varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+            if ((varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+                && calcAccessSuccess(accessLevel, classGetterDec.getAccessModifier()))
                 result.add(methodNameDec);
+        }
+
+        // 处理继承
+        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
+        if (classExtendsDec != null) {
+            accessLevel = calcNewAccess(accessLevel, classExtendsDec.getAccessModifier());
+            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
+            if (classNameDec != null) {
+                findMethodNameDecListForGetter(project, psiFile, namespaceName, classNameDec.getText(), accessLevel, varName, result, deep - 1);
+            }
         }
     }
 
@@ -430,7 +502,7 @@ public class ALittleUtil {
     }
 
     // 查找所有的成员函数节点对象
-    private static void findMethodNameDecListForFun(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    private static void findMethodNameDecListForFun(Project project, PsiFile psiFile, String namespace, String className, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
 
@@ -438,33 +510,35 @@ public class ALittleUtil {
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecListForFun(project, psiFile, namespace, classDec, varName, result, deep);
+        findMethodNameDecListForFun(project, psiFile, namespace, classDec, accessLevel, varName, result, deep);
     }
 
-    public static void findMethodNameDecListForFun(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecListForFun(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
-
-        // 处理继承
-        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
-        if (classExtendsDec != null) {
-            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
-            String namespaceName = namespace;
-            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
-            if (classNameDec != null) {
-                findMethodNameDecListForFun(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
-            }
-        }
 
         // 处理成员函数
         List<ALittleClassMethodDec> classMethodDecList = classDec.getClassMethodDecList();
         for (ALittleClassMethodDec classMethodDec : classMethodDecList) {
             ALittleMethodNameDec methodNameDec = classMethodDec.getMethodNameDec();
             if (methodNameDec == null) continue;
-            if (varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+            if ((varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+                && calcAccessSuccess(accessLevel, classMethodDec.getAccessModifier()))
                 result.add(methodNameDec);
+        }
+
+        // 处理继承
+        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
+        if (classExtendsDec != null) {
+            accessLevel = calcNewAccess(accessLevel, classExtendsDec.getAccessModifier());
+            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
+            if (classNameDec != null) {
+                findMethodNameDecListForFun(project, psiFile, namespaceName, classNameDec.getText(), accessLevel, varName, result, deep - 1);
+            }
         }
     }
 
@@ -510,40 +584,42 @@ public class ALittleUtil {
     }
 
     // 查找所有的static节点对象
-    private static void findMethodNameDecListForStatic(Project project, PsiFile psiFile, String namespace, String className, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {        // 这个用于跳出无限递归
+    private static void findMethodNameDecListForStatic(Project project, PsiFile psiFile, String namespace, String className, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {        // 这个用于跳出无限递归
         if (deep <= 0) return;
 
         List<ALittleClassNameDec> nameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespace, className);
         if (nameDecList == null || nameDecList.isEmpty()) return;
         ALittleClassDec classDec = (ALittleClassDec)nameDecList.get(0).getParent();
 
-        findMethodNameDecListForStatic(project, psiFile, namespace, classDec, varName, result, deep);
+        findMethodNameDecListForStatic(project, psiFile, namespace, classDec, accessLevel, varName, result, deep);
     }
 
-    public static void findMethodNameDecListForStatic(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
+    public static void findMethodNameDecListForStatic(Project project, PsiFile psiFile, String namespace, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
         if (classDec == null) return;
-
-        // 处理继承
-        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
-        if (classExtendsDec != null) {
-            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
-            String namespaceName = namespace;
-            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
-            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
-            if (classNameDec != null) {
-                findMethodNameDecListForStatic(project, psiFile, namespaceName, classNameDec.getText(), varName, result, deep - 1);
-            }
-        }
 
         // 处理惊天函数
         List<ALittleClassStaticDec> classStaticDecList = classDec.getClassStaticDecList();
         for (ALittleClassStaticDec classStaticDec : classStaticDecList) {
             ALittleMethodNameDec methodNameDec = classStaticDec.getMethodNameDec();
             if (methodNameDec == null) continue;
-            if (varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+            if ((varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
+                && calcAccessSuccess(accessLevel, classStaticDec.getAccessModifier()))
                 result.add(methodNameDec);
+        }
+
+        // 处理继承
+        ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
+        if (classExtendsDec != null) {
+            accessLevel = calcNewAccess(accessLevel, classExtendsDec.getAccessModifier());
+            ALittleNamespaceNameDec classExtendsNamespaceNameDec = classExtendsDec.getNamespaceNameDec();
+            String namespaceName = namespace;
+            if (classExtendsNamespaceNameDec != null) namespaceName = classExtendsNamespaceNameDec.getText();
+            ALittleClassNameDec classNameDec = classExtendsDec.getClassNameDec();
+            if (classNameDec != null) {
+                findMethodNameDecListForStatic(project, psiFile, namespaceName, classNameDec.getText(), accessLevel, varName, result, deep - 1);
+            }
         }
     }
 

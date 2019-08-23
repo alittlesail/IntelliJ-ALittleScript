@@ -158,8 +158,22 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleClassDec classDec = (ALittleClassDec)preType.element;
                 String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) classDec.getContainingFile());
                 List<ALittleClassVarDec> classVarDecList = new ArrayList<>();
+
+                // 计算当前元素所在的类
+                PsiElement classDecElement = myElement;
+                while (classDecElement != null) {
+                    if (classDecElement instanceof ALittleClassDec) {
+                        break;
+                    }
+                    classDecElement = classDecElement.getParent();
+                }
+                int accessLevel = ALittleUtil.sAccessPublic;
+                if (classDecElement != null) {
+                    accessLevel = ALittleUtil.calcAccessLevel(classDecElement, classDec, ALittleUtil.sAccessPrivate);
+                }
+
                 // 所有成员变量
-                ALittleUtil.findClassVarNameDecList(project, psiFile, namespaceName, classDec, mKey, classVarDecList, 10);
+                ALittleUtil.findClassVarNameDecList(project, psiFile, namespaceName, classDec, accessLevel, mKey, classVarDecList, 10);
                 for (ALittleClassVarDec classVarDec : classVarDecList) {
                     results.add(new PsiElementResolveResult(classVarDec));
                 }
@@ -168,15 +182,15 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 // 在当前情况下，只有当前propertyValue在等号的左边，并且是最后一个属性才是setter，否则都是getter
                 if (nextSuffix == null && propertyValue.getParent() instanceof ALittleOpAssignExpr) {
                     mSetterList = new ArrayList<>();
-                    ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, mKey, mSetterList, 10);
+                    ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, accessLevel, mKey, mSetterList, 10);
                     classMethodNameDecList.addAll(mSetterList);
                 } else {
                     mGetterList = new ArrayList<>();
-                    ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, mKey, mGetterList, 10);
+                    ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, accessLevel, mKey, mGetterList, 10);
                     classMethodNameDecList.addAll(mGetterList);
                 }
                 // 所有成员函数
-                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, mKey, classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
                 // 过滤掉重复的函数名
                 classMethodNameDecList = ALittleUtil.filterSameMethodName(classMethodNameDecList);
                 // 添加函数名元素
@@ -227,9 +241,23 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleClassNameDec classNameDec = (ALittleClassNameDec)preType.element;
                 ALittleClassDec classDec = (ALittleClassDec) classNameDec.getParent();
                 String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) classNameDec.getContainingFile());
+
+                // 计算当前元素所在的类
+                PsiElement classDecElement = myElement;
+                while (classDecElement != null) {
+                    if (classDecElement instanceof ALittleClassDec) {
+                        break;
+                    }
+                    classDecElement = classDecElement.getParent();
+                }
+                int accessLevel = ALittleUtil.sAccessPublic;
+                if (classDecElement != null) {
+                    accessLevel = ALittleUtil.calcAccessLevel(classDecElement, classDec, ALittleUtil.sAccessPrivate);
+                }
+
                 // 所有静态函数
                 List<ALittleMethodNameDec> classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForStatic(project, psiFile, namespaceName, classDec, mKey, classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForStatic(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
 
                 // 如果后面那个是MethodCall，并且有两个参数的是setter，是一个参数的是getter，否则两个都不是
                 if (nextSuffix != null) {
@@ -238,16 +266,16 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                         int paramCount = methodCallStat.getValueStatList().size();
                         if (paramCount == 1) {
                             // 所有getter
-                            ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, mKey, classMethodNameDecList, 10);
+                            ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
                         } else if (paramCount == 2) {
                             // 所有setter
-                            ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, mKey, classMethodNameDecList, 10);
+                            ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
                         }
                     }
                 }
 
                 // 所有成员函数
-                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, mKey, classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
                 // 过滤掉重复的函数名
                 classMethodNameDecList = ALittleUtil.filterSameMethodName(classMethodNameDecList);
                 for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
@@ -296,13 +324,28 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 preType = suffixList.get(index - 1).guessType();
             }
 
+
             // 处理类的实例对象
             if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                 ALittleClassDec classDec = (ALittleClassDec) preType.element;
                 String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) classDec.getContainingFile());
+
+                // 计算当前元素所在的类
+                PsiElement classDecElement = myElement;
+                while (classDecElement != null) {
+                    if (classDecElement instanceof ALittleClassDec) {
+                        break;
+                    }
+                    classDecElement = classDecElement.getParent();
+                }
+                int accessLevel = ALittleUtil.sAccessPublic;
+                if (classDecElement != null) {
+                    accessLevel = ALittleUtil.calcAccessLevel(classDecElement, classDec, ALittleUtil.sAccessPrivate);
+                }
+
                 List<ALittleClassVarDec> classVarDecList = new ArrayList<>();
                 // 所有成员变量
-                ALittleUtil.findClassVarNameDecList(project, psiFile, namespaceName, classDec, "", classVarDecList, 10);
+                ALittleUtil.findClassVarNameDecList(project, psiFile, namespaceName, classDec, accessLevel, "", classVarDecList, 10);
                 for (ALittleClassVarDec classVarNameDec : classVarDecList) {
                     if (classVarNameDec.getIdContent() == null) continue;
                     variants.add(LookupElementBuilder.create(classVarNameDec.getIdContent().getText()).
@@ -313,7 +356,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
                 // 所有setter
                 List<ALittleMethodNameDec> classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, "", classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
                 for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getIdContent().getText()).
                             withIcon(ALittleIcons.SETTER_METHOD).
@@ -323,7 +366,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
                 // 所有getter
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, "", classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
                 for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getIdContent().getText()).
                             withIcon(ALittleIcons.GETTER_METHOD).
@@ -333,7 +376,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
                 // 所有成员函数
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, "", classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
                 for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getIdContent().getText()).
                             withIcon(ALittleIcons.MEMBER_METHOD).
@@ -402,9 +445,23 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleClassNameDec classNameDec = (ALittleClassNameDec) preType.element;
                 ALittleClassDec classDec = (ALittleClassDec) classNameDec.getParent();
                 String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) classNameDec.getContainingFile());
+
+                // 计算当前元素所在的类
+                PsiElement classDecElement = myElement;
+                while (classDecElement != null) {
+                    if (classDecElement instanceof ALittleClassDec) {
+                        break;
+                    }
+                    classDecElement = classDecElement.getParent();
+                }
+                int accessLevel = ALittleUtil.sAccessPublic;
+                if (classDecElement != null) {
+                    accessLevel = ALittleUtil.calcAccessLevel(classDecElement, classDec, ALittleUtil.sAccessPrivate);
+                }
+
                 // 所有静态函数
                 List<ALittleMethodNameDec> classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForStatic(project, psiFile, namespaceName, classDec, "", classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForStatic(project, psiFile, namespaceName, classDec, accessLevel,"", classMethodNameDecList, 10);
                 for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.STATIC_METHOD).
@@ -413,7 +470,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 }
                 // 所有成员函数
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, "", classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
                 for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.MEMBER_METHOD).
@@ -423,7 +480,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
                 // 所有setter
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, "", classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
                 for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.SETTER_METHOD).
@@ -433,7 +490,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
                 // 所有getter
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, "", classMethodNameDecList, 10);
+                ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
                 for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.GETTER_METHOD).

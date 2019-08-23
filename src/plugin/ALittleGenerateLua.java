@@ -929,6 +929,7 @@ public class ALittleGenerateLua {
                                 ALittleUtil.findClassVarNameDecList(thisGuessType.element.getProject(), thisGuessType.element.getContainingFile()
                                         , ALittleUtil.getNamespaceName((ALittleFile) thisGuessType.element.getContainingFile())
                                         , (ALittleClassDec) thisGuessType.element
+                                        , ALittleUtil.sAccessPrivate
                                         , attrName
                                         , varNameList, 100);
                                 if (!varNameList.isEmpty()) {

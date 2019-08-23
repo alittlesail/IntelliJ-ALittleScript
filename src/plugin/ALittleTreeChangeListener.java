@@ -21,7 +21,6 @@ import java.io.FileOutputStream;
 import java.util.*;
 
 public class ALittleTreeChangeListener implements PsiTreeChangeListener {
-
     public static Map<Project, ALittleTreeChangeListener> sMap = new HashMap<>();
 
     public static List<ALittleNamespaceNameDec> findNamespaceNameDecList(Project project, String namespaceName) {
