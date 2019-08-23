@@ -1,9 +1,7 @@
 package plugin.alittle;
 
-import com.intellij.openapi.compiler.CompilerPaths;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.FileIndexFacade;
+import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.File;
@@ -57,17 +55,24 @@ public class FileHelper {
 
     // 获取输出路径
     public static String calcOutPath(Module module) throws Exception {
-        String out_path = CompilerPaths.getModuleOutputPath(module, false);
-        if (out_path == null) throw new Exception("CompilerPaths.getModuleOutputPath调用失败，是不是没有设置out目录");
-        if (out_path.endsWith(File.separator)) return out_path;
-        return out_path + File.separator;
+        CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
+        if (extension == null) {
+            throw new Exception("该模块没有编译目录设置");
+        }
+        VirtualFile outFile = extension.getCompilerOutputPath();
+        if (outFile == null) {
+            throw new Exception("没有设置脚本生成目录");
+        }
+        String outPath = outFile.getPath();
+        if (outPath.endsWith(File.separator)) return outPath;
+        return outPath + File.separator;
     }
 
     // 获取lua脚本路径
     public static String calcScriptPath(Module module) throws Exception {
-        String out_path = calcOutPath(module);
-        if (module.getName().equals("Engine")) return out_path + "Engine/";
-        return out_path + "Script/";
+        String outPath = calcOutPath(module);
+        if (module.getName().equals("Engine")) return outPath + "Engine/";
+        return outPath + "Script/";
     }
 
     // 计算文件路径

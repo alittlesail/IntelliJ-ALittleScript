@@ -1,13 +1,13 @@
 package plugin;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.util.IconLoader;
+import com.intellij.ui.IconManager;
 
 import javax.swing.*;
 
 public class ALittleIcons {
-    public static final Icon FILE = IconLoader.getIcon("/icons/file_icon.png");
-    public static final Icon MODULE = IconLoader.getIcon("/icons/module_icon.png");
+    public static final Icon FILE = IconManager.getInstance().getIcon("/icons/file_icon.png", ALittleIcons.class);
+    public static final Icon MODULE = IconManager.getInstance().getIcon("/icons/module_icon.png", ALittleIcons.class);
 
     public static final Icon CLASS = AllIcons.Nodes.Class;
     public static final Icon NAMESPACE = AllIcons.Nodes.Package;

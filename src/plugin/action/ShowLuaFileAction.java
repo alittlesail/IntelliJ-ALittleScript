@@ -32,13 +32,12 @@ public class ShowLuaFileAction extends AnAction {
         PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
         if (psiFile instanceof ALittleFile) {
             try {
-                String alittle_rel_path = FileHelper.calcALittleRelPath(module, file);
-                String full_path = FileHelper.calcScriptPath(module) + alittle_rel_path + "lua";
-                VirtualFile new_file = VirtualFileManager.getInstance().findFileByUrl("file://" + full_path);
-                if (new_file == null) return;
-                FileEditorManager.getInstance(project).openFile(new_file, true);
-            } catch (Exception e) {
-                return;
+                String alittleRelPath = FileHelper.calcALittleRelPath(module, file);
+                String fullPath = FileHelper.calcScriptPath(module) + alittleRelPath + "lua";
+                VirtualFile newFile = VirtualFileManager.getInstance().findFileByUrl("file://" + fullPath);
+                if (newFile == null) return;
+                FileEditorManager.getInstance(project).openFile(newFile, true);
+            } catch (Exception ignored) {
             }
         }
     }

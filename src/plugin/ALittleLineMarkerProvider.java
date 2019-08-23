@@ -53,7 +53,7 @@ public class ALittleLineMarkerProvider extends RelatedItemLineMarkerProvider {
                             NavigationGutterIconBuilder.create(ALittleIcons.OVERRIDE).
                                     setTargets(methodNameDec).
                                     setTooltipText("override");
-                    result.add(builder.createLineMarkerInfo(element));
+                    result.add(builder.createLineMarkerInfo(myElement.getIdContent()));
                 }
             } else if (element instanceof ALittleClassCtorDec) {
                 ALittleClassCtorDec myElement = (ALittleClassCtorDec) element;
@@ -77,7 +77,7 @@ public class ALittleLineMarkerProvider extends RelatedItemLineMarkerProvider {
                             NavigationGutterIconBuilder.create(ALittleIcons.OVERRIDE).
                                     setTargets(extendsCtorDec).
                                     setTooltipText("override");
-                    result.add(builder.createLineMarkerInfo(element));
+                    result.add(builder.createLineMarkerInfo(myElement.getFirstChild()));
                 }
             }
         } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
