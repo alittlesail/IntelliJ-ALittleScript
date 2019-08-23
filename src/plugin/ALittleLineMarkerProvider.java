@@ -55,30 +55,6 @@ public class ALittleLineMarkerProvider extends RelatedItemLineMarkerProvider {
                                     setTooltipText("override");
                     result.add(builder.createLineMarkerInfo(myElement.getIdContent()));
                 }
-            } else if (element instanceof ALittleClassCtorDec) {
-                ALittleClassCtorDec myElement = (ALittleClassCtorDec) element;
-                String mNamespace = ALittleUtil.getNamespaceName((ALittleFile)myElement.getContainingFile());
-
-                PsiElement parent = myElement.getParent();
-                Project project = myElement.getProject();
-                PsiFile psiFile = myElement.getContainingFile();
-                if (!(parent instanceof ALittleClassDec)) return;
-                ALittleClassDec classDec = (ALittleClassDec)parent;
-                if (classDec.getClassExtendsDec() == null) return;
-                ALittleClassExtendsDec extendsDec = classDec.getClassExtendsDec();
-                if (extendsDec == null) return;
-                ALittleClassNameDec classNameDec = extendsDec.getClassNameDec();
-                if (classNameDec == null) return;
-                ALittleReferenceUtil.GuessTypeInfo extendsGuess = classNameDec.guessType();
-
-                ALittleClassCtorDec extendsCtorDec = ALittleUtil.findFirstCtorDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, 100);
-                if (extendsCtorDec != null) {
-                    NavigationGutterIconBuilder<PsiElement> builder =
-                            NavigationGutterIconBuilder.create(ALittleIcons.OVERRIDE).
-                                    setTargets(extendsCtorDec).
-                                    setTooltipText("override");
-                    result.add(builder.createLineMarkerInfo(myElement.getFirstChild()));
-                }
             }
         } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
 
