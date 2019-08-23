@@ -176,10 +176,8 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
 
         // 查全局下
         if (findInGlobal) {
-            data = listener.mGlobalAccessMap.get(namespaceName);
-            if (data != null) {
-                data.findInstanceNameDecList(name, result);
-            }
+            for (Data instData : listener.mGlobalAccessMap.values())
+                instData.findInstanceNameDecList(name, result);
         }
 
         return result;

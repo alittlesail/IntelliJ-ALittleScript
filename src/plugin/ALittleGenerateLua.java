@@ -1528,12 +1528,35 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateInstance(ALittleInstanceDec root, String preTab) throws Exception {
-        String globalPreString = "";
-        ALittleAccessModifier accessModifierDec = root.getAccessModifier();
-        if (accessModifierDec != null && accessModifierDec.getText().equals("public")) {
-            globalPreString = "_G.";
+        ALittleVarAssignExpr varAssignExpr = root.getVarAssignExpr();
+        List<ALittleVarAssignDec> pairDecList = varAssignExpr.getVarAssignDecList();
+        if (pairDecList.isEmpty()) {
+            throw new Exception("局部变量没有变量名:" + root.getText());
         }
-        return GenerateVarAssignExpr(root.getVarAssignExpr(), preTab, globalPreString);
+
+        List<String> nameList = new ArrayList<>();
+        for (ALittleVarAssignDec pairDec : pairDecList) {
+            nameList.add(pairDec.getVarAssignNameDec().getIdContent().getText());
+        }
+
+        String content = preTab;
+
+        ALittleAccessModifier accessModifierDec = root.getAccessModifier();
+        if (accessModifierDec == null || accessModifierDec.getText().equals("private")) {
+            content += "local ";
+            content += String.join(", ", nameList);
+        } else if (accessModifierDec.getText().equals("protected")) {
+            content += String.join(", ", nameList);
+        } else if (accessModifierDec.getText().equals("public")) {
+            content += "_G.";
+            content += String.join(", _G.", nameList);
+        }
+
+        ALittleValueStat valueStat = varAssignExpr.getValueStat();
+        if (valueStat == null) {
+            return content + " = nil\n";
+        }
+        return content + " = " + GenerateValueStat(valueStat) + "\n";
     }
 
     @NotNull

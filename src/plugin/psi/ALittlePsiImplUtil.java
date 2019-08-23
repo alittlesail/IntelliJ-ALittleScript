@@ -24,7 +24,7 @@ public class ALittlePsiImplUtil {
     @NotNull
     public static List<ALittleReferenceUtil.GuessTypeInfo> guessTypes(PsiElement element) throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessTypeInfoList = ALittleTreeChangeListener.getGuessTypeList(element);
-        if (guessTypeInfoList != null) {
+        if (guessTypeInfoList != null && !guessTypeInfoList.isEmpty()) {
             boolean isChanged = false;
             for (ALittleReferenceUtil.GuessTypeInfo info : guessTypeInfoList) {
                 if (info.isChanged()) {

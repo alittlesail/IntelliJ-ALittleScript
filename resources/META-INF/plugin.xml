@@ -71,10 +71,6 @@
     </component>
   </application-components>
   <actions>
-    <action id="ALittleGenerateLua" class="plugin.action.ALittleGenerateLuaAction" text="ALittleGenerateLua"
-            description="generate lua script">
-      <add-to-group group-id="BuildMenu" anchor="first"/>
-    </action>
     <action class="plugin.action.CreateALittleFileAction"
             text="ALittle File"
             id="CreateALittleFile">
@@ -88,6 +84,11 @@
     <action class="plugin.action.ShowLuaFileAction"
             text="ShowLuaFile"
             id="ShowLuaFile">
+      <add-to-group group-id="RefactoringMenu" anchor="first"/>
+    </action>
+    <action class="plugin.action.GenerateLuaAction"
+            text="GenerateLua"
+            id="GenerateLua">
       <add-to-group group-id="RefactoringMenu" anchor="first"/>
     </action>
   </actions>

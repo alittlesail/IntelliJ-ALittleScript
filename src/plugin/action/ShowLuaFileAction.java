@@ -3,27 +3,16 @@ package plugin.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.editor.actionSystem.EditorActionManager;
-import com.intellij.openapi.fileChooser.FileSystemTree;
-import com.intellij.openapi.fileChooser.actions.FileChooserAction;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndexFacade;
-import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import plugin.ALittleGenerateLua;
 import plugin.alittle.FileHelper;
-import plugin.alittle.SendLogRunnable;
 import plugin.psi.ALittleFile;
-
-import java.nio.file.FileSystem;
 
 public class ShowLuaFileAction extends AnAction {
     @Override
