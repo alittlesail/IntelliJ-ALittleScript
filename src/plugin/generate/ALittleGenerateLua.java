@@ -1,4 +1,4 @@
-package plugin;
+package plugin.generate;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.FileIndexFacade;
@@ -10,9 +10,11 @@ import com.intellij.psi.PsiReference;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
+import plugin.ALittleUtil;
+import plugin.component.StdLibraryProvider;
 import plugin.alittle.FileHelper;
 import plugin.psi.*;
-import plugin.reference.ALittleReference;
+import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
 
 import java.io.File;
@@ -61,8 +63,8 @@ public class ALittleGenerateLua {
             if (fullCheck) {
                 // 检查错误，给元素上色
                 PsiReference ref = element.getReference();
-                if (ref instanceof ALittleReference) {
-                    ((ALittleReference) ref).checkError();
+                if (ref instanceof ALittleReferenceInterface) {
+                    ((ALittleReferenceInterface) ref).checkError();
                 }
             }
 

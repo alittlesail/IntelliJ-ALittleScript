@@ -50,25 +50,25 @@
   <depends>com.intellij.modules.lang</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <fileTypeFactory implementation="plugin.ALittleFileTypeFactory"/>
-    <lang.parserDefinition language="ALittle" implementationClass="plugin.ALittleParserDefinition"/>
-    <lang.syntaxHighlighterFactory language="ALittle" implementationClass="plugin.ALittleSyntaxHighlighterFactory"/>
+    <fileTypeFactory implementation="plugin.filetype.ALittleFileTypeFactory"/>
+    <lang.parserDefinition language="ALittle" implementationClass="plugin.hightlight.ALittleParserDefinition"/>
+    <lang.syntaxHighlighterFactory language="ALittle" implementationClass="plugin.hightlight.ALittleSyntaxHighlighterFactory"/>
     <lang.formatter language="ALittle" implementationClass="plugin.format.ALittleFormattingModelBuilder" />
-    <annotator language="ALittle" implementationClass="plugin.ALittleAnnotator"/>
-    <completion.contributor language="ALittle" implementationClass="plugin.ALittleCompletionContributor"/>
-    <problemFileHighlightFilter implementation="plugin.ALittleProblemFileHighlightFilter"/>
-    <additionalLibraryRootsProvider implementation="plugin.StdLibraryProvider"/>
+    <annotator language="ALittle" implementationClass="plugin.component.ALittleAnnotator"/>
+    <completion.contributor language="ALittle" implementationClass="plugin.component.ALittleCompletionContributor"/>
+    <problemFileHighlightFilter implementation="plugin.hightlight.ALittleProblemFileHighlightFilter"/>
+    <additionalLibraryRootsProvider implementation="plugin.component.StdLibraryProvider"/>
     <typedHandler implementation="plugin.format.ALittleTypedHandler"/>
     <codeInsight.parameterNameHints language="ALittle" implementationClass="plugin.parameter.ALittleParameterHintsProvider"/>
     <codeInsight.parameterInfo language="ALittle" implementationClass="plugin.parameter.ALittleParameterInfoHandler"/>
     <moduleConfigurationEditorProvider implementation="plugin.module.ALittleModuleConfigurationEditorProvider"/>
     <moduleType id="ALittle" implementationClass="plugin.module.ALittleModuleType"/>
-    <codeInsight.lineMarkerProvider language="ALittle" implementationClass="plugin.ALittleLineMarkerProvider"/>
+    <codeInsight.lineMarkerProvider language="ALittle" implementationClass="plugin.component.ALittleLineMarkerProvider"/>
   </extensions>
 
   <application-components>
     <component>
-      <implementation-class>plugin.ALittleInitComponent</implementation-class>
+      <implementation-class>plugin.component.ALittleInitComponent</implementation-class>
     </component>
   </application-components>
   <actions>

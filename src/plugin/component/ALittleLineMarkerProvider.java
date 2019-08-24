@@ -1,4 +1,4 @@
-package plugin;
+package plugin.component;
 
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
@@ -7,12 +7,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import plugin.ALittleUtil;
 import plugin.psi.*;
-import plugin.reference.ALittleReferenceOpUtil;
 import plugin.reference.ALittleReferenceUtil;
 
 import java.util.Collection;
-import java.util.List;
 
 public class ALittleLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override

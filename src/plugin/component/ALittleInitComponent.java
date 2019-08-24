@@ -1,4 +1,4 @@
-package plugin;
+package plugin.component;
 
 import com.intellij.AppTopics;
 import com.intellij.openapi.application.ApplicationManager;
@@ -15,7 +15,9 @@ import com.intellij.psi.PsiManager;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
+import plugin.ALittleTreeChangeListener;
 import plugin.alittle.SendLogRunnable;
+import plugin.generate.ALittleGenerateLua;
 import plugin.psi.ALittleFile;
 
 public class ALittleInitComponent implements BaseComponent {

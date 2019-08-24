@@ -1,4 +1,4 @@
-package plugin;
+package plugin.hightlight;
 
 import com.intellij.openapi.fileTypes.*;
 import com.intellij.openapi.project.Project;

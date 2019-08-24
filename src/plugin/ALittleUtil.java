@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import plugin.component.ALittleIcons;
 import plugin.psi.*;
 import plugin.reference.ALittleReferenceUtil;
 
@@ -194,15 +195,7 @@ public class ALittleUtil {
         if (classDec == null) return;
 
         // 处理成员变量
-        List<ALittleClassVarDec> classVarDecList = classDec.getClassVarDecList();
-        for (ALittleClassVarDec classVarDec : classVarDecList) {
-            PsiElement varNameDec = classVarDec.getIdContent();
-            if (varNameDec == null) continue;
-            if ((varName.isEmpty() || varNameDec.getText().equals(varName))
-                && calcAccessSuccess(accessLevel, classVarDec.getAccessModifier())) {
-                    result.add(classVarDec);
-            }
-        }
+        ALittleTreeChangeListener.findClassVarDecList(project, classDec, accessLevel, varName, result);
 
         // 处理继承
         ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
@@ -234,9 +227,7 @@ public class ALittleUtil {
         return newResult;
     }
 
-    public static int sAccessPublic = 2;            // 可以访问public的属性和方法
-    public static int sAccessProtected = 3;         // 可以访问public protected的属性和方法
-    public static int sAccessPrivate = 4;           // 可以public protected private的属性和方法
+
     // 根据对应的类，已经访问权限
     public static int calcAccessLevel(@NotNull PsiElement srcElement, @NotNull PsiElement dstElement, int accessLevel) throws ALittleReferenceUtil.ALittleReferenceException {
         // 如果就是自己
@@ -298,8 +289,18 @@ public class ALittleUtil {
         }
         return accessLevel;
     }
+    // 单纯计算访问权限
+    public static int calcAccess(ALittleAccessModifier accessModifier) {
+        if (accessModifier == null || accessModifier.getText().equals("private")) {
+            return sAccessPrivate;
+        }
+        if (accessModifier.getText().equals("protected")) {
+            return sAccessProtected;
+        }
+        return sAccessPublic;
+    }
 
-    // 查找所有的成员函数节点对象
+        // 查找所有的成员函数节点对象
     private static ALittleClassCtorDec findFirstCtorDecFromExtends(Project project, PsiFile psiFile, String namespace, String className, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return null;
@@ -355,14 +356,7 @@ public class ALittleUtil {
         if (classDec == null) return;
 
         // 处理setter函数
-        List<ALittleClassSetterDec> classSetterDecList = classDec.getClassSetterDecList();
-        for (ALittleClassSetterDec classSetterDec : classSetterDecList) {
-            ALittleMethodNameDec methodNameDec = classSetterDec.getMethodNameDec();
-            if (methodNameDec == null) continue;
-            if ((varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
-                && calcAccessSuccess(accessLevel, classSetterDec.getAccessModifier()))
-                result.add(methodNameDec);
-        }
+        ALittleTreeChangeListener.findClassSetterDecList(project, classDec, accessLevel, varName, result);
 
         // 处理继承
         ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
@@ -395,7 +389,6 @@ public class ALittleUtil {
         if (deep <= 0) return null;
         if (classDec == null) return null;
 
-        // 处理成员函数
         List<ALittleClassSetterDec> classSetterDecList = classDec.getClassSetterDecList();
         for (ALittleClassSetterDec classSetterDec : classSetterDecList) {
             ALittleMethodNameDec methodNameDec = classSetterDec.getMethodNameDec();
@@ -437,14 +430,7 @@ public class ALittleUtil {
         if (classDec == null) return;
 
         // 处理getter函数
-        List<ALittleClassGetterDec> classGetterDecList = classDec.getClassGetterDecList();
-        for (ALittleClassGetterDec classGetterDec : classGetterDecList) {
-            ALittleMethodNameDec methodNameDec = classGetterDec.getMethodNameDec();
-            if (methodNameDec == null) continue;
-            if ((varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
-                && calcAccessSuccess(accessLevel, classGetterDec.getAccessModifier()))
-                result.add(methodNameDec);
-        }
+        ALittleTreeChangeListener.findClassGetterDecList(project, classDec, accessLevel, varName, result);
 
         // 处理继承
         ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
@@ -519,14 +505,7 @@ public class ALittleUtil {
         if (classDec == null) return;
 
         // 处理成员函数
-        List<ALittleClassMethodDec> classMethodDecList = classDec.getClassMethodDecList();
-        for (ALittleClassMethodDec classMethodDec : classMethodDecList) {
-            ALittleMethodNameDec methodNameDec = classMethodDec.getMethodNameDec();
-            if (methodNameDec == null) continue;
-            if ((varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
-                && calcAccessSuccess(accessLevel, classMethodDec.getAccessModifier()))
-                result.add(methodNameDec);
-        }
+        ALittleTreeChangeListener.findClassFunDecList(project, classDec, accessLevel, varName, result);
 
         // 处理继承
         ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();
@@ -599,15 +578,8 @@ public class ALittleUtil {
         if (deep <= 0) return;
         if (classDec == null) return;
 
-        // 处理惊天函数
-        List<ALittleClassStaticDec> classStaticDecList = classDec.getClassStaticDecList();
-        for (ALittleClassStaticDec classStaticDec : classStaticDecList) {
-            ALittleMethodNameDec methodNameDec = classStaticDec.getMethodNameDec();
-            if (methodNameDec == null) continue;
-            if ((varName.isEmpty() || methodNameDec.getIdContent().getText().equals(varName))
-                && calcAccessSuccess(accessLevel, classStaticDec.getAccessModifier()))
-                result.add(methodNameDec);
-        }
+        // 处理静态函数
+        ALittleTreeChangeListener.findClassStaticDecList(project, classDec, accessLevel, varName, result);
 
         // 处理继承
         ALittleClassExtendsDec classExtendsDec = classDec.getClassExtendsDec();

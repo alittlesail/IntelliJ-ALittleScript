@@ -8,7 +8,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.ALittleLanguage;
+import plugin.component.ALittleLanguage;
 import plugin.psi.ALittleTypes;
 
 public class ALittleFormattingModelBuilder implements FormattingModelBuilder {

@@ -4,8 +4,8 @@ import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleFileType;
-import plugin.ALittleLanguage;
+import plugin.filetype.ALittleFileType;
+import plugin.component.ALittleLanguage;
 
 import javax.swing.*;
 

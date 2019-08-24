@@ -1,4 +1,4 @@
-package plugin;
+package plugin.component;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.IconManager;

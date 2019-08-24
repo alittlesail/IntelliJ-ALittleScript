@@ -1,10 +1,11 @@
-package plugin;
+package plugin.component;
 
 import com.intellij.lang.annotation.*;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.ALittleFile;
 import plugin.reference.ALittleReference;
+import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
 
 public class ALittleAnnotator implements Annotator {
@@ -13,9 +14,9 @@ public class ALittleAnnotator implements Annotator {
         try {
             // 检查错误，给元素上色
             PsiReference ref = element.getReference();
-            if (ref instanceof ALittleReference) {
-                ((ALittleReference) ref).checkError();
-                ((ALittleReference) ref).colorAnnotator(holder);
+            if (ref instanceof ALittleReferenceInterface) {
+                ((ALittleReferenceInterface) ref).checkError();
+                ((ALittleReferenceInterface) ref).colorAnnotator(holder);
             }
         } catch (ALittleReferenceUtil.ALittleReferenceException e) {
             holder.createErrorAnnotation(e.getElement(), e.getError());

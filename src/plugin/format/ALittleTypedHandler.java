@@ -9,7 +9,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleFileType;
+import plugin.filetype.ALittleFileType;
 
 public class ALittleTypedHandler extends TypedHandlerDelegate {
 

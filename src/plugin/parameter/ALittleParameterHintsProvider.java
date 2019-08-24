@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.reference.ALittleReference;
+import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
 
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
     public List<InlayInfo> getParameterHints(PsiElement psiElement) {
         PsiReference ref = psiElement.getReference();
         try {
-            if (ref instanceof ALittleReference) {
-                return ((ALittleReference) ref).getParameterHints();
+            if (ref instanceof ALittleReferenceInterface) {
+                return ((ALittleReferenceInterface) ref).getParameterHints();
             }
         } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
         }

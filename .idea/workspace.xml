@@ -43,7 +43,7 @@
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553049610453" />
     <property name="jdk.selected.JAVA_MODULE" value="1.8" />
     <property name="last.edited.regexp" value="&quot;11\\\&quot;" />
-    <property name="last_opened_file_path" value="D:/ALittle/Client/Win32/bin/Module/ALittleIDE/ALittleProject" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/plugin" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.33989638" />
@@ -58,8 +58,12 @@
     <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="plugin.parser" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
+      <recent name="D:\ALittleScript\trunk\resources\std\Lua" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\ALittle" />
+      <recent name="D:\ALittleScript\trunk\resources\std" />
+      <recent name="D:\Users\IGG\Desktop\Test\Client\Win32\bin\Module\ALittleScript\Other\ALittleScript\src\plugin" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="plugin.psi" />
@@ -74,18 +78,14 @@
       <recent name="D:\ALittleScript\src\plugin" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="plugin.index" />
       <recent name="plugin.reference" />
       <recent name="plugin.action" />
       <recent name="plugin.psi.impl" />
       <recent name="plugin.psi" />
-      <recent name="plugin" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
-      <recent name="D:\ALittleScript\trunk\resources\std\Lua" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\ALittle" />
-      <recent name="D:\ALittleScript\trunk\resources\std" />
-      <recent name="D:\Users\IGG\Desktop\Test\Client\Win32\bin\Module\ALittleScript\Other\ALittleScript\src\plugin" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="plugin.parser" />
     </key>
   </component>
   <component name="RunDashboard">

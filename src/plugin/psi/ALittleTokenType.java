@@ -3,7 +3,7 @@ package plugin.psi;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleLanguage;
+import plugin.component.ALittleLanguage;
 
 public class ALittleTokenType extends IElementType {
     public ALittleTokenType(@NotNull @NonNls String debugName) {

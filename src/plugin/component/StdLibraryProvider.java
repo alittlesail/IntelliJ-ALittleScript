@@ -1,4 +1,4 @@
-package plugin;
+package plugin.component;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;

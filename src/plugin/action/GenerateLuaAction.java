@@ -10,7 +10,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import plugin.ALittleGenerateLua;
+import plugin.generate.ALittleGenerateLua;
 import plugin.alittle.FileHelper;
 import plugin.alittle.SendLogRunnable;
 import plugin.psi.ALittleFile;

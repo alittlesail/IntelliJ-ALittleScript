@@ -1,12 +1,17 @@
-package plugin;
+package plugin.index;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.*;
-import com.intellij.psi.*;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiTreeChangeEvent;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
+import plugin.ALittleUtil;
 import plugin.component.StdLibraryProvider;
 import plugin.psi.*;
 import plugin.reference.ALittleReferenceUtil;
@@ -14,13 +19,13 @@ import plugin.reference.ALittleReferenceUtil;
 import java.io.File;
 import java.util.*;
 
-public class ALittleTreeChangeListener implements PsiTreeChangeListener {
-    public static Map<Project, ALittleTreeChangeListener> sMap = new HashMap<>();
+public class ALittleAccessData {
+    public static Map<Project, ALittleAccessData> sMap = new HashMap<>();
 
     public static List<ALittleNamespaceNameDec> findNamespaceNameDecList(Project project, String namespaceName) {
         List<ALittleNamespaceNameDec> result = new ArrayList<>();
 
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
@@ -39,7 +44,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     public static List<ALittleClassNameDec> findClassNameDecList(Project project, PsiFile psiFile, String namespaceName, String name) {
         List<ALittleClassNameDec> result = new ArrayList<>();
 
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
@@ -65,7 +70,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public static void findClassVarDecList(Project project, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleClassVarDec> result) {
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return;
         if (!listener.mReloaded) listener.reload();
 
@@ -109,7 +114,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public static void findClassFunDecList(Project project, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result) {
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return;
         if (!listener.mReloaded) listener.reload();
 
@@ -152,7 +157,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public static void findClassSetterDecList(Project project, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result) {
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return;
         if (!listener.mReloaded) listener.reload();
 
@@ -195,7 +200,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public static void findClassGetterDecList(Project project, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result) {
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return;
         if (!listener.mReloaded) listener.reload();
 
@@ -238,7 +243,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public static void findClassStaticDecList(Project project, ALittleClassDec classDec, int accessLevel, String varName, @NotNull List<ALittleMethodNameDec> result) {
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return;
         if (!listener.mReloaded) listener.reload();
 
@@ -283,7 +288,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     public static List<ALittleStructNameDec> findStructNameDecList(Project project, PsiFile psiFile, String namespaceName, String name) {
         List<ALittleStructNameDec> result = new ArrayList<>();
 
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
@@ -311,7 +316,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     public static List<ALittleEnumNameDec> findEnumNameDecList(Project project, PsiFile psiFile, String namespaceName, String name) {
         List<ALittleEnumNameDec> result = new ArrayList<>();
 
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
@@ -339,7 +344,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     public static List<ALittleMethodNameDec> findGlobalMethodNameDecList(Project project, PsiFile psiFile, String namespaceName, String name) {
         List<ALittleMethodNameDec> result = new ArrayList<>();
 
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
@@ -367,7 +372,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     public static List<ALittleVarAssignNameDec> findInstanceNameDecList(Project project, PsiFile psiFile, String namespaceName, String name, boolean findInGlobal) {
         List<ALittleVarAssignNameDec> result = new ArrayList<>();
 
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return result;
         if (!listener.mReloaded) listener.reload();
 
@@ -393,7 +398,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public static List<ALittleReferenceUtil.GuessTypeInfo> getGuessTypeList(PsiElement element) {
-        ALittleTreeChangeListener listener = sMap.get(element.getProject());
+        ALittleAccessData listener = sMap.get(element.getProject());
         if (listener == null) return null;
         if (!listener.mReloaded) listener.reload();
 
@@ -404,7 +409,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public static void putGuessTypeList(PsiElement element, @NotNull List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList) {
-        ALittleTreeChangeListener listener = sMap.get(element.getProject());
+        ALittleAccessData listener = sMap.get(element.getProject());
         if (listener == null) return;
         if (!listener.mReloaded) listener.reload();
 
@@ -435,7 +440,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     private static void handleFileDelete(Project project, ALittleFile alittleFile) {
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return;
 
         if (!listener.mReloaded) listener.reload();
@@ -467,7 +472,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     private static void handleFileCreated(Project project, ALittleFile alittleFile) {
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return;
         if (!listener.mReloaded) listener.reload();
 
@@ -481,7 +486,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public static void handleRefresh(Project project) {
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return;
         if (listener.mIsRefreshed) return;
         listener.mIsRefreshed = true;
@@ -489,7 +494,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     }
 
     public static boolean isReloading(Project project) {
-        ALittleTreeChangeListener listener = sMap.get(project);
+        ALittleAccessData listener = sMap.get(project);
         if (listener == null) return true;
         if (listener.mReloading) return true;
         return false;
@@ -716,7 +721,7 @@ public class ALittleTreeChangeListener implements PsiTreeChangeListener {
     boolean mReloaded = false;          // 是否加载完成
     boolean mIsRefreshed = false;       // 是否刷新过
 
-    public ALittleTreeChangeListener(Project project) {
+    public ALittleAccessData(Project project) {
         mProject = project;
         mAllDataMap = new HashMap<>();
         mGlobalAccessMap = new HashMap<>();

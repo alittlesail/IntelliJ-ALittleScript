@@ -1,4 +1,4 @@
-package plugin;
+package plugin.hightlight;
 
 import com.intellij.lang.*;
 import com.intellij.lexer.Lexer;
@@ -6,6 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.tree.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.component.ALittleLanguage;
+import plugin.component.ALittleLexerAdapter;
 import plugin.parser.ALittleParser;
 import plugin.psi.ALittleFile;
 import plugin.psi.ALittleTypes;

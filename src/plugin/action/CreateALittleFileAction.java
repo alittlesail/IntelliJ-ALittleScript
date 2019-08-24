@@ -5,7 +5,7 @@ import com.intellij.ide.actions.CreateFileFromTemplateDialog;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import plugin.ALittleIcons;
+import plugin.component.ALittleIcons;
 
 public class CreateALittleFileAction extends CreateFileFromTemplateAction implements DumbAware {
     private static final String CREATE_LUA_FILE = "New ALittle File";

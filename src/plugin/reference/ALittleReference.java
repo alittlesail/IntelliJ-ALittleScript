@@ -13,7 +13,7 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ALittleReference<T extends PsiElement> extends PsiReferenceBase<T> implements PsiPolyVariantReference {
+public abstract class ALittleReference<T extends PsiElement> extends PsiReferenceBase<T> implements PsiPolyVariantReference, ALittleReferenceInterface {
     protected String mKey;
     protected String mNamespace;
 
@@ -35,7 +35,18 @@ public abstract class ALittleReference<T extends PsiElement> extends PsiReferenc
     }
 
     @NotNull
-    public abstract List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException;
+    public ALittleReferenceUtil.GuessTypeInfo guessType() throws ALittleReferenceUtil.ALittleReferenceException {
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (guessList.isEmpty()) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "无法计算出该元素属于什么类型");
+        }
+        return guessList.get(0);
+    }
+
+    @NotNull
+    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+        return new ArrayList<>();
+    }
 
     @NotNull
     @Override

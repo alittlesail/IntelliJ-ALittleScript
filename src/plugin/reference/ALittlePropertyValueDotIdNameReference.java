@@ -13,7 +13,7 @@ import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleIcons;
+import plugin.component.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
 import plugin.ALittleUtil;
 import plugin.psi.*;

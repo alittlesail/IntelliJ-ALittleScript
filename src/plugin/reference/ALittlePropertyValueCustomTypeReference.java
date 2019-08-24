@@ -10,7 +10,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.ALittleIcons;
+import plugin.component.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
 import plugin.ALittleUtil;
 import plugin.psi.*;

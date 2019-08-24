@@ -1,8 +1,10 @@
-package plugin;
+package plugin.filetype;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.component.ALittleIcons;
+import plugin.component.ALittleLanguage;
 
 import javax.swing.*;
 

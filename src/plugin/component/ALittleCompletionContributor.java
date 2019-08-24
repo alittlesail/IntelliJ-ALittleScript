@@ -1,4 +1,4 @@
-package plugin;
+package plugin.component;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;

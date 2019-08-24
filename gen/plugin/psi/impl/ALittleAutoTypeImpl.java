@@ -2,8 +2,6 @@
 package plugin.psi.impl;
 
 import java.util.List;
-
-import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;

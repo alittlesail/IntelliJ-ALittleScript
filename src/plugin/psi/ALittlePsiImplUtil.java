@@ -35,7 +35,7 @@ public class ALittlePsiImplUtil {
             if (!isChanged) return  guessTypeInfoList;
         }
 
-        ALittleReference ref = ALittleReferenceUtil.create(element);
+        ALittleReferenceInterface ref = ALittleReferenceUtil.create(element);
         if (ref == null) {
             throw new ALittleReferenceUtil.ALittleReferenceException(element, "ALittleReference对象创建失败 element:" + element);
         }

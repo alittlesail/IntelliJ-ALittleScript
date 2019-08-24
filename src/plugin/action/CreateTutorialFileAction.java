@@ -5,7 +5,7 @@ import com.intellij.ide.actions.CreateFileFromTemplateDialog;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import plugin.ALittleIcons;
+import plugin.component.ALittleIcons;
 import plugin.alittle.SendLogRunnable;
 
 public class CreateTutorialFileAction extends CreateFileFromTemplateAction implements DumbAware {

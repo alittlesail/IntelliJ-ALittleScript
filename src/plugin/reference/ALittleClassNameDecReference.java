@@ -9,13 +9,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleIcons;
+import plugin.component.ALittleIcons;
 import plugin.ALittleTreeChangeListener;
 import plugin.psi.ALittleClassDec;
 import plugin.psi.ALittleClassExtendsDec;
 import plugin.psi.ALittleClassNameDec;
 import plugin.psi.ALittleNamespaceNameDec;
-import plugin.psi.impl.ALittleClassDecImpl;
 
 import java.util.ArrayList;
 import java.util.List;

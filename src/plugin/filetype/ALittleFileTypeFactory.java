@@ -1,4 +1,4 @@
-package plugin;
+package plugin.filetype;
 
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
 import com.intellij.openapi.fileTypes.FileTypeFactory;

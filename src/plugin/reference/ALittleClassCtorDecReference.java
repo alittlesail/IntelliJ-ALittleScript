@@ -1,18 +1,13 @@
 package plugin.reference;
 
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleIcons;
-import plugin.ALittleTreeChangeListener;
 import plugin.ALittleUtil;
 import plugin.psi.*;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
