@@ -6,7 +6,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
+import plugin.alittle.PsiHelper;
 import plugin.psi.ALittleConstValue;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = new ArrayList<>();
         if (myElement.getDigitContent() != null) {
-            if (ALittleUtil.isInt(myElement.getDigitContent().getText()))
+            if (PsiHelper.isInt(myElement.getDigitContent().getText()))
                 guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("int");
             else
                 guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("double");

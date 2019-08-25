@@ -15,9 +15,10 @@ import com.intellij.psi.PsiManager;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleTreeChangeListener;
 import plugin.alittle.SendLogRunnable;
 import plugin.generate.ALittleGenerateLua;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleFile;
 
 public class ALittleInitComponent implements BaseComponent {

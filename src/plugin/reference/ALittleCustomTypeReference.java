@@ -9,8 +9,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
-import plugin.ALittleTreeChangeListener;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -34,21 +36,24 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
 
         {
-            List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, mNamespace, mKey);
-            for (ALittleClassNameDec dec : decList) {
-                guessList.add(dec.guessType());
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.CLASS_NAME, psiFile, mNamespace, mKey, true);
+            for (PsiElement dec : decList) {
+                guessList.add(((ALittleClassNameDec)dec).guessType());
             }
         }
         {
-            List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, psiFile, mNamespace, mKey);
-            for (ALittleStructNameDec dec : decList) {
-                guessList.add(dec.guessType());
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.STRUCT_NAME, psiFile, mNamespace, mKey, true);
+            for (PsiElement dec : decList) {
+                guessList.add(((ALittleStructNameDec)dec).guessType());
             }
         }
         {
-            List<ALittleEnumNameDec> decList = ALittleTreeChangeListener.findEnumNameDecList(project, psiFile, mNamespace, mKey);
-            for (ALittleEnumNameDec dec : decList) {
-                guessList.add(dec.guessType());
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.ENUM_NAME, psiFile, mNamespace, mKey, true);
+            for (PsiElement dec : decList) {
+                guessList.add(((ALittleEnumNameDec)dec).guessType());
             }
         }
 
@@ -79,20 +84,23 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
 
         List<ResolveResult> results = new ArrayList<>();
         {
-            List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, mNamespace, mKey);
-            for (ALittleClassNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.CLASS_NAME, psiFile, mNamespace, mKey, true);
+            for (PsiElement dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
         }
         {
-            List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, psiFile, mNamespace, mKey);
-            for (ALittleStructNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.STRUCT_NAME, psiFile, mNamespace, mKey, true);
+            for (PsiElement dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
         }
         {
-            List<ALittleEnumNameDec> decList = ALittleTreeChangeListener.findEnumNameDecList(project, psiFile, mNamespace, mKey);
-            for (ALittleEnumNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.STRUCT_NAME, psiFile, mNamespace, mKey, true);
+            for (PsiElement dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
         }
@@ -108,8 +116,9 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
 
         // 查找对应命名域下的类名
         {
-            List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, mNamespace, "");
-            for (ALittleClassNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.CLASS_NAME, psiFile, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.CLASS).
                         withTypeText(dec.getContainingFile().getName())
@@ -118,8 +127,9 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
         }
         // 结构体名
         {
-            List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, psiFile, mNamespace, "");
-            for (ALittleStructNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.STRUCT_NAME, psiFile, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.STRUCT).
                         withTypeText(dec.getContainingFile().getName())
@@ -128,8 +138,9 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
         }
         // 枚举名
         {
-            List<ALittleEnumNameDec> decList = ALittleTreeChangeListener.findEnumNameDecList(project, psiFile, mNamespace, "");
-            for (ALittleEnumNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.ENUM_NAME, psiFile, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.ENUM).
                         withTypeText(dec.getContainingFile().getName())
@@ -138,8 +149,9 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
         }
         // 查找全局函数
         {
-            List<ALittleMethodNameDec> decList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, psiFile, mNamespace, "");
-            for (ALittleMethodNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.GLOBAL_METHOD, psiFile, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).
                         withTypeText(dec.getContainingFile().getName())

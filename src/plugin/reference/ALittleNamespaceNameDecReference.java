@@ -7,7 +7,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.component.ALittleIcons;
-import plugin.ALittleTreeChangeListener;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleNamespaceDec;
 import plugin.psi.ALittleNamespaceNameDec;
 

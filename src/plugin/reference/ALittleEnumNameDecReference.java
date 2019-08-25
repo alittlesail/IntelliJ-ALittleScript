@@ -6,8 +6,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
-import plugin.ALittleTreeChangeListener;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -27,9 +29,10 @@ public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNam
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        final List<ALittleEnumNameDec> decList = ALittleTreeChangeListener.findEnumNameDecList(project, myElement.getContainingFile(), mNamespace, mKey);
+        final List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                PsiHelper.PsiElementType.ENUM_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
         List<ResolveResult> results = new ArrayList<>();
-        for (ALittleEnumNameDec dec : decList) {
+        for (PsiElement dec : decList) {
             results.add(new PsiElementResolveResult(dec));
         }
         return results.toArray(new ResolveResult[results.size()]);
@@ -39,9 +42,10 @@ public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNam
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        List<ALittleEnumNameDec> decList = ALittleTreeChangeListener.findEnumNameDecList(project, myElement.getContainingFile(), mNamespace, "");
+        final List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                PsiHelper.PsiElementType.ENUM_NAME, myElement.getContainingFile(), mNamespace, "", true);
         List<LookupElement> variants = new ArrayList<>();
-        for (ALittleEnumNameDec dec : decList) {
+        for (PsiElement dec : decList) {
             variants.add(LookupElementBuilder.create(dec.getText()).
                     withIcon(ALittleIcons.ENUM).
                     withTypeText(dec.getContainingFile().getName())

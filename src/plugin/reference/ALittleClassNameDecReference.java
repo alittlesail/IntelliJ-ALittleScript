@@ -9,8 +9,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
-import plugin.ALittleTreeChangeListener;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleClassDec;
 import plugin.psi.ALittleClassExtendsDec;
 import plugin.psi.ALittleClassNameDec;
@@ -43,10 +45,11 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
             guessList.add(((ALittleClassDec)parent).guessType());
         // 如果是继承那么就从继承那边获取
         } else if (parent instanceof ALittleClassExtendsDec) {
-            List<ALittleClassNameDec> classNameDecList = ALittleTreeChangeListener.findClassNameDecList(myElement.getProject(), myElement.getContainingFile(), mNamespace, mKey);
+            List<PsiElement> classNameDecList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
+                    PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
             if (classNameDecList.isEmpty()) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "找不到类, namespace:" + mNamespace + ", key:" + mKey);
-            for (ALittleClassNameDec classNameDec : classNameDecList) {
-                guessList.add(classNameDec.guessType());
+            for (PsiElement classNameDec : classNameDecList) {
+                guessList.add(((ALittleClassNameDec)classNameDec).guessType());
             }
         } else {
             throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleClassNameDec出现未知的父节点");
@@ -58,10 +61,10 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        Project project = myElement.getProject();
-        final List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, myElement.getContainingFile(), mNamespace, mKey);
+        List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
+                PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
         List<ResolveResult> results = new ArrayList<>();
-        for (ALittleClassNameDec dec : decList) {
+        for (PsiElement dec : decList) {
             results.add(new PsiElementResolveResult(dec));
         }
         return results.toArray(new ResolveResult[results.size()]);
@@ -71,9 +74,10 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, myElement.getContainingFile(), mNamespace, "");
+        List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
+                PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile(), mNamespace, "", true);
         List<LookupElement> variants = new ArrayList<>();
-        for (ALittleClassNameDec dec : decList) {
+        for (PsiElement dec : decList) {
             variants.add(LookupElementBuilder.create(dec.getText()).
                     withIcon(ALittleIcons.CLASS).
                     withTypeText(dec.getContainingFile().getName())

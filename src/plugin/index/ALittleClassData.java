@@ -1,80 +1,124 @@
 package plugin.index;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiTreeChangeEvent;
-import com.intellij.util.PathUtil;
-import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
 import plugin.alittle.PsiHelper;
-import plugin.component.StdLibraryProvider;
 import plugin.psi.*;
-import plugin.reference.ALittleReferenceUtil;
 
-import java.io.File;
 import java.util.*;
 
 public class ALittleClassData {
-    private ALittleClassMemberData privateData;
-    private ALittleClassMemberData protectedData;
-    private ALittleClassMemberData publicData;
+    private Map<PsiHelper.ClassAccessType, Map<PsiHelper.ClassAttrType, Map<String, PsiElement>>> dataMap;
 
     public ALittleClassData() {
-        privateData = new ALittleClassMemberData();
-        protectedData = new ALittleClassMemberData();
-        publicData = new ALittleClassMemberData();
+        dataMap = new HashMap<>();
     }
 
-    public void addClassVarDec(@NotNull ALittleClassVarDec dec) {
-        PsiElement nameDec = dec.getIdContent();
-        if (nameDec == null) return;
-        PsiHelper.ClassAccessType accessType = PsiHelper.calcAccess(dec.getAccessModifier());
-        if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
-            privateData.addClassVarDec(nameDec.getText(), dec);
-        } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
-            protectedData.addClassVarDec(nameDec.getText(), dec);
-        } else {
-            publicData.addClassVarDec(nameDec.getText(), dec);
-        }
-    }
-
-    public void addClassMethodNameDec(@NotNull ALittleMethodNameDec dec) {
-        PsiElement parent = dec.getParent();
-
+    public void addALittleClassChildDec(@NotNull PsiElement dec) {
         PsiHelper.ClassAccessType accessType;
-        PsiHelper.ClassMethodType methodType;
-        if (parent instanceof ALittleClassMethodDec) {
-            ALittleClassMethodDec methodDec = (ALittleClassMethodDec)parent;
-            accessType = PsiHelper.calcAccess(methodDec.getAccessModifier());
-            methodType = PsiHelper.ClassMethodType.FUN;
-        } else if (parent instanceof ALittleClassGetterDec) {
-            ALittleClassGetterDec methodDec = (ALittleClassGetterDec)parent;
-            accessType = PsiHelper.calcAccess(methodDec.getAccessModifier());
-            methodType = PsiHelper.ClassMethodType.GETTER;
-        } else if (parent instanceof ALittleClassSetterDec) {
-            ALittleClassSetterDec methodDec = (ALittleClassSetterDec)parent;
-            accessType = PsiHelper.calcAccess(methodDec.getAccessModifier());
-            methodType = PsiHelper.ClassMethodType.SETTER;
-        } else if (parent instanceof ALittleClassStaticDec) {
-            ALittleClassStaticDec methodDec = (ALittleClassStaticDec)parent;
-            accessType = PsiHelper.calcAccess(methodDec.getAccessModifier());
-            methodType = PsiHelper.ClassMethodType.STATIC;
+        PsiHelper.ClassAttrType attrType;
+        String name;
+        if (dec instanceof ALittleClassVarDec) {
+            ALittleClassVarDec varDec = (ALittleClassVarDec) dec;
+            PsiElement nameDec = varDec.getIdContent();
+            if (nameDec == null) return;
+            name = nameDec.getText();
+            accessType = PsiHelper.calcAccessType(varDec.getAccessModifier());
+            attrType = PsiHelper.ClassAttrType.VAR;
+        } else if (dec instanceof ALittleClassMethodDec) {
+            ALittleClassMethodDec methodDec = (ALittleClassMethodDec)dec;
+            ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
+            if (nameDec == null) return;
+            dec = nameDec;
+            name = nameDec.getText();
+            accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
+            attrType = PsiHelper.ClassAttrType.FUN;
+        } else if (dec instanceof ALittleClassGetterDec) {
+            ALittleClassGetterDec methodDec = (ALittleClassGetterDec)dec;
+            ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
+            if (nameDec == null) return;
+            dec = nameDec;
+            name = nameDec.getText();
+            accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
+            attrType = PsiHelper.ClassAttrType.GETTER;
+        } else if (dec instanceof ALittleClassSetterDec) {
+            ALittleClassSetterDec methodDec = (ALittleClassSetterDec)dec;
+            ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
+            if (nameDec == null) return;
+            dec = nameDec;
+            name = nameDec.getText();
+            accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
+            attrType = PsiHelper.ClassAttrType.SETTER;
+        } else if (dec instanceof ALittleClassStaticDec) {
+            ALittleClassStaticDec methodDec = (ALittleClassStaticDec)dec;
+            ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
+            if (nameDec == null) return;
+            dec = nameDec;
+            name = nameDec.getText();
+            accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
+            attrType = PsiHelper.ClassAttrType.STATIC;
         } else {
             return;
         }
 
-        if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
-            privateData.addMethodNameDec(methodType, dec.getText(), dec);
-        } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
-            protectedData.addMethodNameDec(methodType, dec.getText(), dec);
-        } else {
-            publicData.addMethodNameDec(methodType, dec.getText(), dec);
+        Map<PsiHelper.ClassAttrType, Map<String, PsiElement>> map = dataMap.get(accessType);
+        if (map == null) {
+            map = new HashMap<>();
+            dataMap.put(accessType, map);
+        }
+        Map<String, PsiElement> elementMap = map.get(attrType);
+        if (elementMap == null) {
+            elementMap = new HashMap<>();
+            map.put(attrType, elementMap);
+        }
+        elementMap.put(name, dec);
+    }
+
+    private Map<String, PsiElement> getElementMap(PsiHelper.ClassAttrType attrType, PsiHelper.ClassAccessType accessType) {
+        Map<PsiHelper.ClassAttrType, Map<String, PsiElement>> map = dataMap.get(accessType);
+        if (map == null) return null;
+        return map.get(attrType);
+    }
+
+    public void findClassAttrList(@NotNull ALittleClassDec classDec,
+                                  int accessLevel,
+                                  PsiHelper.ClassAttrType type,
+                                  String name,
+                                  @NotNull List<PsiElement> result) {
+        if (accessLevel >= PsiHelper.sAccessOnlyPublic) {
+            Map<String, PsiElement> map = getElementMap(type, PsiHelper.ClassAccessType.PUBLIC);
+            if (map != null) {
+                if (name.isEmpty()) {
+                    result.addAll(map.values());
+                } else {
+                    PsiElement dec = map.get(name);
+                    if (dec != null) result.add(dec);
+                }
+            }
+        }
+
+        if (accessLevel >= PsiHelper.sAccessProtectedAndPublic) {
+            Map<String, PsiElement> map = getElementMap(type, PsiHelper.ClassAccessType.PROTECTED);
+            if (map != null) {
+                if (name.isEmpty()) {
+                    result.addAll(map.values());
+                } else {
+                    PsiElement dec = map.get(name);
+                    if (dec != null) result.add(dec);
+                }
+            }
+        }
+
+        if (accessLevel >= PsiHelper.sAccessPrivateAndProtectedAndPublic) {
+            Map<String, PsiElement> map = getElementMap(type, PsiHelper.ClassAccessType.PRIVATE);
+            if (map != null) {
+                if (name.isEmpty()) {
+                    result.addAll(map.values());
+                } else {
+                    PsiElement dec = map.get(name);
+                    if (dec != null) result.add(dec);
+                }
+            }
         }
     }
 }

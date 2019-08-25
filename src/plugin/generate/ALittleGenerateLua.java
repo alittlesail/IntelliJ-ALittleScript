@@ -10,7 +10,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
+import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
 import plugin.alittle.FileHelper;
 import plugin.psi.*;
@@ -83,7 +83,7 @@ public class ALittleGenerateLua {
         List<String> mEnumList = new ArrayList<>();
         List<String> mClassList = new ArrayList<>();
 
-        ALittleNamespaceDec namespaceDec = ALittleUtil.getNamespaceDec(alittleFile);
+        ALittleNamespaceDec namespaceDec = PsiHelper.getNamespaceDec(alittleFile);
         if (namespaceDec == null) throw new Exception("没有定义命名域 namespace");
 
         // 如果命名域有register标记，那么就不需要生成
@@ -113,7 +113,7 @@ public class ALittleGenerateLua {
         List<ALittleValueStat> valueStatList = bindStat.getValueStatList();
 
         String content = "ALittle.Bind(";
-        if (ALittleUtil.getNamespaceName((ALittleFile)bindStat.getContainingFile()).equals("ALittle"))
+        if (PsiHelper.getNamespaceName(bindStat.getContainingFile()).equals("ALittle"))
             content = "Bind(";
         List<String> paramList = new ArrayList<>();
         for (ALittleValueStat valueStat : valueStatList) {
@@ -927,11 +927,10 @@ public class ALittleGenerateLua {
                             String attrName = dotId.getPropertyValueDotIdName().getText();
                             ALittleReferenceUtil.GuessTypeInfo thisGuessType = thisType.guessType();
                             if (thisGuessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-                                List<ALittleClassVarDec> varNameList = new ArrayList<>();
-                                ALittleUtil.findClassVarNameDecList(thisGuessType.element.getProject(), thisGuessType.element.getContainingFile()
-                                        , ALittleUtil.getNamespaceName((ALittleFile) thisGuessType.element.getContainingFile())
-                                        , (ALittleClassDec) thisGuessType.element
-                                        , ALittleUtil.sAccessPrivate
+                                List<PsiElement> varNameList = new ArrayList<>();
+                                PsiHelper.findClassAttrList((ALittleClassDec) thisGuessType.element
+                                        , PsiHelper.sAccessPrivateAndProtectedAndPublic
+                                        , PsiHelper.ClassAttrType.VAR
                                         , attrName
                                         , varNameList, 100);
                                 if (!varNameList.isEmpty()) {
@@ -1260,7 +1259,7 @@ public class ALittleGenerateLua {
         for (ALittleEnumVarDec varDec : varDecList) {
             if (varDec.getDigitContent() != null) {
                 String value = varDec.getDigitContent().getText();
-                if (!ALittleUtil.isInt(value)) {
+                if (!PsiHelper.isInt(value)) {
                     throw new Exception(varDec.getIdContent().getText() + "对应的枚举值必须是整数");
                 }
                 if (value.startsWith("0x"))

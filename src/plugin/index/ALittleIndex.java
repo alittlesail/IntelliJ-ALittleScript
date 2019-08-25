@@ -8,7 +8,7 @@ import com.intellij.psi.*;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
+import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
 import plugin.psi.*;
 import plugin.reference.ALittleReferenceUtil;
@@ -21,18 +21,17 @@ public class ALittleIndex {
     Project mProject;
 
     // 保存关键的元素对象，用于快速语法树解析
-    private Map<PsiFile, Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>>> mGuessTypeMap;
-    private Map<PsiFile, Map<ALittleClassDec, ALittleClassData>> mClassDataMap;
+    protected Map<PsiFile, Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>>> mGuessTypeMap;
+    protected Map<PsiFile, Map<ALittleClassDec, ALittleClassData>> mClassDataMap;
+    protected Map<PsiFile, Map<ALittleStructDec, ALittleStructData>> mStructDataMap;
+    protected Map<PsiFile, Map<ALittleEnumDec, ALittleEnumData>> mEnumDataMap;
 
-    // key是命名域名称，value是这个命名域下所有的内容，这里的数据是最全的
-    private Map<String, Map<ALittleNamespaceNameDec, ALittleAccessData>> mAllDataMap;
-
-    // 全局可访问，key是命名域
-    private Map<String, ALittleAccessData> mGlobalAccessMap;
-    // 某个命名域下可访问，key是命名域
-    private Map<String, ALittleAccessData> mNamespaceAccessMap;
-    // 某个文件下可访问
-    private Map<PsiFile, ALittleAccessData> mFileAccessMap;
+    // 按命名域来划分
+    protected Map<String, Map<ALittleNamespaceNameDec, ALittleAccessData>> mAllDataMap;
+    // 根据开放权限来划分
+    protected Map<String, ALittleAccessData> mGlobalAccessMap;
+    protected Map<String, ALittleAccessData> mNamespaceAccessMap;
+    protected Map<PsiFile, ALittleAccessData> mFileAccessMap;
 
     // 已加载的文件列表
     boolean mReloading = false;         // 是否正在加载
@@ -45,8 +44,11 @@ public class ALittleIndex {
         mGlobalAccessMap = new HashMap<>();
         mNamespaceAccessMap = new HashMap<>();
         mFileAccessMap = new HashMap<>();
+
         mGuessTypeMap = new HashMap<>();
         mClassDataMap = new HashMap<>();
+        mStructDataMap = new HashMap<>();
+        mEnumDataMap = new HashMap<>();
     }
 
     private void loadDir(PsiManager psi_mgr, VirtualFile root) {
@@ -71,10 +73,18 @@ public class ALittleIndex {
                     ALittleNamespaceNameDec namespaceNameDec = namespaceDec.getNamespaceNameDec();
                     if (namespaceNameDec == null) continue;
 
-                    addNamespaceName(namespaceNameDec.getText(), namespaceNameDec);
+                    addNamespaceName(namespaceNameDec);
                 }
             }
         }
+    }
+
+    public boolean isLoaded() {
+        return mReloaded;
+    }
+
+    public boolean isLoading() {
+        return mReloading;
     }
 
     public void reload() {
@@ -82,8 +92,11 @@ public class ALittleIndex {
         mGlobalAccessMap = new HashMap<>();
         mNamespaceAccessMap = new HashMap<>();
         mFileAccessMap = new HashMap<>();
+
         mGuessTypeMap = new HashMap<>();
         mClassDataMap = new HashMap<>();
+        mStructDataMap = new HashMap<>();
+        mEnumDataMap = new HashMap<>();
 
         mReloading = true;
 
@@ -112,117 +125,114 @@ public class ALittleIndex {
         }
 
         mReloading = false;
-
-        if (!mReloaded)
-            PsiManager.getInstance(mProject).addPsiTreeChangeListener(this);
         mReloaded = true;
     }
 
+    public void refresh() {
+        if (mIsRefreshed) return;
+        mIsRefreshed = true;
+        reload();
+    }
+
     private void addClassData(@NotNull ALittleClassDec classDec) {
-        Map<ALittleClassDec, ClassData> map = mClassDataMap.get(classDec.getContainingFile());
+        Map<ALittleClassDec, ALittleClassData> map = mClassDataMap.get(classDec.getContainingFile());
         if (map == null) {
             map = new HashMap<>();
             mClassDataMap.put(classDec.getContainingFile(), map);
         }
-        ClassData classData = new ClassData();
+        ALittleClassData classData = new ALittleClassData();
         map.put(classDec, classData);
 
-        for(PsiElement child = classDec.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child instanceof ALittleClassVarDec) {
-                ALittleClassVarDec dec = (ALittleClassVarDec)child;
-                PsiElement nameDec = dec.getIdContent();
-                if (nameDec == null) continue;
-                int accessLevel = ALittleUtil.calcAccess(dec.getAccessModifier());
-                if (accessLevel == ALittleUtil.sAccessPrivate) {
-                    classData.privateData.varMap.put(nameDec.getText(), dec);
-                } else if (accessLevel == ALittleUtil.sAccessProtected) {
-                    classData.protectedData.varMap.put(nameDec.getText(), dec);
-                } else {
-                    classData.publicData.varMap.put(nameDec.getText(), dec);
-                }
-            } else if (child instanceof ALittleClassMethodDec) {
-                ALittleClassMethodDec dec = (ALittleClassMethodDec)child;
-                ALittleMethodNameDec nameDec = dec.getMethodNameDec();
-                if (nameDec == null) continue;
-                int accessLevel = ALittleUtil.calcAccess(dec.getAccessModifier());
-                if (accessLevel == ALittleUtil.sAccessPrivate) {
-                    classData.privateData.funMap.put(nameDec.getText(), nameDec);
-                } else if (accessLevel == ALittleUtil.sAccessProtected) {
-                    classData.protectedData.funMap.put(nameDec.getText(), nameDec);
-                } else {
-                    classData.publicData.funMap.put(nameDec.getText(), nameDec);
-                }
-            } else if (child instanceof ALittleClassGetterDec) {
-                ALittleClassGetterDec dec = (ALittleClassGetterDec)child;
-                ALittleMethodNameDec nameDec = dec.getMethodNameDec();
-                if (nameDec == null) continue;
-                int accessLevel = ALittleUtil.calcAccess(dec.getAccessModifier());
-                if (accessLevel == ALittleUtil.sAccessPrivate) {
-                    classData.privateData.getterMap.put(nameDec.getText(), nameDec);
-                } else if (accessLevel == ALittleUtil.sAccessProtected) {
-                    classData.protectedData.getterMap.put(nameDec.getText(), nameDec);
-                } else {
-                    classData.publicData.getterMap.put(nameDec.getText(), nameDec);
-                }
-            } else if (child instanceof ALittleClassSetterDec) {
-                ALittleClassSetterDec dec = (ALittleClassSetterDec)child;
-                ALittleMethodNameDec nameDec = dec.getMethodNameDec();
-                if (nameDec == null) continue;
-                int accessLevel = ALittleUtil.calcAccess(dec.getAccessModifier());
-                if (accessLevel == ALittleUtil.sAccessPrivate) {
-                    classData.privateData.setterMap.put(nameDec.getText(), nameDec);
-                } else if (accessLevel == ALittleUtil.sAccessProtected) {
-                    classData.protectedData.setterMap.put(nameDec.getText(), nameDec);
-                } else {
-                    classData.publicData.setterMap.put(nameDec.getText(), nameDec);
-                }
-            } else if (child instanceof ALittleClassStaticDec) {
-                ALittleClassStaticDec dec = (ALittleClassStaticDec)child;
-                ALittleMethodNameDec nameDec = dec.getMethodNameDec();
-                if (nameDec == null) continue;
-                int accessLevel = ALittleUtil.calcAccess(dec.getAccessModifier());
-                if (accessLevel == ALittleUtil.sAccessPrivate) {
-                    classData.privateData.staticMap.put(nameDec.getText(), nameDec);
-                } else if (accessLevel == ALittleUtil.sAccessProtected) {
-                    classData.protectedData.staticMap.put(nameDec.getText(), nameDec);
-                } else {
-                    classData.publicData.staticMap.put(nameDec.getText(), nameDec);
-                }
+        for (PsiElement child = classDec.getFirstChild(); child != null; child = child.getNextSibling()) {
+            classData.addALittleClassChildDec(child);
+        }
+    }
+
+    public ALittleClassData getClassData(@NotNull ALittleClassDec dec) {
+        Map<ALittleClassDec, ALittleClassData> map = mClassDataMap.get(dec.getContainingFile());
+        if (map == null) return null;
+        return map.get(dec);
+    }
+
+    private void addStructData(@NotNull ALittleStructDec structDec) {
+        Map<ALittleStructDec, ALittleStructData> map = mStructDataMap.get(structDec.getContainingFile());
+        if (map == null) {
+            map = new HashMap<>();
+            mStructDataMap.put(structDec.getContainingFile(), map);
+        }
+        ALittleStructData structData = new ALittleStructData();
+        map.put(structDec, structData);
+
+        for (PsiElement child = structDec.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof ALittleStructVarDec) {
+                structData.addVarDec((ALittleStructVarDec)child);
             }
         }
     }
 
-    private void addNamespaceName(String name, ALittleNamespaceNameDec element) {
-        // 清除标记
-        mGuessTypeMap.remove(element.getContainingFile());
-        // 处理mNamespaceMap
-        Map<ALittleNamespaceNameDec, Data> map = mAllDataMap.get(name);
+    public ALittleStructData getStructData(@NotNull ALittleStructDec dec) {
+        Map<ALittleStructDec, ALittleStructData> map = mStructDataMap.get(dec.getContainingFile());
+        if (map == null) return null;
+        return map.get(dec);
+    }
+
+    private void addEnumData(@NotNull ALittleEnumDec enumDec) {
+        Map<ALittleEnumDec, ALittleEnumData> map = mEnumDataMap.get(enumDec.getContainingFile());
         if (map == null) {
             map = new HashMap<>();
-            mAllDataMap.put(name, map);
+            mEnumDataMap.put(enumDec.getContainingFile(), map);
         }
-        Data allData = new Data();
-        map.put(element, allData);
+        ALittleEnumData enumData = new ALittleEnumData();
+        map.put(enumDec, enumData);
 
-        // 处理mGlobalAccessMap
-        Data globalData = mGlobalAccessMap.get(name);
-        if (globalData == null) {
-            globalData = new Data();
-            mGlobalAccessMap.put(name, globalData);
+        for (PsiElement child = enumDec.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof ALittleEnumVarDec) {
+                enumData.addVarDec((ALittleEnumVarDec)child);
+            }
+        }
+    }
+
+    public ALittleEnumData getEnumData(@NotNull ALittleEnumDec dec) {
+        Map<ALittleEnumDec, ALittleEnumData> map = mEnumDataMap.get(dec.getContainingFile());
+        if (map == null) return null;
+        return map.get(dec);
+    }
+
+    protected void addNamespaceName(@NotNull ALittleNamespaceNameDec element) {
+        // 清除标记
+        mGuessTypeMap.remove(element.getContainingFile());
+        mClassDataMap.remove(element.getContainingFile());
+        mStructDataMap.remove(element.getContainingFile());
+        mEnumDataMap.remove(element.getContainingFile());
+
+        String namespaceName = element.getText();
+
+        // 处理mNamespaceMap
+        Map<ALittleNamespaceNameDec, ALittleAccessData> allDataMap = mAllDataMap.get(namespaceName);
+        if (allDataMap == null) {
+            allDataMap = new HashMap<>();
+            mAllDataMap.put(namespaceName, allDataMap);
         }
 
-        // 处理mNamespaceAccessMap
-        Data namespaceData = mNamespaceAccessMap.get(name);
-        if (namespaceData == null) {
-            namespaceData = new Data();
-            mNamespaceAccessMap.put(name, namespaceData);
+        ALittleAccessData allAccessData = new ALittleAccessData();
+        allDataMap.put(element, allAccessData);
+
+        ALittleAccessData globalAccessData = mGlobalAccessMap.get(namespaceName);
+        if (globalAccessData == null) {
+            globalAccessData = new ALittleAccessData();
+            mGlobalAccessMap.put(namespaceName, globalAccessData);
         }
 
-        // 处理mFileAccessMap
-        Data psiFileData = mFileAccessMap.get(element.getContainingFile());
-        if (psiFileData == null) {
-            psiFileData = new Data();
-            mFileAccessMap.put(element.getContainingFile(), psiFileData);
+        ALittleAccessData namespaceAccessData = mNamespaceAccessMap.get(namespaceName);
+        if (namespaceAccessData == null) {
+            namespaceAccessData = new ALittleAccessData();
+            mNamespaceAccessMap.put(namespaceName, namespaceAccessData);
+        }
+
+        ALittleAccessData fileAccessData = mFileAccessMap.get(element.getContainingFile());
+        if (fileAccessData == null) {
+            fileAccessData = new ALittleAccessData();
+            mFileAccessMap.put(element.getContainingFile(), fileAccessData);
         }
 
         ALittleNamespaceDec namespaceDec = (ALittleNamespaceDec)element.getParent();
@@ -233,233 +243,111 @@ public class ALittleIndex {
                 if (nameDec == null) continue;
 
                 addClassData(dec);
-                allData.addALittleClassNameDec(nameDec);
-
-                String access = "private";
-                if (dec.getAccessModifier() != null) {
-                    access = dec.getAccessModifier().getText();
-                }
-
-                if (access.equals("private")) {
-                    psiFileData.addALittleClassNameDec(nameDec);
-                } else if (access.equals("protected")) {
-                    namespaceData.addALittleClassNameDec(nameDec);
-                } else if (access.equals("public")) {
-                    globalData.addALittleClassNameDec(nameDec);
+                allAccessData.addALittleNameDec(nameDec);
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+                if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
+                    globalAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
+                    namespaceAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
+                    fileAccessData.addALittleNameDec(nameDec);
                 }
             } else if (child instanceof ALittleEnumDec) {
                 ALittleEnumDec dec = (ALittleEnumDec)child;
                 ALittleEnumNameDec nameDec = dec.getEnumNameDec();
                 if (nameDec == null) continue;
 
-                allData.addALittleEnumNameDec(nameDec);
-
-                String access = "private";
-                if (dec.getAccessModifier() != null) {
-                    access = dec.getAccessModifier().getText();
-                }
-
-                if (access.equals("private")) {
-                    psiFileData.addALittleEnumNameDec(nameDec);
-                } else if (access.equals("protected")) {
-                    namespaceData.addALittleEnumNameDec(nameDec);
-                } else if (access.equals("public")) {
-                    globalData.addALittleEnumNameDec(nameDec);
+                addEnumData(dec);
+                allAccessData.addALittleNameDec(nameDec);
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+                if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
+                    globalAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
+                    namespaceAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
+                    fileAccessData.addALittleNameDec(nameDec);
                 }
             } else if (child instanceof ALittleStructDec) {
                 ALittleStructDec dec = (ALittleStructDec)child;
                 ALittleStructNameDec nameDec = dec.getStructNameDec();
                 if (nameDec == null) continue;
 
-                allData.addALittleStructNameDec(nameDec);
-
-                String access = "private";
-                if (dec.getAccessModifier() != null) {
-                    access = dec.getAccessModifier().getText();
-                }
-
-                if (access.equals("private")) {
-                    psiFileData.addALittleStructNameDec(nameDec);
-                } else if (access.equals("protected")) {
-                    namespaceData.addALittleStructNameDec(nameDec);
-                } else if (access.equals("public")) {
-                    globalData.addALittleStructNameDec(nameDec);
+                addStructData(dec);
+                allAccessData.addALittleNameDec(nameDec);
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+                if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
+                    globalAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
+                    namespaceAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
+                    fileAccessData.addALittleNameDec(nameDec);
                 }
             } else if (child instanceof ALittleGlobalMethodDec) {
                 ALittleGlobalMethodDec dec = (ALittleGlobalMethodDec)child;
                 ALittleMethodNameDec nameDec = dec.getMethodNameDec();
                 if (nameDec == null) continue;
 
-                allData.addALittleGlobalMethodNameDec(nameDec);
-
-                String access = "private";
-                if (dec.getAccessModifier() != null) {
-                    access = dec.getAccessModifier().getText();
-                }
-
-                if (access.equals("private")) {
-                    psiFileData.addALittleGlobalMethodNameDec(nameDec);
-                } else if (access.equals("protected")) {
-                    namespaceData.addALittleGlobalMethodNameDec(nameDec);
-                } else if (access.equals("public")) {
-                    globalData.addALittleGlobalMethodNameDec(nameDec);
+                allAccessData.addALittleNameDec(nameDec);
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+                if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
+                    globalAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
+                    namespaceAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
+                    fileAccessData.addALittleNameDec(nameDec);
                 }
             } else if (child instanceof ALittleInstanceDec) {
                 ALittleInstanceDec dec = (ALittleInstanceDec) child;
-                String access = "private";
-                if (dec.getAccessModifier() != null) {
-                    access = dec.getAccessModifier().getText();
-                }
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
 
                 List<ALittleVarAssignDec> varAssignDecList = dec.getVarAssignExpr().getVarAssignDecList();
                 for (ALittleVarAssignDec varAssignDec : varAssignDecList) {
                     ALittleVarAssignNameDec nameDec = varAssignDec.getVarAssignNameDec();
 
-                    allData.addALittleInstanceNameDec(nameDec);
-                    if (access.equals("private")) {
-                        psiFileData.addALittleInstanceNameDec(nameDec);
-                    } else if (access.equals("protected")) {
-                        namespaceData.addALittleInstanceNameDec(nameDec);
-                    } else if (access.equals("public")) {
-                        globalData.addALittleInstanceNameDec(nameDec);
+                    allAccessData.addALittleNameDec(nameDec);
+                    if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
+                        globalAccessData.addALittleNameDec(nameDec);
+                    } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
+                        namespaceAccessData.addALittleNameDec(nameDec);
+                    } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
+                        fileAccessData.addALittleNameDec(nameDec);
                     }
                 }
             }
         }
     }
 
-    private void removeNamespaceName(String name, ALittleNamespaceNameDec element) {
+    protected void removeNamespaceName(ALittleNamespaceNameDec element) {
         // 清除标记
         mGuessTypeMap.remove(element.getContainingFile());
         mClassDataMap.remove(element.getContainingFile());
+        mStructDataMap.remove(element.getContainingFile());
+        mEnumDataMap.remove(element.getContainingFile());
 
-        Map<ALittleNamespaceNameDec, Data> map = mAllDataMap.get(name);
-        if (map == null) return;
+        String namespaceName = element.getText();
 
-        Data allData = map.get(element);
-        if (allData == null) return;
-        map.remove(element);
-        Data tmp;
+        Map<ALittleNamespaceNameDec, ALittleAccessData> allDataMap = mAllDataMap.get(namespaceName);
+        if (allDataMap == null) return;
+        ALittleAccessData allAccessData = allDataMap.get(element);
+        if (allAccessData == null) return;
 
-        for (Map.Entry<String, Set<ALittleClassNameDec>> entry : allData.classMap.entrySet()) {
-            for (ALittleClassNameDec nameDec : entry.getValue()) {
-                tmp = mFileAccessMap.get(element.getContainingFile());
-                if (tmp != null) tmp.removeALittleClassNameDec(nameDec);
-                tmp = mNamespaceAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleClassNameDec(nameDec);
-                tmp = mGlobalAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleClassNameDec(nameDec);
+        allDataMap.remove(element);
+        if (allDataMap.isEmpty()) {
+            mAllDataMap.remove(namespaceName);
+        }
+
+        ALittleAccessData globalAccessData = mGlobalAccessMap.get(namespaceName);
+        ALittleAccessData namespaceAccessData = mNamespaceAccessMap.get(namespaceName);
+        ALittleAccessData fileAccessData = mFileAccessMap.get(element.getContainingFile());
+
+        for (Map.Entry<PsiHelper.PsiElementType, Map<String, Set<PsiElement>>> entry : allAccessData.elementMap.entrySet()) {
+            for (Map.Entry<String, Set<PsiElement>> elementEntry : entry.getValue().entrySet()) {
+                for (PsiElement nameDec : elementEntry.getValue()) {
+                    if (globalAccessData != null) globalAccessData.removeALittleNameDec(nameDec);
+                    if (namespaceAccessData != null) namespaceAccessData.removeALittleNameDec(nameDec);
+                    if (fileAccessData != null) fileAccessData.removeALittleNameDec(nameDec);
+                }
             }
         }
-        for (Map.Entry<String, Set<ALittleEnumNameDec>> entry : allData.enumMap.entrySet()) {
-            for (ALittleEnumNameDec nameDec : entry .getValue()) {
-                tmp = mFileAccessMap.get(element.getContainingFile());
-                if (tmp != null) tmp.removeALittleEnumNameDec(nameDec);
-                tmp = mNamespaceAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleEnumNameDec(nameDec);
-                tmp = mGlobalAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleEnumNameDec(nameDec);
-            }
-        }
-        for (Map.Entry<String, Set<ALittleStructNameDec>> entry : allData.structMap.entrySet()) {
-            for (ALittleStructNameDec nameDec : entry .getValue()) {
-                tmp = mFileAccessMap.get(element.getContainingFile());
-                if (tmp != null) tmp.removeALittleStructNameDec(nameDec);
-                tmp = mNamespaceAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleStructNameDec(nameDec);
-                tmp = mGlobalAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleStructNameDec(nameDec);
-            }
-        }
-        for (Map.Entry<String, Set<ALittleMethodNameDec>> entry : allData.globalMethodMap.entrySet()) {
-            for (ALittleMethodNameDec nameDec : entry .getValue()) {
-                tmp = mFileAccessMap.get(element.getContainingFile());
-                if (tmp != null) tmp.removeALittleGlobalMethodNameDec(nameDec);
-                tmp = mNamespaceAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleGlobalMethodNameDec(nameDec);
-                tmp = mGlobalAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleGlobalMethodNameDec(nameDec);
-            }
-        }
-        for (Map.Entry<String, Set<ALittleVarAssignNameDec>> entry_instance : allData.instanceMap.entrySet()) {
-            for (ALittleVarAssignNameDec nameDec : entry_instance.getValue()) {
-                tmp = mFileAccessMap.get(element.getContainingFile());
-                if (tmp != null) tmp.removeALittleInstanceNameDec(nameDec);
-                tmp = mNamespaceAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleInstanceNameDec(nameDec);
-                tmp = mGlobalAccessMap.get(name);
-                if (tmp != null) tmp.removeALittleInstanceNameDec(nameDec);
-            }
-        }
-    }
-
-    public void beforeChildAddition(@NotNull PsiTreeChangeEvent var1)
-    {
-    }
-
-    public void beforeChildRemoval(@NotNull PsiTreeChangeEvent var1)
-    {
-    }
-
-    public void beforeChildReplacement(@NotNull PsiTreeChangeEvent var1)
-    {
-    }
-
-    public void beforeChildMovement(@NotNull PsiTreeChangeEvent var1)
-    {
-    }
-
-    public void beforeChildrenChange(@NotNull PsiTreeChangeEvent var1)
-    {
-        PsiFile file = var1.getFile();
-        if (!(file instanceof ALittleFile)) return;
-        ALittleFile alittleFile = (ALittleFile)file;
-
-        ALittleNamespaceDec namespaceDec = ALittleUtil.getNamespaceDec(alittleFile);
-        if (namespaceDec == null) return;
-
-        ALittleNamespaceNameDec namespaceNameDec = namespaceDec.getNamespaceNameDec();
-        if (namespaceNameDec == null) return;
-
-        removeNamespaceName(namespaceNameDec.getText(), namespaceNameDec);
-    }
-
-    public void beforePropertyChange(@NotNull PsiTreeChangeEvent var1)
-    {
-    }
-
-    public void childAdded(@NotNull PsiTreeChangeEvent var1)
-    {
-    }
-
-    public void childRemoved(@NotNull PsiTreeChangeEvent var1)
-    {
-    }
-
-    public void childReplaced(@NotNull PsiTreeChangeEvent var1)
-    {
-    }
-
-    public void childrenChanged(@NotNull PsiTreeChangeEvent var1)
-    {
-        PsiFile file = var1.getFile();
-        if (!(file instanceof ALittleFile)) return;
-        ALittleFile alittleFile = (ALittleFile)file;
-
-        ALittleNamespaceDec namespaceDec = ALittleUtil.getNamespaceDec(alittleFile);
-        if (namespaceDec == null) return;
-
-        ALittleNamespaceNameDec namespaceNameDec = namespaceDec.getNamespaceNameDec();
-        if (namespaceNameDec == null) return;
-
-        addNamespaceName(namespaceNameDec.getText(), namespaceNameDec);
-    }
-
-    public void childMoved(@NotNull PsiTreeChangeEvent var1)
-    {
-    }
-
-    public void propertyChanged(@NotNull PsiTreeChangeEvent var1)
-    {
     }
 }

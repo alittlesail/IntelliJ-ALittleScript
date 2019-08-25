@@ -6,9 +6,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
-import plugin.ALittleTreeChangeListener;
-import plugin.ALittleUtil;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import javax.swing.*;
@@ -244,26 +245,26 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         PsiFile psiFile = myElement.getContainingFile();
         if (!(parent.getParent() instanceof ALittleClassDec)) return;
         ALittleClassDec classDec = (ALittleClassDec)parent.getParent();
-        if (classDec.getClassExtendsDec() == null) return;
-        ALittleClassExtendsDec extendsDec = classDec.getClassExtendsDec();
-        if (extendsDec == null) return;
-        ALittleClassNameDec classNameDec = extendsDec.getClassNameDec();
-        if (classNameDec == null) return;
-        ALittleReferenceUtil.GuessTypeInfo extendsGuess = classNameDec.guessType();
+        // 计算父类
+        PsiHelper.ClassExtendsData classExtendsData = PsiHelper.findClassExtends(classDec);
+        if (classExtendsData == null) return;
 
-        ALittleMethodNameDec methodNameDec = null;
+        PsiHelper.ClassAttrType attrType;
         if (parent instanceof ALittleClassMethodDec) {
-            methodNameDec = ALittleUtil.findFirstFunDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
+            attrType = PsiHelper.ClassAttrType.FUN;
         } else if (parent instanceof ALittleClassStaticDec) {
-            methodNameDec = ALittleUtil.findFirstStaticDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
-
+            attrType = PsiHelper.ClassAttrType.STATIC;
         } else if (parent instanceof ALittleClassGetterDec) {
-            methodNameDec = ALittleUtil.findFirstGetterDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
-
+            attrType = PsiHelper.ClassAttrType.GETTER;
         } else if (parent instanceof ALittleClassSetterDec) {
-            methodNameDec = ALittleUtil.findFirstSetterDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
+            attrType = PsiHelper.ClassAttrType.SETTER;
+        } else {
+            return;
         }
-        if (methodNameDec == null) return;
+
+        PsiElement result = PsiHelper.findFirstClassAttrFromExtends(classExtendsData.dec, attrType, mKey, 100);
+        if (!(result instanceof ALittleMethodNameDec)) return;
+        ALittleMethodNameDec methodNameDec = (ALittleMethodNameDec)result;
 
         ALittleReferenceUtil.GuessTypeInfo myGuessTypeInfo = guessTypes().get(0);
         if (myGuessTypeInfo == null) return;
@@ -286,13 +287,20 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         if (methodDec.getParent() instanceof ALittleClassDec) {
             ALittleClassDec classDec = (ALittleClassDec) methodDec.getParent();
 
-            List<ALittleMethodNameDec> decList = new ArrayList<>();
-            List<Icon> iconList = new ArrayList<>();
-            ALittleUtil.findMethodNameDecList(project, psiFile, mNamespace, classDec, "", decList, iconList, 100);
+            List<PsiElement> decList = new ArrayList<>();
+            PsiHelper.findClassMethodNameDecList(classDec, PsiHelper.sAccessPrivateAndProtectedAndPublic, "", decList, 100);
             for (int i = 0; i < decList.size(); ++i) {
-                ALittleMethodNameDec dec = decList.get(i);
+                PsiElement dec = decList.get(i);
                 Icon icon = null;
-                if (i < iconList.size()) icon = iconList.get(i);
+                if (dec.getParent() instanceof ALittleClassMethodDec) {
+                    icon = ALittleIcons.MEMBER_METHOD;
+                } else if (dec.getParent() instanceof ALittleClassSetterDec) {
+                    icon = ALittleIcons.SETTER_METHOD;
+                } else if (dec.getParent() instanceof ALittleClassGetterDec) {
+                    icon = ALittleIcons.GETTER_METHOD;
+                } else if (dec.getParent() instanceof ALittleClassStaticDec) {
+                    icon = ALittleIcons.STATIC_METHOD;
+                }
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(icon).
                         withTypeText(dec.getContainingFile().getName())
@@ -300,8 +308,8 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             }
         // 全局函数
         } else if (methodDec.getParent() instanceof ALittleNamespaceDec) {
-            List<ALittleMethodNameDec> decList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, psiFile, mNamespace, "");
-            for (ALittleMethodNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project, PsiHelper.PsiElementType.GLOBAL_METHOD, psiFile, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).
                         withTypeText(dec.getContainingFile().getName())

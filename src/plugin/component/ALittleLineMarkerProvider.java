@@ -7,7 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
+import plugin.alittle.PsiHelper;
+import plugin.index.ALittleClassData;
 import plugin.psi.*;
 import plugin.reference.ALittleReferenceUtil;
 
@@ -17,46 +18,42 @@ public class ALittleLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element,
                                             Collection<? super RelatedItemLineMarkerInfo> result) {
-        try {
-            if (element instanceof ALittleMethodNameDec) {
-                ALittleMethodNameDec myElement = (ALittleMethodNameDec) element;
-                String mNamespace = ALittleUtil.getNamespaceName((ALittleFile)myElement.getContainingFile());
-                String mKey = myElement.getText();
+        if (element instanceof ALittleMethodNameDec) {
+            ALittleMethodNameDec myElement = (ALittleMethodNameDec) element;
+            // 获取命名域名
+            String mNamespace = PsiHelper.getNamespaceName(myElement.getContainingFile());
+            // 获取函数名
+            String mKey = myElement.getText();
 
-                PsiElement parent = myElement.getParent();
-                Project project = myElement.getProject();
-                PsiFile psiFile = myElement.getContainingFile();
-                if (!(parent.getParent() instanceof ALittleClassDec)) return;
-                ALittleClassDec classDec = (ALittleClassDec) parent.getParent();
-                if (classDec.getClassExtendsDec() == null) return;
-                ALittleClassExtendsDec extendsDec = classDec.getClassExtendsDec();
-                if (extendsDec == null) return;
-                ALittleClassNameDec classNameDec = extendsDec.getClassNameDec();
-                if (classNameDec == null) return;
-                ALittleReferenceUtil.GuessTypeInfo extendsGuess = classNameDec.guessType();
+            PsiElement parent = myElement.getParent();
+            // 必须是类的函数
+            if (!(parent.getParent() instanceof ALittleClassDec)) return;
+            ALittleClassDec classDec = (ALittleClassDec) parent.getParent();
+            // 计算父类
+            PsiHelper.ClassExtendsData classExtendsData = PsiHelper.findClassExtends(classDec);
+            if (classExtendsData == null) return;
 
-                ALittleMethodNameDec methodNameDec = null;
-                if (parent instanceof ALittleClassMethodDec) {
-                    methodNameDec = ALittleUtil.findFirstFunDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
-                } else if (parent instanceof ALittleClassStaticDec) {
-                    methodNameDec = ALittleUtil.findFirstStaticDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
-
-                } else if (parent instanceof ALittleClassGetterDec) {
-                    methodNameDec = ALittleUtil.findFirstGetterDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
-
-                } else if (parent instanceof ALittleClassSetterDec) {
-                    methodNameDec = ALittleUtil.findFirstSetterDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, mKey, 100);
-                }
-                if (methodNameDec != null) {
-                    NavigationGutterIconBuilder<PsiElement> builder =
-                            NavigationGutterIconBuilder.create(ALittleIcons.OVERRIDE).
-                                    setTargets(methodNameDec).
-                                    setTooltipText("override");
-                    result.add(builder.createLineMarkerInfo(myElement.getIdContent()));
-                }
+            PsiHelper.ClassAttrType attrType;
+            if (parent instanceof ALittleClassMethodDec) {
+                attrType = PsiHelper.ClassAttrType.FUN;
+            } else if (parent instanceof ALittleClassStaticDec) {
+                attrType = PsiHelper.ClassAttrType.STATIC;
+            } else if (parent instanceof ALittleClassGetterDec) {
+                attrType = PsiHelper.ClassAttrType.GETTER;
+            } else if (parent instanceof ALittleClassSetterDec) {
+                attrType = PsiHelper.ClassAttrType.SETTER;
+            } else {
+                return;
             }
-        } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
 
+            PsiElement methodNameDec = PsiHelper.findFirstClassAttrFromExtends(classExtendsData.dec, attrType, mKey, 100);
+            if (methodNameDec != null) {
+                NavigationGutterIconBuilder<PsiElement> builder =
+                        NavigationGutterIconBuilder.create(ALittleIcons.OVERRIDE).
+                                setTargets(methodNameDec).
+                                setTooltipText("override");
+                result.add(builder.createLineMarkerInfo(myElement.getIdContent()));
+            }
         }
     }
 }

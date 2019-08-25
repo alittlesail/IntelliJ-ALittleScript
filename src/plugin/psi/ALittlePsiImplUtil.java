@@ -2,7 +2,8 @@ package plugin.psi;
 
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleTreeChangeListener;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.reference.*;
 
 import java.util.List;

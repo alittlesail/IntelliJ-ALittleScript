@@ -7,23 +7,25 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
-import plugin.ALittleTreeChangeListener;
-import plugin.ALittleUtil;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALittlePropertyValueDotIdName> {
-    private List<ALittleMethodNameDec> mGetterList;
-    private List<ALittleMethodNameDec> mSetterList;
+    private List<PsiElement> mGetterList;
+    private List<PsiElement> mSetterList;
 
     public ALittlePropertyValueDotIdNameReference(@NotNull ALittlePropertyValueDotIdName element, TextRange textRange) {
         super(element, textRange);
@@ -156,54 +158,47 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             // 处理类的实例对象
             if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                 ALittleClassDec classDec = (ALittleClassDec)preType.element;
-                String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) classDec.getContainingFile());
-                List<ALittleClassVarDec> classVarDecList = new ArrayList<>();
 
                 // 计算当前元素所在的类
-                PsiElement classDecElement = myElement;
-                while (classDecElement != null) {
-                    if (classDecElement instanceof ALittleClassDec) {
-                        break;
-                    }
-                    classDecElement = classDecElement.getParent();
-                }
-                int accessLevel = ALittleUtil.sAccessPublic;
-                if (classDecElement != null) {
-                    accessLevel = ALittleUtil.calcAccessLevel(classDecElement, classDec, ALittleUtil.sAccessPrivate);
+                int accessLevel =  PsiHelper.sAccessOnlyPublic;
+                ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(myElement);
+                if (myClassDec != null) {
+                    accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, classDec);
                 }
 
                 // 所有成员变量
-                ALittleUtil.findClassVarNameDecList(project, psiFile, namespaceName, classDec, accessLevel, mKey, classVarDecList, 10);
-                for (ALittleClassVarDec classVarDec : classVarDecList) {
+                List<PsiElement> classVarDecList = new ArrayList<>();
+                PsiHelper.findClassAttrList(classDec,
+                        accessLevel, PsiHelper.ClassAttrType.VAR, mKey, classVarDecList, 100);
+                for (PsiElement classVarDec : classVarDecList) {
                     results.add(new PsiElementResolveResult(classVarDec));
                 }
 
-                List<ALittleMethodNameDec> classMethodNameDecList = new ArrayList<>();
+                List<PsiElement> classMethodNameDecList = new ArrayList<>();
                 // 在当前情况下，只有当前propertyValue在等号的左边，并且是最后一个属性才是setter，否则都是getter
                 if (nextSuffix == null && propertyValue.getParent() instanceof ALittleOpAssignExpr) {
                     mSetterList = new ArrayList<>();
-                    ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, accessLevel, mKey, mSetterList, 10);
+                    PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.SETTER, mKey, mSetterList, 100);
                     classMethodNameDecList.addAll(mSetterList);
                 } else {
                     mGetterList = new ArrayList<>();
-                    ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, accessLevel, mKey, mGetterList, 10);
+                    PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.GETTER, mKey, mGetterList, 100);
                     classMethodNameDecList.addAll(mGetterList);
                 }
                 // 所有成员函数
-                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
-                // 过滤掉重复的函数名
-                classMethodNameDecList = ALittleUtil.filterSameMethodName(classMethodNameDecList);
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.FUN, mKey, classMethodNameDecList, 100);
                 // 添加函数名元素
-                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                classMethodNameDecList = PsiHelper.filterSameName(classMethodNameDecList);
+                for (PsiElement classMethodNameDec : classMethodNameDecList) {
                     results.add(new PsiElementResolveResult(classMethodNameDec));
                 }
                 // 处理结构体的实例对象
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
                 ALittleStructDec structDec = (ALittleStructDec)preType.element;
-                String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) structDec.getContainingFile());
+                String namespaceName = PsiHelper.getNamespaceName(structDec.getContainingFile());
                 List<ALittleStructVarDec> structVarDecList = new ArrayList<>();
                 // 所有成员变量
-                ALittleUtil.findStructVarNameDecList(project, psiFile, namespaceName, structDec, mKey, structVarDecList, 10);
+                PsiHelper.findStructVarDecList(structDec, mKey, structVarDecList, 100);
                 for (ALittleStructVarDec structVarDec : structVarDecList) {
                     results.add(new PsiElementResolveResult(structVarDec));
                 }
@@ -212,52 +207,50 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleNamespaceNameDec namespaceNameDec = (ALittleNamespaceNameDec)preType.element;
                 String namespaceName = namespaceNameDec.getText();
                 // 所有枚举名
-                List<ALittleEnumNameDec> enumNameDecList = ALittleTreeChangeListener.findEnumNameDecList(project, psiFile, namespaceName, mKey);
-                for (ALittleEnumNameDec enumNameDec : enumNameDecList) {
+                List<PsiElement> enumNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.ENUM_NAME, psiFile, namespaceName, mKey, true);
+                for (PsiElement enumNameDec : enumNameDecList) {
                     results.add(new PsiElementResolveResult(enumNameDec));
                 }
                 // 所有全局函数
-                List<ALittleMethodNameDec> methodNameDecList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, psiFile, namespaceName, mKey);
-                for (ALittleMethodNameDec methodNameDec : methodNameDecList) {
+                List<PsiElement> methodNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.GLOBAL_METHOD, psiFile, namespaceName, mKey, true);
+                for (PsiElement methodNameDec : methodNameDecList) {
                     results.add(new PsiElementResolveResult(methodNameDec));
                 }
                 // 所有类名
-                List<ALittleClassNameDec> classNameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespaceName, mKey);
-                for (ALittleClassNameDec classNameDec : classNameDecList) {
+                List<PsiElement> classNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.CLASS_NAME, psiFile, namespaceName, mKey, true);
+                for (PsiElement classNameDec : classNameDecList) {
                     results.add(new PsiElementResolveResult(classNameDec));
                 }
                 // 所有结构体名
-                List<ALittleStructNameDec> structNameDecList = ALittleTreeChangeListener.findStructNameDecList(project, psiFile, namespaceName, mKey);
-                for (ALittleStructNameDec structNameDec : structNameDecList) {
+                List<PsiElement> structNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.STRUCT_NAME, psiFile, namespaceName, mKey, true);
+                for (PsiElement structNameDec : structNameDecList) {
                     results.add(new PsiElementResolveResult(structNameDec));
                 }
                 // 所有单例
-                List<ALittleVarAssignNameDec> instanceNameDecList = ALittleTreeChangeListener.findInstanceNameDecList(project, psiFile, namespaceName, mKey, false);
-                for (ALittleVarAssignNameDec instanceNameDec : instanceNameDecList) {
+                List<PsiElement> instanceNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.INSTANCE_NAME, psiFile, namespaceName, mKey, false);
+                for (PsiElement instanceNameDec : instanceNameDecList) {
                     results.add(new PsiElementResolveResult(instanceNameDec));
                 }
                 // 比如 AClassName.XXX
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS_NAME) {
                 ALittleClassNameDec classNameDec = (ALittleClassNameDec)preType.element;
                 ALittleClassDec classDec = (ALittleClassDec) classNameDec.getParent();
-                String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) classNameDec.getContainingFile());
 
                 // 计算当前元素所在的类
-                PsiElement classDecElement = myElement;
-                while (classDecElement != null) {
-                    if (classDecElement instanceof ALittleClassDec) {
-                        break;
-                    }
-                    classDecElement = classDecElement.getParent();
-                }
-                int accessLevel = ALittleUtil.sAccessPublic;
-                if (classDecElement != null) {
-                    accessLevel = ALittleUtil.calcAccessLevel(classDecElement, classDec, ALittleUtil.sAccessPrivate);
+                int accessLevel =  PsiHelper.sAccessOnlyPublic;
+                ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(myElement);
+                if (myClassDec != null) {
+                    accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, classDec);
                 }
 
                 // 所有静态函数
-                List<ALittleMethodNameDec> classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForStatic(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
+                List<PsiElement> classMethodNameDecList = new ArrayList<>();
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.STATIC, mKey, classMethodNameDecList, 100);
 
                 // 如果后面那个是MethodCall，并且有两个参数的是setter，是一个参数的是getter，否则两个都不是
                 if (nextSuffix != null) {
@@ -266,19 +259,18 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                         int paramCount = methodCallStat.getValueStatList().size();
                         if (paramCount == 1) {
                             // 所有getter
-                            ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
+                            PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.GETTER, mKey, classMethodNameDecList, 100);
                         } else if (paramCount == 2) {
                             // 所有setter
-                            ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
+                            PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.SETTER, mKey, classMethodNameDecList, 100);
                         }
                     }
                 }
 
                 // 所有成员函数
-                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, accessLevel, mKey, classMethodNameDecList, 10);
-                // 过滤掉重复的函数名
-                classMethodNameDecList = ALittleUtil.filterSameMethodName(classMethodNameDecList);
-                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.FUN, mKey, classMethodNameDecList, 100);
+                classMethodNameDecList = PsiHelper.filterSameName(classMethodNameDecList);
+                for (PsiElement classMethodNameDec : classMethodNameDecList) {
                     results.add(new PsiElementResolveResult(classMethodNameDec));
                 }
                 // 比如 AEnumName.XXX
@@ -287,7 +279,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleEnumNameDec enumNameDec = (ALittleEnumNameDec) preType.element;
                 ALittleEnumDec enumDec = (ALittleEnumDec) enumNameDec.getParent();
                 List<ALittleEnumVarDec> varDecList = new ArrayList<>();
-                ALittleUtil.findEnumVarNameDecList(enumDec, mKey, varDecList);
+                PsiHelper.findEnumVarDecList(enumDec, mKey, varDecList);
                 for (ALittleEnumVarDec varNameDec : varDecList) {
                     results.add(new PsiElementResolveResult(varNameDec));
                 }
@@ -324,41 +316,34 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 preType = suffixList.get(index - 1).guessType();
             }
 
-
             // 处理类的实例对象
             if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                 ALittleClassDec classDec = (ALittleClassDec) preType.element;
-                String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) classDec.getContainingFile());
 
                 // 计算当前元素所在的类
-                PsiElement classDecElement = myElement;
-                while (classDecElement != null) {
-                    if (classDecElement instanceof ALittleClassDec) {
-                        break;
-                    }
-                    classDecElement = classDecElement.getParent();
-                }
-                int accessLevel = ALittleUtil.sAccessPublic;
-                if (classDecElement != null) {
-                    accessLevel = ALittleUtil.calcAccessLevel(classDecElement, classDec, ALittleUtil.sAccessPrivate);
+                int accessLevel =  PsiHelper.sAccessOnlyPublic;
+                ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(myElement);
+                if (myClassDec != null) {
+                    accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, classDec);
                 }
 
-                List<ALittleClassVarDec> classVarDecList = new ArrayList<>();
+                List<PsiElement> classVarDecList = new ArrayList<>();
                 // 所有成员变量
-                ALittleUtil.findClassVarNameDecList(project, psiFile, namespaceName, classDec, accessLevel, "", classVarDecList, 10);
-                for (ALittleClassVarDec classVarNameDec : classVarDecList) {
-                    if (classVarNameDec.getIdContent() == null) continue;
-                    variants.add(LookupElementBuilder.create(classVarNameDec.getIdContent().getText()).
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.VAR, "", classVarDecList, 100);
+                for (PsiElement classVarDec : classVarDecList) {
+                    PsiElement nameDec = ((ALittleClassVarDec)classVarDec).getIdContent();
+                    if (nameDec == null) continue;
+                    variants.add(LookupElementBuilder.create(nameDec.getText()).
                             withIcon(ALittleIcons.PROPERTY).
-                            withTypeText(classVarNameDec.getContainingFile().getName())
+                            withTypeText(nameDec.getContainingFile().getName())
                     );
                 }
 
                 // 所有setter
-                List<ALittleMethodNameDec> classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(classMethodNameDec.getIdContent().getText()).
+                List<PsiElement> classMethodNameDecList = new ArrayList<>();
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.SETTER, "", classMethodNameDecList, 100);
+                for (PsiElement classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.SETTER_METHOD).
                             withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
@@ -366,9 +351,9 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
                 // 所有getter
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(classMethodNameDec.getIdContent().getText()).
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.GETTER, "", classMethodNameDecList, 100);
+                for (PsiElement classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.GETTER_METHOD).
                             withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
@@ -376,9 +361,9 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
                 // 所有成员函数
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
-                    variants.add(LookupElementBuilder.create(classMethodNameDec.getIdContent().getText()).
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.FUN, "", classMethodNameDecList, 10);
+                for (PsiElement classMethodNameDec : classMethodNameDecList) {
+                    variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.MEMBER_METHOD).
                             withTypeText(classMethodNameDec.getContainingFile().getName())
                     );
@@ -386,10 +371,10 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 // 处理结构体的实例对象
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
                 ALittleStructDec structDec = (ALittleStructDec) preType.element;
-                String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) structDec.getContainingFile());
+                String namespaceName = PsiHelper.getNamespaceName((ALittleFile) structDec.getContainingFile());
                 List<ALittleStructVarDec> structVarDecList = new ArrayList<>();
                 // 所有成员变量
-                ALittleUtil.findStructVarNameDecList(project, psiFile, namespaceName, structDec, "", structVarDecList, 10);
+                PsiHelper.findStructVarDecList(structDec, "", structVarDecList, 100);
                 for (ALittleStructVarDec structVarDec : structVarDecList) {
                     variants.add(LookupElementBuilder.create(structVarDec.getText()).
                             withIcon(ALittleIcons.PROPERTY).
@@ -399,42 +384,47 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 // 比如 ALittleName.XXX
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME) {
                 ALittleNamespaceNameDec namespaceNameDec = (ALittleNamespaceNameDec) preType.element;
-                String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) namespaceNameDec.getContainingFile());
+                String namespaceName = PsiHelper.getNamespaceName((ALittleFile) namespaceNameDec.getContainingFile());
                 // 所有枚举名
-                List<ALittleEnumNameDec> enumNameDecList = ALittleTreeChangeListener.findEnumNameDecList(project, psiFile, namespaceName, "");
-                for (ALittleEnumNameDec enumNameDec : enumNameDecList) {
+                List<PsiElement> enumNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.ENUM_NAME, psiFile, namespaceName, "", true);
+                for (PsiElement enumNameDec : enumNameDecList) {
                     variants.add(LookupElementBuilder.create(enumNameDec.getText()).
                             withIcon(ALittleIcons.ENUM).
                             withTypeText(enumNameDec.getContainingFile().getName())
                     );
                 }
                 // 所有全局函数
-                List<ALittleMethodNameDec> methodNameDecList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, psiFile, namespaceName, "");
-                for (ALittleMethodNameDec methodNameDec : methodNameDecList) {
+                List<PsiElement> methodNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.GLOBAL_METHOD, psiFile, namespaceName, "", true);
+                for (PsiElement methodNameDec : methodNameDecList) {
                     variants.add(LookupElementBuilder.create(methodNameDec.getText()).
                             withIcon(ALittleIcons.GLOBAL_METHOD).
                             withTypeText(methodNameDec.getContainingFile().getName())
                     );
                 }
                 // 所有类名
-                List<ALittleClassNameDec> classNameDecList = ALittleTreeChangeListener.findClassNameDecList(project, psiFile, namespaceName, "");
-                for (ALittleClassNameDec classNameDec : classNameDecList) {
+                List<PsiElement> classNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.CLASS_NAME, psiFile, namespaceName, "", true);
+                for (PsiElement classNameDec : classNameDecList) {
                     variants.add(LookupElementBuilder.create(classNameDec.getText()).
                             withIcon(ALittleIcons.CLASS).
                             withTypeText(classNameDec.getContainingFile().getName())
                     );
                 }
                 // 所有结构体名
-                List<ALittleStructNameDec> structNameDecList = ALittleTreeChangeListener.findStructNameDecList(project, psiFile, namespaceName, "");
-                for (ALittleStructNameDec structNameDec : structNameDecList) {
+                List<PsiElement> structNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.STRUCT_NAME, psiFile, namespaceName, "", true);
+                for (PsiElement structNameDec : structNameDecList) {
                     variants.add(LookupElementBuilder.create(structNameDec.getText()).
                             withIcon(ALittleIcons.STRUCT).
                             withTypeText(structNameDec.getContainingFile().getName())
                     );
                 }
                 // 所有单例
-                List<ALittleVarAssignNameDec> instanceNameDecList = ALittleTreeChangeListener.findInstanceNameDecList(project, psiFile, namespaceName, "", false);
-                for (ALittleVarAssignNameDec instanceNameDec : instanceNameDecList) {
+                List<PsiElement> instanceNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                        PsiHelper.PsiElementType.INSTANCE_NAME, psiFile, namespaceName, "", false);
+                for (PsiElement instanceNameDec : instanceNameDecList) {
                     variants.add(LookupElementBuilder.create(instanceNameDec.getText()).
                             withIcon(ALittleIcons.INSTANCE).
                             withTypeText(instanceNameDec.getContainingFile().getName())
@@ -444,25 +434,18 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS_NAME) {
                 ALittleClassNameDec classNameDec = (ALittleClassNameDec) preType.element;
                 ALittleClassDec classDec = (ALittleClassDec) classNameDec.getParent();
-                String namespaceName = ALittleUtil.getNamespaceName((ALittleFile) classNameDec.getContainingFile());
 
                 // 计算当前元素所在的类
-                PsiElement classDecElement = myElement;
-                while (classDecElement != null) {
-                    if (classDecElement instanceof ALittleClassDec) {
-                        break;
-                    }
-                    classDecElement = classDecElement.getParent();
-                }
-                int accessLevel = ALittleUtil.sAccessPublic;
-                if (classDecElement != null) {
-                    accessLevel = ALittleUtil.calcAccessLevel(classDecElement, classDec, ALittleUtil.sAccessPrivate);
+                int accessLevel =  PsiHelper.sAccessOnlyPublic;
+                ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(myElement);
+                if (myClassDec != null) {
+                    accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, classDec);
                 }
 
                 // 所有静态函数
-                List<ALittleMethodNameDec> classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForStatic(project, psiFile, namespaceName, classDec, accessLevel,"", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                List<PsiElement> classMethodNameDecList = new ArrayList<>();
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.STATIC, "", classMethodNameDecList, 100);
+                for (PsiElement classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.STATIC_METHOD).
                             withTypeText(classMethodNameDec.getContainingFile().getName())
@@ -470,8 +453,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 }
                 // 所有成员函数
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForFun(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.FUN, "", classMethodNameDecList, 100);
+                for (PsiElement classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.MEMBER_METHOD).
                             withTypeText(classMethodNameDec.getContainingFile().getName())
@@ -480,8 +463,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
                 // 所有setter
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForSetter(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.SETTER, "", classMethodNameDecList, 100);
+                for (PsiElement classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.SETTER_METHOD).
                             withTypeText(classMethodNameDec.getContainingFile().getName())
@@ -490,8 +473,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
                 // 所有getter
                 classMethodNameDecList = new ArrayList<>();
-                ALittleUtil.findMethodNameDecListForGetter(project, psiFile, namespaceName, classDec, accessLevel, "", classMethodNameDecList, 10);
-                for (ALittleMethodNameDec classMethodNameDec : classMethodNameDecList) {
+                PsiHelper.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.GETTER, "", classMethodNameDecList, 100);
+                for (PsiElement classMethodNameDec : classMethodNameDecList) {
                     variants.add(LookupElementBuilder.create(classMethodNameDec.getText()).
                             withIcon(ALittleIcons.GETTER_METHOD).
                             withTypeText(classMethodNameDec.getContainingFile().getName())
@@ -503,7 +486,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleEnumNameDec enumNameDec = (ALittleEnumNameDec) preType.element;
                 ALittleEnumDec enumDec = (ALittleEnumDec) enumNameDec.getParent();
                 List<ALittleEnumVarDec> varDecList = new ArrayList<>();
-                ALittleUtil.findEnumVarNameDecList(enumDec, "", varDecList);
+                PsiHelper.findEnumVarDecList(enumDec, "", varDecList);
                 for (ALittleEnumVarDec varNameDec : varDecList) {
                     variants.add(LookupElementBuilder.create(varNameDec.getIdContent().getText()).
                             withIcon(ALittleIcons.PROPERTY).

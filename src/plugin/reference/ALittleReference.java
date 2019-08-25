@@ -7,7 +7,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import plugin.ALittleUtil;
+import plugin.alittle.PsiHelper;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public abstract class ALittleReference<T extends PsiElement> extends PsiReferenc
     public ALittleReference(@NotNull T element, TextRange textRange) {
         super(element, textRange);
         mKey = element.getText().substring(textRange.getStartOffset(), textRange.getEndOffset());
-        mNamespace = ALittleUtil.getNamespaceName((ALittleFile) element.getContainingFile());
+        mNamespace = PsiHelper.getNamespaceName(element.getContainingFile());
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {

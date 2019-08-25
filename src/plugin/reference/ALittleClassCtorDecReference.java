@@ -5,7 +5,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-import plugin.ALittleUtil;
+import plugin.alittle.PsiHelper;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -23,18 +23,12 @@ public class ALittleClassCtorDecReference extends ALittleReference<ALittleClassC
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
         PsiElement parent = myElement.getParent();
-        Project project = myElement.getProject();
-        PsiFile psiFile = myElement.getContainingFile();
         if (!(parent instanceof ALittleClassDec)) return;
         ALittleClassDec classDec = (ALittleClassDec)parent;
-        if (classDec.getClassExtendsDec() == null) return;
-        ALittleClassExtendsDec extendsDec = classDec.getClassExtendsDec();
-        if (extendsDec == null) return;
-        ALittleClassNameDec classNameDec = extendsDec.getClassNameDec();
-        if (classNameDec == null) return;
-        ALittleReferenceUtil.GuessTypeInfo extendsGuess = classNameDec.guessType();
+        PsiHelper.ClassExtendsData classExtendsData = PsiHelper.findClassExtends(classDec);
+        if (classExtendsData == null) return;
 
-        ALittleClassCtorDec extendsCtorDec = ALittleUtil.findFirstCtorDecFromExtends(project, psiFile, mNamespace, (ALittleClassDec) extendsGuess.element, 100);
+        ALittleClassCtorDec extendsCtorDec = PsiHelper.findFirstCtorDecFromExtends(classExtendsData.dec, 100);
         if (extendsCtorDec == null) return;
 
         // 参数必须一致并且可转化

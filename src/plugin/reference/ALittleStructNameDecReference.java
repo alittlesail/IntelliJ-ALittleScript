@@ -6,8 +6,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
-import plugin.ALittleTreeChangeListener;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -37,9 +39,10 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
             guessList.add(((ALittleStructDec)parent).guessType());
             // 如果是继承那么就从继承那边获取
         } else if (parent instanceof ALittleStructExtendsDec) {
-            List<ALittleStructNameDec> structNameDecList = ALittleTreeChangeListener.findStructNameDecList(myElement.getProject(), myElement.getContainingFile(), mNamespace, mKey);
-            for (ALittleStructNameDec structNameDec : structNameDecList) {
-                guessList.add(structNameDec.guessType());
+            List<PsiElement> structNameDecList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
+                    PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
+            for (PsiElement structNameDec : structNameDecList) {
+                guessList.add(((ALittleStructNameDec)structNameDec).guessType());
             }
         }
 
@@ -49,10 +52,10 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        Project project = myElement.getProject();
-        final List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, myElement.getContainingFile(), mNamespace, mKey);
+        List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
+                PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
         List<ResolveResult> results = new ArrayList<>();
-        for (ALittleStructNameDec dec : decList) {
+        for (PsiElement dec : decList) {
             results.add(new PsiElementResolveResult(dec));
         }
         return results.toArray(new ResolveResult[results.size()]);
@@ -61,10 +64,10 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     @NotNull
     @Override
     public Object[] getVariants() {
-        Project project = myElement.getProject();
-        List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, myElement.getContainingFile(), mNamespace, "");
+        List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
+                PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile(), mNamespace, "", true);
         List<LookupElement> variants = new ArrayList<>();
-        for (ALittleStructNameDec dec : decList) {
+        for (PsiElement dec : decList) {
             variants.add(LookupElementBuilder.create(dec.getText()).
                     withIcon(ALittleIcons.STRUCT).
                     withTypeText(dec.getContainingFile().getName())

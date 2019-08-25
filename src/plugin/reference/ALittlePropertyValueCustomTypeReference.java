@@ -10,21 +10,17 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
-import plugin.ALittleTreeChangeListener;
-import plugin.ALittleUtil;
+import plugin.index.ALittleIndex;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ALittlePropertyValueCustomTypeReference extends ALittleReference<ALittlePropertyValueCustomType> {
-    private ALittleClassDec mClassDec = null;
-    private ALittleClassCtorDec mClassCtorDec = null;
-    private ALittleClassSetterDec mClassSetterDec = null;
-    private ALittleClassMethodDec mClassMethodDec = null;
-    private ALittleClassStaticDec mClassStaticDec = null;
-    private ALittleGlobalMethodDec mGlobalMethodDec = null;
+    private PsiElement mMethodDec = null;
 
     public ALittlePropertyValueCustomTypeReference(@NotNull ALittlePropertyValueCustomType element, TextRange textRange) {
         super(element, textRange);
@@ -32,29 +28,19 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
     }
 
     private void reloadInfo() {
-        mClassDec = null;
-        mClassCtorDec = null;
-        mClassSetterDec = null;
-        mClassMethodDec = null;
-        mClassStaticDec = null;
-
+        mMethodDec = null;
         PsiElement parent = myElement;
-        while (true) {
-            if (parent == null) break;
-
+        while (parent != null) {
             if (parent instanceof ALittleClassDec) {
-                mClassDec = (ALittleClassDec)parent;
                 break;
-            } else if (parent instanceof ALittleClassCtorDec) {
-                mClassCtorDec = (ALittleClassCtorDec)parent;
-            } else if (parent instanceof ALittleClassSetterDec) {
-                mClassSetterDec = (ALittleClassSetterDec)parent;
-            } else if (parent instanceof ALittleClassMethodDec) {
-                mClassMethodDec = (ALittleClassMethodDec)parent;
-            } else if (parent instanceof ALittleClassStaticDec) {
-                mClassStaticDec = (ALittleClassStaticDec)parent;
-            } else if (parent instanceof ALittleGlobalMethodDec) {
-                mGlobalMethodDec = (ALittleGlobalMethodDec)parent;
+            } else if (parent instanceof ALittleClassCtorDec
+                || parent instanceof ALittleClassSetterDec
+                || parent instanceof ALittleClassGetterDec
+                || parent instanceof ALittleClassMethodDec
+                || parent instanceof ALittleClassStaticDec
+                || parent instanceof ALittleGlobalMethodDec) {
+                mMethodDec = parent;
+                break;
             }
 
             parent = parent.getParent();
@@ -150,51 +136,52 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         }
         // 处理全局函数
         {
-            List<ALittleMethodNameDec> decList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, file, mNamespace, mKey);
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.GLOBAL_METHOD, file, mNamespace, mKey, true);
             if (!decList.isEmpty()) results.clear();
-            for (ALittleMethodNameDec dec : decList) {
+            for (PsiElement dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
         }
         // 处理类名
         {
-            List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, file, mNamespace, mKey);
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.CLASS_NAME, file, mNamespace, mKey, true);
             if (!decList.isEmpty()) results.clear();
-            for (ALittleClassNameDec dec : decList) {
+            for (PsiElement dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
         }
         // 处理结构体名
         {
-            List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, file, mNamespace, mKey);
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.STRUCT_NAME, file, mNamespace, mKey, true);
             if (!decList.isEmpty()) results.clear();
-            for (ALittleStructNameDec dec : decList) {
+            for (PsiElement dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
         }
         // 处理枚举名
         {
-            List<ALittleEnumNameDec> decList = ALittleTreeChangeListener.findEnumNameDecList(project, file, mNamespace, mKey);
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.ENUM_NAME, file, mNamespace, mKey, true);
             if (!decList.isEmpty()) results.clear();
-            for (ALittleEnumNameDec dec : decList) {
+            for (PsiElement dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
         }
         // 处理单例
         {
-            List<ALittleVarAssignNameDec> decList = ALittleTreeChangeListener.findInstanceNameDecList(project, file, mNamespace, mKey, true);
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.INSTANCE_NAME, file, mNamespace, mKey, true);
             if (!decList.isEmpty()) results.clear();
-            for (ALittleVarAssignNameDec dec : decList) {
+            for (PsiElement dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
         }
         // 处理参数
         {
-            List<ALittleMethodParamNameDec> decList = ALittleUtil.findMethodParamNameDecList(
-                    mClassCtorDec, mClassSetterDec
-                    , mClassMethodDec, mClassStaticDec
-                    , mGlobalMethodDec
-                    , mKey);
+            List<ALittleMethodParamNameDec> decList = PsiHelper.findMethodParamNameDecList(mMethodDec, mKey);
             if (!decList.isEmpty()) results.clear();
             for (ALittleMethodParamNameDec dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
@@ -202,7 +189,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         }
         // 处理表达式定义
         {
-            List<ALittleVarAssignNameDec> decList = ALittleUtil.findVarAssignNameDecList(myElement, mKey);
+            List<ALittleVarAssignNameDec> decList = PsiHelper.findVarAssignNameDecList(myElement, mKey);
             if (!decList.isEmpty()) results.clear();
             for (ALittleVarAssignNameDec dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
@@ -239,8 +226,8 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         }
         // 处理全局函数
         {
-            List<ALittleMethodNameDec> decList = ALittleTreeChangeListener.findGlobalMethodNameDecList(project, file, mNamespace, "");
-            for (ALittleMethodNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project, PsiHelper.PsiElementType.GLOBAL_METHOD, file, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).
                         withTypeText(dec.getContainingFile().getName())
@@ -249,8 +236,8 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         }
         // 处理类名
         {
-            List<ALittleClassNameDec> decList = ALittleTreeChangeListener.findClassNameDecList(project, file, mNamespace, "");
-            for (ALittleClassNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project, PsiHelper.PsiElementType.CLASS_NAME, file, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.CLASS).
                         withTypeText(dec.getContainingFile().getName())
@@ -259,8 +246,8 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         }
         // 处理结构体名
         {
-            List<ALittleStructNameDec> decList = ALittleTreeChangeListener.findStructNameDecList(project, file, mNamespace, "");
-            for (ALittleStructNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project, PsiHelper.PsiElementType.STRUCT_NAME, file, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.STRUCT).
                         withTypeText(dec.getContainingFile().getName())
@@ -269,8 +256,8 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         }
         // 处理枚举名
         {
-            List<ALittleEnumNameDec> decList = ALittleTreeChangeListener.findEnumNameDecList(project, file, mNamespace, "");
-            for (ALittleEnumNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project, PsiHelper.PsiElementType.ENUM_NAME, file, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.ENUM).
                         withTypeText(dec.getContainingFile().getName())
@@ -279,8 +266,8 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         }
         // 处理单例
         {
-            List<ALittleVarAssignNameDec> decList = ALittleTreeChangeListener.findInstanceNameDecList(project, file, mNamespace, "", true);
-            for (ALittleVarAssignNameDec dec : decList) {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project, PsiHelper.PsiElementType.INSTANCE_NAME, file, mNamespace, "", true);
+            for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.INSTANCE).
                         withTypeText(dec.getContainingFile().getName())
@@ -290,11 +277,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
 
         // 处理参数
         {
-            List<ALittleMethodParamNameDec> decList = ALittleUtil.findMethodParamNameDecList(
-                    mClassCtorDec, mClassSetterDec
-                    , mClassMethodDec, mClassStaticDec
-                    , mGlobalMethodDec
-                    , "");
+            List<ALittleMethodParamNameDec> decList = PsiHelper.findMethodParamNameDecList(mMethodDec, "");
             for (ALittleMethodParamNameDec dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.PARAM).
@@ -305,7 +288,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
 
         // 处理表达式
         {
-            List<ALittleVarAssignNameDec> decList = ALittleUtil.findVarAssignNameDecList(myElement, "");
+            List<ALittleVarAssignNameDec> decList = PsiHelper.findVarAssignNameDecList(myElement, "");
             for (ALittleVarAssignNameDec dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.VARIABLE).
