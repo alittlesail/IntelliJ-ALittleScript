@@ -12,10 +12,17 @@ type = type
 collectgarbage = collectgarbage
 local __pcall = pcall
 local __unpack = unpack
-__pcall = function(...)
-    local out_list = {pcall(...)}
-    if out_list[1] ~= true then return out_list[2] end
-    return unpack(out_list, 2)
+local __maxn = table.maxn
+pcall = function(...)
+    local out_list = {__pcall(...)}
+    -- 如果第一个参数不是true，说明第二个调用失败的原因
+    if out_list[1] ~= true then return out_list[2] or "nil" end
+    -- 先获取当前list的长度
+    local len = __maxn(out_list)
+    -- 把第一个设置为空
+    out_list[1] = nil
+    -- 最后展开返回
+    return __unpack(out_list, 1, len)
 end
 unpack = unpack
 tostring = tostring
