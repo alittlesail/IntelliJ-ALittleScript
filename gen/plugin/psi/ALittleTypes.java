@@ -54,6 +54,7 @@ public interface ALittleTypes {
   IElementType METHOD_PARAM_DEC = new ALittleElementType("METHOD_PARAM_DEC");
   IElementType METHOD_PARAM_NAME_DEC = new ALittleElementType("METHOD_PARAM_NAME_DEC");
   IElementType METHOD_PARAM_ONE_DEC = new ALittleElementType("METHOD_PARAM_ONE_DEC");
+  IElementType METHOD_PARAM_TAIL_DEC = new ALittleElementType("METHOD_PARAM_TAIL_DEC");
   IElementType METHOD_RETURN_DEC = new ALittleElementType("METHOD_RETURN_DEC");
   IElementType NAMESPACE_DEC = new ALittleElementType("NAMESPACE_DEC");
   IElementType NAMESPACE_NAME_DEC = new ALittleElementType("NAMESPACE_NAME_DEC");
@@ -96,6 +97,7 @@ public interface ALittleTypes {
   IElementType OP_ASSIGN_EXPR = new ALittleElementType("OP_ASSIGN_EXPR");
   IElementType OP_NEW_LIST_STAT = new ALittleElementType("OP_NEW_LIST_STAT");
   IElementType OP_NEW_STAT = new ALittleElementType("OP_NEW_STAT");
+  IElementType PCALL_STAT = new ALittleElementType("PCALL_STAT");
   IElementType PRIMITIVE_TYPE = new ALittleElementType("PRIMITIVE_TYPE");
   IElementType PROPERTY_VALUE = new ALittleElementType("PROPERTY_VALUE");
   IElementType PROPERTY_VALUE_BRACKET_VALUE = new ALittleElementType("PROPERTY_VALUE_BRACKET_VALUE");
@@ -108,6 +110,7 @@ public interface ALittleTypes {
   IElementType PROPERTY_VALUE_METHOD_CALL = new ALittleElementType("PROPERTY_VALUE_METHOD_CALL");
   IElementType PROPERTY_VALUE_SUFFIX = new ALittleElementType("PROPERTY_VALUE_SUFFIX");
   IElementType PROPERTY_VALUE_THIS_TYPE = new ALittleElementType("PROPERTY_VALUE_THIS_TYPE");
+  IElementType PROTO_MODIFIER = new ALittleElementType("PROTO_MODIFIER");
   IElementType REFLECT_VALUE = new ALittleElementType("REFLECT_VALUE");
   IElementType REGISTER_MODIFIER = new ALittleElementType("REGISTER_MODIFIER");
   IElementType RETURN_EXPR = new ALittleElementType("RETURN_EXPR");
@@ -159,6 +162,8 @@ public interface ALittleTypes {
   IElementType GET = new ALittleTokenType("get");
   IElementType GREATER = new ALittleTokenType(">");
   IElementType GREATER_OR_EQUAL = new ALittleTokenType(">=");
+  IElementType HTTPGET = new ALittleTokenType("httpget");
+  IElementType HTTPPOST = new ALittleTokenType("httppost");
   IElementType I64 = new ALittleTokenType("I64");
   IElementType ID_CONTENT = new ALittleTokenType("ID_CONTENT");
   IElementType IF = new ALittleTokenType("if");
@@ -181,11 +186,15 @@ public interface ALittleTypes {
   IElementType NOT = new ALittleTokenType("!");
   IElementType NOT_EQ = new ALittleTokenType("!=");
   IElementType NULL = new ALittleTokenType("null");
+  IElementType PARAM_TAIL = new ALittleTokenType("...");
+  IElementType PCALL = new ALittleTokenType("pcall");
   IElementType PLUS = new ALittleTokenType("+");
   IElementType PLUS_ASSIGN = new ALittleTokenType("+=");
   IElementType PLUS_PLUS = new ALittleTokenType("++");
   IElementType PRIVATE = new ALittleTokenType("private");
   IElementType PROTECTED = new ALittleTokenType("protected");
+  IElementType PROTOMSG = new ALittleTokenType("protomsg");
+  IElementType PROTO_OPTION = new ALittleTokenType("@Proto");
   IElementType PUBLIC = new ALittleTokenType("public");
   IElementType QUOTE = new ALittleTokenType("\"");
   IElementType QUOTIENT = new ALittleTokenType("/");
@@ -350,6 +359,9 @@ public interface ALittleTypes {
       else if (type == METHOD_PARAM_ONE_DEC) {
         return new ALittleMethodParamOneDecImpl(node);
       }
+      else if (type == METHOD_PARAM_TAIL_DEC) {
+        return new ALittleMethodParamTailDecImpl(node);
+      }
       else if (type == METHOD_RETURN_DEC) {
         return new ALittleMethodReturnDecImpl(node);
       }
@@ -476,6 +488,9 @@ public interface ALittleTypes {
       else if (type == OP_NEW_STAT) {
         return new ALittleOpNewStatImpl(node);
       }
+      else if (type == PCALL_STAT) {
+        return new ALittlePcallStatImpl(node);
+      }
       else if (type == PRIMITIVE_TYPE) {
         return new ALittlePrimitiveTypeImpl(node);
       }
@@ -511,6 +526,9 @@ public interface ALittleTypes {
       }
       else if (type == PROPERTY_VALUE_THIS_TYPE) {
         return new ALittlePropertyValueThisTypeImpl(node);
+      }
+      else if (type == PROTO_MODIFIER) {
+        return new ALittleProtoModifierImpl(node);
       }
       else if (type == REFLECT_VALUE) {
         return new ALittleReflectValueImpl(node);

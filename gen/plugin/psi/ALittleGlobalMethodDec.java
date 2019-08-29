@@ -28,6 +28,9 @@ public interface ALittleGlobalMethodDec extends PsiElement {
   @Nullable
   ALittleMethodReturnDec getMethodReturnDec();
 
+  @Nullable
+  ALittleProtoModifier getProtoModifier();
+
   @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 

@@ -15,9 +15,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Action" />
-        <option value="NewALittle" />
         <option value="package-info" />
         <option value="Class" />
+        <option value="NewALittle" />
       </list>
     </option>
   </component>
@@ -67,25 +67,25 @@
       <recent name="plugin" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\Software\ALittleScript\trunk\src\plugin" />
-      <recent name="D:\ALittleScript\trunk\resources\fileTemplates\internal" />
-      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
-      <recent name="D:\ALittleScript\trunk\resources\adapter\Javascript" />
-      <recent name="D:\ALittleScript\src\plugin" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\adapter" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\adapter\Native" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\adapter\Lua" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\ALittle" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="plugin.index" />
       <recent name="plugin.reference" />
+      <recent name="plugin.index" />
       <recent name="plugin.action" />
       <recent name="plugin.psi.impl" />
       <recent name="plugin.psi" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
       <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
-      <recent name="D:\ALittleScript\trunk\resources\std\Lua" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\ALittle" />
-      <recent name="D:\ALittleScript\trunk\resources\std" />
-      <recent name="D:\Users\IGG\Desktop\Test\Client\Win32\bin\Module\ALittleScript\Other\ALittleScript\src\plugin" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -142,6 +142,11 @@
           <url>file://$PROJECT_DIR$/src/plugin/index/ALittleIndex.java</url>
           <line>248</line>
           <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/plugin/generate/ALittleGenerateLua.java</url>
+          <line>39</line>
+          <option name="timeStamp" value="19" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

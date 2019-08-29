@@ -686,7 +686,8 @@ public class ALittleReferenceOpUtil {
             if (rightGuessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR
                 || leftGuessInfo.functorParamList.size() != rightGuessInfo.functorParamList.size()
                 || leftGuessInfo.functorReturnList.size() != rightGuessInfo.functorReturnList.size()
-                || leftGuessInfo.functorAwait != rightGuessInfo.functorAwait) {
+                || leftGuessInfo.functorAwait != rightGuessInfo.functorAwait
+                || leftGuessInfo.functorParamTail != rightGuessInfo.functorParamTail) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
             }
             for (int i = 0; i < leftGuessInfo.functorParamList.size(); ++i) {

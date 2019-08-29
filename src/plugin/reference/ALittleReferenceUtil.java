@@ -67,6 +67,7 @@ public class ALittleReferenceUtil {
         GT_STRUCT_NAME,
         GT_ENUM,
         GT_ENUM_NAME,
+        GT_PARAM_TAIL,
     }
 
     // 类型信息
@@ -77,6 +78,8 @@ public class ALittleReferenceUtil {
 
         public boolean isChanged() {
             if (type == GuessType.GT_PRIMITIVE) {
+                return false;
+            } else if (type == GuessType.GT_PARAM_TAIL) {
                 return false;
             } else if (type == GuessType.GT_CONST) {
                 return false;
@@ -108,8 +111,9 @@ public class ALittleReferenceUtil {
         public GuessTypeInfo mapValueType;                // type="Map"时, 表示Map的Value
         public List<GuessTypeInfo> functorParamList;      // type="Functor"时, 表示参数列表
         public List<String> functorParamNameList;         // type="Functor"时, 表示参数名列表
+        public GuessTypeInfo functorParamTail;            // type="Functor"时, 表示参数占位符
         public List<GuessTypeInfo> functorReturnList;     // type="Functor"时, 表示返回值列表
-        boolean functorAwait;                             // type="Functor"时, 表示是否是await
+        public boolean functorAwait;                             // type="Functor"时, 表示是否是await
     }
 
     // 计算表达式需要使用什么样的变量方式
@@ -121,8 +125,6 @@ public class ALittleReferenceUtil {
             return "___ipairs";
         } else if (guessType.type == GuessType.GT_MAP) {
             return "___pairs";
-        } else if (guessType.value.equals("any")) {
-            return "";
         }
 
         throw new ALittleReferenceException(valueStat, "该表达式不能遍历");
@@ -187,6 +189,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleGenericType) return new ALittleGenericTypeReference((ALittleGenericType)element, range);
         if (element instanceof ALittleMethodNameDec) return new ALittleMethodNameDecReference((ALittleMethodNameDec)element, range);
         if (element instanceof ALittleMethodParamNameDec) return new ALittleMethodParamNameDecReference((ALittleMethodParamNameDec)element, range);
+        if (element instanceof ALittleMethodParamTailDec) return new ALittleMethodParamTailDecReference((ALittleMethodParamTailDec)element, range);
 
         if (element instanceof ALittleNamespaceDec) return new ALittleNamespaceDecReference((ALittleNamespaceDec)element, range);
         if (element instanceof ALittleNamespaceNameDec) return new ALittleNamespaceNameDecReference((ALittleNamespaceNameDec)element, range);
@@ -194,6 +197,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleOpAssignExpr) return new ALittleOpAssignExprReference((ALittleOpAssignExpr)element, range);
         if (element instanceof ALittleOpNewListStat) return new ALittleOpNewListStatReference((ALittleOpNewListStat)element, range);
         if (element instanceof ALittleOpNewStat) return new ALittleOpNewStatReference((ALittleOpNewStat)element, range);
+        if (element instanceof ALittlePcallStat) return new ALittlePcallStatReference((ALittlePcallStat)element, range);
         if (element instanceof ALittlePrimitiveType) return new ALittlePrimitiveTypeReference((ALittlePrimitiveType)element, range);
 
         if (element instanceof ALittlePropertyValueBracketValue) return new ALittlePropertyValueBracketValueReference((ALittlePropertyValueBracketValue)element, range);

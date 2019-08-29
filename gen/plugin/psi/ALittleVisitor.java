@@ -191,6 +191,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitMethodParamTailDec(@NotNull ALittleMethodParamTailDec o) {
+    visitPsiElement(o);
+  }
+
   public void visitMethodReturnDec(@NotNull ALittleMethodReturnDec o) {
     visitPsiElement(o);
   }
@@ -359,6 +363,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitPcallStat(@NotNull ALittlePcallStat o) {
+    visitPsiElement(o);
+  }
+
   public void visitPrimitiveType(@NotNull ALittlePrimitiveType o) {
     visitPsiElement(o);
   }
@@ -404,6 +412,10 @@ public class ALittleVisitor extends PsiElementVisitor {
   }
 
   public void visitPropertyValueThisType(@NotNull ALittlePropertyValueThisType o) {
+    visitPsiElement(o);
+  }
+
+  public void visitProtoModifier(@NotNull ALittleProtoModifier o) {
     visitPsiElement(o);
   }
 

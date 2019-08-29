@@ -23,6 +23,10 @@ public class ALittleValueStatReference extends ALittleReference<ALittleValueStat
             return myElement.getValueFactorStat().guessTypes();
         } else if (myElement.getBindStat() != null) {
             return myElement.getBindStat().guessTypes();
+        } else if (myElement.getMethodParamTailDec() != null) {
+            return myElement.getMethodParamTailDec().guessTypes();
+        } else if (myElement.getPcallStat() != null) {
+            return myElement.getPcallStat().guessTypes();
         } else if (myElement.getOp2Stat() != null) {
             List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
             guessList.add(ALittleReferenceOpUtil.guessType(myElement.getOp2Stat()));

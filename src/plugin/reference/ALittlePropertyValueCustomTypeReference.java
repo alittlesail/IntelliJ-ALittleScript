@@ -31,7 +31,9 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         mMethodDec = null;
         PsiElement parent = myElement;
         while (parent != null) {
-            if (parent instanceof ALittleClassDec) {
+            if (parent instanceof ALittleNamespaceDec) {
+                break;
+            } else if (parent instanceof ALittleClassDec) {
                 break;
             } else if (parent instanceof ALittleClassCtorDec
                 || parent instanceof ALittleClassSetterDec
@@ -180,6 +182,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
             }
         }
         // 处理参数
+        if (mMethodDec != null)
         {
             List<ALittleMethodParamNameDec> decList = PsiHelper.findMethodParamNameDecList(mMethodDec, mKey);
             if (!decList.isEmpty()) results.clear();
@@ -276,6 +279,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         }
 
         // 处理参数
+        if (mMethodDec != null)
         {
             List<ALittleMethodParamNameDec> decList = PsiHelper.findMethodParamNameDecList(mMethodDec, "");
             for (ALittleMethodParamNameDec dec : decList) {

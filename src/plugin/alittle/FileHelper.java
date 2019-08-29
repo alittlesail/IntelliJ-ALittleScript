@@ -3,6 +3,7 @@ package plugin.alittle;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.vfs.VirtualFile;
+import plugin.component.StdLibraryProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,6 +46,17 @@ public class FileHelper {
             throw new Exception("文件夹删除失败 path:" + root.getPath());
     }
 
+    // 获取模块路径
+    public static String calcModulePath(Module module) throws Exception {
+        String module_name = module.getName();
+        String module_file_path = module.getModuleFilePath();
+        String module_file_name = module_name + ".iml";
+        if (!module_file_path.endsWith(module_file_name))
+            throw new Exception("模块文件路径:" + module_file_path + "没有以:" + module_file_name + "结尾");
+
+        return module_file_path.substring(0, module_file_path.length() - module_file_name.length());
+    }
+
     // 重新构建一个空的文件夹
     public static void rebuildPath(String path) throws Exception {
         FileHelper.deepDeletePath(path);
@@ -70,30 +82,38 @@ public class FileHelper {
 
     // 获取lua脚本路径
     public static String calcScriptPath(Module module) throws Exception {
-        String outPath = calcOutPath(module);
-        if (module.getName().equals("Engine")) return outPath + "Engine/";
-        return outPath + "Script/";
+        if (StdLibraryProvider.isPluginSelf(module.getProject())) {
+            return calcModulePath(module) + "resources/adapter" + File.separator;
+        } else {
+            String outPath = calcOutPath(module);
+            if (module.getName().equals("Engine")) return outPath + "Engine/";
+            return outPath + "Script/";
+        }
     }
 
     // 计算文件路径
     public static String calcALittleRelPath(Module module, VirtualFile file) throws Exception {
-        String module_name = module.getName();
-        String module_file_path = module.getModuleFilePath();
-        String module_file_name = module_name + ".iml";
-        if (!module_file_path.endsWith(module_file_name))
-            throw new Exception("模块文件路径:" + module_file_path + "没有以:" + module_file_name + "结尾");
-
-        String module_base_path = module_file_path.substring(0, module_file_path.length() - module_file_name.length());
+        String module_base_path = calcModulePath(module);
 
         String file_path = file.getPath();
         if (!file_path.startsWith(module_base_path)) {
             throw new Exception("当前文件不在模块路径下:" + file_path);
         }
+
         String alittle_rel_path = file_path.substring(module_base_path.length());
-        if (!alittle_rel_path.startsWith("src")) {
-            throw new Exception("不支持该目录下的文件生成:" + file_path);
+        // 如果是插件项目本身就特殊处理
+        if (StdLibraryProvider.isPluginSelf(module.getProject())) {
+            if (!alittle_rel_path.startsWith("resources/std")) {
+                throw new Exception("不支持该目录下的文件生成:" + file_path);
+            }
+            alittle_rel_path = alittle_rel_path.substring("resources/std/".length());
+        // 其他模块必须
+        } else {
+            if (!alittle_rel_path.startsWith("src")) {
+                throw new Exception("不支持该目录下的文件生成:" + file_path);
+            }
+            alittle_rel_path = alittle_rel_path.substring("src/".length());
         }
-        alittle_rel_path = alittle_rel_path.substring("src/".length());
 
         String ext = "alittle";
         if (!alittle_rel_path.endsWith(ext)) {

@@ -376,10 +376,13 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 // 所有成员变量
                 PsiHelper.findStructVarDecList(structDec, "", structVarDecList, 100);
                 for (ALittleStructVarDec structVarDec : structVarDecList) {
-                    variants.add(LookupElementBuilder.create(structVarDec.getText()).
-                            withIcon(ALittleIcons.PROPERTY).
-                            withTypeText(structVarDec.getContainingFile().getName())
-                    );
+                    PsiElement nameDec = structVarDec.getIdContent();
+                    if (nameDec != null) {
+                        variants.add(LookupElementBuilder.create(nameDec.getText()).
+                                withIcon(ALittleIcons.PROPERTY).
+                                withTypeText(structVarDec.getContainingFile().getName())
+                        );
+                    }
                 }
                 // 比如 ALittleName.XXX
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME) {

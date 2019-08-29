@@ -128,6 +128,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                         info.functorParamNameList.add("");
                     }
                 }
+                ALittleMethodParamTailDec tailDec = paramDec.getMethodParamTailDec();
+                if (tailDec != null) {
+                    info.functorParamTail = tailDec.guessType();
+                    typeList.add(tailDec.getText());
+                }
             }
             info.value += String.join(",", typeList) + ")";
             typeList = new ArrayList<>();
@@ -174,6 +179,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                         info.functorParamNameList.add("");
                     }
                 }
+                ALittleMethodParamTailDec tailDec = paramDec.getMethodParamTailDec();
+                if (tailDec != null) {
+                    info.functorParamTail = tailDec.guessType();
+                    typeList.add(tailDec.getText());
+                }
             }
             info.value += String.join(",", typeList) + ")";
             typeList = new ArrayList<>();
@@ -219,6 +229,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                         info.functorParamNameList.add("");
                     }
                 }
+                ALittleMethodParamTailDec tailDec = paramDec.getMethodParamTailDec();
+                if (tailDec != null) {
+                    info.functorParamTail = tailDec.guessType();
+                    typeList.add(tailDec.getText());
+                }
             }
             info.value += String.join(",", typeList) + ")";
             typeList = new ArrayList<>();
@@ -241,8 +256,6 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
         PsiElement parent = myElement.getParent();
-        Project project = myElement.getProject();
-        PsiFile psiFile = myElement.getContainingFile();
         if (!(parent.getParent() instanceof ALittleClassDec)) return;
         ALittleClassDec classDec = (ALittleClassDec)parent.getParent();
         // 计算父类

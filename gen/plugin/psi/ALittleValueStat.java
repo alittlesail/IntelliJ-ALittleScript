@@ -14,6 +14,9 @@ public interface ALittleValueStat extends PsiElement {
   ALittleBindStat getBindStat();
 
   @Nullable
+  ALittleMethodParamTailDec getMethodParamTailDec();
+
+  @Nullable
   ALittleOp2Stat getOp2Stat();
 
   @Nullable
@@ -39,6 +42,9 @@ public interface ALittleValueStat extends PsiElement {
 
   @Nullable
   ALittleOpNewStat getOpNewStat();
+
+  @Nullable
+  ALittlePcallStat getPcallStat();
 
   @Nullable
   ALittleValueFactorStat getValueFactorStat();

@@ -8,13 +8,10 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public interface ALittleMethodParamDec extends PsiElement {
+public interface ALittlePcallStat extends PsiElement {
 
   @NotNull
-  List<ALittleMethodParamOneDec> getMethodParamOneDecList();
-
-  @Nullable
-  ALittleMethodParamTailDec getMethodParamTailDec();
+  List<ALittleValueStat> getValueStatList();
 
   @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;

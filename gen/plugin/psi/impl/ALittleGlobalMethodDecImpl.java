@@ -66,6 +66,12 @@ public class ALittleGlobalMethodDecImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
+  @Nullable
+  public ALittleProtoModifier getProtoModifier() {
+    return findChildByClass(ALittleProtoModifier.class);
+  }
+
+  @Override
   @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);

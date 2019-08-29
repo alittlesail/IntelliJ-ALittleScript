@@ -37,6 +37,12 @@ public class ALittleValueStatImpl extends ASTWrapperPsiElement implements ALittl
 
   @Override
   @Nullable
+  public ALittleMethodParamTailDec getMethodParamTailDec() {
+    return findChildByClass(ALittleMethodParamTailDec.class);
+  }
+
+  @Override
+  @Nullable
   public ALittleOp2Stat getOp2Stat() {
     return findChildByClass(ALittleOp2Stat.class);
   }
@@ -87,6 +93,12 @@ public class ALittleValueStatImpl extends ASTWrapperPsiElement implements ALittl
   @Nullable
   public ALittleOpNewStat getOpNewStat() {
     return findChildByClass(ALittleOpNewStat.class);
+  }
+
+  @Override
+  @Nullable
+  public ALittlePcallStat getPcallStat() {
+    return findChildByClass(ALittlePcallStat.class);
   }
 
   @Override

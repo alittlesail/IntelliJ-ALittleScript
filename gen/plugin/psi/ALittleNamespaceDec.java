@@ -25,6 +25,12 @@ public interface ALittleNamespaceDec extends PsiElement {
   @Nullable
   ALittleNamespaceNameDec getNamespaceNameDec();
 
+  @NotNull
+  List<ALittleOpAssignExpr> getOpAssignExprList();
+
+  @NotNull
+  List<ALittlePropertyValueExpr> getPropertyValueExprList();
+
   @Nullable
   ALittleRegisterModifier getRegisterModifier();
 

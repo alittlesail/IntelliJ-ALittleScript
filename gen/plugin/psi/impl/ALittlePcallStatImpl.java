@@ -14,14 +14,14 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public class ALittleMethodParamDecImpl extends ASTWrapperPsiElement implements ALittleMethodParamDec {
+public class ALittlePcallStatImpl extends ASTWrapperPsiElement implements ALittlePcallStat {
 
-  public ALittleMethodParamDecImpl(@NotNull ASTNode node) {
+  public ALittlePcallStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitMethodParamDec(this);
+    visitor.visitPcallStat(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -31,14 +31,8 @@ public class ALittleMethodParamDecImpl extends ASTWrapperPsiElement implements A
 
   @Override
   @NotNull
-  public List<ALittleMethodParamOneDec> getMethodParamOneDecList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleMethodParamOneDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleMethodParamTailDec getMethodParamTailDec() {
-    return findChildByClass(ALittleMethodParamTailDec.class);
+  public List<ALittleValueStat> getValueStatList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleValueStat.class);
   }
 
   @Override

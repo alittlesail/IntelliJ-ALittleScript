@@ -50,6 +50,8 @@
       APOS                 =  "'"
       QUOTE                =  '"'
       BACK                 =  '\'
+      PROTO_OPTION         =  '@Proto'
+      PARAM_TAIL           =  '...'
 
       WHITE_SPACE          = 'regexp:\s+'
       COMMENT              = 'regexp://.*'
@@ -62,16 +64,19 @@
 alittleFile ::= namespaceDec?
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 注册修饰符
+// 注册修饰符，如果有这个修饰，那么就不会生成目标代码
 registerModifier ::= register
 // 访问修饰符
 accessModifier ::= public | private | protected
 // 协程修饰符
 coModifier ::= async | await
+// 协议修饰符
+protoModifier ::= PROTO_OPTION protoOption {pin=1}
+private protoOption ::= protomsg | httpget | httppost
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 命名域
-namespaceDec ::= registerModifier? namespace namespaceNameDec SEMI (globalMethodDec | classDec | enumDec | structDec | instanceDec)* {pin=2}
+namespaceDec ::= registerModifier? namespace namespaceNameDec SEMI (globalMethodDec | classDec | enumDec | structDec | instanceDec | opAssignExpr | propertyValueExpr)* {pin=2}
 namespaceNameDec ::= ID_CONTENT
 
 // 类定义
@@ -110,8 +115,10 @@ enumVarDec::= ID_CONTENT (ASSIGN (DIGIT_CONTENT | STRING_CONTENT))? {pin=1}
 // 函数参数部分
 methodParamOneDec ::= allType methodParamNameDec {pin=1}
 methodParamNameDec ::= ID_CONTENT
-methodParamDec ::= LPAREN (methodParamOneDec methodParamPairDec*)? RPAREN {pin=1}
-private methodParamPairDec ::= COMMA methodParamOneDec {pin=1}
+methodParamTailDec ::= PARAM_TAIL
+methodParamDec ::= LPAREN ((methodParamOneDec methodParamPairDec* methodParamTailPairDec?) | methodParamTailDec)? RPAREN {pin=1}
+private methodParamPairDec ::= COMMA methodParamOneDec
+private methodParamTailPairDec ::= COMMA methodParamTailDec
 // 函数体部分
 methodBodyDec ::= LBRACE allExpr* RBRACE {pin=1}
 // 函数名部分
@@ -130,7 +137,7 @@ classMethodDec ::= accessModifier? coModifier? fun methodNameDec methodParamDec 
 // 类静态函数定义
 classStaticDec ::= accessModifier? coModifier? static methodNameDec methodParamDec methodReturnDec? methodBodyDec {pin=3}
 // 全局函数
-globalMethodDec ::= accessModifier? coModifier? static methodNameDec methodParamDec methodReturnDec? methodBodyDec {pin=3}
+globalMethodDec ::= protoModifier? accessModifier? coModifier? static methodNameDec methodParamDec methodReturnDec? methodBodyDec {pin=4}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -239,7 +246,7 @@ autoType ::= auto
 
 //复合值///////////////////////////////////////////////////////////////////
 // 复合值
-valueStat ::= opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat
+valueStat ::= opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | pcallStat | methodParamTailDec
 valueFactorStat ::= wrapValueStat | constValue | propertyValue | reflectValue
 
 // new
@@ -248,6 +255,8 @@ opNewStat ::= new (customType | genericType) LPAREN (valueStat (COMMA valueStat)
 opNewListStat ::= LBRACK (valueStat (COMMA valueStat)*)? RBRACK {pin=1}
 // bind
 bindStat ::= bind LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
+// pcall
+pcallStat ::= pcall LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
 // 值
 wrapValueStat ::= LPAREN valueStat RPAREN
 // 常量值

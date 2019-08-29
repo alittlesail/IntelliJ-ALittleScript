@@ -1,6 +1,5 @@
 package plugin.alittle;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
@@ -17,13 +16,26 @@ import java.util.Map;
 
 public class PsiHelper {
     // 判断字符串是不是整型值
-    public static boolean isInt(String content) {
+    public static boolean isInt(@NotNull String content) {
         try {
             double v = Double.parseDouble(content);
             return v == Math.floor(v) && !content.contains(".");
         } catch (NumberFormatException e) {
             return true;
         }
+    }
+
+    // 计算哈希值
+    public static int JSHash(@NotNull String content) {
+        byte[] bytes = content.getBytes();
+        int l = content.length();
+        int h = l;
+        int step = l >> 5 + 1;
+
+        for (int i=l; i >= step; i-=step) {
+            h = h ^ (h << 5 + bytes[i] + h >> 2);
+        }
+        return h;
     }
 
     // 类的属性类型

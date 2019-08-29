@@ -54,6 +54,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                 newPreType.functorParamNameList.addAll(preType.functorParamNameList);
                 newPreType.functorReturnList = new ArrayList<>();
                 newPreType.functorReturnList.addAll(preType.functorReturnList);
+                newPreType.functorParamTail = preType.functorParamTail;
                 preType = newPreType;
 
                 preType.functorParamList.remove(0);
@@ -65,6 +66,9 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                 List<String> paramList = new ArrayList<>();
                 for (ALittleReferenceUtil.GuessTypeInfo guessTypeInfo : preType.functorParamList) {
                     paramList.add(guessTypeInfo.value);
+                }
+                if (preType.functorParamTail != null) {
+                    paramList.add(preType.functorParamTail.value);
                 }
                 preType.value += String.join(",", paramList);
                 preType.value += ")";
@@ -107,13 +111,14 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         // 如果需要处理
         if (preType.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
             List<ALittleValueStat> valueStatList = myElement.getValueStatList();
-            if (preType.functorParamList.size() < valueStatList.size()) {
+            if (preType.functorParamList.size() < valueStatList.size() && preType.functorParamTail == null) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "函数调用最多需要" + preType.functorParamList.size() + "个参数,不能是:" + valueStatList.size() + "个");
             }
 
             for (int i = 0; i < valueStatList.size(); ++i) {
                 ALittleValueStat valueStat = valueStatList.get(i);
                 ALittleReferenceUtil.GuessTypeInfo guessTypeInfo = valueStat.guessType();
+                if (i >= preType.functorParamList.size()) break;
                 try {
                     ALittleReferenceOpUtil.guessTypeEqual(myElement, preType.functorParamList.get(i), valueStat, guessTypeInfo);
                 } catch (ALittleReferenceUtil.ALittleReferenceException e) {
@@ -126,7 +131,9 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                 // 检查这次所在的函数必须要有await或者async修饰
                 PsiElement parent = myElement;
                 while (parent != null) {
-                    if (parent instanceof ALittleClassCtorDec) {
+                    if (parent instanceof ALittleNamespaceDec) {
+                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "全局表达式不能调用带有await的函数");
+                    } else if (parent instanceof ALittleClassCtorDec) {
                         throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "构造函数内不能调用带有await的函数");
                     } else if (parent instanceof ALittleClassGetterDec) {
                         throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "getter函数内不能调用带有await的函数");

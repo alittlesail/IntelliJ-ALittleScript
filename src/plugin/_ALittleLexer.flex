@@ -71,12 +71,17 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "'"                   { return APOS; }
   "\""                  { return QUOTE; }
   "\\"                  { return BACK; }
+  "@Proto"              { return PROTO_OPTION; }
+  "..."                 { return PARAM_TAIL; }
   "register"            { return REGISTER; }
   "public"              { return PUBLIC; }
   "private"             { return PRIVATE; }
   "protected"           { return PROTECTED; }
   "async"               { return ASYNC; }
   "await"               { return AWAIT; }
+  "protomsg"            { return PROTOMSG; }
+  "httpget"             { return HTTPGET; }
+  "httppost"            { return HTTPPOST; }
   "namespace"           { return NAMESPACE; }
   "class"               { return CLASS; }
   "struct"              { return STRUCT; }
@@ -108,6 +113,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "auto"                { return AUTO; }
   "new"                 { return NEW; }
   "bind"                { return BIND; }
+  "pcall"               { return PCALL; }
   "true"                { return TRUE; }
   "false"               { return FALSE; }
   "null"                { return NULL; }

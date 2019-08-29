@@ -22,8 +22,8 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
 
         // 第一个参数必须是函数
         ALittleValueStat valueStat = valueStatList.get(0);
-        ALittleReferenceUtil.GuessTypeInfo GuessInfo = valueStat.guessType();
-        if (GuessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
+        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
             throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "bind表达式第一个参数必须是一个函数");
         }
 
@@ -32,19 +32,22 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
         info.value = "Functor<";
         info.element = myElement;
-        info.functorAwait = GuessInfo.functorAwait;
+        info.functorAwait = guessInfo.functorAwait;
         if (info.functorAwait) {
             info.value = "await";
         }
         info.functorParamList = new ArrayList<>();
-        info.functorParamList.addAll(GuessInfo.functorParamList);
+        info.functorParamList.addAll(guessInfo.functorParamList);
         info.functorParamNameList = new ArrayList<>();
-        info.functorParamNameList.addAll(GuessInfo.functorParamNameList);
+        info.functorParamNameList.addAll(guessInfo.functorParamNameList);
         info.functorReturnList = new ArrayList<>();
-        info.functorReturnList.addAll(GuessInfo.functorReturnList);
+        info.functorReturnList.addAll(guessInfo.functorReturnList);
+        info.functorParamTail = guessInfo.functorParamTail;
         // 移除掉以填写的参数
         int paramCount = valueStatList.size() - 1;
-        while (paramCount > 0) {
+        while (paramCount > 0
+                && info.functorParamList.size() > 0
+                && info.functorParamNameList.size() > 0) {
             info.functorParamList.remove(0);
             info.functorParamNameList.remove(0);
             --paramCount;
@@ -53,6 +56,9 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         List<String> nameList = new ArrayList<>();
         for (ALittleReferenceUtil.GuessTypeInfo paramInfo : info.functorParamList) {
             nameList.add(paramInfo.value);
+        }
+        if (info.functorParamTail != null) {
+            nameList.add(info.functorParamTail.value);
         }
         info.value += "(";
         info.value += String.join(",", nameList);
@@ -87,7 +93,11 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
 
         // 后面跟的参数数量不能超过这个函数的参数个数
         if (valueStatList.size() - 1 > guessInfo.functorParamList.size()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "bind表达式参数太多了");
+            if (guessInfo.functorParamTail == null) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "bind表达式参数太多了");
+            } else {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "bind表达式参数太多了，即使被bind的函数定义的参数占位符(...)也不行!");
+            }
         }
 
         // 遍历所有的表达式，看下是否符合

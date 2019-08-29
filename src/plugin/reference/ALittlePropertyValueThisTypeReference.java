@@ -35,7 +35,9 @@ public class ALittlePropertyValueThisTypeReference extends ALittleReference<ALit
         while (true) {
             if (parent == null) break;
 
-            if (parent instanceof ALittleClassDec) {
+            if (parent instanceof ALittleNamespaceDec) {
+                break;
+            } else if (parent instanceof ALittleClassDec) {
                 mClassDec = (ALittleClassDec)parent;
                 break;
             } else if (parent instanceof ALittleClassCtorDec) {

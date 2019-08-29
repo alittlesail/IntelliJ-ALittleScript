@@ -14,31 +14,19 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public class ALittleMethodParamDecImpl extends ASTWrapperPsiElement implements ALittleMethodParamDec {
+public class ALittleProtoModifierImpl extends ASTWrapperPsiElement implements ALittleProtoModifier {
 
-  public ALittleMethodParamDecImpl(@NotNull ASTNode node) {
+  public ALittleProtoModifierImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitMethodParamDec(this);
+    visitor.visitProtoModifier(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ALittleVisitor) accept((ALittleVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public List<ALittleMethodParamOneDec> getMethodParamOneDecList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleMethodParamOneDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleMethodParamTailDec getMethodParamTailDec() {
-    return findChildByClass(ALittleMethodParamTailDec.class);
   }
 
   @Override

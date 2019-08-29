@@ -38,9 +38,9 @@ public class ALittleGenerateLua {
         String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
         VirtualFile dir;
         if (jarPath.endsWith(".jar"))
-            dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "adapter/Lua"));
+            dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "adapter"));
         else
-            dir = VfsUtil.findFileByIoFile(new File(jarPath +"/adapter/Lua"), true);
+            dir = VfsUtil.findFileByIoFile(new File(jarPath +"/adapter"), true);
 
         if (dir != null) {
             VirtualFile[] fileList = dir.getChildren();
@@ -80,9 +80,6 @@ public class ALittleGenerateLua {
             throw new Exception(e.getElement().getContainingFile().getName() + "有语法错误:" + e.getError());
         }
 
-        List<String> mEnumList = new ArrayList<>();
-        List<String> mClassList = new ArrayList<>();
-
         ALittleNamespaceDec namespaceDec = PsiHelper.getNamespaceDec(alittleFile);
         if (namespaceDec == null) throw new Exception("没有定义命名域 namespace");
 
@@ -105,7 +102,9 @@ public class ALittleGenerateLua {
         FileHelper.writeFile(FileHelper.calcScriptPath(module) + alittleRelPath + "lua", content);
 
         // 复制标准库
-        copyStdLibrary(FileHelper.calcScriptPath(module));
+        if (!StdLibraryProvider.isPluginSelf(module.getProject())) {
+            copyStdLibrary(FileHelper.calcScriptPath(module));
+        }
     }
 
     @NotNull
@@ -115,6 +114,22 @@ public class ALittleGenerateLua {
         String content = "ALittle.Bind(";
         if (PsiHelper.getNamespaceName(bindStat.getContainingFile()).equals("ALittle"))
             content = "Bind(";
+        List<String> paramList = new ArrayList<>();
+        for (ALittleValueStat valueStat : valueStatList) {
+            paramList.add(GenerateValueStat(valueStat));
+        }
+        content += String.join(", ", paramList);
+        content += ")";
+        return content;
+    }
+
+    @NotNull
+    private String GeneratePcallStat(ALittlePcallStat pcallStat) throws Exception {
+        List<ALittleValueStat> valueStatList = pcallStat.getValueStatList();
+
+        String content = "ALittle.pcall(";
+        if (PsiHelper.getNamespaceName(pcallStat.getContainingFile()).equals("ALittle"))
+            content = "pcall(";
         List<String> paramList = new ArrayList<>();
         for (ALittleValueStat valueStat : valueStatList) {
             paramList.add(GenerateValueStat(valueStat));
@@ -658,6 +673,12 @@ public class ALittleGenerateLua {
 
         ALittleBindStat bindStat = rootStat.getBindStat();
         if (bindStat != null) return GenerateBindStat(bindStat);
+
+        ALittlePcallStat pcallStat = rootStat.getPcallStat();
+        if (pcallStat != null) return GeneratePcallStat(pcallStat);
+
+        ALittleMethodParamTailDec tailDec = rootStat.getMethodParamTailDec();
+        if (tailDec != null) return tailDec.getText();
 
         return "";
     }
@@ -1443,6 +1464,10 @@ public class ALittleGenerateLua {
                     }
                     paramNameList.add(paramNameDec.getIdContent().getText());
                 }
+                ALittleMethodParamTailDec tailDec = paramDec.getMethodParamTailDec();
+                if (tailDec != null) {
+                    paramNameList.add(tailDec.getText());
+                }
             }
             String methodParamList = String.join(", ", paramNameList);
             content.append(preTab)
@@ -1491,6 +1516,10 @@ public class ALittleGenerateLua {
                         throw new Exception("class " + className + " 静态函数没有参数名");
                     }
                     paramNameList.add(paramNameDec.getIdContent().getText());
+                }
+                ALittleMethodParamTailDec tailDec = paramDec.getMethodParamTailDec();
+                if (tailDec != null) {
+                    paramNameList.add(tailDec.getText());
                 }
             }
 
@@ -1584,16 +1613,37 @@ public class ALittleGenerateLua {
                 }
                 paramNameList.add(paramNameDec.getIdContent().getText());
             }
+            ALittleMethodParamTailDec tailDec = paramDec.getMethodParamTailDec();
+            if (tailDec != null) {
+                paramNameList.add(tailDec.getText());
+            }
         }
+
+        boolean isPrivate = PsiHelper.calcAccessType(root.getAccessModifier()) == PsiHelper.ClassAccessType.PRIVATE;
 
         StringBuilder content = new StringBuilder();
         String methodParamList = String.join(", ", paramNameList);
-        content.append(preTab)
-                .append("function ")
-                .append(methodName)
-                .append("(")
-                .append(methodParamList)
-                .append(")\n");
+
+        if (isPrivate) {
+            content.append(preTab)
+                    .append("local ")
+                    .append(methodName)
+                    .append("\n")
+                    .append(preTab)
+                    .append(methodName)
+                    .append(" = ")
+                    .append("function")
+                    .append("(")
+                    .append(methodParamList)
+                    .append(")\n");
+        } else {
+            content.append(preTab)
+                    .append("function ")
+                    .append(methodName)
+                    .append("(")
+                    .append(methodParamList)
+                    .append(")\n");
+        }
 
         ALittleMethodBodyDec classMethodBodyDec = root.getMethodBodyDec();
         if (classMethodBodyDec == null) {
@@ -1648,6 +1698,12 @@ public class ALittleGenerateLua {
             // 处理全局函数
             } else if (child instanceof ALittleGlobalMethodDec) {
                 otherContent.append(GenerateGlobalMethod((ALittleGlobalMethodDec)child, ""));
+            // 处理全局操作表达式
+            } else if (child instanceof ALittleOpAssignExpr) {
+                otherContent.append(GenerateOpAssignExpr((ALittleOpAssignExpr)child, ""));
+            // 处理函数调用
+            } else if (child instanceof ALittlePropertyValueExpr) {
+                otherContent.append(GeneratePropertyValueExpr((ALittlePropertyValueExpr)child, ""));
             }
         }
 

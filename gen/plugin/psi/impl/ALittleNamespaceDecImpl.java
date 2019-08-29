@@ -60,6 +60,18 @@ public class ALittleNamespaceDecImpl extends ASTWrapperPsiElement implements ALi
   }
 
   @Override
+  @NotNull
+  public List<ALittleOpAssignExpr> getOpAssignExprList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleOpAssignExpr.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ALittlePropertyValueExpr> getPropertyValueExprList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittlePropertyValueExpr.class);
+  }
+
+  @Override
   @Nullable
   public ALittleRegisterModifier getRegisterModifier() {
     return findChildByClass(ALittleRegisterModifier.class);

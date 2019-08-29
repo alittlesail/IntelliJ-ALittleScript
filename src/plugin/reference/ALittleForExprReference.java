@@ -61,9 +61,6 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
 
             // 如果for的对象是any，那么就放过，不检查了
             ALittleReferenceUtil.GuessTypeInfo guessType = valueStat.guessType();
-            if (guessType.value.equals("any")) {
-                return;
-            }
 
             List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
             if (guessType.type == ALittleReferenceUtil.GuessType.GT_LIST) {
@@ -98,7 +95,6 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                     throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "key变量格式错误，不能是:" + keyGuessType.value + " :" + e.getError());
                 }
 
-
                 ALittleReferenceUtil.GuessTypeInfo valueGuessType = pairDecList.get(1).guessType();
                 try {
                     ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessType.mapValueType, pairDecList.get(1), valueGuessType);
@@ -109,7 +105,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                 return;
             }
 
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "遍历对象类型必须是List,Map,any");
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "遍历对象类型必须是List,Map");
         }
     }
 }
