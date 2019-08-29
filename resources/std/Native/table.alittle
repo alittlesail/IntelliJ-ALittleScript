@@ -1,8 +1,13 @@
 
-register namespace lua;
+register namespace ALittle;
 
 public class table
 {
+    // 创建一张表
+    public static create() : any {}
+    // 设置弱引用
+    public static setweak(any table, bool key, bool value) {}
+
     // Given an array where all elements are strings or numbers, returns table[i]..sep..table[i+1] ··· sep..table[j].
     // The default value for sep is the empty string, the default for i is 1, and the default for j is the length of the table.
     // If i is greater than j, returns the empty string.
@@ -12,6 +17,7 @@ public class table
     // The default value for pos is n+1, where n is the length of the table (see §2.5.5),
     //     so that a call table.insert(t,x) inserts x at the end of table t.
     public static insert(List<any> list, int index, any object) {}
+    public static push(List<any> list, any object) {}
 
     // Returns the largest positive numerical index of the given table, or zero if the table has no positive numerical indices.
     // (To do its job this function does a linear traversal of the whole table.)

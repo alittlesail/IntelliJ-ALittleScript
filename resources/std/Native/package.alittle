@@ -1,5 +1,5 @@
 
-register namespace lua;
+register namespace ALittle;
 
 public class Package
 {

@@ -1,0 +1,70 @@
+
+namespace ALittle;
+
+// 设置自定义的日志函数，如果没有设置，那么默认使用lua的print
+// func回调的第一个参数是打印的内容，第二个参数是打印的等级参考LogLevel枚举
+public enum LogLevel
+{
+    INFO = 0,
+    WARN = 1,
+    ERROR = 2,
+}
+
+private Functor<(string, int)> __log;
+public static SetLogCallback(Functor<(string, int)> func)
+{
+    __log = func;
+}
+
+private auto __push = table.push;
+private auto __concat = table.concat;
+public static Log(...)
+{
+    // 创建列表
+    List<any> new_arg = new List<any>();
+    // 获取参数个数
+    int arg_count = select("#", ...);
+    // 遍历参数
+    // 把参数变成字符串添加到列表中
+    for (int i = 1, arg_count, 1)
+        __push(new_arg, tostring(select(i, ...)));
+    // 打印出来
+    if (__log == null)
+        print(__concat(new_arg, "\t"));
+    else
+        __log(__concat(new_arg, "\t"), 0);
+}
+
+public static Warn(...)
+{
+    // 创建列表
+    List<any> new_arg = new List<any>();
+    // 获取参数个数
+    int arg_count = select("#", ...);
+    // 遍历参数
+    // 把参数变成字符串添加到列表中
+    for (int i = 1, arg_count, 1)
+        __push(new_arg, tostring(select(i, ...)));
+    // 打印出来
+    if (__log == null)
+        print(__concat(new_arg, "\t"));
+    else
+        __log(__concat(new_arg, "\t"), 1);
+}
+
+public static Error(...)
+{
+    // 创建列表
+    List<any> new_arg = new List<any>();
+    // 获取参数个数
+    int arg_count = select("#", ...);
+    // 遍历参数
+    // 把参数变成字符串添加到列表中
+    for (int i = 1, arg_count, 1)
+        __push(new_arg, tostring(select(i, ...)));
+    // 打印出来
+    if (__log == null)
+        print(__concat(new_arg, "\t"));
+    else
+        __log(__concat(new_arg, "\t"), 2);
+}

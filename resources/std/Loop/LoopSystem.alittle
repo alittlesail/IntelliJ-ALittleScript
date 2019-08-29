@@ -1,0 +1,144 @@
+
+namespace ALittle;
+
+struct LoopChildInfo
+{
+    string clazz;               // 类型
+    any target;                 // 目标值
+    int total_time;             // 时长
+    int delay_time;             // 延时
+}
+
+struct LoopListInfo
+{
+    string link;                // 绑定名
+    string attribute;           // 属性名
+    any init;                   // 初始值
+    List<LoopChildInfo> childs;  // 子循环信息
+}
+
+protected struct LoopGroupInfo
+{
+    List<LoopListInfo> childs;  // 子循环信息
+}
+
+public class LoopObject
+{
+    public fun IsCompleted() : bool {}
+    public fun Completed() {}
+    public fun Update(int frame_time) {}
+    public fun Reset() {}
+    public fun SetTime(int time) : int, bool {}
+    public fun SetCompleted() {}
+    public fun Start() {}
+    public fun Close() {}
+}
+
+public class LoopSystem
+{
+    private Map<LoopObject, bool> _loop_updaters;
+    private bool _in_update;
+    private Map<LoopObject, bool> _loop_cache;
+    private bool _cache_empty;
+
+    public Ctor(bool weak)
+    {
+        this._loop_updaters = new Map<LoopObject, bool>();
+        this._in_update = false;
+        this._loop_cache = new Map<LoopObject, bool>();
+        this._cache_empty = true;
+
+        if (weak) table.setweak(this._loop_updaters, true, false);
+    }
+
+    // 添加updater
+    public fun AddUpdater(LoopObject updater)
+    {
+        if (updater == null) return;
+        
+        if (this._in_update)
+        {
+            this._cache_empty = false;
+            this._loop_cache[updater] = true;
+        }
+        else
+        {
+            this._loop_updaters[updater] = true;
+        }
+    }
+    
+    // 移除updater
+    public fun RemoveUpdater(LoopObject updater)
+    {
+        if (updater == null) return;
+        
+        if (this._in_update)
+        {
+            this._cache_empty = false;
+            this._loop_cache[updater] = false;
+        }
+        else
+        {
+            this._loop_updaters[updater] = null;
+        }
+    }
+    
+    // 检查updater是否存在
+    public fun HasUpdater(LoopObject updater) : bool
+    {
+        return this._loop_updaters[updater] != null || this._loop_cache[updater] == true;
+    }
+
+    // 更新
+    public fun Update(int frame_time)
+    {
+        // 标记为正在更新
+        this._in_update = true;
+        
+        // 遍历并更新，并且保存更新完成的对象
+        Map<LoopObject, bool> remove_map = null;
+        for (LoopObject updater, bool v in this._loop_updaters)
+        {
+            if (updater.IsCompleted())
+            {
+                if (remove_map == null)
+                    remove_map = new Map<LoopObject, bool>();
+                remove_map[updater] = true;
+            }
+            else
+            {
+                updater.Update(frame_time);
+            }
+        }
+        
+        // 遍历列表，移除
+        if (remove_map != null)
+        {
+            for (LoopObject updater, bool v in remove_map)
+            {
+                this._loop_updaters[updater] = null;
+                updater.Completed();
+            }
+        }
+        
+        // 处理更新期间所产生的缓存
+        if (!this._cache_empty)
+        {
+            for (LoopObject updater, bool v in this._loop_cache)
+            {
+                if (v)
+                    this._loop_updaters[updater] = true;
+                else
+                    this._loop_updaters[updater] = null;
+            }
+            this._loop_cache = new Map<LoopObject, bool>();
+            this._cache_empty = true;
+        }
+        
+        // 标记为不在更新中
+        this._in_update = false;
+    }
+}
+
+public LoopSystem A_LoopSystem = new LoopSystem(false);
+public LoopSystem A_WeakLoopSystem = new LoopSystem(true);

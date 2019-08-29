@@ -1,0 +1,42 @@
+
+namespace ALittle;
+
+// 协议结构
+public struct ReflectInfo
+{
+    string name;                 // 带命名域的结构体名
+    List<string> name_list;      // 变量名列表
+    List<string> type_list;      // 变量类型列表
+}
+
+private auto __all_name_reflect = new Map<string, ReflectInfo>();
+table.setweak(__all_name_reflect, false, true);
+private auto __all_id_reflect = new Map<int, ReflectInfo>();
+table.setweak(__all_id_reflect, false, true);
+protected static RegReflect(string name, ReflectInfo info)
+{
+    if (__all_name_reflect[name] != null)
+    {
+        Error("RegReflect 反射信息注册失败，名字为"..name.."已存在");
+        return;
+    }
+    int hash = JSHash(name);
+    ReflectInfo old_info = __all_id_reflect[hash];
+    if (old_info != null)
+    {
+        Error("RegReflect 名字为"..name.."和名字为"..old_info.name.."哈希值冲突");
+        return;
+    }
+    __all_name_reflect[name] = info;
+    __all_id_reflect[hash] = info;
+}
+
+protected static FindReflectByName(string name) : ReflectInfo
+{
+    return __all_name_reflect[name];
+}
+
+protected static FindReflectById(int id) : ReflectInfo
+{
+    return __all_id_reflect[id];
+}

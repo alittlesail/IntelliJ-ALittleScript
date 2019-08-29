@@ -1,0 +1,30 @@
+
+register namespace ALittle;
+
+public class thread { }
+
+public class coroutine
+{
+    // 唤醒协程对象
+    // 参数
+    // co 协程对象
+    // reason 应答成功时填null，应答失败时填失败的原因
+    // param  应答成功时填对应的参数，应答失败时填null
+    public static resume(thread co, string reason, any param) : bool, string {}
+
+    // Returns the running coroutine, or nil when called by the main thread.
+    public static running() : thread {}
+
+    // Returns the status of coroutine co, as a string:
+    // "running", if the coroutine is running (that is, it called status);
+    // "suspended", if the coroutine is suspended in a call to yield, or if it has not started running yet;
+    // "normal" if the coroutine is active but not running (that is, it has resumed another coroutine);
+    // "dead" if the coroutine has finished its body function, or if it has stopped with an error.
+    public static status(thread co) : string {}
+
+    // Creates a new coroutine, with body f. f must be a Lua function.
+    // Returns a function that resumes the coroutine each time it is called.
+    // Any arguments passed to the function behave as the extra arguments to resume.
+    // Returns the same values returned by resume, except the first boolean. In case of error, propagates the error.
+    public static wrap(any func) : any {}
+}
