@@ -22,11 +22,6 @@ function LoopTimer:Ctor(func, delay_time)
 		Log("LoopTimer create failed:function is nil or not a function")
 		return
 	end
-	if delay_time == 0 then
-		self._accumulate_count = self._accumulate_count + 1
-		___rawset(self, "_accumulate_delay_time", self._total_delay_time)
-		func()
-	end
 	___rawset(self, "_complete_callback", nil)
 end
 

@@ -1,0 +1,246 @@
+namespace ALittle;
+
+private auto __lshift = bit.lshift;
+private auto __rshift = bit.rshift;
+private auto __bxor = bit.bxor;
+
+private auto __byte = String.byte;
+private auto __sub = String.sub;
+private auto __len = String.len;
+private auto __find = String.find;
+private auto __concat = table.concat;
+
+// 哈希函数
+public static JSHash(string str) : int
+{
+    auto l = __len(str);
+    auto h = l;
+    auto step = __rshift(l, 5) + 1;
+
+    for (auto i=l,step,-step)
+        h = __bxor(h, (__lshift(h, 5) + __byte(str, i) + __rshift(h, 2)));
+
+    return h;
+}
+
+// 深度复制表
+public static String_CopyTable(any info) : any
+{
+    Map<any, any> new_info = new Map<any, any>();
+    for (any key, any value in cast<Map<any, any> >(info))
+    {
+        if (type(value) != "table")
+            new_info[key] = value;
+        else
+            new_info[key] = String_CopyTable(value);
+    }
+    return new_info;
+}
+
+// 根据分隔符拆分字符串成列表，正常版本
+public static String_Split(string target, string sep) : List<string>
+{
+    if (target == null)
+        return new List<string>();
+    if (sep == null || sep == "")
+        sep = ":";
+    List<string> fields = new List<string>();
+    int fields_count = 0;
+    int start_pos = 1;
+    while (true)
+    {
+        int start_index = __find(target, sep, start_pos);
+        if (start_index == null)
+        {
+            ++fields_count;
+            fields[fields_count] = __sub(target, start_pos);
+            break;
+        }
+        ++fields_count;
+        fields[fields_count] = __sub(target, start_pos, start_index - 1);
+        start_pos = start_index + __len(sep);
+    }
+    return fields;
+}
+
+// 根据分隔符拆分字符串成列表，正常版本
+public static String_SplitSepList(string target, List<string> sep_list) : List<string>
+{
+    if (target == null) return new List<string>();
+    if (sep_list == null) sep_list = new List<string>();
+
+    List<string> fields = new List<string>();
+    int fields_count = 0;
+    int start_pos = 1;
+    while (true)
+    {
+        int start_index;
+        int end_index;
+        for (int _, string sep in sep_list)
+        {
+            int start_index_tmp = __find(target, sep, start_pos);
+            if (start_index_tmp != null)
+            {
+                if (start_index == null || start_index_tmp < start_index)
+                {
+                    start_index = start_index_tmp;
+                    end_index = start_index + __len(sep) - 1;
+                }
+            }
+        }
+        if (start_index == null)
+        {
+            string value = __sub(target, start_pos);
+            if (__len(value) > 0)
+            {
+                ++ fields_count;
+                fields[fields_count] = __sub(target, start_pos);
+            }
+            break;
+        }
+
+        string value = __sub(target, start_pos, start_index - 1);
+        if (__len(value) > 0)
+        {
+            ++ fields_count;
+            fields[fields_count] = __sub(target, start_pos, start_index - 1);
+        }
+        start_pos = end_index + 1;
+    }
+    return fields;
+}
+
+// 把列表以分隔符合并成字符串
+public static String_Join(List<any> list, string sep) : string
+{
+    return __concat(list, sep);
+}
+
+// 往Url尾巴添加参数
+public static String_UrlAppendParam(string url, string param) : string
+{
+    if (String.find(url, "?", 1) == null)
+        url = url .. "?";
+    else
+        url = url .. "&";
+
+    return url .. param;
+}
+
+// 把Url解析成需要的信息
+struct UrlAnalyseInfo
+{
+    string protocol;
+    string ip;
+    int port;
+    string path;
+    Map<string, string> value_map;
+}
+public static String_UrlAnalyse(string url) : UrlAnalyseInfo
+{
+    UrlAnalyseInfo info = new UrlAnalyseInfo();
+    info.value_map = new Map<string, string>();
+
+    int start_pos = 1;
+    int start_index = String.find(url, "http://", start_pos);
+    if (start_index != null)
+    {
+        info.protocol = "http";
+        start_pos = start_index + String.len("http://");
+    }
+    else
+    {
+        start_index = String.find(url, "https://", start_pos);
+        if (start_index != null)
+        {
+            info.protocol = "https";
+            start_pos = start_index + String.len("https://");
+        }
+    }
+
+    string ip_and_port = null;
+    start_index = String.find(url, "/", start_pos);
+    if (start_index != null)
+        ip_and_port = String.sub(url, start_pos, start_index - 1);
+    else
+        ip_and_port = String.sub(url, start_pos);
+
+    int ip_start = String.find(ip_and_port, ":", 1);
+    if (ip_start != null)
+    {
+        info.ip = String.sub(ip_and_port, 1, ip_start - 1);
+        info.port = math.floor(tonumber(String.sub(ip_and_port, ip_start + 1)));
+    }
+    else
+    {
+        info.ip = ip_and_port;
+        info.port = 80;
+        if (info.protocol == "https")
+            info.port = 443;
+    }
+
+    if (start_index == null)
+        return info;
+
+    start_pos = start_index;
+    start_index = String.find(url, "?", start_pos);
+    if (start_index != null)
+        info.path = String.sub(url, start_pos, start_index - 1);
+    else
+        info.path = String.sub(url, start_pos);
+
+    if (start_index == null)
+        return info;
+
+    start_pos = start_index + 1;
+
+    List<string> param_list = String_Split(String.sub(url, start_pos), "&");
+    for (int k, string v in param_list)
+    {
+        List<string> param_list_list = String_Split(v, "=");
+        if (param_list_list[1] != null && param_list_list[2] != null)
+            info.value_map[param_list_list[1]] = param_list_list[2];
+    }
+
+    return info;
+}
+
+class StringGenerateID
+{
+    private int _string_last_time;
+    private int _string_last_index;
+
+    public Ctor()
+    {
+        math.randomseed(os.time());
+        this._string_last_index = 0;
+        this._string_last_time = 0;
+    }
+
+    public fun GenID(string pre) : string
+    {
+        int cur_time = os.time();
+        if (cur_time != this._string_last_time)
+        {
+            this._string_last_time = cur_time;
+            this._string_last_index = 0;
+        }
+        else
+        {
+            ++ this._string_last_index;
+        }
+        string result = "";
+        if (pre != null)
+            result = pre .. "-";
+        result = result .. this._string_last_time .. "-" .. this._string_last_index .. "-" .. math.random(0, 10000) .. "-" .. math.random(0, 10000);
+        return result;
+    }
+}
+
+private StringGenerateID A_StringGenerateID = new StringGenerateID();
+
+// 生成ID
+public static String_GenerateID(string pre) : string
+{
+    return A_StringGenerateID.GenID(pre);
+}

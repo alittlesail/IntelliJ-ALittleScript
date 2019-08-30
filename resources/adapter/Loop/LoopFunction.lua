@@ -29,10 +29,6 @@ function LoopFunction:Ctor(func, count, interval_time, delay_time)
 		Log("LoopFunction create failed:function is nil or not a function")
 		return
 	end
-	if delay_time == 0 then
-		func()
-		self._accumulate_count = self._accumulate_count + 1
-	end
 	___rawset(self, "_complete_callback", nil)
 end
 

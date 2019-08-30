@@ -1,0 +1,18 @@
+
+register namespace ALittle;
+
+public struct FileAttr
+{
+    string mode;        // 文件类型
+    int size;           // 文件大小
+}
+
+protected class __CPPAPIlfs
+{
+    public static currentdir() : string {}
+    public static chdir(string path) : bool {}
+    public static attributes(string path) : FileAttr {}
+    public static dir(string path) : any {}
+    public static rmdir(string path) : bool {}
+    public static mkdir(string path) : bool {}
+}

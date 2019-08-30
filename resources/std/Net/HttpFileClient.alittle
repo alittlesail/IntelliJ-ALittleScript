@@ -1,0 +1,78 @@
+namespace ALittle;
+
+// Http文件协议接口类，负责处理
+public class IHttpFileClient
+{
+    public await fun SendRPC(string url, string file_path, bool download, int start_size) : string, any {}
+}
+
+// 连接对象
+public class IHttpFileInterface
+{
+    public fun GetID() : int {}
+    public fun SetURL(string url, string file_path, bool download, int start_size) {}
+    public fun Start() {}
+    public fun Stop() {}
+    public fun GetCurrentSize() : int {}
+    public fun GetTotalSize() : int {}
+}
+
+// 短连接文件所有的对象集合
+private Map<int, HttpFileClient> __HttpFileClientMap = new Map<int, HttpFileClient>();
+public static FindHttpFileClient(int id) : HttpFileClient { return __HttpFileClientMap[id]; }
+
+public class HttpFileClient : public IHttpFileClient
+{
+    private IHttpFileInterface _interface;
+    private thread _co;
+    private Functor<(IHttpFileInterface)> _callback;        // 下载或者上传的进度回调
+
+    public Ctor(IHttpFileInterface interface, Functor<(IHttpFileInterface)> callback)
+    {
+        this._interface = interface;
+        this._callback = callback;
+    }
+
+    public await fun SendRPC(string url, string file_path, bool download, int start_size) : string, any
+    {
+        thread co = coroutine.running();
+        if (co == null)
+            return "当前不是协程", null;
+
+        this._co = co;
+        __HttpFileClientMap[this._interface.GetID()] = this;
+
+        if (start_size == null)
+            start_size = 0;
+        // 设置URL
+        this._interface.SetURL(url, file_path, download, start_size);
+        this._interface.Start();
+
+        // 协程挂起，并等待返回值
+        return yield;
+    }
+
+    public fun Stop()
+    {
+        this._interface.Stop();
+    }
+
+    public fun HandleSucceed()
+    {
+        __HttpFileClientMap[this._interface.GetID()] = null;
+        assert(coroutine.resume(this._co, null, null));
+    }
+
+    public fun HandleFailed(string reason)
+    {
+        __HttpFileClientMap[this._interface.GetID()] = null;
+        assert(coroutine.resume(this._co, reason, null));
+    }
+
+    public fun HandleProcess()
+    {
+        if (this._callback != null)
+            this._callback(this._interface);
+    }
+}
+

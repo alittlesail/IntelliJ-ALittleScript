@@ -31,14 +31,6 @@ public class LoopTimer : public LoopObject
             Log("LoopTimer create failed:function is nil or not a function");
             return;
         }
-
-        // 如果延时时间为0，则立即调用一次
-        if (delay_time == 0)
-        {
-            ++ this._accumulate_count;
-            this._accumulate_delay_time = this._total_delay_time;
-            func();
-        }
         this._complete_callback = null;    // 完成后会调用这个函数
     }
 

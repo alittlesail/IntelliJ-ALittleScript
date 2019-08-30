@@ -14,21 +14,21 @@ end
 function INetClient:SendRPC(msg_id, msg_body)
 end
 
-INetSystem = Class(nil, "INetSystem")
+INetInterface = Class(nil, "INetInterface")
 
-function INetSystem:GetID()
+function INetInterface:GetID()
 end
 
-function INetSystem:Connect(ip, port)
+function INetInterface:Connect(ip, port)
 end
 
-function INetSystem:IsConnected()
+function INetInterface:IsConnected()
 end
 
-function INetSystem:SendFactory(factory)
+function INetInterface:SendFactory(factory)
 end
 
-function INetSystem:Close()
+function INetInterface:Close()
 end
 
 local __NetClientMap = {}
@@ -38,8 +38,8 @@ end
 
 NetClient = Class(INetClient, "NetClient")
 
-function NetClient:Ctor(net_system, factory, heartbeat, check_heartbeat)
-	___rawset(self, "_net_system", net_system)
+function NetClient:Ctor(net_interface, factory, heartbeat, check_heartbeat)
+	___rawset(self, "_net_interface", net_interface)
 	___rawset(self, "_write_factory", factory)
 	___rawset(self, "_heartbeat", heartbeat)
 	___rawset(self, "_heartbeat_loop", nil)
@@ -68,12 +68,12 @@ function NetClient.__setter:net_disconnected_callback(value)
 end
 
 function NetClient:Connect(ip, port)
-	self._net_system:Connect(ip, port)
-	__NetClientMap[self._net_system:GetID()] = self
+	self._net_interface:Connect(ip, port)
+	__NetClientMap[self._net_interface:GetID()] = self
 end
 
 function NetClient:IsConnected()
-	return self._net_system:IsConnected()
+	return self._net_interface:IsConnected()
 end
 
 function NetClient:HandleConnectSucceed()
@@ -87,7 +87,7 @@ end
 
 function NetClient:HandleDisconnect()
 	self:StopHeartbeat()
-	__NetClientMap[self._net_system:GetID()] = nil
+	__NetClientMap[self._net_interface:GetID()] = nil
 	self:ClearRPC("连接断开了")
 	if self._net_disconnected_callback ~= nil then
 		self._net_disconnected_callback(self)
@@ -95,7 +95,7 @@ function NetClient:HandleDisconnect()
 end
 
 function NetClient:HandleConnectFailed()
-	__NetClientMap[self._net_system:GetID()] = nil
+	__NetClientMap[self._net_interface:GetID()] = nil
 	if self._net_connect_failed_callback ~= nil then
 		self._net_connect_failed_callback(self)
 	end
@@ -194,27 +194,27 @@ end
 function NetClient:Send(msg_id, msg_body, rpc_id)
 	self._write_factory:SetRpcID(rpc_id)
 	self:MessageWrite(msg_id, msg_body)
-	self._net_system:SendFactory(self._write_factory)
+	self._net_interface:SendFactory(self._write_factory)
 end
 
 function NetClient:Close(reason)
 	self:StopHeartbeat()
-	self._net_system:Close()
+	self._net_interface:Close()
 	if reason == nil then
 		reason = "主动关闭连接"
 	end
 	self:ClearRPC(reason)
-	__NetClientMap[self._net_system:GetID()] = nil
+	__NetClientMap[self._net_interface:GetID()] = nil
 end
 
 function NetClient:SendHeartbeat(max_ms)
-	if self._net_system:IsConnected() == false then
+	if self._net_interface:IsConnected() == false then
 		return
 	end
 	self._write_factory:ResetOffset()
 	self._write_factory:SetID(0)
 	self._write_factory:SetRpcID(0)
-	self._net_system:SendFactory(self._write_factory)
+	self._net_interface:SendFactory(self._write_factory)
 	if self._check_heartbeat then
 		local send_time = os.clock()
 		local default_delta = self._heartbeat / 2
@@ -231,14 +231,14 @@ function NetClient:SendHeartbeat(max_ms)
 end
 
 function NetClient:SendRpcError(rpc_id, reason)
-	if self._net_system:IsConnected() == false then
+	if self._net_interface:IsConnected() == false then
 		return
 	end
 	self._write_factory:ResetOffset()
 	self._write_factory:SetID(1)
 	self._write_factory:SetRpcID(rpc_id)
 	self._write_factory:WriteString(reason)
-	self._net_system:SendFactory(self._write_factory)
+	self._net_interface:SendFactory(self._write_factory)
 end
 
 function NetClient:CheckHeartbeat(send_time, cmp_time, delta_time)
@@ -251,7 +251,7 @@ function NetClient:CheckHeartbeat(send_time, cmp_time, delta_time)
 		return
 	end
 	if self._last_recv_time > 0 and send_time - self._last_recv_time > cmp_time then
-		if self._net_system:IsConnected() == false then
+		if self._net_interface:IsConnected() == false then
 			return
 		end
 		self:Close("心跳检测失败，主动断开连接")
@@ -272,7 +272,7 @@ function NetClient:SendRPC(msg_id, msg_body)
 	local rpc_id = self._id_creator:CreateID()
 	self._write_factory:SetRpcID(rpc_id)
 	self:MessageWrite(msg_id, msg_body)
-	self._net_system:SendFactory(self._write_factory)
+	self._net_interface:SendFactory(self._write_factory)
 	local info = {}
 	info.co = co
 	info.rpc_id = rpc_id
@@ -299,7 +299,10 @@ function NetClient:ClearRPC(reason)
 	end
 	self._id_map_rpc = {}
 	for rpc_id, info in ___pairs(tmp) do
-		coroutine.resume(info.co, reason, nil)
+		local result, reason = coroutine.resume(info.co, reason, nil)
+		if result ~= true then
+			Error(reason)
+		end
 	end
 end
 

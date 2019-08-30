@@ -1,0 +1,70 @@
+namespace ALittle;
+
+// Http协议接口类，负责处理
+public class IHttpClient
+{
+    public await fun SendRPC(string url, any content) : string, any {}
+}
+
+// 连接对象
+public class IHttpInterface
+{
+    public fun GetID() : int {}
+    public fun SetURL(string url, string content) {}
+    public fun Start() {}
+    public fun Stop() {}
+    public fun GetResponse() : string {}
+}
+
+// 短连接所有的对象集合
+private Map<int, HttpClient> __HttpClientMap = new Map<int, HttpClient>();
+public static FindHttpClient(int id) : HttpClient { return __HttpClientMap[id]; }
+
+public class HttpClient : public IHttpClient
+{
+    private IHttpInterface _interface;
+    private thread _co;
+
+    public Ctor(IHttpInterface interface)
+    {
+        this._interface = interface;
+    }
+
+    public await fun SendRPC(string url, any content) : string, any
+    {
+        thread co = coroutine.running();
+        if (co == null)
+            return "当前不是协程", null;
+
+        this._co = co;
+        __HttpClientMap[this._interface.GetID()] = this;
+
+        if (content == null)
+            this._interface.SetURL(url, null);
+        else
+            this._interface.SetURL(url, Json.encode(content));
+        this._interface.Start();
+
+        // 协程挂起，并等待返回值
+        return yield;
+    }
+
+    public fun Stop()
+    {
+        this._interface.Stop();
+    }
+
+    public fun HandleSucceed()
+    {
+        __HttpClientMap[this._interface.GetID()] = null;
+        auto error, auto param = pcall(Json.decode, this._interface.GetResponse());
+        assert(coroutine.resume(this._co, error, param));
+    }
+
+    public fun HandleFailed(string reason)
+    {
+        __HttpClientMap[this._interface.GetID()] = null;
+        assert(coroutine.resume(this._co, reason, null));
+    }
+}
+

@@ -1,0 +1,86 @@
+namespace ALittle;
+
+public class ConfigSystem
+{
+    private string              _file_path;
+    private Map<string, any>    _config_map;
+
+    public Ctor(string file_path)
+    {
+        // 保存路径
+        this._file_path = file_path;
+        // 定义KEY-VALUE映射
+        this._config_map = new Map<string, any>();
+
+        // 读取全部内容
+        auto file = this.CreateFileLoader();
+        if (file == null)
+        {
+            Log("CreateFileLoader failed!");
+            return;
+        }
+        string content = file.Load(this._file_path);
+        if (content == null) return;
+
+        // 解析配置文件
+        string error, any json_content = pcall(Json.decode, content);
+        if (error != null)
+        {
+            Log("Json Decode failed." .. file_path .. ", " .. error);
+            return;
+        }
+        // 保存解析内容
+        this._config_map = json_content;
+    }
+
+    private fun CreateFileLoader() : IFileLoader { return new NormalFileLoader(); }
+    private fun CreateFileSaver() : IFileSaver { return new NormalFileSaver(); }
+
+    private fun LoadFile(string file) : string
+    {
+        auto file = io.open(file, "r");
+        if (file == null) return null;
+        string content = file.read("*a");
+        file.close();
+    }
+
+    public fun GetConfig(string key, any default) : any
+    {
+        // 获取值
+        any value = this._config_map[key];
+        // 如果为空则返回默认值
+        if (value == null) return default;
+        return value;
+    }
+
+    public fun SetConfig(string key, any value, bool not_save)
+    {
+        // 保存新值
+        this._config_map[key] = value;
+        if (!not_save)
+            this.SaveConfig();
+    }
+
+    public fun CoverConfig(Map<string, any> msg, bool save)
+    {
+        for (string k, any v in msg)
+            this._config_map[k] = v;
+        if (!save)
+            this.SaveConfig();
+    }
+
+    public fun SaveConfig()
+    {
+        // 保存配置值
+        auto file = this.CreateFileSaver();
+        if (file == null)
+        {
+            Log("CreateFileSaver failed!");
+            return;
+        }
+        if (!file.Save(this._file_path, Json.encode(this._config_map)))
+        {
+            Log("Save Congig Failed.", this._file_path);
+        }
+    }
+}

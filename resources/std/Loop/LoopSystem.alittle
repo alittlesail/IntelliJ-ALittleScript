@@ -1,27 +1,6 @@
 
 namespace ALittle;
 
-struct LoopChildInfo
-{
-    string clazz;               // 类型
-    any target;                 // 目标值
-    int total_time;             // 时长
-    int delay_time;             // 延时
-}
-
-struct LoopListInfo
-{
-    string link;                // 绑定名
-    string attribute;           // 属性名
-    any init;                   // 初始值
-    List<LoopChildInfo> childs;  // 子循环信息
-}
-
-protected struct LoopGroupInfo
-{
-    List<LoopListInfo> childs;  // 子循环信息
-}
-
 public class LoopObject
 {
     public fun IsCompleted() : bool {}

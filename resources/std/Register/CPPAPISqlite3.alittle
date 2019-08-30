@@ -1,0 +1,21 @@
+
+register namespace ALittle;
+
+protected class Sqlite3Stmt
+{
+    public fun nrows() : any {}
+    public fun reset() {}
+    public fun bind_values(any arg1, any arg2, any arg3, any arg4) {}
+}
+
+protected class Sqlite3Object
+{
+    public fun prepare(string sql) : Sqlite3Stmt {}
+    public fun close() {}
+    public fun exec(string sql) {}
+}
+
+protected class Sqlite3
+{
+    public static open(string db_path) : Sqlite3Object {}
+}

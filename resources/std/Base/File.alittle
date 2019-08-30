@@ -1,0 +1,193 @@
+namespace ALittle;
+
+// 文件加载接口
+public class IFileLoader
+{
+    public fun Load(string file_path) : string {}
+}
+
+// 最普通的文件加载器
+public class NormalFileLoader : public IFileLoader
+{
+    public fun Load(string file_path) : string
+    {
+        auto file = io.open(file_path, "r");
+        if (file == null) return null;
+        auto content = file.read("*a");
+        file.close();
+        return content;
+    }
+}
+
+// 文件保存接口
+public class IFileSaver
+{
+    public fun Save(string file_path, string content) : bool {}
+}
+
+// 最普通的文件保存期
+public class NormalFileSaver : public IFileSaver
+{
+    public fun Save(string file_path, string content) : bool
+    {
+        auto file = io.open(file_path, "w");
+        if (file == null) return false;
+        file.write(content);
+        file.close();
+        return true;
+    }
+}
+
+// 获取当前路径
+public static File_GetCurrentPath() : string { return __CPPAPIlfs.currentdir(); }
+
+// 设置当前路径
+public static File_SetCurrentPath(string path) : bool { return __CPPAPIlfs.chdir(path); }
+
+// 重命名文件
+public static File_RenameFile(string path, string new_path) : bool { return os.rename(path, new_path); }
+
+// 删除文件
+public static File_DeleteFile(string path) : bool { return os.remove(path); }
+
+// 获取文件属性
+public static File_GetFileAttr(string path) : FileAttr { return __CPPAPIlfs.attributes(path); }
+
+// 遍历目录文件
+public static File_IteratorDir(string path) : any { return __CPPAPIlfs.dir(path); }
+
+// 获取某个目录以及子目录下的所有文件属性
+public static File_GetFileAttrByDir(string path, Map<string, FileAttr> file_map) : Map<string, FileAttr>
+{
+    // 初始化参数
+    if (file_map == null)
+        file_map = new Map<string, FileAttr>();
+    // 遍历路径
+    any dir_next = __CPPAPIlfs.dir(path);
+    any key, string file = next(dir_next);
+    while (file != null)
+    {
+        // 跳过当前目录，父级目录
+        if (file != "." && file != "..")
+        {
+            // 生成文件目录
+            string file_path = path .. "/" .. file;
+            // 获取文件属性
+            FileAttr attr = __CPPAPIlfs.attributes(file_path);
+            // 如果是目录，那么就递归遍历
+            if (attr.mode == "directory")
+                File_GetFileAttrByDir(file_path, file_map);
+                // 如果是文件，那么就直接获取属性
+            else
+                file_map[file_path] = attr;
+        }
+
+        key, file = next(dir_next, key);
+    }
+    // 返回结果
+    return file_map;
+}
+
+// 删除文件夹(只对空文件夹有效)
+public static File_DeleteDir(string path) : bool { return __CPPAPIlfs.rmdir(path); }
+
+// 深度删除文件夹
+public static File_DeleteDeepDir(string path, bool log_path)
+{
+    // 拦截判断，如果path是空串，表示当前盘的根目录，所以必须拦截
+    if (path == null || path == "")
+        return;
+    if (File_GetFileAttr(path) == null)
+        return;
+
+    // 遍历文件夹
+    any dir_next = __CPPAPIlfs.dir(path);
+    any key, string file = next(dir_next);
+    while (file != null)
+    {
+        // 跳过当前目录，父级目录
+        if (file != "." && file != "..")
+        {
+            // 生成文件目录
+            string file_path = path .. "/" .. file;
+            // 获取文件属性
+            FileAttr attr = __CPPAPIlfs.attributes(file_path);
+            // 如果是目录，那么就递归删除文件夹
+            if (attr.mode == "directory")
+                File_DeleteDeepDir(file_path, log_path);
+                // 如果是文件，那么就直接删除文件
+            else
+            {
+                File_DeleteFile(file_path);
+                if (log_path)
+                    Log("delete file:", file_path);
+            }
+        }
+
+        key, file = next(dir_next, key);
+    }
+    // 删除文件夹
+    File_DeleteDir(path);
+}
+
+// 创建文件夹
+public static File_MakeDir(string path) : bool { return __CPPAPIlfs.mkdir(path); }
+
+// 深度创建文件夹
+public static File_MakeDeepDir(string path)
+{
+    // 根据路径分隔符分割
+    List<string> path_list = String_SplitSepList(path, ["/", "\\"]);
+    // 遍历路径列表
+    string cur_path = "";
+    for (int index, string sub_path in path_list)
+    {
+        // 计算当前要创建的路径
+        cur_path = cur_path .. sub_path;
+        // 创建路径
+        __CPPAPIlfs.mkdir(cur_path);
+        // 添加分隔符
+        cur_path = cur_path .. "/";
+    }
+}
+
+// 从路径中获取文件名(带后缀)
+public static File_GetFileNameByPath(string file_path) : string
+{
+    auto list = String_SplitSepList(file_path, ["/","\\"]);
+    auto len = table.maxn(list);
+    if (len <= 0) return file_path;
+    return list[len];
+}
+
+// 从路径中获取路径
+public static File_GetFilePathByPath(string file_path) : string
+{
+    string new_file_path = File_GetFileNameByPath(file_path);
+    return String.sub(file_path, 1, -String.len(new_file_path) - 2);
+}
+
+// 从路径中获取扩展名
+public static File_GetFileExtByPath(string file_path) : string
+{
+    auto list = String_Split(file_path, ".");
+    auto len = table.maxn(list);
+    if (len <= 0) return file_path;
+    return list[len];
+}
+
+// 从路径中获取扩展名并改为大写
+public static File_GetFileExtByPathAndUpper(string file_path) : string
+{
+    return String.upper(File_GetFileExtByPath(file_path));
+}
+
+// 从路径中获取文件名(不带后缀)
+public static File_GetJustFileNameByPath(string file_path) : string
+{
+    string new_file_path = File_GetFileNameByPath(file_path);
+    auto list = String_Split(new_file_path, ".");
+    int len = table.maxn(list);
+    if (len <= 1) return new_file_path;
+    return list[len - 1];
+}

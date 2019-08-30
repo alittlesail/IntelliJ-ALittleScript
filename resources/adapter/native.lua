@@ -1,6 +1,7 @@
 
 module("ALittleScript", package.seeall)
 
+io = io
 bit = bit
 coroutine = coroutine
 require = require
