@@ -103,7 +103,8 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
             if (guessTypeList.isEmpty()) return;
 
             ALittleReferenceUtil.GuessTypeInfo guessType = guessTypeList.get(0);
-            if (guessType.element instanceof ALittleClassStaticDec) {
+            if (guessType.element instanceof ALittleClassStaticDec
+                || guessType.element instanceof ALittleGlobalMethodDec) {
                 Annotation anno = holder.createInfoAnnotation(myElement.getIdContent(), null);
                 anno.setTextAttributes(DefaultLanguageHighlighterColors.STATIC_METHOD);
             }
