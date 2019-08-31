@@ -79,10 +79,15 @@ private protoOption ::= protomsg | httpget | httppost
 namespaceDec ::= registerModifier? namespace namespaceNameDec SEMI (globalMethodDec | classDec | enumDec | structDec | instanceDec | opAssignExpr | propertyValueExpr)* {pin=2}
 namespaceNameDec ::= ID_CONTENT
 
+// 模板定义
+templateDec ::= LESS templatePairDec (COMMA templatePairDec)? GREATER {pin=1}
+templatePairDec ::= ID_CONTENT templateExtendsDec? {pin=1}
+private templateExtendsDec ::= COLON allType {pin=1}
+
 // 类定义
-classDec ::= accessModifier? class classNameDec classExtendsDec? classBodyDec {pin=2}
+classDec ::= accessModifier? class classNameDec templateDec? classExtendsDec? classBodyDec {pin=2}
 classNameDec ::= ID_CONTENT
-classExtendsDec ::= COLON accessModifier? (namespaceNameDec DOT)? classNameDec {pin=1}
+classExtendsDec ::= COLON accessModifier? (namespaceNameDec DOT)? classNameDec templateDec? {pin=1}
 private classBodyDec ::= LBRACE (classVarDec | classCtorDec | classGetterDec | classSetterDec | classStaticDec | classMethodDec)* RBRACE {pin=1}
 
 // 结构体定义
@@ -228,7 +233,9 @@ op1Expr ::= op1 valueStat SEMI {pin=1}
 allType ::= primitiveType | genericType | customType
 
 // 自定义类型
-customType ::= (namespaceNameDec DOT)? ID_CONTENT
+customType ::= (namespaceNameDec DOT)? ID_CONTENT customTypeTemplate?
+private customTypeTemplate ::= LESS allType customTypeTemplatePair* GREATER {pin=1}
+private customTypeTemplatePair ::= COMMA allType {pin=1}
 
 // 通用类型
 genericType ::= genericListType | genericMapType | genericFunctorType

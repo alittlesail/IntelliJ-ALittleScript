@@ -37,6 +37,9 @@ public interface ALittleClassDec extends PsiElement {
   @NotNull
   List<ALittleClassVarDec> getClassVarDecList();
 
+  @Nullable
+  ALittleTemplateDec getTemplateDec();
+
   @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 

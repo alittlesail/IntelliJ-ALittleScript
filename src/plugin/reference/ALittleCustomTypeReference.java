@@ -38,8 +38,27 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
         {
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
                     PsiHelper.PsiElementType.CLASS_NAME, psiFile, mNamespace, mKey, true);
+
+            List<ALittleAllType> templateList = myElement.getAllTypeList();
+            List<ALittleReferenceUtil.GuessTypeInfo> srcGuessList = new ArrayList<>();
+            for (ALittleAllType allType : templateList) {
+                srcGuessList.add(allType.guessType());
+            }
+
             for (PsiElement dec : decList) {
-                guessList.add(((ALittleClassNameDec)dec).guessType());
+                ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleClassNameDec)dec).guessType();
+                List<ALittleReferenceUtil.GuessTypeInfo> templateGuessList = guessInfo.classTemplateList;
+                if (templateList.size() != templateGuessList.size()) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "模板参数数量和类定义的不一致, namespace:" + mNamespace + ", key:" + mKey);
+                }
+                for (int i = 0; i < templateList.size(); ++i) {
+                    ALittleReferenceUtil.GuessTypeInfo templateGuessInfo = templateGuessList.get(i);
+                    if (templateGuessInfo.classTemplateExtends == null) {
+                        continue;
+                    }
+                    ALittleReferenceOpUtil.guessTypeEqual(myElement, templateGuessInfo, myElement, srcGuessList.get(i));
+                }
+                guessList.add(guessInfo);
             }
         }
         {

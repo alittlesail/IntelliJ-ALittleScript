@@ -68,6 +68,7 @@ public class ALittleReferenceUtil {
         GT_ENUM,
         GT_ENUM_NAME,
         GT_PARAM_TAIL,
+        GT_CLASS_TEMPLATE,            // 声明的模板
     }
 
     // 类型信息
@@ -95,6 +96,16 @@ public class ALittleReferenceUtil {
                     if (returnInfo.isChanged()) return true;
                 }
                 return false;
+            } else if (type == GuessType.GT_CLASS_TEMPLATE) {
+                if (classTemplateExtends != null && classTemplateExtends.isChanged()) return true;
+                return false;
+            }
+
+            if (type == GuessType.GT_CLASS && classTemplateList != null) {
+                for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateList) {
+                    if (classTemplateInfo.isChanged()) return true;
+                }
+                return false;
             }
 
             if (element != null && ALittleTreeChangeListener.getGuessTypeList(element) != null) {
@@ -106,6 +117,8 @@ public class ALittleReferenceUtil {
         public GuessType type;
         public String value;                              // 完整类型的字符串
         public PsiElement element;                        // 指向的元素
+        public GuessTypeInfo classTemplateExtends;        // type="GT_CLASS_TEMPLATE"时，如果有继承的类
+        public List<GuessTypeInfo> classTemplateList;     // type="GT_CLASS"时，定义的模板列表
         public GuessTypeInfo listSubType;                 // type="List"时，表示List的子类型
         public GuessTypeInfo mapKeyType;                  // type="Map"时, 表示Map的Key
         public GuessTypeInfo mapValueType;                // type="Map"时, 表示Map的Value
@@ -113,7 +126,7 @@ public class ALittleReferenceUtil {
         public List<String> functorParamNameList;         // type="Functor"时, 表示参数名列表
         public GuessTypeInfo functorParamTail;            // type="Functor"时, 表示参数占位符
         public List<GuessTypeInfo> functorReturnList;     // type="Functor"时, 表示返回值列表
-        public boolean functorAwait;                             // type="Functor"时, 表示是否是await
+        public boolean functorAwait;                      // type="Functor"时, 表示是否是await
     }
 
     // 计算表达式需要使用什么样的变量方式
@@ -218,6 +231,8 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleStructNameDec) return new ALittleStructNameDecReference((ALittleStructNameDec)element, range);
         if (element instanceof ALittleStructVarDec) return new ALittleStructVarDecReference((ALittleStructVarDec)element, range);
 
+        if (element instanceof ALittleTemplateDec) return new ALittleTemplateDecReference((ALittleTemplateDec)element, range);
+        if (element instanceof ALittleTemplatePairDec) return new ALittleTemplatePairDecReference((ALittleTemplatePairDec)element, range);
         if (element instanceof ALittleValueFactorStat) return new ALittleValueFactorStatReference((ALittleValueFactorStat)element, range);
         if (element instanceof ALittleValueStat) return new ALittleValueStatReference((ALittleValueStat)element, range);
 

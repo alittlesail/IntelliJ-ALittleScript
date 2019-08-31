@@ -30,6 +30,12 @@ public class ALittleCustomTypeImpl extends ASTWrapperPsiElement implements ALitt
   }
 
   @Override
+  @NotNull
+  public List<ALittleAllType> getAllTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleAllType.class);
+  }
+
+  @Override
   @Nullable
   public ALittleNamespaceNameDec getNamespaceNameDec() {
     return findChildByClass(ALittleNamespaceNameDec.class);

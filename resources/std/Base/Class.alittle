@@ -2,10 +2,12 @@ namespace ALittle;
 
 public struct ClassInfo
 {
-    string __name;
-    ClassInfo __super;
-    Map<string, Functor<(ObjectInfo):any>> __getter;
-    Map<string, Functor<(ObjectInfo, any)>> __setter;
+    string __name;                      // 类名
+    ClassInfo __super;                  // 父类信息
+    Map<string, ClassInfo> __element;   // 模板元素
+    Map<string, ClassInfo> __child;     // 继承于当前的子模板
+    Map<string, Functor<(ObjectInfo):any>> __getter;    // getter
+    Map<string, Functor<(ObjectInfo, any)>> __setter;   // setter
 }
 
 public struct ObjectInfo
@@ -155,6 +157,43 @@ protected static Class(ClassInfo super, string name) : ClassInfo
     setmetatable(clazz, __class_mt);
     // 返回类模版
     return clazz;
+}
+
+// 定义模板
+protected static Template(ClassInfo clazz, string name, ...) : ClassInfo
+{
+    auto child = clazz.__child;
+    if (child == null)
+    {
+        child = new Map<string, ClassInfo>();
+        clazz.__child = child;
+    }
+    ClassInfo template = child[name];
+    if (template != null) return template;
+
+    // 定义模板
+    template = new ClassInfo();
+    child[name] = template;
+    // 复制
+    template.__super = clazz.__super;
+    template.__name = name;
+    template.__setter = clazz.__setter;
+    template.__getter = clazz.__getter;
+    // 模板元素
+    auto map = new Map<string, ClassInfo>();
+    // 复制模板
+    int len = select("#", ...);
+    for (int i = 1, len, 1)
+    {
+        ClassInfo info = select(i, ...);
+        map[info.__name] = info;
+    }
+    template.__element = map;
+
+    // 设置类模版的元表
+    setmetatable(template, __class_mt);
+    // 返回模板
+    return template;
 }
 
 // 获取类

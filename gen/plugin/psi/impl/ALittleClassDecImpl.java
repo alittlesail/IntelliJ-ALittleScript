@@ -84,6 +84,12 @@ public class ALittleClassDecImpl extends ASTWrapperPsiElement implements ALittle
   }
 
   @Override
+  @Nullable
+  public ALittleTemplateDec getTemplateDec() {
+    return findChildByClass(ALittleTemplateDec.class);
+  }
+
+  @Override
   @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);

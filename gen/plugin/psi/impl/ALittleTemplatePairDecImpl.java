@@ -14,14 +14,14 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public class ALittleClassExtendsDecImpl extends ASTWrapperPsiElement implements ALittleClassExtendsDec {
+public class ALittleTemplatePairDecImpl extends ASTWrapperPsiElement implements ALittleTemplatePairDec {
 
-  public ALittleClassExtendsDecImpl(@NotNull ASTNode node) {
+  public ALittleTemplatePairDecImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitClassExtendsDec(this);
+    visitor.visitTemplatePairDec(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -31,26 +31,14 @@ public class ALittleClassExtendsDecImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ALittleAccessModifier getAccessModifier() {
-    return findChildByClass(ALittleAccessModifier.class);
+  public ALittleAllType getAllType() {
+    return findChildByClass(ALittleAllType.class);
   }
 
   @Override
-  @Nullable
-  public ALittleClassNameDec getClassNameDec() {
-    return findChildByClass(ALittleClassNameDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleNamespaceNameDec getNamespaceNameDec() {
-    return findChildByClass(ALittleNamespaceNameDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleTemplateDec getTemplateDec() {
-    return findChildByClass(ALittleTemplateDec.class);
+  @NotNull
+  public PsiElement getIdContent() {
+    return findNotNullChildByType(ID_CONTENT);
   }
 
   @Override

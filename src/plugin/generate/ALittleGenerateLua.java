@@ -1317,7 +1317,7 @@ public class ALittleGenerateLua {
 
         //类声明//////////////////////////////////////////////////////////////////////////////////////////
         String className = nameDec.getIdContent().getText();
-        StringBuilder content = new StringBuilder(preTab + className);
+        StringBuilder content = new StringBuilder();
 
         String namespacePre = "ALittle.";
         if (mNamespaceName.equals("ALittle")) namespacePre = "";
@@ -1334,9 +1334,24 @@ public class ALittleGenerateLua {
         }
         if (extendsName.equals("")) {
             extendsName = "nil";
+        } else {
+            content.append(preTab)
+                    .append("assert(")
+                    .append(extendsName)
+                    .append(", \" extends class:")
+                    .append(extendsName)
+                    .append(" is nil\")\n");
         }
 
-        content.append(" = ").append(namespacePre).append("Class(").append(extendsName).append(", \"").append(className).append("\")\n\n");
+        content.append(preTab)
+                .append(className)
+                .append(" = ")
+                .append(namespacePre)
+                .append("Class(")
+                .append(extendsName)
+                .append(", \"")
+                .append(className)
+                .append("\")\n\n");
 
         //构建构造函数//////////////////////////////////////////////////////////////////////////////////////////
         String ctorParamList = "";

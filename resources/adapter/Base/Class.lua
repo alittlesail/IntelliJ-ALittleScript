@@ -102,6 +102,33 @@ function Class(super, name)
 	return clazz
 end
 
+function Template(clazz, name, ...)
+	local child = clazz.__child
+	if child == nil then
+		child = {}
+		clazz.__child = child
+	end
+	local template = child[name]
+	if template ~= nil then
+		return template
+	end
+	template = {}
+	child[name] = template
+	template.__super = clazz.__super
+	template.__name = name
+	template.__setter = clazz.__setter
+	template.__getter = clazz.__getter
+	local map = {}
+	local len = select("#", ...)
+	for i = 1, len, 1 do
+		local info = select(i, ...)
+		map[info.__name] = info
+	end
+	template.__element = map
+	setmetatable(template, __class_mt)
+	return template
+end
+
 function GetClass(object)
 	if type(object) ~= "table" then
 		return nil

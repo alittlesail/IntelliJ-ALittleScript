@@ -10,6 +10,9 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
 public interface ALittleCustomType extends PsiElement {
 
+  @NotNull
+  List<ALittleAllType> getAllTypeList();
+
   @Nullable
   ALittleNamespaceNameDec getNamespaceNameDec();
 

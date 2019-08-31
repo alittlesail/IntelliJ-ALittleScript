@@ -119,6 +119,8 @@ public interface ALittleTypes {
   IElementType STRUCT_EXTENDS_DEC = new ALittleElementType("STRUCT_EXTENDS_DEC");
   IElementType STRUCT_NAME_DEC = new ALittleElementType("STRUCT_NAME_DEC");
   IElementType STRUCT_VAR_DEC = new ALittleElementType("STRUCT_VAR_DEC");
+  IElementType TEMPLATE_DEC = new ALittleElementType("TEMPLATE_DEC");
+  IElementType TEMPLATE_PAIR_DEC = new ALittleElementType("TEMPLATE_PAIR_DEC");
   IElementType VALUE_FACTOR_STAT = new ALittleElementType("VALUE_FACTOR_STAT");
   IElementType VALUE_STAT = new ALittleElementType("VALUE_STAT");
   IElementType VAR_ASSIGN_DEC = new ALittleElementType("VAR_ASSIGN_DEC");
@@ -553,6 +555,12 @@ public interface ALittleTypes {
       }
       else if (type == STRUCT_VAR_DEC) {
         return new ALittleStructVarDecImpl(node);
+      }
+      else if (type == TEMPLATE_DEC) {
+        return new ALittleTemplateDecImpl(node);
+      }
+      else if (type == TEMPLATE_PAIR_DEC) {
+        return new ALittleTemplatePairDecImpl(node);
       }
       else if (type == VALUE_FACTOR_STAT) {
         return new ALittleValueFactorStatImpl(node);
