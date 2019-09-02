@@ -13,14 +13,14 @@ public interface ALittleClassExtendsDec extends PsiElement {
   @Nullable
   ALittleAccessModifier getAccessModifier();
 
+  @NotNull
+  List<ALittleAllType> getAllTypeList();
+
   @Nullable
   ALittleClassNameDec getClassNameDec();
 
   @Nullable
   ALittleNamespaceNameDec getNamespaceNameDec();
-
-  @Nullable
-  ALittleTemplateDec getTemplateDec();
 
   @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;

@@ -15,10 +15,26 @@ public class ALittleClassData {
     }
 
     public void addALittleClassChildDec(@NotNull PsiElement dec) {
+        // 模板定义特殊处理
+        if (dec instanceof ALittleTemplateDec) {
+            ALittleTemplateDec templateDec = (ALittleTemplateDec)dec;
+            List<ALittleTemplatePairDec> pairDecList = templateDec.getTemplatePairDecList();
+            for (ALittleTemplatePairDec pairDec : pairDecList) {
+                addALittleClassChildDec(pairDec);
+            }
+            return;
+        }
+
         PsiHelper.ClassAccessType accessType;
         PsiHelper.ClassAttrType attrType;
         String name;
-        if (dec instanceof ALittleClassVarDec) {
+
+        if (dec instanceof ALittleTemplatePairDec) {
+            ALittleTemplatePairDec pairDec = (ALittleTemplatePairDec)dec;
+            name = pairDec.getIdContent().getText();
+            accessType = PsiHelper.ClassAccessType.PUBLIC;
+            attrType = PsiHelper.ClassAttrType.TEMPLATE;
+        } else if (dec instanceof ALittleClassVarDec) {
             ALittleClassVarDec varDec = (ALittleClassVarDec) dec;
             PsiElement nameDec = varDec.getIdContent();
             if (nameDec == null) return;

@@ -36,6 +36,12 @@ public class ALittleClassExtendsDecImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
+  @NotNull
+  public List<ALittleAllType> getAllTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleAllType.class);
+  }
+
+  @Override
   @Nullable
   public ALittleClassNameDec getClassNameDec() {
     return findChildByClass(ALittleClassNameDec.class);
@@ -45,12 +51,6 @@ public class ALittleClassExtendsDecImpl extends ASTWrapperPsiElement implements 
   @Nullable
   public ALittleNamespaceNameDec getNamespaceNameDec() {
     return findChildByClass(ALittleNamespaceNameDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleTemplateDec getTemplateDec() {
-    return findChildByClass(ALittleTemplateDec.class);
   }
 
   @Override

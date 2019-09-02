@@ -46,6 +46,7 @@ public class PsiHelper {
         GETTER,
         SETTER,
         STATIC,
+        TEMPLATE,
     }
 
     // 访问权限类型

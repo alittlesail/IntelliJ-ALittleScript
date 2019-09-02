@@ -269,7 +269,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // COLON accessModifier? (namespaceNameDec DOT)? classNameDec templateDec?
+  // COLON accessModifier? (namespaceNameDec DOT)? classNameDec classTemplate?
   public static boolean classExtendsDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "classExtendsDec")) return false;
     if (!nextTokenIs(b, COLON)) return false;
@@ -310,10 +310,10 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // templateDec?
+  // classTemplate?
   private static boolean classExtendsDec_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "classExtendsDec_4")) return false;
-    templateDec(b, l + 1);
+    classTemplate(b, l + 1);
     return true;
   }
 
@@ -454,6 +454,47 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "classStaticDec_5")) return false;
     methodReturnDec(b, l + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // LESS allType classTemplatePair* GREATER
+  static boolean classTemplate(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classTemplate")) return false;
+    if (!nextTokenIs(b, LESS)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, LESS);
+    p = r; // pin = 1
+    r = r && report_error_(b, allType(b, l + 1));
+    r = p && report_error_(b, classTemplate_2(b, l + 1)) && r;
+    r = p && consumeToken(b, GREATER) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // classTemplatePair*
+  private static boolean classTemplate_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classTemplate_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!classTemplatePair(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "classTemplate_2", c)) break;
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // COMMA allType
+  static boolean classTemplatePair(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classTemplatePair")) return false;
+    if (!nextTokenIs(b, COMMA)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, COMMA);
+    p = r; // pin = 1
+    r = r && allType(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */

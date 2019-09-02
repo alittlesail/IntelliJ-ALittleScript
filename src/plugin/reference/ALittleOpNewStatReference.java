@@ -42,6 +42,11 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
                 return;
             }
 
+            if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE
+                && guessType.classTemplateExtends != null) {
+                guessType = guessType.classTemplateExtends;
+            }
+
             if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                 ALittleClassDec classDec = (ALittleClassDec) guessType.element;
                 List<ALittleClassCtorDec> ctorDecList = classDec.getClassCtorDecList();

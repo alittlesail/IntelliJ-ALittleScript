@@ -16,9 +16,12 @@ import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomType> {
+    private ALittleClassDec mClassDec;
+
     public ALittleCustomTypeReference(@NotNull ALittleCustomType element, TextRange textRange) {
         super(element, textRange);
 
@@ -27,6 +30,12 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
             mNamespace = namespaceNameDec.getIdContent().getText();
         }
         mKey = element.getIdContent().getText();
+    }
+
+    public ALittleClassDec getClassDec() {
+        if (mClassDec != null) return mClassDec;
+        mClassDec = PsiHelper.findClassDecFromParent(myElement);
+        return mClassDec;
     }
 
     @NotNull
@@ -39,26 +48,56 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
                     PsiHelper.PsiElementType.CLASS_NAME, psiFile, mNamespace, mKey, true);
 
+            // 获取填充的内容，并计算类型
             List<ALittleAllType> templateList = myElement.getAllTypeList();
             List<ALittleReferenceUtil.GuessTypeInfo> srcGuessList = new ArrayList<>();
             for (ALittleAllType allType : templateList) {
                 srcGuessList.add(allType.guessType());
             }
 
+            // 遍历
             for (PsiElement dec : decList) {
+                // 获取模板参数，并把有类继承的拿出来比对，是否符合条件
                 ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleClassNameDec)dec).guessType();
                 List<ALittleReferenceUtil.GuessTypeInfo> templateGuessList = guessInfo.classTemplateList;
                 if (templateList.size() != templateGuessList.size()) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "模板参数数量和类定义的不一致, namespace:" + mNamespace + ", key:" + mKey);
                 }
                 for (int i = 0; i < templateList.size(); ++i) {
-                    ALittleReferenceUtil.GuessTypeInfo templateGuessInfo = templateGuessList.get(i);
-                    if (templateGuessInfo.classTemplateExtends == null) {
-                        continue;
-                    }
-                    ALittleReferenceOpUtil.guessTypeEqual(myElement, templateGuessInfo, myElement, srcGuessList.get(i));
+                    ALittleReferenceOpUtil.guessTypeEqual(myElement, templateGuessList.get(i), myElement, srcGuessList.get(i));
                 }
+
+                if (!templateGuessList.isEmpty()) {
+                    ALittleClassDec srcClassDec = (ALittleClassDec) guessInfo.element;
+                    ALittleClassNameDec srcClassNameDec = srcClassDec.getClassNameDec();
+                    if (srcClassNameDec == null)
+                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "类模板没有定义类名");
+
+                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+                    info.type = guessInfo.type;
+                    info.element = guessInfo.element;
+                    info.value = PsiHelper.getNamespaceName(srcClassDec) + "." + srcClassNameDec.getIdContent().getText();
+                    info.classTemplateMap = new HashMap<>();
+                    List<String> nameList = new ArrayList<>();
+                    for (int i = 0; i < templateGuessList.size(); ++i) {
+                        nameList.add(srcGuessList.get(i).value);
+                        info.classTemplateMap.put(templateGuessList.get(i).value, srcGuessList.get(i));
+                    }
+                    info.value += "<" + String.join(",", nameList) + ">";
+                    guessInfo = info;
+                }
+
                 guessList.add(guessInfo);
+            }
+        }
+        {
+            ALittleClassDec classDec = getClassDec();
+            if (classDec != null) {
+                List<PsiElement> decList = new ArrayList<>();
+                ALittleTreeChangeListener.findClassAttrList(classDec, PsiHelper.sAccessPrivateAndProtectedAndPublic, PsiHelper.ClassAttrType.TEMPLATE, mKey, decList);
+                for (PsiElement dec : decList) {
+                    guessList.add(((ALittleTemplatePairDec)dec).guessType());
+                }
             }
         }
         {
@@ -110,6 +149,16 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
             }
         }
         {
+            ALittleClassDec classDec = getClassDec();
+            if (classDec != null) {
+                List<PsiElement> decList = new ArrayList<>();
+                ALittleTreeChangeListener.findClassAttrList(classDec, PsiHelper.sAccessPrivateAndProtectedAndPublic, PsiHelper.ClassAttrType.TEMPLATE, mKey, decList);
+                for (PsiElement dec : decList) {
+                    results.add(new PsiElementResolveResult(dec));
+                }
+            }
+        }
+        {
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
                     PsiHelper.PsiElementType.STRUCT_NAME, psiFile, mNamespace, mKey, true);
             for (PsiElement dec : decList) {
@@ -142,6 +191,21 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
                         withIcon(ALittleIcons.CLASS).
                         withTypeText(dec.getContainingFile().getName())
                 );
+            }
+        }
+        // 查找模板
+        {
+            ALittleClassDec classDec = getClassDec();
+            if (classDec != null) {
+                List<PsiElement> decList = new ArrayList<>();
+                ALittleTreeChangeListener.findClassAttrList(classDec, PsiHelper.sAccessPrivateAndProtectedAndPublic, PsiHelper.ClassAttrType.TEMPLATE, "", decList);
+                for (PsiElement dec : decList) {
+                    ALittleTemplatePairDec pairDec = (ALittleTemplatePairDec)dec;
+                    variants.add(LookupElementBuilder.create(pairDec.getIdContent().getText()).
+                            withIcon(ALittleIcons.TEMPLATE).
+                            withTypeText(dec.getContainingFile().getName())
+                    );
+                }
             }
         }
         // 结构体名

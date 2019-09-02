@@ -10,6 +10,7 @@ public class ALittleIcons {
     public static final Icon MODULE = IconManager.getInstance().getIcon("/icons/module_icon.png", ALittleIcons.class);
 
     public static final Icon CLASS = AllIcons.Nodes.Class;
+    public static final Icon TEMPLATE = AllIcons.Nodes.Class;
     public static final Icon NAMESPACE = AllIcons.Nodes.Package;
     public static final Icon STRUCT = AllIcons.Nodes.DataTables;
     public static final Icon ENUM = AllIcons.Nodes.Enum;

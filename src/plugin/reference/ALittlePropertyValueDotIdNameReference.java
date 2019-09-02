@@ -26,6 +26,7 @@ import java.util.List;
 public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALittlePropertyValueDotIdName> {
     private List<PsiElement> mGetterList;
     private List<PsiElement> mSetterList;
+    private ALittleReferenceUtil.GuessTypeInfo mClassGuessInfo;
 
     public ALittlePropertyValueDotIdNameReference(@NotNull ALittlePropertyValueDotIdName element, TextRange textRange) {
         super(element, textRange);
@@ -37,6 +38,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
         mGetterList = null;
         mSetterList = null;
+        mClassGuessInfo = null;
 
         ResolveResult[] resultList = multiResolve(false);
         for (ResolveResult result : resultList) {
@@ -45,6 +47,14 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             ALittleReferenceUtil.GuessTypeInfo guess = null;
             if (element instanceof ALittleClassVarDec) {
                 guess = ((ALittleClassVarDec) element).guessType();
+
+                if (mClassGuessInfo != null && guess.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE && mClassGuessInfo.classTemplateMap != null) {
+                    if (!mClassGuessInfo.classTemplateMap.containsKey(guess.value)) {
+                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, mClassGuessInfo.value + "没有定义模板" + guess.value);
+                    }
+                    guess = mClassGuessInfo.classTemplateMap.get(guess.value);
+                }
+
             } else if (element instanceof ALittleStructVarDec) {
                 guess = ((ALittleStructVarDec) element).guessType();
             } else if (element instanceof ALittleEnumVarDec) {
@@ -58,6 +68,84 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 } else if (element.getParent() instanceof ALittleClassSetterDec) {
                     if (mSetterList != null && mSetterList.indexOf(element) >= 0) {
                         guess = guess.functorParamList.get(1);
+                    }
+                }
+
+                if (mClassGuessInfo != null && mClassGuessInfo.classTemplateMap != null) {
+                    // 检查是否有模板
+                    boolean has_template = false;
+                    for (ALittleReferenceUtil.GuessTypeInfo returnGuessInfo : guess.functorReturnList) {
+                        if (returnGuessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+                            has_template = true;
+                            break;
+                        }
+                    }
+                    if (!has_template) {
+                        for (ALittleReferenceUtil.GuessTypeInfo paramGuessInfo : guess.functorParamList) {
+                            if (paramGuessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+                                has_template = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 如果有模板参数，那么就要重新构建一下
+                    if (has_template) {
+                        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+                        info.type = guess.type;
+                        info.element = guess.element;
+                        info.functorAwait = guess.functorAwait;
+                        info.functorParamTail = guess.functorParamTail;
+                        info.value = "Functor<(";
+                        if (info.functorAwait) {
+                            info.value = "Functor<await(";
+                        }
+
+                        info.functorParamList = new ArrayList<>();
+                        info.functorParamNameList = new ArrayList<>();
+                        info.functorParamNameList.addAll(guess.functorParamNameList);
+
+                        List<String> typeList = new ArrayList<>();
+                        int start_index = 0;
+                        if (element.getParent() instanceof ALittleClassMethodDec) {
+                            info.functorParamList.add(mClassGuessInfo);
+                            typeList.add(mClassGuessInfo.value);
+                            start_index = 1;
+                        }
+                        for (int i = start_index; i < guess.functorParamList.size(); ++i) {
+                            ALittleReferenceUtil.GuessTypeInfo guessInfo = guess.functorParamList.get(i);
+                            if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+                                if (!mClassGuessInfo.classTemplateMap.containsKey(guessInfo.value)) {
+                                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, mClassGuessInfo.value + "没有定义模板" + guessInfo.value);
+                                }
+                                ALittleReferenceUtil.GuessTypeInfo templateGuessInfo = mClassGuessInfo.classTemplateMap.get(guessInfo.value);
+                                info.functorParamList.add(templateGuessInfo);
+                                typeList.add(templateGuessInfo.value);
+                            } else {
+                                info.functorParamList.add(guessInfo);
+                                typeList.add(guessInfo.value);
+                            }
+                        }
+                        info.value += String.join(",", typeList) + ")";
+                        info.functorReturnList = new ArrayList<>();
+                        typeList = new ArrayList<>();
+                        for (ALittleReferenceUtil.GuessTypeInfo guessInfo : guess.functorReturnList) {
+                            if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+                                if (!mClassGuessInfo.classTemplateMap.containsKey(guessInfo.value)) {
+                                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, mClassGuessInfo.value + "没有定义模板" + guessInfo.value);
+                                }
+                                ALittleReferenceUtil.GuessTypeInfo templateGuessInfo = mClassGuessInfo.classTemplateMap.get(guessInfo.value);
+                                info.functorReturnList.add(templateGuessInfo);
+                                typeList.add(templateGuessInfo.value);
+                            } else {
+                                info.functorReturnList.add(guessInfo);
+                                typeList.add(guessInfo.value);
+                            }
+                        }
+                        if (!typeList.isEmpty()) info.value += ":";
+                        info.value += String.join(",", typeList);
+
+                        guess = info;
                     }
                 }
             } else if (element instanceof ALittleVarAssignNameDec) {
@@ -83,6 +171,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
         mGetterList = null;
         mSetterList = null;
+        mClassGuessInfo = null;
 
         return guessList;
     }
@@ -157,6 +246,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
             // 处理类的实例对象
             if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+                mClassGuessInfo = preType;
                 ALittleClassDec classDec = (ALittleClassDec)preType.element;
 
                 // 计算当前元素所在的类

@@ -713,6 +713,14 @@ public class ALittleReferenceOpUtil {
             throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
         }
 
+        if (leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+            if (leftGuessInfo.classTemplateExtends != null) {
+                guessTypeEqual(leftSrc, leftGuessInfo.classTemplateExtends, rightSrc, rightGuessInfo);
+                return;
+            }
+            throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
+        }
+
         if (leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
             if (rightGuessInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);

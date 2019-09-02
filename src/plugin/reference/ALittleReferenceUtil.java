@@ -101,9 +101,16 @@ public class ALittleReferenceUtil {
                 return false;
             }
 
-            if (type == GuessType.GT_CLASS && classTemplateList != null) {
-                for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateList) {
-                    if (classTemplateInfo.isChanged()) return true;
+            if (type == GuessType.GT_CLASS) {
+                if (classTemplateList != null) {
+                    for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateList) {
+                        if (classTemplateInfo.isChanged()) return true;
+                    }
+                }
+                if (classTemplateMap != null) {
+                    for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateMap.values()) {
+                        if (classTemplateInfo.isChanged()) return true;
+                    }
                 }
                 return false;
             }
@@ -119,6 +126,7 @@ public class ALittleReferenceUtil {
         public PsiElement element;                        // 指向的元素
         public GuessTypeInfo classTemplateExtends;        // type="GT_CLASS_TEMPLATE"时，如果有继承的类
         public List<GuessTypeInfo> classTemplateList;     // type="GT_CLASS"时，定义的模板列表
+        public Map<String, GuessTypeInfo> classTemplateMap; // type="GT_CLASS"时，属于实例化模板时的类型映射, KEY是模板定义名，Value是实例对象
         public GuessTypeInfo listSubType;                 // type="List"时，表示List的子类型
         public GuessTypeInfo mapKeyType;                  // type="Map"时, 表示Map的Key
         public GuessTypeInfo mapValueType;                // type="Map"时, 表示Map的Value
