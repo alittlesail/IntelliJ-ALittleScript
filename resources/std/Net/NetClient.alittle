@@ -25,14 +25,14 @@ struct NetClientRPCInfo
 }
 
 // 长连接所有的对象集合
-private Map<int, NetClient> __NetClientMap = new Map<int, NetClient>();
-public static FindNetClient(int id) : NetClient { return __NetClientMap[id]; }
+private Map<int, INetClient> __NetClientMap = new Map<int, INetClient>();
+public static FindNetClient(int id) : INetClient { return __NetClientMap[id]; }
 
 // 用于长连接
-public class NetClient : public INetClient
+public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public INetClient
 {
-    private INetInterface _net_interface;                  // 网络对象
-    private IMessageWriteFactory _write_factory;     // 协议序列化对象
+    private NI _net_interface;      // 网络对象
+    private MWF _write_factory;     // 协议序列化对象
     private Map<int, ProtocolInvokeInfo> _invoke_map;// 协议缓存数据
 
     private int _heartbeat;                 // 心跳间隔时间
@@ -42,9 +42,9 @@ public class NetClient : public INetClient
     private SafeIDCreator _id_creator;
     private Map<int, NetClientRPCInfo> _id_map_rpc;
 
-    private Functor<(NetClient)> _net_connect_succeed_callback;
-    private Functor<(NetClient)> _net_connect_failed_callback;
-    private Functor<(NetClient)> _net_disconnected_callback;
+    private Functor<(INetClient)> _net_connect_succeed_callback;
+    private Functor<(INetClient)> _net_connect_failed_callback;
+    private Functor<(INetClient)> _net_disconnected_callback;
 
     // @param protocol 协议对象
     // @param heartbeat 心跳间隔时间(秒)
@@ -52,8 +52,8 @@ public class NetClient : public INetClient
     public Ctor(INetInterface net_interface, IMessageWriteFactory factory, int heartbeat, bool check_heartbeat)
     {
         // 创建客户端对象
-        this._net_interface = net_interface;
-        this._write_factory = factory;
+        this._net_interface = new NI();
+        this._write_factory = new MWF();
         // 定时心跳
         this._heartbeat = heartbeat;
         this._heartbeat_loop = null;
@@ -72,15 +72,15 @@ public class NetClient : public INetClient
         this._net_disconnected_callback = null;
     }
 
-    public set net_connect_succeed_callback(Functor<(NetClient)> value)
+    public set net_connect_succeed_callback(Functor<(INetClient)> value)
     {
         this._net_connect_succeed_callback = value;
     }
-    public set net_connect_failed_callback(Functor<(NetClient)> value)
+    public set net_connect_failed_callback(Functor<(INetClient)> value)
     {
         this._net_connect_failed_callback = value;
     }
-    public set net_disconnected_callback(Functor<(NetClient)> value)
+    public set net_disconnected_callback(Functor<(INetClient)> value)
     {
         this._net_disconnected_callback = value;
     }
@@ -186,7 +186,7 @@ public class NetClient : public INetClient
         if (rpc_id == 0)
         {
             // 获取函数对象
-            Functor<(NetClient, any) : any> callback = FindMessageCallback(id);
+            Functor<(INetClient, any) : any> callback = FindMessageCallback(id);
             if (callback == null)
             {
                 Log("NetSystem.HandleMessage can't find callback by id:" .. id);
@@ -207,7 +207,7 @@ public class NetClient : public INetClient
         if (rpc_id > 0)
         {
             // 获取函数对象
-            Functor<(NetClient, any) : any> callback, int return_id = FindMessageCallback(id);
+            Functor<(INetClient, any) : any> callback, int return_id = FindMessageCallback(id);
             if (callback == null)
             {
                 this.SendRpcError(-rpc_id, "没有注册消息RPC回调函数");

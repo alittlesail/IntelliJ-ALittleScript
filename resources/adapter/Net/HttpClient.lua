@@ -6,12 +6,12 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-IHttpClient = Class(nil, "IHttpClient")
+IHttpClient = Class(nil, "ALittle.IHttpClient")
 
 function IHttpClient:SendRPC(url, content)
 end
 
-IHttpInterface = Class(nil, "IHttpInterface")
+IHttpInterface = Class(nil, "ALittle.IHttpInterface")
 
 function IHttpInterface:GetID()
 end
@@ -33,10 +33,11 @@ function FindHttpClient(id)
 	return __HttpClientMap[id]
 end
 
-HttpClient = Class(IHttpClient, "HttpClient")
+assert(IHttpClient, " extends class:IHttpClient is nil")
+HttpClient = Class(IHttpClient, "ALittle.HttpClient")
 
-function HttpClient:Ctor(interface)
-	___rawset(self, "_interface", interface)
+function HttpClient:Ctor()
+	___rawset(self, "_interface", ___rawget(self, "__class").__element.HC)
 end
 
 function HttpClient:SendRPC(url, content)

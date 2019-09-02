@@ -6,12 +6,12 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-IHttpFileClient = Class(nil, "IHttpFileClient")
+IHttpFileClient = Class(nil, "ALittle.IHttpFileClient")
 
 function IHttpFileClient:SendRPC(url, file_path, download, start_size)
 end
 
-IHttpFileInterface = Class(nil, "IHttpFileInterface")
+IHttpFileInterface = Class(nil, "ALittle.IHttpFileInterface")
 
 function IHttpFileInterface:GetID()
 end
@@ -36,10 +36,11 @@ function FindHttpFileClient(id)
 	return __HttpFileClientMap[id]
 end
 
-HttpFileClient = Class(IHttpFileClient, "HttpFileClient")
+assert(IHttpFileClient, " extends class:IHttpFileClient is nil")
+HttpFileClient = Class(IHttpFileClient, "ALittle.HttpFileClient")
 
-function HttpFileClient:Ctor(interface, callback)
-	___rawset(self, "_interface", interface)
+function HttpFileClient:Ctor(callback)
+	___rawset(self, "_interface", ___rawget(self, "__class").__element.HFC)
 	___rawset(self, "_callback", callback)
 end
 

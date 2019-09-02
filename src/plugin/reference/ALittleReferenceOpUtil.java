@@ -701,6 +701,9 @@ public class ALittleReferenceOpUtil {
         }
 
         if (leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+            if (rightGuessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+                rightGuessInfo = rightGuessInfo.classTemplateExtends;
+            }
             if (rightGuessInfo.type != ALittleReferenceUtil.GuessType.GT_CLASS) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
             }
@@ -718,7 +721,7 @@ public class ALittleReferenceOpUtil {
                 guessTypeEqual(leftSrc, leftGuessInfo.classTemplateExtends, rightSrc, rightGuessInfo);
                 return;
             }
-            throw new ALittleReferenceUtil.ALittleReferenceException(rightSrc, "要求是" + leftGuessInfo.value + ",不能是:" + rightGuessInfo.value);
+            return;
         }
 
         if (leftGuessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {

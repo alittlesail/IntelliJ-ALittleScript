@@ -36,12 +36,6 @@ public class ALittleClassExtendsDecImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
-  @NotNull
-  public List<ALittleAllType> getAllTypeList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleAllType.class);
-  }
-
-  @Override
   @Nullable
   public ALittleClassNameDec getClassNameDec() {
     return findChildByClass(ALittleClassNameDec.class);

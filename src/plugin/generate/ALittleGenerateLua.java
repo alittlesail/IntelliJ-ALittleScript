@@ -182,11 +182,50 @@ public class ALittleGenerateLua {
             // 如果是类名
             } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                 // 如果是类名
-                String content = "";
+                String className = "";
                 ALittleNamespaceNameDec namespaceNameDec = customType.getNamespaceNameDec();
                 if (namespaceNameDec != null)
-                    content = namespaceNameDec.getIdContent().getText() + ".";
-                content += customType.getIdContent().getText() + "(";
+                    className = namespaceNameDec.getIdContent().getText() + ".";
+                className += customType.getIdContent().getText();
+
+                // 如果有模板，那么就
+                List<String> templateParamList = new ArrayList<>();
+                List<ALittleAllType> allTypeList = customType.getAllTypeList();
+                for (ALittleAllType allType : allTypeList) {
+                    ALittleReferenceUtil.GuessTypeInfo guessInfo = allType.guessType();
+                    if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+                        templateParamList.add(guessInfo.value);
+                    }
+                }
+
+                String content = "";
+                if (!allTypeList.isEmpty()) {
+                    String templateNamespaceName = "ALittle.";
+                    if (PsiHelper.getNamespaceName(opNewStat).equals("ALittle"))
+                        templateNamespaceName = "";
+
+                    content = templateNamespaceName + "Template(" + className;
+                    content += ", \"" + guessType.value + "\"";
+                    if (!templateParamList.isEmpty()) {
+                        content += ", " + String.join(", ", templateParamList);
+                    }
+                    content += ")(";
+                } else {
+                    content = className + "(";
+                }
+
+                List<String> paramList = new ArrayList<>();
+                List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
+                for (ALittleValueStat valueStat : valueStatList) {
+                    paramList.add(GenerateValueStat(valueStat));
+                }
+                content += String.join(", ", paramList);
+
+                content += ")";
+                return content;
+            // 如果是模板
+            } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+                String content = "self.__class.__element." + guessType.value + "(";
 
                 List<String> paramList = new ArrayList<>();
                 List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
@@ -1350,6 +1389,8 @@ public class ALittleGenerateLua {
                 .append("Class(")
                 .append(extendsName)
                 .append(", \"")
+                .append(PsiHelper.getNamespaceName(root))
+                .append(".")
                 .append(className)
                 .append("\")\n\n");
 

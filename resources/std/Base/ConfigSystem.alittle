@@ -1,6 +1,6 @@
 namespace ALittle;
 
-public class ConfigSystem
+public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
 {
     private string              _file_path;
     private Map<string, any>    _config_map;
@@ -13,12 +13,7 @@ public class ConfigSystem
         this._config_map = new Map<string, any>();
 
         // 读取全部内容
-        auto file = this.CreateFileLoader();
-        if (file == null)
-        {
-            Log("CreateFileLoader failed!");
-            return;
-        }
+        auto file = new FL();
         string content = file.Load(this._file_path);
         if (content == null) return;
 
@@ -31,17 +26,6 @@ public class ConfigSystem
         }
         // 保存解析内容
         this._config_map = json_content;
-    }
-
-    private fun CreateFileLoader() : IFileLoader { return new NormalFileLoader(); }
-    private fun CreateFileSaver() : IFileSaver { return new NormalFileSaver(); }
-
-    private fun LoadFile(string file) : string
-    {
-        auto file = io.open(file, "r");
-        if (file == null) return null;
-        string content = file.read("*a");
-        file.close();
     }
 
     public fun GetConfig(string key, any default) : any
@@ -72,12 +56,7 @@ public class ConfigSystem
     public fun SaveConfig()
     {
         // 保存配置值
-        auto file = this.CreateFileSaver();
-        if (file == null)
-        {
-            Log("CreateFileSaver failed!");
-            return;
-        }
+        auto file = new FS();
         if (!file.Save(this._file_path, Json.encode(this._config_map)))
         {
             Log("Save Congig Failed.", this._file_path);

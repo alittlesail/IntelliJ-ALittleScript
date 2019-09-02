@@ -17,17 +17,17 @@ public class IHttpInterface
 }
 
 // 短连接所有的对象集合
-private Map<int, HttpClient> __HttpClientMap = new Map<int, HttpClient>();
-public static FindHttpClient(int id) : HttpClient { return __HttpClientMap[id]; }
+private Map<int, IHttpClient> __HttpClientMap = new Map<int, IHttpClient>();
+public static FindHttpClient(int id) : IHttpClient { return __HttpClientMap[id]; }
 
-public class HttpClient : public IHttpClient
+public class HttpClient<HC : IHttpInterface> : public IHttpClient
 {
-    private IHttpInterface _interface;
+    private HC _interface;
     private thread _co;
 
-    public Ctor(IHttpInterface interface)
+    public Ctor()
     {
-        this._interface = interface;
+        this._interface = new HC();
     }
 
     public await fun SendRPC(string url, any content) : string, any

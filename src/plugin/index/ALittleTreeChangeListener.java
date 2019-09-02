@@ -126,7 +126,8 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         ALittleTreeChangeListener listener = getListener(classDec.getProject());
         if (listener == null) return;
 
-        Map<ALittleClassDec, ALittleClassData> map = listener.mClassDataMap.get(classDec.getContainingFile());
+        PsiFile psiFile = classDec.getContainingFile();
+        Map<ALittleClassDec, ALittleClassData> map = listener.mClassDataMap.get(psiFile);
         if (map == null) return;
         ALittleClassData classData = map.get(classDec);
         if (classData == null) return;

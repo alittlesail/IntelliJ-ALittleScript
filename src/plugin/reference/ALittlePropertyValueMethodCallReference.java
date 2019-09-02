@@ -41,6 +41,9 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
 
         // 如果是Functor
         if (preType.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+            if (prePreType != null && prePreType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+                prePreType = prePreType.classTemplateExtends;
+            }
             // 如果再往前一个是一个Class实例对象，那么就要去掉第一个参数
             if (prePreType != null && prePreType.type == ALittleReferenceUtil.GuessType.GT_CLASS && !preType.functorParamList.isEmpty()
                     && (preType.element instanceof ALittleClassMethodDec || preType.element instanceof ALittleClassGetterDec || preType.element instanceof ALittleClassSetterDec)) {

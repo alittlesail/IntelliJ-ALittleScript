@@ -18,18 +18,18 @@ public class IHttpFileInterface
 }
 
 // 短连接文件所有的对象集合
-private Map<int, HttpFileClient> __HttpFileClientMap = new Map<int, HttpFileClient>();
-public static FindHttpFileClient(int id) : HttpFileClient { return __HttpFileClientMap[id]; }
+private Map<int, IHttpFileClient> __HttpFileClientMap = new Map<int, IHttpFileClient>();
+public static FindHttpFileClient(int id) : IHttpFileClient { return __HttpFileClientMap[id]; }
 
-public class HttpFileClient : public IHttpFileClient
+public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
 {
-    private IHttpFileInterface _interface;
+    private HFC _interface;
     private thread _co;
     private Functor<(IHttpFileInterface)> _callback;        // 下载或者上传的进度回调
 
-    public Ctor(IHttpFileInterface interface, Functor<(IHttpFileInterface)> callback)
+    public Ctor(Functor<(IHttpFileInterface)> callback)
     {
-        this._interface = interface;
+        this._interface = new HFC();
         this._callback = callback;
     }
 

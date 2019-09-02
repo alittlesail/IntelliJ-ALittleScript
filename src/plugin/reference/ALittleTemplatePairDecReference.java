@@ -33,7 +33,11 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        if (myElement.getIdContent().getText().startsWith("___")) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "局部变量名不能以3个下划线开头");
+        }
+
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
             throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
         } else if (guessList.size() != 1) {

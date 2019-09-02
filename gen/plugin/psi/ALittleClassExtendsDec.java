@@ -13,9 +13,6 @@ public interface ALittleClassExtendsDec extends PsiElement {
   @Nullable
   ALittleAccessModifier getAccessModifier();
 
-  @NotNull
-  List<ALittleAllType> getAllTypeList();
-
   @Nullable
   ALittleClassNameDec getClassNameDec();
 

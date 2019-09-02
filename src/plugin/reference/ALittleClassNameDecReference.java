@@ -49,7 +49,11 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
                     PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
             if (classNameDecList.isEmpty()) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "找不到类, namespace:" + mNamespace + ", key:" + mKey);
             for (PsiElement classNameDec : classNameDecList) {
-                guessList.add(((ALittleClassNameDec)classNameDec).guessType());
+                ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleClassNameDec)classNameDec).guessType();
+                if (guessInfo.classTemplateList != null && !guessInfo.classTemplateList.isEmpty()) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "不能继承于一个模板类, namespace:" + mNamespace + ", key:" + mKey);
+                }
+                guessList.add(guessInfo);
             }
         } else {
             throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleClassNameDec出现未知的父节点");
@@ -91,7 +95,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
             throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "类名不能以3个下划线开头");
         }
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
             throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
         } else if (guessList.size() != 1) {

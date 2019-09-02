@@ -17,7 +17,7 @@ public class ALittleStructVarDecReference extends ALittleReference<ALittleStruct
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
             throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
         } else if (guessList.size() != 1) {

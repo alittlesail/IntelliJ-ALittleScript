@@ -6,7 +6,7 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-INetClient = Class(nil, "INetClient")
+INetClient = Class(nil, "ALittle.INetClient")
 
 function INetClient:Send(msg_id, msg_body, rpc_id)
 end
@@ -14,7 +14,7 @@ end
 function INetClient:SendRPC(msg_id, msg_body)
 end
 
-INetInterface = Class(nil, "INetInterface")
+INetInterface = Class(nil, "ALittle.INetInterface")
 
 function INetInterface:GetID()
 end
@@ -36,11 +36,12 @@ function FindNetClient(id)
 	return __NetClientMap[id]
 end
 
-NetClient = Class(INetClient, "NetClient")
+assert(INetClient, " extends class:INetClient is nil")
+NetClient = Class(INetClient, "ALittle.NetClient")
 
 function NetClient:Ctor(net_interface, factory, heartbeat, check_heartbeat)
-	___rawset(self, "_net_interface", net_interface)
-	___rawset(self, "_write_factory", factory)
+	___rawset(self, "_net_interface", ___rawget(self, "__class").__element.NI)
+	___rawset(self, "_write_factory", ___rawget(self, "__class").__element.MWF)
 	___rawset(self, "_heartbeat", heartbeat)
 	___rawset(self, "_heartbeat_loop", nil)
 	___rawset(self, "_check_heartbeat", nil)

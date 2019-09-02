@@ -66,7 +66,7 @@ public class ALittleValueStatReference extends ALittleReference<ALittleValueStat
                 || parent instanceof ALittleElseIfExpr
                 || parent instanceof ALittleWhileExpr
                 || parent instanceof ALittleDoWhileExpr) {
-            List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = this.guessTypes();
+            List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = myElement.guessTypes();
             if (guessTypeList.isEmpty()) return;
 
             if (!guessTypeList.get(0).value.equals("bool") && !guessTypeList.get(0).value.equals("null")) {

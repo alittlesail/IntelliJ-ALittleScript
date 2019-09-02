@@ -204,7 +204,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
             throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
         } else if (guessList.size() != 1) {
@@ -243,6 +243,12 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             if (index + 1 < suffixList.size()) {
                 nextSuffix = suffixList.get(index + 1);
             }
+
+            if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+                preType = preType.classTemplateExtends;
+            }
+
+            if (preType == null) return new ResolveResult[0];
 
             // 处理类的实例对象
             if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
@@ -405,6 +411,12 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             } else {
                 preType = suffixList.get(index - 1).guessType();
             }
+
+            if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+                preType = preType.classTemplateExtends;
+            }
+
+            if (preType == null) return variants.toArray();
 
             // 处理类的实例对象
             if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {

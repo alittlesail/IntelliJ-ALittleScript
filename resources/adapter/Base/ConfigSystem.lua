@@ -6,16 +6,12 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-ConfigSystem = Class(nil, "ConfigSystem")
+ConfigSystem = Class(nil, "ALittle.ConfigSystem")
 
 function ConfigSystem:Ctor(file_path)
 	___rawset(self, "_file_path", file_path)
 	___rawset(self, "_config_map", {})
-	local file = self:CreateFileLoader()
-	if file == nil then
-		Log("CreateFileLoader failed!")
-		return
-	end
+	local file = self.__class.__element.FL()
 	local content = file:Load(self._file_path)
 	if content == nil then
 		return
@@ -26,23 +22,6 @@ function ConfigSystem:Ctor(file_path)
 		return
 	end
 	___rawset(self, "_config_map", json_content)
-end
-
-function ConfigSystem:CreateFileLoader()
-	return NormalFileLoader()
-end
-
-function ConfigSystem:CreateFileSaver()
-	return NormalFileSaver()
-end
-
-function ConfigSystem:LoadFile(file)
-	local file = io.open(file, "r")
-	if file == nil then
-		return nil
-	end
-	local content = file:read("*a")
-	file:close()
 end
 
 function ConfigSystem:GetConfig(key, default)
@@ -70,11 +49,7 @@ function ConfigSystem:CoverConfig(msg, save)
 end
 
 function ConfigSystem:SaveConfig()
-	local file = self:CreateFileSaver()
-	if file == nil then
-		Log("CreateFileSaver failed!")
-		return
-	end
+	local file = self.__class.__element.FS()
 	if not file:Save(self._file_path, Json.encode(self._config_map)) then
 		Log("Save Congig Failed.", self._file_path)
 	end
