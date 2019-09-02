@@ -124,7 +124,7 @@ public class ALittleReferenceUtil {
         public GuessType type;
         public String value;                              // 完整类型的字符串
         public PsiElement element;                        // 指向的元素
-        public GuessTypeInfo classTemplateExtends;        // type="GT_CLASS_TEMPLATE"时，如果有继承的类
+        public GuessTypeInfo classTemplateExtends;        // type="GT_CLASS_TEMPLATE"时，类模板标识符继承的类
         public List<GuessTypeInfo> classTemplateList;     // type="GT_CLASS"时，定义的模板列表
         public Map<String, GuessTypeInfo> classTemplateMap; // type="GT_CLASS"时，属于实例化模板时的类型映射, KEY是模板定义名，Value是实例对象
         public GuessTypeInfo listSubType;                 // type="List"时，表示List的子类型

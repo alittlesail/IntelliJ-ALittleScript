@@ -118,13 +118,13 @@ function Template(clazz, name, ...)
 	template.__name = name
 	template.__setter = clazz.__setter
 	template.__getter = clazz.__getter
-	local map = {}
+	local list = {}
 	local len = select("#", ...)
 	for i = 1, len, 1 do
 		local info = select(i, ...)
-		map[info.__name] = info
+		list[i] = info
 	end
-	template.__element = map
+	template.__element = list
 	setmetatable(template, __class_mt)
 	return template
 end

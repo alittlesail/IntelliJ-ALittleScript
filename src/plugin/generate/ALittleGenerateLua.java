@@ -195,6 +195,8 @@ public class ALittleGenerateLua {
                     ALittleReferenceUtil.GuessTypeInfo guessInfo = allType.guessType();
                     if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                         templateParamList.add(guessInfo.value);
+                    } else {
+                        templateParamList.add("nil");
                     }
                 }
 
@@ -225,7 +227,12 @@ public class ALittleGenerateLua {
                 return content;
             // 如果是模板
             } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
-                String content = "self.__class.__element." + guessType.value + "(";
+                // 检查下标
+                ALittleTemplatePairDec templatePairDec = (ALittleTemplatePairDec)guessType.element;
+                ALittleTemplateDec templateDec = (ALittleTemplateDec)templatePairDec.getParent();
+                int index = templateDec.getTemplatePairDecList().indexOf(templatePairDec);
+
+                String content = "self.__class.__element[" + (index + 1) + "](";
 
                 List<String> paramList = new ArrayList<>();
                 List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();

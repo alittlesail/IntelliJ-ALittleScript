@@ -4,7 +4,7 @@ public struct ClassInfo
 {
     string __name;                      // 类名
     ClassInfo __super;                  // 父类信息
-    Map<string, ClassInfo> __element;   // 模板元素
+    List<ClassInfo> __element;   // 模板元素
     Map<string, ClassInfo> __child;     // 继承于当前的子模板
     Map<string, Functor<(ObjectInfo):any>> __getter;    // getter
     Map<string, Functor<(ObjectInfo, any)>> __setter;   // setter
@@ -180,15 +180,15 @@ protected static Template(ClassInfo clazz, string name, ...) : ClassInfo
     template.__setter = clazz.__setter;
     template.__getter = clazz.__getter;
     // 模板元素
-    auto map = new Map<string, ClassInfo>();
+    auto list = new List<ClassInfo>();
     // 复制模板
     int len = select("#", ...);
     for (int i = 1, len, 1)
     {
         ClassInfo info = select(i, ...);
-        map[info.__name] = info;
+        list[i] = info;
     }
-    template.__element = map;
+    template.__element = list;
 
     // 设置类模版的元表
     setmetatable(template, __class_mt);
