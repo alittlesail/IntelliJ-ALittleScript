@@ -161,9 +161,14 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 guess.value = ((ALittleStructNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleClassNameDec) {
+                ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassNameDec) element).guessType();
+                if (classGuessInfo.classTemplateList != null && !classGuessInfo.classTemplateList.isEmpty()) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "模板类" + classGuessInfo.value + "不能直接使用");
+                }
                 guess = new ALittleReferenceUtil.GuessTypeInfo();
                 guess.type = ALittleReferenceUtil.GuessType.GT_CLASS_NAME;
                 guess.element = element;
+                guess.value = classGuessInfo.value;
             }
 
             if (guess != null) guessList.add(guess);

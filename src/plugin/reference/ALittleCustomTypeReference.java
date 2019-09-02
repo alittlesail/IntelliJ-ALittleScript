@@ -95,6 +95,10 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
             if (classDec != null) {
                 List<PsiElement> decList = new ArrayList<>();
                 ALittleTreeChangeListener.findClassAttrList(classDec, PsiHelper.sAccessPrivateAndProtectedAndPublic, PsiHelper.ClassAttrType.TEMPLATE, mKey, decList);
+                // 不能再静态函数中使用模板定义
+                if (!decList.isEmpty() && PsiHelper.isInClassStaticMethod(myElement)) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "类静态函数不能使用模板符号");
+                }
                 for (PsiElement dec : decList) {
                     guessList.add(((ALittleTemplatePairDec)dec).guessType());
                 }

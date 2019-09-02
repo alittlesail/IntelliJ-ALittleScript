@@ -32,6 +32,18 @@ function ConfigSystem:GetConfig(key, default)
 	return value
 end
 
+function ConfigSystem:GetInt(key, default)
+	return math.floor(tonumber(self:GetConfig(key, default)))
+end
+
+function ConfigSystem:GetDouble(key, default)
+	return tonumber(self:GetConfig(key, default))
+end
+
+function ConfigSystem:GetString(key, default)
+	return tostring(self:GetConfig(key, default))
+end
+
 function ConfigSystem:SetConfig(key, value, not_save)
 	self._config_map[key] = value
 	if not not_save then

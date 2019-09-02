@@ -141,6 +141,35 @@ public class PsiHelper {
         return null;
     }
 
+    // 检查是否在静态函数中
+    public static boolean isInClassStaticMethod(@NotNull PsiElement dec) {
+
+        PsiElement parent = dec;
+        while (true) {
+            if (parent == null) break;
+
+            if (parent instanceof ALittleNamespaceDec) {
+                return false;
+            } else if (parent instanceof ALittleClassDec) {
+                return false;
+            } else if (parent instanceof ALittleClassCtorDec) {
+                return false;
+            } else if (parent instanceof ALittleClassSetterDec) {
+                return false;
+            } else if (parent instanceof ALittleClassMethodDec) {
+                return false;
+            } else if (parent instanceof ALittleClassStaticDec) {
+                return true;
+            } else if (parent instanceof ALittleGlobalMethodDec) {
+                return false;
+            }
+
+            parent = parent.getParent();
+        }
+
+        return false;
+    }
+
     // 获取这个结构体的所有成员
     public static void findStructVarDecList(@NotNull ALittleStructDec structDec,
                                                 String name,

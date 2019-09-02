@@ -37,6 +37,21 @@ public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
         return value;
     }
 
+    public fun GetInt(string key, int default) : int
+    {
+        return math.floor(tonumber(this.GetConfig(key, default)));
+    }
+
+    public fun GetDouble(string key, double default) : double
+    {
+        return tonumber(this.GetConfig(key, default));
+    }
+
+    public fun GetString(string key, string default) : string
+    {
+        return tostring(this.GetConfig(key, default));
+    }
+
     public fun SetConfig(string key, any value, bool not_save)
     {
         // 保存新值
