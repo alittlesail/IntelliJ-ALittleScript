@@ -8,6 +8,7 @@ import plugin.index.ALittleEnumData;
 import plugin.index.ALittleStructData;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
+import plugin.reference.ALittleReferenceUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;

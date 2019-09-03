@@ -9,6 +9,7 @@ import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
+import org.apache.velocity.util.ArrayListWrapper;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
@@ -20,13 +21,17 @@ import plugin.reference.ALittleReferenceUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ALittleGenerateLua {
     private String mNamespaceName = "";
 
     private boolean mOpenRawSet = false;
     private int mRawsetUseCount = 0;
+
+    private Map<String, String> mReflectMap;
 
     private void copyStdLibrary(String moduleBasePath) throws Exception {
         File file = new File(moduleBasePath + "/std");
@@ -111,9 +116,10 @@ public class ALittleGenerateLua {
     private String GenerateBindStat(ALittleBindStat bindStat) throws Exception {
         List<ALittleValueStat> valueStatList = bindStat.getValueStatList();
 
-        String content = "ALittle.Bind(";
-        if (PsiHelper.getNamespaceName(bindStat.getContainingFile()).equals("ALittle"))
-            content = "Bind(";
+        String namespacePre = "ALittle.";
+        if (mNamespaceName.equals("ALittle")) namespacePre = "";
+
+        String content = namespacePre + "Bind(";
         List<String> paramList = new ArrayList<>();
         for (ALittleValueStat valueStat : valueStatList) {
             paramList.add(GenerateValueStat(valueStat));
@@ -127,9 +133,10 @@ public class ALittleGenerateLua {
     private String GeneratePcallStat(ALittlePcallStat pcallStat) throws Exception {
         List<ALittleValueStat> valueStatList = pcallStat.getValueStatList();
 
-        String content = "ALittle.pcall(";
-        if (PsiHelper.getNamespaceName(pcallStat.getContainingFile()).equals("ALittle"))
-            content = "pcall(";
+        String namespacePre = "ALittle.";
+        if (mNamespaceName.equals("ALittle")) namespacePre = "";
+
+        String content = namespacePre + "pcall(";
         List<String> paramList = new ArrayList<>();
         for (ALittleValueStat valueStat : valueStatList) {
             paramList.add(GenerateValueStat(valueStat));
@@ -202,11 +209,10 @@ public class ALittleGenerateLua {
 
                 String content = "";
                 if (!allTypeList.isEmpty()) {
-                    String templateNamespaceName = "ALittle.";
-                    if (PsiHelper.getNamespaceName(opNewStat).equals("ALittle"))
-                        templateNamespaceName = "";
+                    String namespacePre = "ALittle.";
+                    if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
-                    content = templateNamespaceName + "Template(" + className;
+                    content = namespacePre + "Template(" + className;
                     content += ", \"" + guessType.value + "\"";
                     if (!templateParamList.isEmpty()) {
                         content += ", " + String.join(", ", templateParamList);
@@ -767,15 +773,52 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    static public String GenerateReflectValue(ALittleReflectValue reflectValue) throws Exception {
-        String content = "";
+    public String GenerateReflectValue(ALittleReflectValue reflectValue) throws Exception {
         ALittleCustomType customType = reflectValue.getCustomType();
-        if (customType == null) return content;
+        if (customType == null) throw new Exception("reflect表达式没有设置反射对象");
+
         ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
+        if (guessType.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+            throw new Exception("reflect表达式的反射对象必须是struct");
+        }
 
-        // 把获取到的对象转为Json
+        String namespacePre = "ALittle.";
+        if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
-        return "\"" + content.replace("\"", "\\\"") + "\"";
+        String content = namespacePre + "FindReflectByName(\"" + guessType.value + "\")";
+        GenerateReflectStructInfo(guessType);
+        return content;
+    }
+
+    private void GenerateReflectStructInfo(@NotNull ALittleReferenceUtil.GuessTypeInfo guessInfo) throws Exception {
+        if (mReflectMap.containsKey(guessInfo.value)) return;
+        ALittleStructDec structDec = (ALittleStructDec)guessInfo.element;
+
+        List<String> nameList = new ArrayList<>();
+        List<String> typeList = new ArrayList<>();
+        List<ALittleReferenceUtil.GuessTypeInfo> nextList = new ArrayList<>();
+        List<ALittleStructVarDec> varDecList = structDec.getStructVarDecList();
+        for (ALittleStructVarDec varDec : varDecList) {
+            ALittleReferenceUtil.GuessTypeInfo varGuessInfo = varDec.guessType();
+            PsiElement nameDec = varDec.getIdContent();
+            if (nameDec == null) throw new Exception(guessInfo.value + "没有定义变量名");
+            nameList.add("\"" + nameDec.getText() + "\"");
+            typeList.add("\"" + varGuessInfo.value + "\"");
+            if (varGuessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
+                nextList.add(varGuessInfo);
+            }
+        }
+
+        String content = "{";
+        content += "name = \"" + guessInfo.value + "\",\n";
+        content += "name_list = {" + String.join(",", nameList) +"},\n";
+        content += "type_list = {" + String.join(",", typeList) + "}\n";
+        content += "}";
+        mReflectMap.put(guessInfo.value, content);
+
+        for (ALittleReferenceUtil.GuessTypeInfo varGuessInfo : nextList) {
+            GenerateReflectStructInfo(varGuessInfo);
+        }
     }
 
     @NotNull
@@ -1737,6 +1780,7 @@ public class ALittleGenerateLua {
             throw new Exception("命名域没有定义名字");
         }
         mNamespaceName = nameDec.getIdContent().getText();
+        mReflectMap = new HashMap<>();
 
         StringBuilder content;
         if (mNamespaceName.equals("lua"))
@@ -1776,6 +1820,19 @@ public class ALittleGenerateLua {
         content.append("local ___ipairs = ipairs\n");
         content.append("local ___coroutine = coroutine\n");
         content.append("\n");
+
+        String namespacePre = "ALittle.";
+        if (mNamespaceName.equals("ALittle"))
+            namespacePre = "";
+
+        for (Map.Entry<String, String> entry : mReflectMap.entrySet()) {
+            content.append(namespacePre)
+                    .append("RegReflect(\"")
+                    .append(entry.getKey())
+                    .append("\", ")
+                    .append(entry.getValue())
+                    .append(")\n");
+        }
 
         content.append(otherContent);
 
