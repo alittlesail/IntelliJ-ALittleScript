@@ -6,7 +6,7 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-LoopObject = Class(nil, "LoopObject")
+LoopObject = Class(nil, "ALittle.LoopObject")
 
 function LoopObject:IsCompleted()
 end
@@ -32,7 +32,7 @@ end
 function LoopObject:Close()
 end
 
-LoopSystem = Class(nil, "LoopSystem")
+LoopSystem = Class(nil, "ALittle.LoopSystem")
 
 function LoopSystem:Ctor(weak)
 	___rawset(self, "_loop_updaters", {})

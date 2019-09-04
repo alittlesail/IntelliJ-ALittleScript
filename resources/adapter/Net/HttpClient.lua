@@ -37,7 +37,7 @@ assert(IHttpClient, " extends class:IHttpClient is nil")
 HttpClient = Class(IHttpClient, "ALittle.HttpClient")
 
 function HttpClient:Ctor()
-	___rawset(self, "_interface", ___rawget(self, "__class").__element.HC)
+	___rawset(self, "_interface", self.__class.__element[1]())
 end
 
 function HttpClient:SendRPC(url, content)

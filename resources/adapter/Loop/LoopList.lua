@@ -6,7 +6,8 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-LoopList = Class(LoopObject, "LoopList")
+assert(LoopObject, " extends class:LoopObject is nil")
+LoopList = Class(LoopObject, "ALittle.LoopList")
 
 function LoopList:Ctor()
 	___rawset(self, "_count", 0)

@@ -6,7 +6,8 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-LoopTimer = Class(LoopObject, "LoopTimer")
+assert(LoopObject, " extends class:LoopObject is nil")
+LoopTimer = Class(LoopObject, "ALittle.LoopTimer")
 
 function LoopTimer:Ctor(func, delay_time)
 	___rawset(self, "_func", func)

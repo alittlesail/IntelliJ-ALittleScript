@@ -6,7 +6,8 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-LoopGroup = Class(LoopObject, "LoopGroup")
+assert(LoopObject, " extends class:LoopObject is nil")
+LoopGroup = Class(LoopObject, "ALittle.LoopGroup")
 
 function LoopGroup:Ctor()
 	___rawset(self, "_total_count", 0)

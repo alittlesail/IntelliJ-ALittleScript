@@ -170,7 +170,7 @@ function String_UrlAnalyse(url)
 	return info
 end
 
-StringGenerateID = Class(nil, "StringGenerateID")
+StringGenerateID = Class(nil, "ALittle.StringGenerateID")
 
 function StringGenerateID:Ctor()
 	math.randomseed(os.time())

@@ -40,7 +40,7 @@ assert(IHttpFileClient, " extends class:IHttpFileClient is nil")
 HttpFileClient = Class(IHttpFileClient, "ALittle.HttpFileClient")
 
 function HttpFileClient:Ctor(callback)
-	___rawset(self, "_interface", ___rawget(self, "__class").__element.HFC)
+	___rawset(self, "_interface", self.__class.__element[1]())
 	___rawset(self, "_callback", callback)
 end
 

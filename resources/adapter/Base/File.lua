@@ -5,12 +5,13 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-IFileLoader = Class(nil, "IFileLoader")
+IFileLoader = Class(nil, "ALittle.IFileLoader")
 
 function IFileLoader:Load(file_path)
 end
 
-NormalFileLoader = Class(IFileLoader, "NormalFileLoader")
+assert(IFileLoader, " extends class:IFileLoader is nil")
+NormalFileLoader = Class(IFileLoader, "ALittle.NormalFileLoader")
 
 function NormalFileLoader:Load(file_path)
 	local file = io.open(file_path, "r")
@@ -22,12 +23,13 @@ function NormalFileLoader:Load(file_path)
 	return content
 end
 
-IFileSaver = Class(nil, "IFileSaver")
+IFileSaver = Class(nil, "ALittle.IFileSaver")
 
 function IFileSaver:Save(file_path, content)
 end
 
-NormalFileSaver = Class(IFileSaver, "NormalFileSaver")
+assert(IFileSaver, " extends class:IFileSaver is nil")
+NormalFileSaver = Class(IFileSaver, "ALittle.NormalFileSaver")
 
 function NormalFileSaver:Save(file_path, content)
 	local file = io.open(file_path, "w")

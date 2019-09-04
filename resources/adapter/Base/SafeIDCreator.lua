@@ -6,7 +6,7 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-SafeIDCreator = Class(nil, "SafeIDCreator")
+SafeIDCreator = Class(nil, "ALittle.SafeIDCreator")
 
 function SafeIDCreator:Ctor()
 	___rawset(self, "_max_id", 0)
