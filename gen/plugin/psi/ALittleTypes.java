@@ -164,8 +164,9 @@ public interface ALittleTypes {
   IElementType GET = new ALittleTokenType("get");
   IElementType GREATER = new ALittleTokenType(">");
   IElementType GREATER_OR_EQUAL = new ALittleTokenType(">=");
-  IElementType HTTPGET = new ALittleTokenType("httpget");
-  IElementType HTTPPOST = new ALittleTokenType("httppost");
+  IElementType HTTP = new ALittleTokenType("@Http");
+  IElementType HTTP_DOWNLOAD = new ALittleTokenType("@HttpDownload");
+  IElementType HTTP_UPLOAD = new ALittleTokenType("@HttpUpload");
   IElementType I64 = new ALittleTokenType("I64");
   IElementType ID_CONTENT = new ALittleTokenType("ID_CONTENT");
   IElementType IF = new ALittleTokenType("if");
@@ -181,6 +182,7 @@ public interface ALittleTypes {
   IElementType MINUS = new ALittleTokenType("-");
   IElementType MINUS_ASSIGN = new ALittleTokenType("-=");
   IElementType MINUS_MINUS = new ALittleTokenType("--");
+  IElementType MSG = new ALittleTokenType("@Msg");
   IElementType MUL = new ALittleTokenType("*");
   IElementType MUL_ASSIGN = new ALittleTokenType("*=");
   IElementType NAMESPACE = new ALittleTokenType("namespace");
@@ -195,8 +197,6 @@ public interface ALittleTypes {
   IElementType PLUS_PLUS = new ALittleTokenType("++");
   IElementType PRIVATE = new ALittleTokenType("private");
   IElementType PROTECTED = new ALittleTokenType("protected");
-  IElementType PROTOMSG = new ALittleTokenType("protomsg");
-  IElementType PROTO_OPTION = new ALittleTokenType("@Proto");
   IElementType PUBLIC = new ALittleTokenType("public");
   IElementType QUOTE = new ALittleTokenType("\"");
   IElementType QUOTIENT = new ALittleTokenType("/");

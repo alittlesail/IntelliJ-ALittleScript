@@ -16,11 +16,10 @@ public class ALittleCompletionContributor extends CompletionContributor {
             ,"for","do","while","break","return","cast","reflect"
             ,"get","set","fun","static","Ctor","Functor","this"
             ,"public","protected","private","instance"
-            ,"async","await","yield","bind"
+            ,"async","await","yield","bind","@Http","@HttpDownload","@HttpUploadBegin","@HttpUploadEnd","@Msg"
     };
 
     public ALittleCompletionContributor() {
-
         extend(CompletionType.BASIC,
                 PlatformPatterns.psiElement(ALittleTypes.ID_CONTENT).withLanguage(ALittleLanguage.INSTANCE),
                 new CompletionProvider<CompletionParameters>() {

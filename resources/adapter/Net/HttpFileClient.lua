@@ -8,6 +8,9 @@ local ___coroutine = coroutine
 
 IHttpFileClient = Class(nil, "ALittle.IHttpFileClient")
 
+function IHttpFileClient:GetID()
+end
+
 function IHttpFileClient:SendRPC(url, file_path, download, start_size)
 end
 
@@ -34,6 +37,20 @@ end
 local __HttpFileClientMap = {}
 function FindHttpFileClient(id)
 	return __HttpFileClientMap[id]
+end
+
+local __all_callback = {}
+table.setweak(__all_callback, false, true)
+function RegHttpFileCallback(method, callback)
+	if __all_callback[method] ~= nil then
+		Error("RegHttpCallback消息回调函数注册失败，名字为" .. method .. "已存在")
+		return
+	end
+	__all_callback[method] = callback
+end
+
+function FindHttpFileCallback(method)
+	return __all_callback[method]
 end
 
 assert(IHttpFileClient, " extends class:IHttpFileClient is nil")

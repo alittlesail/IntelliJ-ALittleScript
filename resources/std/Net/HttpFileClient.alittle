@@ -4,7 +4,8 @@ namespace ALittle;
 // Http文件协议接口类，负责处理
 public class IHttpFileClient
 {
-    public await fun SendRPC(string url, string file_path, bool download, int start_size) : string, any {}
+    protected fun GetID() : int {}
+    protected await fun SendRPC(string url, string file_path, bool download, int start_size) : string, any {}
 }
 
 // 连接对象
@@ -21,6 +22,23 @@ public class IHttpFileInterface
 // 短连接文件所有的对象集合
 private Map<int, IHttpFileClient> __HttpFileClientMap = new Map<int, IHttpFileClient>();
 public static FindHttpFileClient(int id) : IHttpFileClient { return __HttpFileClientMap[id]; }
+
+private Map<string, Functor<(IHttpFileClient, any):any>> __all_callback = new Map<string, Functor<(IHttpFileClient, any):any>>();
+table.setweak(__all_callback, false, true);
+protected static RegHttpFileCallback(string method, Functor<(IHttpFileClient, any):any> callback)
+{
+    if (__all_callback[method] != null)
+    {
+        Error("RegHttpCallback消息回调函数注册失败，名字为"..method.."已存在");
+        return;
+    }
+    __all_callback[method] = callback;
+}
+// 获取回调函数
+public static FindHttpFileCallback(string method) : Functor<(IHttpFileClient, any):any>
+{
+    return __all_callback[method];
+}
 
 public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
 {

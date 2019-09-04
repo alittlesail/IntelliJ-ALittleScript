@@ -2828,27 +2828,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // PROTO_OPTION protoOption
+  // HTTP | HTTP_DOWNLOAD | HTTP_UPLOAD |  MSG
   public static boolean protoModifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "protoModifier")) return false;
-    if (!nextTokenIs(b, PROTO_OPTION)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, PROTO_MODIFIER, null);
-    r = consumeToken(b, PROTO_OPTION);
-    p = r; // pin = 1
-    r = r && protoOption(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  /* ********************************************************** */
-  // protomsg | httpget | httppost
-  static boolean protoOption(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "protoOption")) return false;
     boolean r;
-    r = consumeToken(b, PROTOMSG);
-    if (!r) r = consumeToken(b, HTTPGET);
-    if (!r) r = consumeToken(b, HTTPPOST);
+    Marker m = enter_section_(b, l, _NONE_, PROTO_MODIFIER, "<proto modifier>");
+    r = consumeToken(b, HTTP);
+    if (!r) r = consumeToken(b, HTTP_DOWNLOAD);
+    if (!r) r = consumeToken(b, HTTP_UPLOAD);
+    if (!r) r = consumeToken(b, MSG);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

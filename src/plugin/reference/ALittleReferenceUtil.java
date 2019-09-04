@@ -208,6 +208,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleForExpr) return new ALittleForExprReference((ALittleForExpr)element, range);
         if (element instanceof ALittleForPairDec) return new ALittleForPairDecReference((ALittleForPairDec)element, range);
         if (element instanceof ALittleGenericType) return new ALittleGenericTypeReference((ALittleGenericType)element, range);
+        if (element instanceof ALittleGlobalMethodDec) return new ALittleGlobalMethodDecReference((ALittleGlobalMethodDec)element, range);
         if (element instanceof ALittleMethodNameDec) return new ALittleMethodNameDecReference((ALittleMethodNameDec)element, range);
         if (element instanceof ALittleMethodParamNameDec) return new ALittleMethodParamNameDecReference((ALittleMethodParamNameDec)element, range);
         if (element instanceof ALittleMethodParamTailDec) return new ALittleMethodParamTailDecReference((ALittleMethodParamTailDec)element, range);

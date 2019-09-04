@@ -51,31 +51,23 @@ protected struct ProtocolInvokeInfo
 }
 
 // 注册回调函数
-struct MessageCallbackInfo
-{
-    Functor<(INetClient, any) : any> callback;
-    int return_id;
-}
-private Map<int, MessageCallbackInfo> __all_callback = new Map<int, MessageCallbackInfo>();
+private Map<int, Functor<(IMsgClient, any) : any>> __all_callback = new Map<int, Functor<(IMsgClient, any) : any>>();
+private Map<int, int> __all_return_id = new Map<int, int>();
 table.setweak(__all_callback, false, true);
-protected static RegMessageCallback(int msg_id, Functor<(INetClient, any) : any> callback, int return_id)
+protected static RegMessageCallback(int msg_id, Functor<(IMsgClient, any) : any> callback, int return_id)
 {
     if (__all_callback[msg_id] != null)
     {
         Error("RegMessageCallback消息回调函数注册失败，名字为"..msg_id.."已存在");
         return;
     }
-    MessageCallbackInfo info = new MessageCallbackInfo();
-    info.callback = callback;
-    info.return_id = return_id;
-    __all_callback[msg_id] = info;
+    __all_callback[msg_id] = callback;
+    __all_return_id[msg_id] = return_id;
 }
 // 获取回调函数
-public static FindMessageCallback(int msg_id) : Functor<(INetClient, any) : any>, int
+public static FindMessageCallback(int msg_id) : Functor<(IMsgClient, any) : any>, int
 {
-    MessageCallbackInfo info = __all_callback[msg_id];
-    if (info == null) return null, null;
-    return info.callback, info.return_id;
+    return __all_callback[msg_id], __all_return_id[msg_id];
 }
 
 //序列化部分////////////////////////////////////////////////////////////////////////////////////////////////////////////-

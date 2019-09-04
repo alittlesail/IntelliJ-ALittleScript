@@ -50,7 +50,10 @@
       APOS                 =  "'"
       QUOTE                =  '"'
       BACK                 =  '\'
-      PROTO_OPTION         =  '@Proto'
+      HTTP                 =  '@Http'
+      HTTP_DOWNLOAD        =  '@HttpDownload'
+      HTTP_UPLOAD          =  '@HttpUpload'
+      MSG                  =  '@Msg'
       PARAM_TAIL           =  '...'
 
       WHITE_SPACE          = 'regexp:\s+'
@@ -71,8 +74,7 @@ accessModifier ::= public | private | protected
 // 协程修饰符
 coModifier ::= async | await
 // 协议修饰符
-protoModifier ::= PROTO_OPTION protoOption {pin=1}
-private protoOption ::= protomsg | httpget | httppost
+protoModifier ::= HTTP | HTTP_DOWNLOAD | HTTP_UPLOAD |  MSG
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 命名域

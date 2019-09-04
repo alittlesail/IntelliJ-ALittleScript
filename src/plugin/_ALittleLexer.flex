@@ -71,7 +71,10 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "'"                   { return APOS; }
   "\""                  { return QUOTE; }
   "\\"                  { return BACK; }
-  "@Proto"              { return PROTO_OPTION; }
+  "@Http"               { return HTTP; }
+  "@HttpDownload"       { return HTTP_DOWNLOAD; }
+  "@HttpUpload"         { return HTTP_UPLOAD; }
+  "@Msg"                { return MSG; }
   "..."                 { return PARAM_TAIL; }
   "register"            { return REGISTER; }
   "public"              { return PUBLIC; }
@@ -79,9 +82,6 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "protected"           { return PROTECTED; }
   "async"               { return ASYNC; }
   "await"               { return AWAIT; }
-  "protomsg"            { return PROTOMSG; }
-  "httpget"             { return HTTPGET; }
-  "httppost"            { return HTTPPOST; }
   "namespace"           { return NAMESPACE; }
   "class"               { return CLASS; }
   "struct"              { return STRUCT; }

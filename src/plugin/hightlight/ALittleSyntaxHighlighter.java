@@ -23,6 +23,8 @@ public class ALittleSyntaxHighlighter extends SyntaxHighlighterBase {
             createTextAttributesKey("ALITTLE_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
     public static final TextAttributesKey BAD_CHARACTER =
             createTextAttributesKey("ALITTLE_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
+    public static final TextAttributesKey ANNO =
+            createTextAttributesKey("ALITTLE_ANNO", DefaultLanguageHighlighterColors.STATIC_METHOD);
 
     private static final TextAttributesKey[] BAD_CHARACTER_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
@@ -30,6 +32,7 @@ public class ALittleSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] NUMBER_CONTENT_KEYS = new TextAttributesKey[]{NUMBER};
     private static final TextAttributesKey[] SYMBOL_KEYS = new TextAttributesKey[]{SYMBOL};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
+    private static final TextAttributesKey[] ANNO_KEYS = new TextAttributesKey[]{ANNO};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
     @NotNull
@@ -53,6 +56,8 @@ public class ALittleSyntaxHighlighter extends SyntaxHighlighterBase {
             return NUMBER_CONTENT_KEYS;
         } else if (ALittleParserDefinition.BAD_CHARACTER_SET.contains(tokenType)) {
             return BAD_CHARACTER_KEYS;
+        } else if (ALittleParserDefinition.ANNO_SET.contains(tokenType)) {
+            return ANNO_KEYS;
         }
 
         return EMPTY_KEYS;

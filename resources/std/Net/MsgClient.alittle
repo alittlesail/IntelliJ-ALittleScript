@@ -2,14 +2,15 @@
 namespace ALittle;
 
 // 二进制协议接口类
-public class INetClient
+public class IMsgClient
 {
-    public fun Send(int msg_id, any msg_body, int rpc_id) {}
-    public await fun SendRPC(int msg_id, any msg_body) : string, any {}
+    protected fun GetID() : int {}
+    protected fun Send(int msg_id, any msg_body, int rpc_id) {}
+    protected await fun SendRPC(int msg_id, any msg_body) : string, any {}
 }
 
 // 连接对象
-public class INetInterface
+public class IMsgInterface
 {
     public fun GetID() : int {}
     public fun Connect(string ip, int port) {}
@@ -19,20 +20,20 @@ public class INetInterface
 }
 
 // RPC结构信息
-struct NetClientRPCInfo
+struct MsgClientRPCInfo
 {
     int rpc_id;
     thread co;
 }
 
 // 长连接所有的对象集合
-private Map<int, INetClient> __NetClientMap = new Map<int, INetClient>();
-public static FindNetClient(int id) : INetClient { return __NetClientMap[id]; }
+private Map<int, IMsgClient> __MsgClientMap = new Map<int, IMsgClient>();
+public static FindMsgClient(int id) : IMsgClient { return __MsgClientMap[id]; }
 
 // 用于长连接
-public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public INetClient
+public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public IMsgClient
 {
-    private NI _net_interface;      // 网络对象
+    private MI _msg_interface;      // 网络对象
     private MWF _write_factory;     // 协议序列化对象
     private Map<int, ProtocolInvokeInfo> _invoke_map;// 协议缓存数据
 
@@ -41,19 +42,19 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
     private bool _check_heartbeat;
     private int _last_recv_time;
     private SafeIDCreator _id_creator;
-    private Map<int, NetClientRPCInfo> _id_map_rpc;
+    private Map<int, MsgClientRPCInfo> _id_map_rpc;
 
-    private Functor<(INetClient)> _net_connect_succeed_callback;
-    private Functor<(INetClient)> _net_connect_failed_callback;
-    private Functor<(INetClient)> _net_disconnected_callback;
+    private Functor<(IMsgClient)> _connect_succeed_callback;
+    private Functor<(IMsgClient)> _connect_failed_callback;
+    private Functor<(IMsgClient)> _disconnected_callback;
 
     // @param protocol 协议对象
     // @param heartbeat 心跳间隔时间(秒)
     // @param check_heartbeat 检测心跳是否有接受到回复
-    public Ctor(INetInterface net_interface, IMessageWriteFactory factory, int heartbeat, bool check_heartbeat)
+    public Ctor(IMsgInterface Msg_interface, IMessageWriteFactory factory, int heartbeat, bool check_heartbeat)
     {
         // 创建客户端对象
-        this._net_interface = new NI();
+        this._msg_interface = new MI();
         this._write_factory = new MWF();
         // 定时心跳
         this._heartbeat = heartbeat;
@@ -65,40 +66,40 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         this._last_recv_time = 0;
 
         this._id_creator = new SafeIDCreator();
-        this._id_map_rpc = new Map<int, NetClientRPCInfo>();
+        this._id_map_rpc = new Map<int, MsgClientRPCInfo>();
 
         // 连接回调
-        this._net_connect_succeed_callback = null;
-        this._net_connect_failed_callback = null;
-        this._net_disconnected_callback = null;
+        this._connect_succeed_callback = null;
+        this._connect_failed_callback = null;
+        this._disconnected_callback = null;
     }
 
-    public set net_connect_succeed_callback(Functor<(INetClient)> value)
+    public set connect_succeed_callback(Functor<(IMsgClient)> value)
     {
-        this._net_connect_succeed_callback = value;
+        this._connect_succeed_callback = value;
     }
-    public set net_connect_failed_callback(Functor<(INetClient)> value)
+    public set connect_failed_callback(Functor<(IMsgClient)> value)
     {
-        this._net_connect_failed_callback = value;
+        this._connect_failed_callback = value;
     }
-    public set net_disconnected_callback(Functor<(INetClient)> value)
+    public set disconnected_callback(Functor<(IMsgClient)> value)
     {
-        this._net_disconnected_callback = value;
+        this._disconnected_callback = value;
     }
 
     // 连接ip对象，ip也可以是域名
     public fun Connect(string ip, int port)
     {
         // 开始连接
-        this._net_interface.Connect(ip, port);
-        // 注册到NetSystem
-        __NetClientMap[this._net_interface.GetID()] = this;
+        this._msg_interface.Connect(ip, port);
+        // 注册到MsgSystem
+        __MsgClientMap[this._msg_interface.GetID()] = this;
     }
 
     // 判断是否已经连接成功
     public fun IsConnected() : bool
     {
-        return this._net_interface.IsConnected();
+        return this._msg_interface.IsConnected();
     }
 
     // 客户端连接服务端，成功
@@ -111,27 +112,27 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         // 启动定时心跳
         this.StartHeartbeat();
         // 通知逻辑
-        if (this._net_connect_succeed_callback != null)
-            this._net_connect_succeed_callback(this);
+        if (this._connect_succeed_callback != null)
+            this._connect_succeed_callback(this);
     }
 
     // 断开连接
     public fun HandleDisconnect()
     {
         this.StopHeartbeat();
-        __NetClientMap[this._net_interface.GetID()] = null;
+        __MsgClientMap[this._msg_interface.GetID()] = null;
 
         this.ClearRPC("连接断开了");
-        if (this._net_disconnected_callback != null)
-            this._net_disconnected_callback(this);
+        if (this._disconnected_callback != null)
+            this._disconnected_callback(this);
     }
 
     // 客户端链接服务端，失败
     public fun HandleConnectFailed()
     {
-        __NetClientMap[this._net_interface.GetID()] = null;
-        if (this._net_connect_failed_callback != null)
-            this._net_connect_failed_callback(this);
+        __MsgClientMap[this._msg_interface.GetID()] = null;
+        if (this._connect_failed_callback != null)
+            this._connect_failed_callback(this);
     }
 
     // 消息读取
@@ -187,17 +188,17 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         if (rpc_id == 0)
         {
             // 获取函数对象
-            Functor<(INetClient, any) : any> callback = FindMessageCallback(id);
+            Functor<(IMsgClient, any) : any> callback = FindMessageCallback(id);
             if (callback == null)
             {
-                Log("NetSystem.HandleMessage can't find callback by id:" .. id);
+                Log("MsgSystem.HandleMessage can't find callback by id:" .. id);
                 return;
             }
 
             any msg = this.MessageRead(factory, id);
             if (msg == null)
             {
-                Log("NetSystem.HandleMessage MessageRead failed by id:" .. id);
+                Log("MsgSystem.HandleMessage MessageRead failed by id:" .. id);
                 return;
             }
             callback(this, msg);
@@ -208,18 +209,18 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         if (rpc_id > 0)
         {
             // 获取函数对象
-            Functor<(INetClient, any) : any> callback, int return_id = FindMessageCallback(id);
+            Functor<(IMsgClient, any) : any> callback, int return_id = FindMessageCallback(id);
             if (callback == null)
             {
                 this.SendRpcError(-rpc_id, "没有注册消息RPC回调函数");
-                Log("NetSystem.HandleMessage can't find callback by id:"..id);
+                Log("MsgSystem.HandleMessage can't find callback by id:"..id);
                 return;
             }
 
             any msg = this.MessageRead(factory, id);
             if (msg == null)
             {
-                Log("NetSystem.HandleMessage MessageRead failed by id:"..id);
+                Log("MsgSystem.HandleMessage MessageRead failed by id:"..id);
                 return;
             }
 
@@ -228,7 +229,7 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
             if (error != true)
             {
                 this.SendRpcError(-rpc_id, return_body);
-                Log("NetSystem.HandleMessage callback invoke failed! by id:"..id..", reason:"..error);
+                Log("MsgSystem.HandleMessage callback invoke failed! by id:"..id..", reason:"..error);
                 return;
             }
             this.Send(return_id, return_body, -rpc_id);
@@ -239,10 +240,10 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         rpc_id = -rpc_id;
         // 回收id
         this._id_creator.ReleaseID(rpc_id);
-        NetClientRPCInfo info = this._id_map_rpc[rpc_id];
+        MsgClientRPCInfo info = this._id_map_rpc[rpc_id];
         if (info == null)
         {
-            Log("NetSystem.HandleMessage can't find rpc info by id:"..id);
+            Log("MsgSystem.HandleMessage can't find rpc info by id:"..id);
             return;
         }
         this._id_map_rpc[rpc_id] = null;
@@ -257,7 +258,7 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         any msg = this.MessageRead(factory, id);
         if (msg == null)
         {
-            Log("NetSystem.HandleMessage MessageRead failed by id:"..id);
+            Log("MsgSystem.HandleMessage MessageRead failed by id:"..id);
             return;
         }
         coroutine.resume(info.co, null, msg);
@@ -268,7 +269,7 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
     {
         this._write_factory.SetRpcID(rpc_id);
         this.MessageWrite(msg_id, msg_body);
-        this._net_interface.SendFactory(this._write_factory);
+        this._msg_interface.SendFactory(this._write_factory);
     }
 
     // 关闭连接
@@ -277,13 +278,13 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         // 停止发送心跳包
         this.StopHeartbeat();
         // 关闭连接
-        this._net_interface.Close();
+        this._msg_interface.Close();
 
         // 清理RPC
         if (reason == null) reason = "主动关闭连接";
         this.ClearRPC(reason);
 
-        __NetClientMap[this._net_interface.GetID()] = null;
+        __MsgClientMap[this._msg_interface.GetID()] = null;
     }
 
     // 发送心跳包
@@ -291,7 +292,7 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
     public fun SendHeartbeat(int max_ms)
     {
         // 如果没有连接成功，那么直接返回
-        if (this._net_interface.IsConnected() == false)
+        if (this._msg_interface.IsConnected() == false)
             return;
 
         // 发送心跳包
@@ -299,7 +300,7 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         // 设置id
         this._write_factory.SetID(0);
         this._write_factory.SetRpcID(0);
-        this._net_interface.SendFactory(this._write_factory);
+        this._msg_interface.SendFactory(this._write_factory);
 
         // 启动检测
         if (this._check_heartbeat)
@@ -323,7 +324,7 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
     public fun SendRpcError(int rpc_id, string reason)
     {
         // 如果没有连接成功，那么直接返回
-        if (this._net_interface.IsConnected() == false)
+        if (this._msg_interface.IsConnected() == false)
             return;
 
         // 发送心跳包
@@ -332,7 +333,7 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         this._write_factory.SetID(1);
         this._write_factory.SetRpcID(rpc_id);
         this._write_factory.WriteString(reason);
-        this._net_interface.SendFactory(this._write_factory);
+        this._msg_interface.SendFactory(this._write_factory);
     }
 
     // 心跳包检测
@@ -359,13 +360,13 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         if (this._last_recv_time > 0 && send_time - this._last_recv_time > cmp_time)
         {
             // 如果没有连接成功，那么直接返回
-            if (this._net_interface.IsConnected() == false)
+            if (this._msg_interface.IsConnected() == false)
             return;
             // 主动关闭连接
             this.Close("心跳检测失败，主动断开连接");
             // 调用断开连接回调
-            if (this._net_disconnected_callback != null)
-            this._net_disconnected_callback(this);
+            if (this._disconnected_callback != null)
+            this._disconnected_callback(this);
         }
     }
 
@@ -382,9 +383,9 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
         int rpc_id = this._id_creator.CreateID();
         this._write_factory.SetRpcID(rpc_id);
         this.MessageWrite(msg_id, msg_body);
-        this._net_interface.SendFactory(this._write_factory);
+        this._msg_interface.SendFactory(this._write_factory);
 
-        NetClientRPCInfo info = new NetClientRPCInfo();
+        MsgClientRPCInfo info = new MsgClientRPCInfo();
         info.co = co;
         info.rpc_id = rpc_id;
         this._id_map_rpc[rpc_id] = info;
@@ -395,7 +396,7 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
     // 处理RPC应答
     public fun HandleRPCMessage(int rpc_id, string error, any param)
     {
-        NetClientRPCInfo info = this._id_map_rpc[rpc_id];
+        MsgClientRPCInfo info = this._id_map_rpc[rpc_id];
         if (info == null)
         {
             Error("出现未知的rpc_id.", rpc_id);
@@ -411,15 +412,15 @@ public class NetClient<NI : INetInterface, MWF : IMessageWriteFactory> : public 
     public fun ClearRPC(string reason)
     {
         // 先复制，再清理
-        Map<int, NetClientRPCInfo> tmp = new Map<int, NetClientRPCInfo>();
-        for (int rpc_id, NetClientRPCInfo info in this._id_map_rpc)
+        Map<int, MsgClientRPCInfo> tmp = new Map<int, MsgClientRPCInfo>();
+        for (int rpc_id, MsgClientRPCInfo info in this._id_map_rpc)
         {
             this._id_creator.ReleaseID(rpc_id);
             tmp[rpc_id] = info;
         }
-        this._id_map_rpc = new Map<int, NetClientRPCInfo>();
+        this._id_map_rpc = new Map<int, MsgClientRPCInfo>();
         // 逐个调用表示失败
-        for (int rpc_id, NetClientRPCInfo info in tmp)
+        for (int rpc_id, MsgClientRPCInfo info in tmp)
         {
             auto result, auto reason = coroutine.resume(info.co, reason, null);
             if (result != true) Error(reason);

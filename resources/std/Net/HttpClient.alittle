@@ -3,7 +3,7 @@ namespace ALittle;
 // Http协议接口类，负责处理
 public class IHttpClient
 {
-    public await fun SendRPC(string url, any content) : string, any {}
+    protected await fun SendRPC(string url, any content) : string, any {}
 }
 
 // 连接对象
@@ -19,6 +19,23 @@ public class IHttpInterface
 // 短连接所有的对象集合
 private Map<int, IHttpClient> __HttpClientMap = new Map<int, IHttpClient>();
 public static FindHttpClient(int id) : IHttpClient { return __HttpClientMap[id]; }
+
+private Map<string, Functor<(IHttpClient, any):any>> __all_callback = new Map<string, Functor<(IHttpClient, any):any>>();
+table.setweak(__all_callback, false, true);
+protected static RegHttpCallback(string method, Functor<(IHttpClient, any):any> callback)
+{
+    if (__all_callback[method] != null)
+    {
+        Error("RegHttpCallback消息回调函数注册失败，名字为"..method.."已存在");
+        return;
+    }
+    __all_callback[method] = callback;
+}
+// 获取回调函数
+public static FindHttpCallback(string method) : Functor<(IHttpClient, any):any>
+{
+    return __all_callback[method];
+}
 
 public class HttpClient<HC : IHttpInterface> : public IHttpClient
 {

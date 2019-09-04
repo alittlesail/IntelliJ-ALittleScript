@@ -1759,6 +1759,53 @@ public class ALittleGenerateLua {
 
         content.append("\n");
 
+        ALittleProtoModifier protoModifier = root.getProtoModifier();
+        if (protoModifier != null) {
+            String text = protoModifier.getText();
+
+            if (paramDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有两个参数");
+            List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
+            if (oneDecList.size() != 2) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有两个参数");
+            ALittleReferenceUtil.GuessTypeInfo guess_param = oneDecList.get(1).getAllType().guessType();
+
+            ALittleMethodReturnDec returnDec = root.getMethodReturnDec();
+            if (returnDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有两个返回值");
+            List<ALittleAllType> returnList = returnDec.getAllTypeList();
+            if (returnList.size() != 2) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有两个返回值");
+            ALittleReferenceUtil.GuessTypeInfo guess_return = returnList.get(1).guessType();
+
+            if (text.equals("@Http") || text.equals("@HttpDownload")) {
+                content.append(preTab)
+                        .append(namespacePre)
+                        .append("RegHttpCallback(\"")
+                        .append(guess_param.value)
+                        .append("\", ")
+                        .append(methodName)
+                        .append(")\n");
+            } else if (text.equals("@HttpUpload")) {
+                content.append(preTab)
+                        .append(namespacePre)
+                        .append("RegHttpFileCallback(\"")
+                        .append(guess_param.value)
+                        .append("\", ")
+                        .append(methodName)
+                        .append(")\n");
+            } else if (text.equals("@Msg")) {
+                content.append(preTab)
+                        .append(namespacePre)
+                        .append("RegMsgCallback(")
+                        .append(PsiHelper.JSHash(guess_param.value))
+                        .append(", ")
+                        .append(methodName)
+                        .append(", ")
+                        .append(PsiHelper.JSHash(guess_return.value))
+                        .append(")\n");
+
+                GenerateReflectStructInfo(guess_param);
+                GenerateReflectStructInfo(guess_return);
+            }
+        }
+
         return content.toString();
     }
 

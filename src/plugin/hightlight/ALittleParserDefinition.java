@@ -39,6 +39,9 @@ public class ALittleParserDefinition implements ParserDefinition {
             ALittleTypes.QUOTIENT_ASSIGN, ALittleTypes.RBRACE, ALittleTypes.RBRACK, ALittleTypes.REMAINDER, ALittleTypes.REMAINDER_ASSIGN, ALittleTypes.RPAREN,
             ALittleTypes.SEMI);
 
+    public static final TokenSet ANNO_SET = TokenSet.create(ALittleTypes.HTTP, ALittleTypes.HTTP_DOWNLOAD, ALittleTypes.HTTP_UPLOAD, ALittleTypes.MSG
+            );
+
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
