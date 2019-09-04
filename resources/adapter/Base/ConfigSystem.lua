@@ -11,7 +11,7 @@ ConfigSystem = Class(nil, "ALittle.ConfigSystem")
 function ConfigSystem:Ctor(file_path)
 	___rawset(self, "_file_path", file_path)
 	___rawset(self, "_config_map", {})
-	local file = self.__class.__element.FL()
+	local file = self.__class.__element[1]()
 	local content = file:Load(self._file_path)
 	if content == nil then
 		return
@@ -61,7 +61,7 @@ function ConfigSystem:CoverConfig(msg, save)
 end
 
 function ConfigSystem:SaveConfig()
-	local file = self.__class.__element.FS()
+	local file = self.__class.__element[2]()
 	if not file:Save(self._file_path, Json.encode(self._config_map)) then
 		Log("Save Congig Failed.", self._file_path)
 	end

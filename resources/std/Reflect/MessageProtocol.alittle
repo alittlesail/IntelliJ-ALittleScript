@@ -40,13 +40,10 @@ protected struct ProtocolInvokeInfo
     string var_name;
 
     // 当前是Map时
-    string key_type;
-    string value_type;
     ProtocolInvokeInfo key_info;
     ProtocolInvokeInfo value_info;
 
     // 当前是List时
-    string sub_type;
     ProtocolInvokeInfo sub_info;
 
     // 当前是Message，各个成员变量的结构体
@@ -392,10 +389,9 @@ private static CreateSubInfo(string sub_type) : ProtocolInvokeInfo
 private static CreateArrayInfo(string var_type) : ProtocolInvokeInfo
 {
     auto invoke_info = new ProtocolInvokeInfo();
-    invoke_info.sub_type = __sub(var_type, 6, -2);
     invoke_info.wfunc = PS_WriteArray;
     invoke_info.rfunc = PS_ReadArray;
-    invoke_info.sub_info = CreateSubInfo(invoke_info.sub_type);
+    invoke_info.sub_info = CreateSubInfo(__sub(var_type, 6, -2));
     return invoke_info;
 }
 
@@ -423,12 +419,10 @@ private static CreateMapInfo(string var_type) : ProtocolInvokeInfo
         }
     }
     assert(comma_index != 0, "can'f find comma in var_type:" .. var_type);
-    invoke_info.key_type = __sub(sub_type, 1, comma_index - 1);
-    invoke_info.value_type = __sub(sub_type, comma_index + 1);
     invoke_info.wfunc = PS_WriteMap;
     invoke_info.rfunc = PS_ReadMap;
-    invoke_info.key_info = CreateSubInfo(invoke_info.key_type);
-    invoke_info.value_info = CreateSubInfo(invoke_info.value_type);
+    invoke_info.key_info = CreateSubInfo(__sub(sub_type, 1, comma_index - 1));
+    invoke_info.value_info = CreateSubInfo(__sub(sub_type, comma_index + 1));
     return invoke_info;
 }
 

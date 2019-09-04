@@ -5,7 +5,7 @@ protected class Sqlite3Stmt
 {
     public fun nrows() : any {}
     public fun reset() {}
-    public fun bind_values(any arg1, any arg2, any arg3, any arg4) {}
+    public fun bind_values(...) {}
 }
 
 protected class Sqlite3Object

@@ -1,0 +1,171 @@
+
+namespace ALittle;
+
+protected class ICSVFile
+{
+    public fun Close() {}
+    public fun ReadCell(int lua_row, int lua_col) : string {}
+    public fun GetRowCount() : int {}
+    public fun GetColCount() : int {}
+}
+
+protected struct CSVInvokeInfo
+{
+    Functor<(string, CSVInvokeInfo):any> func;
+
+    // 当这个结构体是上级的成员变量时，那么这个不为空
+    string var_name;
+
+    // 如果是List
+    string split;
+    CSVInvokeInfo sub_info;
+
+    // 如果是message，表示列表
+    List<CSVInvokeInfo> handle;
+}
+
+//回调注册部分//////////////////////////////////////////////////////////////////////////////////////////////////////////-
+
+private static CSV_ReadBool(string content, CSVInvokeInfo value) : bool
+{
+    return content == "true";
+}
+
+private static CSV_ReadInt(string content, CSVInvokeInfo value) : int
+{
+    if (content == "") return 0;
+    return math.floor(tonumber(content));
+}
+
+private static CSV_ReadLongLong(string content, CSVInvokeInfo value) : I64
+{
+    if (content == "") return 0;
+    return math.floor(tonumber(content));
+}
+
+private static CSV_ReadString(string content, CSVInvokeInfo value) : string
+{
+    return content;
+}
+
+private static CSV_ReadDouble(string content, CSVInvokeInfo value) : double
+{
+    if (content == "") return 0;
+    return tonumber(content);
+}
+
+private static CSV_ReadArray(string content, CSVInvokeInfo value) : List<any>
+{
+    auto list = String_Split(content, value.split);
+    List<any> result = new List<any>();
+    for (auto index, auto sub in list)
+    {
+        auto v = value.func(sub, value.sub_info);
+        if (v == null) return null;
+        result[index] = v;
+    }
+    return result;
+}
+
+protected static CSV_ReadMessage(string content, CSVInvokeInfo value) : any
+{
+    auto list = String_Split(content, value.split);
+    Map<string, any> t = table.create();
+    for (auto index, auto handle in value.handle)
+    {
+        t[handle.var_name] = handle.func(list[index], handle);
+    }
+    return t;
+}
+
+private auto __csv_read_data_map = new Map<string, any>();
+__csv_read_data_map["bool"] = CSV_ReadBool;
+__csv_read_data_map["int"] = CSV_ReadInt;
+__csv_read_data_map["I64"] = CSV_ReadLongLong;
+__csv_read_data_map["string"] = CSV_ReadString;
+__csv_read_data_map["double"] = CSV_ReadDouble;
+
+protected auto __split_list = ["#","*","|"];
+protected auto __split_list_last = __split_list[table.maxn(__split_list)];
+
+//构造部分//////////////////////////////////////////////////////////////////////////////////////////////////////////-
+private auto __find = String.find;
+private auto __sub = String.sub;
+private auto __len = String.len;
+private auto __byte = String.byte;
+private auto __assert = assert;
+private static CreateSubInfo(string sub_type, int split_index) : CSVInvokeInfo
+{
+    if (__find(sub_type, "List", 1) == 1)
+        return CreateArrayInfo(sub_type, split_index);
+
+    if (__find(sub_type, "Map", 1) == 1)
+        __assert(false, "不支持Map解析");
+
+    auto func = __csv_read_data_map[sub_type];
+    if (func != null)
+    {
+        auto sub_info = new CSVInvokeInfo();
+        sub_info.func = func;
+        return sub_info;
+    }
+
+    return CreateMessageInfo(sub_type, split_index);
+}
+
+private static CreateArrayInfo(string var_type, int split_index) : CSVInvokeInfo
+{
+    __assert(split_index > 0, "分隔符数量不足");
+
+    auto invoke_info = new CSVInvokeInfo();
+    invoke_info.func = CSV_ReadArray;
+    invoke_info.split = __split_list[split_index];
+    invoke_info.sub_info = CreateSubInfo(__sub(var_type, 6, -2), split_index - 1);
+    return invoke_info;
+}
+
+private static CreateMessageInfo(string var_type, int split_index) : CSVInvokeInfo
+{
+    __assert(split_index > 0, "分隔符数量不足");
+
+    auto reflect_info = FindReflectByName(var_type);
+    __assert(reflect_info != null, "FindReflectByName调用失败! 未知类型:" .. var_type);
+
+    auto invoke_info = new CSVInvokeInfo();
+    invoke_info.split = __split_list[split_index];
+    invoke_info.func = CSV_ReadMessage;
+
+    auto handle = new List<CSVInvokeInfo>();
+    invoke_info.handle = handle;
+    auto handle_count = 0;
+    for (auto index, auto var_name in reflect_info.name_list)
+    {
+        auto var_info = CreateSubInfo(reflect_info.type_list[index], split_index - 1);
+        var_info.var_name = var_name;
+        handle_count = handle_count + 1;
+        handle[handle_count] = var_info;
+    }
+    return invoke_info;
+}
+
+protected static CreateCSVInfo(ReflectInfo reflect_info) : CSVInvokeInfo
+{
+    int split_index = table.maxn(__split_list);
+    __assert(split_index > 0, "分隔符数量不足");
+
+    auto invoke_info = new CSVInvokeInfo();
+    invoke_info.split = __split_list[split_index];
+    invoke_info.func = CSV_ReadMessage;
+
+    auto handle = new List<CSVInvokeInfo>();
+    invoke_info.handle = handle;
+    auto handle_count = 0;
+    for (auto index, auto var_name in reflect_info.name_list)
+    {
+        auto var_info = CreateSubInfo(reflect_info.type_list[index], split_index - 1);
+        var_info.var_name = var_name;
+        handle_count = handle_count + 1;
+        handle[handle_count] = var_info;
+    }
+    return invoke_info;
+}

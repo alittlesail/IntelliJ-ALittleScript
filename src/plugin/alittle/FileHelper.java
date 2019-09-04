@@ -46,6 +46,31 @@ public class FileHelper {
             throw new Exception("文件夹删除失败 path:" + root.getPath());
     }
 
+    // 复制文件
+    public static void copyFile(VirtualFile root, String targetPath) throws Exception {
+        File target = new File(targetPath);
+        if (!target.exists()) target.mkdirs();
+        FileOutputStream fileOut = new FileOutputStream(new File(targetPath + "/" + root.getName()));
+        fileOut.write(root.contentsToByteArray());
+        fileOut.close();
+    }
+
+    // 复制文件夹 targetPath
+    public static void deepCopyPath(VirtualFile root, String targetPath) throws Exception {
+        if (!root.isDirectory()) return;
+
+        VirtualFile[] fileList = root.getChildren();
+        if (fileList == null) return;
+
+        for (VirtualFile file : fileList) {
+            if (file.isDirectory()) {
+                deepCopyPath(file, targetPath + "/" + file.getName());
+            } else {
+                copyFile(file, targetPath);
+            }
+        }
+    }
+
     // 获取模块路径
     public static String calcModulePath(Module module) throws Exception {
         String module_name = module.getName();

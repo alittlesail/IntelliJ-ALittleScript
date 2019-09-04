@@ -4,12 +4,9 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiErrorElement;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.*;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
-import org.apache.velocity.util.ArrayListWrapper;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
@@ -19,7 +16,6 @@ import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,14 +44,7 @@ public class ALittleGenerateLua {
             dir = VfsUtil.findFileByIoFile(new File(jarPath +"/adapter"), true);
 
         if (dir != null) {
-            VirtualFile[] fileList = dir.getChildren();
-            if (fileList != null) {
-                for (VirtualFile virtualFile : fileList) {
-                    FileOutputStream fileOut = new FileOutputStream(new File(moduleBasePath + "/std/" + virtualFile.getName()));
-                    fileOut.write(virtualFile.contentsToByteArray());
-                    fileOut.close();
-                }
-            }
+            FileHelper.deepCopyPath(dir, moduleBasePath + "/std");
         }
     }
 

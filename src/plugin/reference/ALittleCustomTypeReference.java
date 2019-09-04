@@ -77,6 +77,8 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
                     info.type = guessInfo.type;
                     info.element = guessInfo.element;
                     info.value = PsiHelper.getNamespaceName(srcClassDec) + "." + srcClassNameDec.getIdContent().getText();
+                    info.classTemplateList = new ArrayList<>();
+                    info.classTemplateList.addAll(guessInfo.classTemplateList);
                     info.classTemplateMap = new HashMap<>();
                     List<String> nameList = new ArrayList<>();
                     for (int i = 0; i < templateGuessList.size(); ++i) {
