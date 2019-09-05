@@ -116,8 +116,10 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             info.classTemplateList = new ArrayList<>();
             info.classTemplateList.addAll(guess.classTemplateList);
             info.classTemplateMap = new HashMap<>();
-            for (Map.Entry<String, ALittleReferenceUtil.GuessTypeInfo> entry : guess.classTemplateMap.entrySet()) {
-                info.classTemplateMap.put(entry.getKey(), replaceTemplate(entry.getValue()));
+            if (guess.classTemplateMap != null) {
+                for (Map.Entry<String, ALittleReferenceUtil.GuessTypeInfo> entry : guess.classTemplateMap.entrySet()) {
+                    info.classTemplateMap.put(entry.getKey(), replaceTemplate(entry.getValue()));
+                }
             }
 
             ALittleClassDec srcClassDec = (ALittleClassDec) guess.element;

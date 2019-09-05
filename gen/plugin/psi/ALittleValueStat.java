@@ -17,6 +17,9 @@ public interface ALittleValueStat extends PsiElement {
   ALittleMethodParamTailDec getMethodParamTailDec();
 
   @Nullable
+  ALittleNcallStat getNcallStat();
+
+  @Nullable
   ALittleOp2Stat getOp2Stat();
 
   @Nullable

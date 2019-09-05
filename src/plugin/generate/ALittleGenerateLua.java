@@ -136,6 +136,76 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
+    private String GenerateNcallStat(ALittleNcallStat ncallStat) throws Exception {
+        List<ALittleValueStat> valueStatList = ncallStat.getValueStatList();
+        if (valueStatList.isEmpty()) throw new Exception("ncall第一个参数必须是带注解的全局函数");
+        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStatList.get(0).guessType();
+        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR || !(guessInfo.element instanceof ALittleGlobalMethodDec)) {
+            throw new Exception("ncall第一个参数必须是带注解的全局函数");
+        }
+        ALittleGlobalMethodDec methodDec = (ALittleGlobalMethodDec)guessInfo.element;
+        ALittleProtoModifier protoModifier = methodDec.getProtoModifier();
+        if (protoModifier == null) {
+            throw new Exception("ncall第一个参数必须是带注解的全局函数");
+        }
+        String text = protoModifier.getText();
+
+        String namespacePre = "ALittle.";
+        if (mNamespaceName.equals("ALittle")) namespacePre = "";
+
+        String replaceTest = "";
+        int msg_id = 0;
+        if (text.equals("@Http")) {
+            replaceTest = "IHttpClient.Invoke";
+        } else if (text.equals("@HttpUpload")) {
+            replaceTest = "IHttpFileClient.InvokeUpload";
+        } else if (text.equals("@HttpDownload")) {
+            replaceTest = "IHttpFileClient.InvokeDownload";
+        } else if (text.equals("@Msg")) {
+            ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
+            if (returnDec == null) {
+                replaceTest = "IMsgClient.Invoke";
+            } else {
+                replaceTest = "IMsgClient.InvokeRPC";
+            }
+            if (valueStatList.size() >= 2) {
+                ALittleReferenceUtil.GuessTypeInfo structInfo = valueStatList.get(1).guessType();
+                if (structInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+                    throw new Exception(structInfo.value + "的第二个参数必须是struct");
+                }
+                msg_id = PsiHelper.JSHash(structInfo.value);
+
+                GenerateReflectStructInfo(structInfo);
+            }
+
+            if (returnDec != null) {
+                List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
+                if (!allTypeList.isEmpty()) {
+                    ALittleReferenceUtil.GuessTypeInfo structInfo = allTypeList.get(0).guessType();
+                    if (structInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+                        throw new Exception(structInfo.value + "的返回值必须是struct");
+                    }
+                    GenerateReflectStructInfo(structInfo);
+                }
+            }
+        } else {
+            throw new Exception("未知的注解类型:" + text);
+        }
+
+        String content = namespacePre + replaceTest + "(";
+        List<String> paramList = new ArrayList<>();
+        for (int i = 1; i < valueStatList.size(); ++i) {
+            paramList.add(GenerateValueStat(valueStatList.get(i)));
+        }
+        if (text.equals("@Msg")) {
+            paramList.add("" + msg_id);
+        }
+        content += String.join(", ", paramList);
+        content += ")";
+        return content;
+    }
+
+    @NotNull
     private String GenerateOpNewListStat(ALittleOpNewListStat opNewList) throws Exception {
         List<ALittleValueStat> valueStatList = opNewList.getValueStatList();
 
@@ -718,6 +788,9 @@ public class ALittleGenerateLua {
         ALittlePcallStat pcallStat = rootStat.getPcallStat();
         if (pcallStat != null) return GeneratePcallStat(pcallStat);
 
+        ALittleNcallStat ncallStat = rootStat.getNcallStat();
+        if (ncallStat != null) return GenerateNcallStat(ncallStat);
+
         ALittleMethodParamTailDec tailDec = rootStat.getMethodParamTailDec();
         if (tailDec != null) return tailDec.getText();
 
@@ -830,8 +903,9 @@ public class ALittleGenerateLua {
                     isLuaNamespace = true;
 
                 // 如果是lua命名域，那么就忽略
-                if (!isLuaNamespace)
+                if (!isLuaNamespace) {
                     content.append(customType.getText());
+                }
                 // 如果是this，那么就变为self
             } else if (thisType != null) {
                 content.append("self");
@@ -853,7 +927,7 @@ public class ALittleGenerateLua {
                 ALittlePropertyValueSuffix nextSuffix = null;
                 if (index + 1 < suffixList.size()) nextSuffix = suffixList.get(index + 1);
 
-                // 如果当前是
+                // 如果当前是点
                 ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
                 if (dotId != null) {
                     // 获取类型
@@ -1769,10 +1843,10 @@ public class ALittleGenerateLua {
             ALittleReferenceUtil.GuessTypeInfo guess_param = oneDecList.get(1).getAllType().guessType();
 
             ALittleMethodReturnDec returnDec = root.getMethodReturnDec();
-            if (returnDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有两个返回值");
+            if (returnDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有返回值");
             List<ALittleAllType> returnList = returnDec.getAllTypeList();
-            if (returnList.size() != 2) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有两个返回值");
-            ALittleReferenceUtil.GuessTypeInfo guess_return = returnList.get(1).guessType();
+            if (returnList.size() != 1) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有一个返回值");
+            ALittleReferenceUtil.GuessTypeInfo guess_return = returnList.get(0).guessType();
 
             if (text.equals("@Http") || text.equals("@HttpDownload")) {
                 content.append(preTab)

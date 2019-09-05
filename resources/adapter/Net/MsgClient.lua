@@ -8,13 +8,18 @@ local ___coroutine = coroutine
 
 IMsgClient = Class(nil, "ALittle.IMsgClient")
 
-function IMsgClient:GetID()
-end
-
 function IMsgClient:Send(msg_id, msg_body, rpc_id)
 end
 
 function IMsgClient:SendRPC(msg_id, msg_body)
+end
+
+function IMsgClient.Invoke(client, msg_body, msg_id)
+	client:Send(msg_id, msg_body, 0)
+end
+
+function IMsgClient.InvokeRPC(client, msg_body, msg_id)
+	return client:SendRPC(msg_id, msg_body)
 end
 
 IMsgInterface = Class(nil, "ALittle.IMsgInterface")
@@ -42,8 +47,8 @@ end
 assert(IMsgClient, " extends class:IMsgClient is nil")
 MsgClient = Class(IMsgClient, "ALittle.MsgClient")
 
-function MsgClient:Ctor(Msg_interface, factory, heartbeat, check_heartbeat)
-	___rawset(self, "_msg_interface", self.__class.__element[1]())
+function MsgClient:Ctor(heartbeat, check_heartbeat)
+	___rawset(self, "_interface", self.__class.__element[1]())
 	___rawset(self, "_write_factory", self.__class.__element[2]())
 	___rawset(self, "_heartbeat", heartbeat)
 	___rawset(self, "_heartbeat_loop", nil)
@@ -72,12 +77,12 @@ function MsgClient.__setter:disconnected_callback(value)
 end
 
 function MsgClient:Connect(ip, port)
-	self._msg_interface:Connect(ip, port)
-	__MsgClientMap[self._msg_interface:GetID()] = self
+	self._interface:Connect(ip, port)
+	__MsgClientMap[self._interface:GetID()] = self
 end
 
 function MsgClient:IsConnected()
-	return self._msg_interface:IsConnected()
+	return self._interface:IsConnected()
 end
 
 function MsgClient:HandleConnectSucceed()
@@ -91,7 +96,7 @@ end
 
 function MsgClient:HandleDisconnect()
 	self:StopHeartbeat()
-	__MsgClientMap[self._msg_interface:GetID()] = nil
+	__MsgClientMap[self._interface:GetID()] = nil
 	self:ClearRPC("连接断开了")
 	if self._disconnected_callback ~= nil then
 		self._disconnected_callback(self)
@@ -99,7 +104,7 @@ function MsgClient:HandleDisconnect()
 end
 
 function MsgClient:HandleConnectFailed()
-	__MsgClientMap[self._msg_interface:GetID()] = nil
+	__MsgClientMap[self._interface:GetID()] = nil
 	if self._connect_failed_callback ~= nil then
 		self._connect_failed_callback(self)
 	end
@@ -198,27 +203,27 @@ end
 function MsgClient:Send(msg_id, msg_body, rpc_id)
 	self._write_factory:SetRpcID(rpc_id)
 	self:MessageWrite(msg_id, msg_body)
-	self._msg_interface:SendFactory(self._write_factory)
+	self._interface:SendFactory(self._write_factory)
 end
 
 function MsgClient:Close(reason)
 	self:StopHeartbeat()
-	self._msg_interface:Close()
+	self._interface:Close()
 	if reason == nil then
 		reason = "主动关闭连接"
 	end
 	self:ClearRPC(reason)
-	__MsgClientMap[self._msg_interface:GetID()] = nil
+	__MsgClientMap[self._interface:GetID()] = nil
 end
 
 function MsgClient:SendHeartbeat(max_ms)
-	if self._msg_interface:IsConnected() == false then
+	if self._interface:IsConnected() == false then
 		return
 	end
 	self._write_factory:ResetOffset()
 	self._write_factory:SetID(0)
 	self._write_factory:SetRpcID(0)
-	self._msg_interface:SendFactory(self._write_factory)
+	self._interface:SendFactory(self._write_factory)
 	if self._check_heartbeat then
 		local send_time = os.clock()
 		local default_delta = self._heartbeat / 2
@@ -235,14 +240,14 @@ function MsgClient:SendHeartbeat(max_ms)
 end
 
 function MsgClient:SendRpcError(rpc_id, reason)
-	if self._msg_interface:IsConnected() == false then
+	if self._interface:IsConnected() == false then
 		return
 	end
 	self._write_factory:ResetOffset()
 	self._write_factory:SetID(1)
 	self._write_factory:SetRpcID(rpc_id)
 	self._write_factory:WriteString(reason)
-	self._msg_interface:SendFactory(self._write_factory)
+	self._interface:SendFactory(self._write_factory)
 end
 
 function MsgClient:CheckHeartbeat(send_time, cmp_time, delta_time)
@@ -255,7 +260,7 @@ function MsgClient:CheckHeartbeat(send_time, cmp_time, delta_time)
 		return
 	end
 	if self._last_recv_time > 0 and send_time - self._last_recv_time > cmp_time then
-		if self._msg_interface:IsConnected() == false then
+		if self._interface:IsConnected() == false then
 			return
 		end
 		self:Close("心跳检测失败，主动断开连接")
@@ -276,7 +281,7 @@ function MsgClient:SendRPC(msg_id, msg_body)
 	local rpc_id = self._id_creator:CreateID()
 	self._write_factory:SetRpcID(rpc_id)
 	self:MessageWrite(msg_id, msg_body)
-	self._msg_interface:SendFactory(self._write_factory)
+	self._interface:SendFactory(self._write_factory)
 	local info = {}
 	info.co = co
 	info.rpc_id = rpc_id

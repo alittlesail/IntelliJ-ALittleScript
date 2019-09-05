@@ -4,14 +4,20 @@ namespace ALittle;
 // Http文件协议接口类，负责处理
 public class IHttpFileClient
 {
-    protected fun GetID() : int {}
-    protected await fun SendRPC(string url, string file_path, bool download, int start_size) : string, any {}
+    // 提供子类继承
+    protected await fun SendDownloadRPC(any content) : string {}
+    protected await fun SendUploadRPC(any content) : string, any {}
+
+    // 提供框架调用
+    protected await static InvokeDownload(IHttpFileClient client, any content) : string { return client.SendDownloadRPC(content); }
+    protected await static InvokeUpload(IHttpFileClient client, any content) : string, any { return client.SendUploadRPC(content); }
 }
 
 // 连接对象
 public class IHttpFileInterface
 {
     public fun GetID() : int {}
+    public fun GetPath() : string {}
     public fun SetURL(string url, string file_path, bool download, int start_size) {}
     public fun Start() {}
     public fun Stop() {}
@@ -44,15 +50,41 @@ public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
 {
     private HFC _interface;
     private thread _co;
+    private string _url;
+    private string _file_path;
+    private int _start_size;
     private Functor<(IHttpFileInterface)> _callback;        // 下载或者上传的进度回调
 
-    public Ctor(Functor<(IHttpFileInterface)> callback)
+    public Ctor(string url, string file_path, int start_size, Functor<(IHttpFileInterface)> callback)
     {
         this._interface = new HFC();
+        this._url = url;
+        this._file_path = file_path;
+        this._start_size = start_size;
         this._callback = callback;
     }
 
-    public await fun SendRPC(string url, string file_path, bool download, int start_size) : string, any
+    public await fun SendDownloadRPC(any content) : string
+    {
+        thread co = coroutine.running();
+        if (co == null)
+            return "当前不是协程";
+
+        this._co = co;
+        __HttpFileClientMap[this._interface.GetID()] = this;
+
+        if (this._start_size == null)
+            this._start_size = 0;
+
+        // 设置URL
+        this._interface.SetURL(String_UrlAppendParamMap(this._url, content), this._file_path, true, this._start_size);
+        this._interface.Start();
+
+        // 协程挂起，并等待返回值
+        return yield;
+    }
+
+    public await fun SendUploadRPC(any content) : string, any
     {
         thread co = coroutine.running();
         if (co == null)
@@ -61,10 +93,11 @@ public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
         this._co = co;
         __HttpFileClientMap[this._interface.GetID()] = this;
 
-        if (start_size == null)
-            start_size = 0;
+        if (this._start_size == null)
+            this._start_size = 0;
+
         // 设置URL
-        this._interface.SetURL(url, file_path, download, start_size);
+        this._interface.SetURL(String_UrlAppendParamMap(this._url, content), this._file_path, false, this._start_size);
         this._interface.Start();
 
         // 协程挂起，并等待返回值
@@ -74,6 +107,11 @@ public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
     public fun Stop()
     {
         this._interface.Stop();
+    }
+
+    public fun GetTotalSize() : int
+    {
+        return this._interface.GetTotalSize();
     }
 
     public fun HandleSucceed()

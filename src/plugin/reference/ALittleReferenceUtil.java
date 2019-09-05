@@ -250,6 +250,8 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleVarAssignNameDec) return new ALittleVarAssignNameDecReference((ALittleVarAssignNameDec)element, range);
         if (element instanceof ALittleWrapValueStat) return new ALittleWrapValueStatReference((ALittleWrapValueStat)element, range);
 
+        if (element instanceof ALittleNcallStat) return new ALittleNcallStatReference((ALittleNcallStat)element, range);
+
         return null;
     }
 }

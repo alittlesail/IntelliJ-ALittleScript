@@ -34,7 +34,7 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         info.element = myElement;
         info.functorAwait = guessInfo.functorAwait;
         if (info.functorAwait) {
-            info.value = "await";
+            info.value = "Functor<await";
         }
         info.functorParamList = new ArrayList<>();
         info.functorParamList.addAll(guessInfo.functorParamList);

@@ -3,7 +3,11 @@ namespace ALittle;
 // Http协议接口类，负责处理
 public class IHttpClient
 {
-    protected await fun SendRPC(string url, any content) : string, any {}
+    // 提供子类继承
+    protected await fun SendRPC(any content) : string, any {}
+
+    // 提供框架调用
+    protected await static Invoke(IHttpClient client, any content) : string, any { return client.SendRPC(content); }
 }
 
 // 连接对象
@@ -41,13 +45,15 @@ public class HttpClient<HC : IHttpInterface> : public IHttpClient
 {
     private HC _interface;
     private thread _co;
+    private string _url;
 
-    public Ctor()
+    public Ctor(string url)
     {
         this._interface = new HC();
+        this._url = url;
     }
 
-    public await fun SendRPC(string url, any content) : string, any
+    protected await fun SendRPC(any content) : string, any
     {
         thread co = coroutine.running();
         if (co == null)
@@ -57,9 +63,9 @@ public class HttpClient<HC : IHttpInterface> : public IHttpClient
         __HttpClientMap[this._interface.GetID()] = this;
 
         if (content == null)
-            this._interface.SetURL(url, null);
+            this._interface.SetURL(this._url, null);
         else
-            this._interface.SetURL(url, Json.encode(content));
+            this._interface.SetURL(this._url, Json.encode(content));
         this._interface.Start();
 
         // 协程挂起，并等待返回值

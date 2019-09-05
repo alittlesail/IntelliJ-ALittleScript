@@ -1700,6 +1700,61 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // ncall LPAREN (valueStat (COMMA valueStat)*)? RPAREN
+  public static boolean ncallStat(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ncallStat")) return false;
+    if (!nextTokenIs(b, NCALL)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, NCALL_STAT, null);
+    r = consumeTokens(b, 1, NCALL, LPAREN);
+    p = r; // pin = 1
+    r = r && report_error_(b, ncallStat_2(b, l + 1));
+    r = p && consumeToken(b, RPAREN) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (valueStat (COMMA valueStat)*)?
+  private static boolean ncallStat_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ncallStat_2")) return false;
+    ncallStat_2_0(b, l + 1);
+    return true;
+  }
+
+  // valueStat (COMMA valueStat)*
+  private static boolean ncallStat_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ncallStat_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = valueStat(b, l + 1);
+    r = r && ncallStat_2_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (COMMA valueStat)*
+  private static boolean ncallStat_2_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ncallStat_2_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!ncallStat_2_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "ncallStat_2_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // COMMA valueStat
+  private static boolean ncallStat_2_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ncallStat_2_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && valueStat(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // PLUS_PLUS | MINUS_MINUS
   public static boolean op1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "op1")) return false;
@@ -3154,7 +3209,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | pcallStat | methodParamTailDec
+  // opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | pcallStat | ncallStat | methodParamTailDec
   public static boolean valueStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "valueStat")) return false;
     boolean r;
@@ -3171,6 +3226,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = opNewListStat(b, l + 1);
     if (!r) r = bindStat(b, l + 1);
     if (!r) r = pcallStat(b, l + 1);
+    if (!r) r = ncallStat(b, l + 1);
     if (!r) r = methodParamTailDec(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;

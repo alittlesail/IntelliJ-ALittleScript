@@ -14,6 +14,16 @@ local __sub = String.sub
 local __len = String.len
 local __find = String.find
 local __concat = table.concat
+local __JsonEncode = Json.encode
+local __JsonDecode = Json.decode
+function JsonEncode(content)
+	return __JsonEncode(content)
+end
+
+function JsonDecode(content)
+	return __JsonDecode(content)
+end
+
 function JSHash(str)
 	local l = __len(str)
 	local h = l
@@ -113,6 +123,21 @@ function String_UrlAppendParam(url, param)
 	return url .. param
 end
 
+function String_UrlAppendParamMap(url, param)
+	local list = {}
+	local count = 0
+	for key, value in ___pairs(param) do
+		count = count + 1
+		list[count] = key .. "=" .. tostring(value)
+	end
+	if String.find(url, "?", 1) == nil then
+		url = url .. "?"
+	else
+		url = url .. "&"
+	end
+	return url .. String_Join(list, "&")
+end
+
 function String_UrlAnalyse(url)
 	local info = {}
 	info.value_map = {}
@@ -197,5 +222,10 @@ end
 local A_StringGenerateID = StringGenerateID()
 function String_GenerateID(pre)
 	return A_StringGenerateID:GenID(pre)
+end
+
+function String_Replace(content, old_split, new_split)
+	local list = String_Split(content, old_split)
+	return String_Join(list, new_split)
 end
 

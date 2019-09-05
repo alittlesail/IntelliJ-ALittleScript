@@ -58,6 +58,7 @@ public interface ALittleTypes {
   IElementType METHOD_RETURN_DEC = new ALittleElementType("METHOD_RETURN_DEC");
   IElementType NAMESPACE_DEC = new ALittleElementType("NAMESPACE_DEC");
   IElementType NAMESPACE_NAME_DEC = new ALittleElementType("NAMESPACE_NAME_DEC");
+  IElementType NCALL_STAT = new ALittleElementType("NCALL_STAT");
   IElementType OP_1 = new ALittleElementType("OP_1");
   IElementType OP_1_EXPR = new ALittleElementType("OP_1_EXPR");
   IElementType OP_2 = new ALittleElementType("OP_2");
@@ -186,6 +187,7 @@ public interface ALittleTypes {
   IElementType MUL = new ALittleTokenType("*");
   IElementType MUL_ASSIGN = new ALittleTokenType("*=");
   IElementType NAMESPACE = new ALittleTokenType("namespace");
+  IElementType NCALL = new ALittleTokenType("ncall");
   IElementType NEW = new ALittleTokenType("new");
   IElementType NOT = new ALittleTokenType("!");
   IElementType NOT_EQ = new ALittleTokenType("!=");
@@ -372,6 +374,9 @@ public interface ALittleTypes {
       }
       else if (type == NAMESPACE_NAME_DEC) {
         return new ALittleNamespaceNameDecImpl(node);
+      }
+      else if (type == NCALL_STAT) {
+        return new ALittleNcallStatImpl(node);
       }
       else if (type == OP_1) {
         return new ALittleOp1Impl(node);

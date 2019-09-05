@@ -10,6 +10,20 @@ private auto __len = String.len;
 private auto __find = String.find;
 private auto __concat = table.concat;
 
+private auto __JsonEncode = Json.encode;
+private auto __JsonDecode = Json.decode;
+
+// Json
+public static JsonEncode(any content) : string
+{
+    return __JsonEncode(content);
+}
+
+public static JsonDecode(string content) : any
+{
+    return __JsonDecode(content);
+}
+
 // 哈希函数
 public static JSHash(string str) : int
 {
@@ -125,6 +139,23 @@ public static String_UrlAppendParam(string url, string param) : string
         url = url .. "&";
 
     return url .. param;
+}
+public static String_UrlAppendParamMap(string url, Map<string, any> param) : string
+{
+    List<string> list = new List<string>();
+    int count = 0;
+    for (auto key, auto value in param)
+    {
+        ++ count;
+        list[count] = key.."="..tostring(value);
+    }
+
+    if (String.find(url, "?", 1) == null)
+        url = url .. "?";
+    else
+        url = url .. "&";
+
+    return url .. String_Join(list, "&");
 }
 
 // 把Url解析成需要的信息
@@ -243,4 +274,11 @@ private StringGenerateID A_StringGenerateID = new StringGenerateID();
 public static String_GenerateID(string pre) : string
 {
     return A_StringGenerateID.GenID(pre);
+}
+
+// 替换
+public static String_Replace(string content, string old_split, string new_split) : string
+{
+    auto list = String_Split(content, old_split);
+    return String_Join(list, new_split);
 }

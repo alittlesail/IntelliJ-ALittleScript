@@ -8,15 +8,26 @@ local ___coroutine = coroutine
 
 IHttpFileClient = Class(nil, "ALittle.IHttpFileClient")
 
-function IHttpFileClient:GetID()
+function IHttpFileClient:SendDownloadRPC(content)
 end
 
-function IHttpFileClient:SendRPC(url, file_path, download, start_size)
+function IHttpFileClient:SendUploadRPC(content)
+end
+
+function IHttpFileClient.InvokeDownload(client, content)
+	return client:SendDownloadRPC(content)
+end
+
+function IHttpFileClient.InvokeUpload(client, content)
+	return client:SendUploadRPC(content)
 end
 
 IHttpFileInterface = Class(nil, "ALittle.IHttpFileInterface")
 
 function IHttpFileInterface:GetID()
+end
+
+function IHttpFileInterface:GetPath()
 end
 
 function IHttpFileInterface:SetURL(url, file_path, download, start_size)
@@ -56,28 +67,50 @@ end
 assert(IHttpFileClient, " extends class:IHttpFileClient is nil")
 HttpFileClient = Class(IHttpFileClient, "ALittle.HttpFileClient")
 
-function HttpFileClient:Ctor(callback)
+function HttpFileClient:Ctor(url, file_path, start_size, callback)
 	___rawset(self, "_interface", self.__class.__element[1]())
+	___rawset(self, "_url", url)
+	___rawset(self, "_file_path", file_path)
+	___rawset(self, "_start_size", start_size)
 	___rawset(self, "_callback", callback)
 end
 
-function HttpFileClient:SendRPC(url, file_path, download, start_size)
+function HttpFileClient:SendDownloadRPC(content)
+	local co = coroutine.running()
+	if co == nil then
+		return "当前不是协程"
+	end
+	self._co = co
+	__HttpFileClientMap[self._interface:GetID()] = self
+	if self._start_size == nil then
+		self._start_size = 0
+	end
+	self._interface:SetURL(String_UrlAppendParamMap(self._url, content), self._file_path, true, self._start_size)
+	self._interface:Start()
+	return ___coroutine.yield()
+end
+
+function HttpFileClient:SendUploadRPC(content)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程", nil
 	end
 	self._co = co
 	__HttpFileClientMap[self._interface:GetID()] = self
-	if start_size == nil then
-		start_size = 0
+	if self._start_size == nil then
+		self._start_size = 0
 	end
-	self._interface:SetURL(url, file_path, download, start_size)
+	self._interface:SetURL(String_UrlAppendParamMap(self._url, content), self._file_path, false, self._start_size)
 	self._interface:Start()
 	return ___coroutine.yield()
 end
 
 function HttpFileClient:Stop()
 	self._interface:Stop()
+end
+
+function HttpFileClient:GetTotalSize()
+	return self._interface:GetTotalSize()
 end
 
 function HttpFileClient:HandleSucceed()
