@@ -89,9 +89,15 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         }
 
         // 查本命名域的
-        data = listener.mNamespaceAccessMap.get(namespaceName);
-        if (data != null) {
-            data.findALittleNameDecList(type, name, result);
+        String srcNamespaceName = null;
+        ALittleNamespaceNameDec namespaceNameDec = PsiHelper.getNamespaceNameDec(psiFile);
+        if (namespaceNameDec != null) srcNamespaceName = namespaceNameDec.getText();
+
+        if (srcNamespaceName == null || srcNamespaceName.equals(namespaceName)) {
+            data = listener.mNamespaceAccessMap.get(namespaceName);
+            if (data != null) {
+                data.findALittleNameDecList(type, name, result);
+            }
         }
 
         // 查全局下

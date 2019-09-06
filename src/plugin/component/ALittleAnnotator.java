@@ -2,6 +2,7 @@ package plugin.component;
 
 import com.intellij.lang.annotation.*;
 import com.intellij.psi.*;
+import net.sf.cglib.asm.$MethodVisitor;
 import org.jetbrains.annotations.NotNull;
 import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
@@ -17,7 +18,9 @@ public class ALittleAnnotator implements Annotator {
                 ((ALittleReferenceInterface) ref).colorAnnotator(holder);
             }
         } catch (ALittleReferenceUtil.ALittleReferenceException e) {
-            holder.createErrorAnnotation(e.getElement(), e.getError());
+            if (holder.getCurrentAnnotationSession().getFile().equals(e.getElement().getContainingFile())) {
+                holder.createErrorAnnotation(e.getElement(), e.getError());
+            }
         }
     }
 }

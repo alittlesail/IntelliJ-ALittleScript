@@ -502,13 +502,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   public static boolean customType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "customType")) return false;
     if (!nextTokenIs(b, ID_CONTENT)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, CUSTOM_TYPE, null);
     r = customType_0(b, l + 1);
     r = r && consumeToken(b, ID_CONTENT);
+    p = r; // pin = 2
     r = r && customType_2(b, l + 1);
-    exit_section_(b, m, CUSTOM_TYPE, r);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   // (namespaceNameDec DOT)?

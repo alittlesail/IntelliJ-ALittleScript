@@ -1,7 +1,15 @@
 package plugin.reference;
 
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
+import plugin.component.ALittleIcons;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import java.util.ArrayList;

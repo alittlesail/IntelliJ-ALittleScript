@@ -930,8 +930,10 @@ public class ALittleGenerateLua {
                 // 如果当前是点
                 ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
                 if (dotId != null) {
+                    ALittlePropertyValueDotIdName dotIdName = dotId.getPropertyValueDotIdName();
+                    if (dotIdName == null) throw new Exception("点后面没有定义属性对象");
                     // 获取类型
-                    ALittleReferenceUtil.GuessTypeInfo guess = dotId.guessType();
+                    ALittleReferenceUtil.GuessTypeInfo guess = dotIdName.guessType();
 
                     if (!isLuaNamespace) {
                         String split = ".";

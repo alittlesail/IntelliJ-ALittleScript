@@ -20,7 +20,7 @@ public abstract class ALittleReference<T extends PsiElement> extends PsiReferenc
     public ALittleReference(@NotNull T element, TextRange textRange) {
         super(element, textRange);
         mKey = element.getText().substring(textRange.getStartOffset(), textRange.getEndOffset());
-        mNamespace = PsiHelper.getNamespaceName(element.getContainingFile());
+        mNamespace = PsiHelper.getNamespaceName(element);
     }
 
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
