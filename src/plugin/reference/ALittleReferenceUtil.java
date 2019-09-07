@@ -78,46 +78,48 @@ public class ALittleReferenceUtil {
         public GuessTypeInfo(GuessType t, String v) { type = t; value = v; }
 
         public boolean isChanged() {
-            if (type == GuessType.GT_PRIMITIVE) {
-                return false;
-            } else if (type == GuessType.GT_PARAM_TAIL) {
-                return false;
-            } else if (type == GuessType.GT_CONST) {
-                return false;
-            } else if (type == GuessType.GT_LIST) {
-                return listSubType.isChanged();
-            } else if (type == GuessType.GT_MAP) {
-                return mapKeyType.isChanged() || mapValueType.isChanged();
-            } else if (type == GuessType.GT_FUNCTOR) {
+            if (listSubType != null && listSubType.isChanged()) {
+                return true;
+            }
+
+            if (mapKeyType != null && mapKeyType.isChanged()) {
+                return true;
+            }
+
+            if (mapValueType != null && mapValueType.isChanged()) {
+                return true;
+            }
+
+            if (functorParamList != null) {
                 for (ALittleReferenceUtil.GuessTypeInfo paramInfo : functorParamList) {
                     if (paramInfo.isChanged()) return true;
                 }
+            }
+            if (functorReturnList != null) {
                 for (ALittleReferenceUtil.GuessTypeInfo returnInfo : functorReturnList) {
                     if (returnInfo.isChanged()) return true;
                 }
-                return false;
-            } else if (type == GuessType.GT_CLASS_TEMPLATE) {
-                if (classTemplateExtends != null && classTemplateExtends.isChanged()) return true;
-                return false;
             }
 
-            if (type == GuessType.GT_CLASS) {
-                if (classTemplateList != null) {
-                    for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateList) {
-                        if (classTemplateInfo.isChanged()) return true;
-                    }
+            if (classTemplateExtends != null && classTemplateExtends.isChanged()) {
+                return true;
+            }
+
+            if (classTemplateList != null) {
+                for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateList) {
+                    if (classTemplateInfo.isChanged()) return true;
                 }
-                if (classTemplateMap != null) {
-                    for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateMap.values()) {
-                        if (classTemplateInfo.isChanged()) return true;
-                    }
+            }
+            if (classTemplateMap != null) {
+                for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateMap.values()) {
+                    if (classTemplateInfo.isChanged()) return true;
                 }
-                return false;
             }
 
             if (element != null && ALittleTreeChangeListener.getGuessTypeList(element) != null) {
                 return false;
             }
+
             return true;
         }
 
