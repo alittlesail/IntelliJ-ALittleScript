@@ -2,6 +2,8 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleClassDec;
 import plugin.psi.ALittleClassNameDec;
 import plugin.psi.ALittleTemplateDec;

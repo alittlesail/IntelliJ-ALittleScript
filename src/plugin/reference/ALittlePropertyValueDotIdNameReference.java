@@ -255,7 +255,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        PsiFile psiFile = myElement.getContainingFile();
+        PsiFile psiFile = myElement.getContainingFile().getOriginalFile();
         List<ResolveResult> results = new ArrayList<>();
         try {
             // 获取父节点
@@ -330,7 +330,6 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 // 处理结构体的实例对象
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
                 ALittleStructDec structDec = (ALittleStructDec)preType.element;
-                String namespaceName = PsiHelper.getNamespaceName(structDec.getContainingFile());
                 List<ALittleStructVarDec> structVarDecList = new ArrayList<>();
                 // 所有成员变量
                 PsiHelper.findStructVarDecList(structDec, mKey, structVarDecList, 100);
@@ -429,7 +428,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        PsiFile psiFile = myElement.getContainingFile();
+        PsiFile psiFile = myElement.getContainingFile().getOriginalFile();
         List<LookupElement> variants = new ArrayList<>();
         try {
             // 获取父节点
@@ -512,7 +511,6 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 // 处理结构体的实例对象
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
                 ALittleStructDec structDec = (ALittleStructDec) preType.element;
-                String namespaceName = PsiHelper.getNamespaceName((ALittleFile) structDec.getContainingFile());
                 List<ALittleStructVarDec> structVarDecList = new ArrayList<>();
                 // 所有成员变量
                 PsiHelper.findStructVarDecList(structDec, "", structVarDecList, 100);
@@ -528,7 +526,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 // 比如 ALittleName.XXX
             } else if (preType.type == ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME) {
                 ALittleNamespaceNameDec namespaceNameDec = (ALittleNamespaceNameDec) preType.element;
-                String namespaceName = PsiHelper.getNamespaceName((ALittleFile) namespaceNameDec.getContainingFile());
+                String namespaceName = namespaceNameDec.getText();
                 // 所有枚举名
                 List<PsiElement> enumNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
                         PsiHelper.PsiElementType.ENUM_NAME, psiFile, namespaceName, "", true);

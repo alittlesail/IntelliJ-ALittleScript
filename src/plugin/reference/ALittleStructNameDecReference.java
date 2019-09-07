@@ -40,7 +40,7 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
             // 如果是继承那么就从继承那边获取
         } else if (parent instanceof ALittleStructExtendsDec) {
             List<PsiElement> structNameDecList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
-                    PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
+                    PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
             for (PsiElement structNameDec : structNameDecList) {
                 guessList.add(((ALittleStructNameDec)structNameDec).guessType());
             }
@@ -53,7 +53,7 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
-                PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
+                PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
         List<ResolveResult> results = new ArrayList<>();
         for (PsiElement dec : decList) {
             results.add(new PsiElementResolveResult(dec));
@@ -65,7 +65,7 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     @Override
     public Object[] getVariants() {
         List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
-                PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile(), mNamespace, "", true);
+                PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, "", true);
         List<LookupElement> variants = new ArrayList<>();
         for (PsiElement dec : decList) {
             variants.add(LookupElementBuilder.create(dec.getText()).

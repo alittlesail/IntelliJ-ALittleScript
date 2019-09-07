@@ -36,7 +36,7 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         ALittleTreeChangeListener listener = getListener(element.getProject());
         if (listener == null) return null;
 
-        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(element.getContainingFile());
+        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(element.getContainingFile().getOriginalFile());
         if (map == null) return null;
 
         return map.get(element);
@@ -46,10 +46,10 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         ALittleTreeChangeListener listener = getListener(element.getProject());
         if (listener == null) return;
 
-        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(element.getContainingFile());
+        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(element.getContainingFile().getOriginalFile());
         if (map == null) {
             map = new HashMap<>();
-            listener.mGuessTypeMap.put(element.getContainingFile(), map);
+            listener.mGuessTypeMap.put(element.getContainingFile().getOriginalFile(), map);
         }
 
         map.put(element, guessTypeList);
@@ -132,10 +132,13 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         ALittleTreeChangeListener listener = getListener(classDec.getProject());
         if (listener == null) return;
 
-        PsiFile psiFile = classDec.getContainingFile();
-        Map<ALittleClassDec, ALittleClassData> map = listener.mClassDataMap.get(psiFile);
+        ALittleClassNameDec nameDec = classDec.getClassNameDec();
+        if (nameDec == null) return;
+
+        PsiFile psiFile = classDec.getContainingFile().getOriginalFile();
+        Map<String, ALittleClassData> map = listener.mClassDataMap.get(psiFile);
         if (map == null) return;
-        ALittleClassData classData = map.get(classDec);
+        ALittleClassData classData = map.get(nameDec.getText());
         if (classData == null) return;
 
         classData.findClassAttrList(classDec, accessLevel, attrType, name, result);

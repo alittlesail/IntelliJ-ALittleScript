@@ -22,9 +22,9 @@ public class ALittleIndex {
 
     // 保存关键的元素对象，用于快速语法树解析
     protected Map<PsiFile, Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>>> mGuessTypeMap;
-    protected Map<PsiFile, Map<ALittleClassDec, ALittleClassData>> mClassDataMap;
-    protected Map<PsiFile, Map<ALittleStructDec, ALittleStructData>> mStructDataMap;
-    protected Map<PsiFile, Map<ALittleEnumDec, ALittleEnumData>> mEnumDataMap;
+    protected Map<PsiFile, Map<String, ALittleClassData>> mClassDataMap;
+    protected Map<PsiFile, Map<String, ALittleStructData>> mStructDataMap;
+    protected Map<PsiFile, Map<String, ALittleEnumData>> mEnumDataMap;
 
     // 按命名域来划分
     protected Map<String, Map<ALittleNamespaceNameDec, ALittleAccessData>> mAllDataMap;
@@ -135,13 +135,15 @@ public class ALittleIndex {
     }
 
     private void addClassData(@NotNull ALittleClassDec classDec) {
-        Map<ALittleClassDec, ALittleClassData> map = mClassDataMap.get(classDec.getContainingFile());
+        ALittleClassNameDec nameDec = classDec.getClassNameDec();
+        if (nameDec == null) return;
+        Map<String, ALittleClassData> map = mClassDataMap.get(classDec.getContainingFile().getOriginalFile());
         if (map == null) {
             map = new HashMap<>();
-            mClassDataMap.put(classDec.getContainingFile(), map);
+            mClassDataMap.put(classDec.getContainingFile().getOriginalFile(), map);
         }
         ALittleClassData classData = new ALittleClassData();
-        map.put(classDec, classData);
+        map.put(nameDec.getText(), classData);
 
         for (PsiElement child = classDec.getFirstChild(); child != null; child = child.getNextSibling()) {
             classData.addALittleClassChildDec(child);
@@ -149,19 +151,23 @@ public class ALittleIndex {
     }
 
     public ALittleClassData getClassData(@NotNull ALittleClassDec dec) {
-        Map<ALittleClassDec, ALittleClassData> map = mClassDataMap.get(dec.getContainingFile());
+        ALittleClassNameDec nameDec = dec.getClassNameDec();
+        if (nameDec == null) return null;
+        Map<String, ALittleClassData> map = mClassDataMap.get(dec.getContainingFile().getOriginalFile());
         if (map == null) return null;
-        return map.get(dec);
+        return map.get(nameDec.getText());
     }
 
     private void addStructData(@NotNull ALittleStructDec structDec) {
-        Map<ALittleStructDec, ALittleStructData> map = mStructDataMap.get(structDec.getContainingFile());
+        ALittleStructNameDec nameDec = structDec.getStructNameDec();
+        if (nameDec == null) return;
+        Map<String, ALittleStructData> map = mStructDataMap.get(structDec.getContainingFile().getOriginalFile());
         if (map == null) {
             map = new HashMap<>();
-            mStructDataMap.put(structDec.getContainingFile(), map);
+            mStructDataMap.put(structDec.getContainingFile().getOriginalFile(), map);
         }
         ALittleStructData structData = new ALittleStructData();
-        map.put(structDec, structData);
+        map.put(nameDec.getText(), structData);
 
         for (PsiElement child = structDec.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleStructVarDec) {
@@ -171,19 +177,23 @@ public class ALittleIndex {
     }
 
     public ALittleStructData getStructData(@NotNull ALittleStructDec dec) {
-        Map<ALittleStructDec, ALittleStructData> map = mStructDataMap.get(dec.getContainingFile());
+        ALittleStructNameDec nameDec = dec.getStructNameDec();
+        if (nameDec == null) return null;
+        Map<String, ALittleStructData> map = mStructDataMap.get(dec.getContainingFile().getOriginalFile());
         if (map == null) return null;
-        return map.get(dec);
+        return map.get(nameDec.getText());
     }
 
     private void addEnumData(@NotNull ALittleEnumDec enumDec) {
-        Map<ALittleEnumDec, ALittleEnumData> map = mEnumDataMap.get(enumDec.getContainingFile());
+        ALittleEnumNameDec nameDec = enumDec.getEnumNameDec();
+        if (nameDec == null) return;
+        Map<String, ALittleEnumData> map = mEnumDataMap.get(enumDec.getContainingFile().getOriginalFile());
         if (map == null) {
             map = new HashMap<>();
-            mEnumDataMap.put(enumDec.getContainingFile(), map);
+            mEnumDataMap.put(enumDec.getContainingFile().getOriginalFile(), map);
         }
         ALittleEnumData enumData = new ALittleEnumData();
-        map.put(enumDec, enumData);
+        map.put(nameDec.getText(), enumData);
 
         for (PsiElement child = enumDec.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleEnumVarDec) {
@@ -193,17 +203,19 @@ public class ALittleIndex {
     }
 
     public ALittleEnumData getEnumData(@NotNull ALittleEnumDec dec) {
-        Map<ALittleEnumDec, ALittleEnumData> map = mEnumDataMap.get(dec.getContainingFile());
+        ALittleEnumNameDec nameDec = dec.getEnumNameDec();
+        if (nameDec == null) return null;
+        Map<String, ALittleEnumData> map = mEnumDataMap.get(dec.getContainingFile().getOriginalFile());
         if (map == null) return null;
-        return map.get(dec);
+        return map.get(nameDec.getText());
     }
 
     protected void addNamespaceName(@NotNull ALittleNamespaceNameDec element) {
         // 清除标记
-        mGuessTypeMap.remove(element.getContainingFile());
-        mClassDataMap.remove(element.getContainingFile());
-        mStructDataMap.remove(element.getContainingFile());
-        mEnumDataMap.remove(element.getContainingFile());
+        mGuessTypeMap.remove(element.getContainingFile().getOriginalFile());
+        mClassDataMap.remove(element.getContainingFile().getOriginalFile());
+        mStructDataMap.remove(element.getContainingFile().getOriginalFile());
+        mEnumDataMap.remove(element.getContainingFile().getOriginalFile());
 
         String namespaceName = element.getText();
 
@@ -229,10 +241,10 @@ public class ALittleIndex {
             mNamespaceAccessMap.put(namespaceName, namespaceAccessData);
         }
 
-        ALittleAccessData fileAccessData = mFileAccessMap.get(element.getContainingFile());
+        ALittleAccessData fileAccessData = mFileAccessMap.get(element.getContainingFile().getOriginalFile());
         if (fileAccessData == null) {
             fileAccessData = new ALittleAccessData();
-            mFileAccessMap.put(element.getContainingFile(), fileAccessData);
+            mFileAccessMap.put(element.getContainingFile().getOriginalFile(), fileAccessData);
         }
 
         ALittleNamespaceDec namespaceDec = (ALittleNamespaceDec)element.getParent();
@@ -319,10 +331,10 @@ public class ALittleIndex {
 
     protected void removeNamespaceName(ALittleNamespaceNameDec element) {
         // 清除标记
-        mGuessTypeMap.remove(element.getContainingFile());
-        mClassDataMap.remove(element.getContainingFile());
-        mStructDataMap.remove(element.getContainingFile());
-        mEnumDataMap.remove(element.getContainingFile());
+        mGuessTypeMap.remove(element.getContainingFile().getOriginalFile());
+        mClassDataMap.remove(element.getContainingFile().getOriginalFile());
+        mStructDataMap.remove(element.getContainingFile().getOriginalFile());
+        mEnumDataMap.remove(element.getContainingFile().getOriginalFile());
 
         String namespaceName = element.getText();
 
@@ -338,7 +350,7 @@ public class ALittleIndex {
 
         ALittleAccessData globalAccessData = mGlobalAccessMap.get(namespaceName);
         ALittleAccessData namespaceAccessData = mNamespaceAccessMap.get(namespaceName);
-        ALittleAccessData fileAccessData = mFileAccessMap.get(element.getContainingFile());
+        ALittleAccessData fileAccessData = mFileAccessMap.get(element.getContainingFile().getOriginalFile());
 
         for (Map.Entry<PsiHelper.PsiElementType, Map<String, Set<PsiElement>>> entry : allAccessData.elementMap.entrySet()) {
             for (Map.Entry<String, Set<PsiElement>> elementEntry : entry.getValue().entrySet()) {

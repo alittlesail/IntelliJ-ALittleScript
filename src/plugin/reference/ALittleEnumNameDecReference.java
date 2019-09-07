@@ -30,7 +30,7 @@ public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNam
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
         final List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
-                PsiHelper.PsiElementType.ENUM_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
+                PsiHelper.PsiElementType.ENUM_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
         List<ResolveResult> results = new ArrayList<>();
         for (PsiElement dec : decList) {
             results.add(new PsiElementResolveResult(dec));
@@ -43,7 +43,7 @@ public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNam
     public Object[] getVariants() {
         Project project = myElement.getProject();
         final List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
-                PsiHelper.PsiElementType.ENUM_NAME, myElement.getContainingFile(), mNamespace, "", true);
+                PsiHelper.PsiElementType.ENUM_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, "", true);
         List<LookupElement> variants = new ArrayList<>();
         for (PsiElement dec : decList) {
             variants.add(LookupElementBuilder.create(dec.getText()).

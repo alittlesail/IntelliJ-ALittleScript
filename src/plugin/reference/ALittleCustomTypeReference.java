@@ -41,7 +41,7 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
         Project project = myElement.getProject();
-        PsiFile psiFile = myElement.getContainingFile();
+        PsiFile psiFile = myElement.getContainingFile().getOriginalFile();
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
 
         {
@@ -144,7 +144,7 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        PsiFile psiFile = myElement.getContainingFile();
+        PsiFile psiFile = myElement.getContainingFile().getOriginalFile();
 
         List<ResolveResult> results = new ArrayList<>();
         {

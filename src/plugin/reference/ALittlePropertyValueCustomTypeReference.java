@@ -130,7 +130,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        PsiFile file = myElement.getContainingFile();
+        PsiFile file = myElement.getContainingFile().getOriginalFile();
         List<ResolveResult> results = new ArrayList<>();
 
         // 处理命名域
@@ -217,7 +217,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        PsiFile file = myElement.getContainingFile();
+        PsiFile file = myElement.getContainingFile().getOriginalFile();
         List<LookupElement> variants = new ArrayList<>();
         if (mKey.equals("IntellijIdeaRulezzz"))
             return variants.toArray();

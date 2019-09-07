@@ -119,7 +119,7 @@ public class PsiHelper {
     // 获取某个元素的命名域
     @NotNull
     public static String getNamespaceName(@NotNull PsiElement element) {
-        PsiFile psiFile = element.getContainingFile();
+        PsiFile psiFile = element.getContainingFile().getOriginalFile();
         if (psiFile == null) return "";
         for(PsiElement child = psiFile.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleNamespaceDec) {
@@ -269,7 +269,7 @@ public class PsiHelper {
         }
 
         PsiElement result = ALittleTreeChangeListener.findALittleNameDec(dec.getProject()
-                , PsiHelper.PsiElementType.STRUCT_NAME, dec.getContainingFile()
+                , PsiHelper.PsiElementType.STRUCT_NAME, dec.getContainingFile().getOriginalFile()
                 , namespaceName, structNameDec.getText(), true);
         if (result instanceof ALittleStructNameDec) return (ALittleStructDec)result.getParent();
         return null;
@@ -297,7 +297,7 @@ public class PsiHelper {
         }
 
         PsiElement result = ALittleTreeChangeListener.findALittleNameDec(dec.getProject()
-                , PsiHelper.PsiElementType.CLASS_NAME, dec.getContainingFile()
+                , PsiHelper.PsiElementType.CLASS_NAME, dec.getContainingFile().getOriginalFile()
                 , namespaceName, classNameDec.getText(), true);
         if (result instanceof ALittleClassNameDec) {
             ClassExtendsData data = new ClassExtendsData();

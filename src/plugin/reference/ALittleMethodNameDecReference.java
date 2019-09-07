@@ -293,7 +293,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        PsiFile psiFile = myElement.getContainingFile();
+        PsiFile psiFile = myElement.getContainingFile().getOriginalFile();
         PsiElement methodDec = myElement.getParent();
         List<LookupElement> variants = new ArrayList<>();
         // 类内部的函数

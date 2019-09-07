@@ -46,7 +46,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
         // 如果是继承那么就从继承那边获取
         } else if (parent instanceof ALittleClassExtendsDec) {
             List<PsiElement> classNameDecList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
-                    PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
+                    PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
             if (classNameDecList.isEmpty()) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "找不到类, namespace:" + mNamespace + ", key:" + mKey);
             for (PsiElement classNameDec : classNameDecList) {
                 ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleClassNameDec)classNameDec).guessType();
@@ -66,7 +66,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
-                PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile(), mNamespace, mKey, true);
+                PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
         List<ResolveResult> results = new ArrayList<>();
         for (PsiElement dec : decList) {
             results.add(new PsiElementResolveResult(dec));
@@ -79,7 +79,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
     public Object[] getVariants() {
         Project project = myElement.getProject();
         List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
-                PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile(), mNamespace, "", true);
+                PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, "", true);
         List<LookupElement> variants = new ArrayList<>();
         for (PsiElement dec : decList) {
             variants.add(LookupElementBuilder.create(dec.getText()).

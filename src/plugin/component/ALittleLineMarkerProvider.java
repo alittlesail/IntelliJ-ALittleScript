@@ -21,7 +21,7 @@ public class ALittleLineMarkerProvider extends RelatedItemLineMarkerProvider {
         if (element instanceof ALittleMethodNameDec) {
             ALittleMethodNameDec myElement = (ALittleMethodNameDec) element;
             // 获取命名域名
-            String mNamespace = PsiHelper.getNamespaceName(myElement.getContainingFile());
+            String mNamespace = PsiHelper.getNamespaceName(myElement.getContainingFile().getOriginalFile());
             // 获取函数名
             String mKey = myElement.getText();
 
