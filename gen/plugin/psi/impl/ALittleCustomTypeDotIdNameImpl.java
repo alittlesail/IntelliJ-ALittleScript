@@ -14,31 +14,19 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public class ALittleCustomTypeImpl extends ASTWrapperPsiElement implements ALittleCustomType {
+public class ALittleCustomTypeDotIdNameImpl extends ASTWrapperPsiElement implements ALittleCustomTypeDotIdName {
 
-  public ALittleCustomTypeImpl(@NotNull ASTNode node) {
+  public ALittleCustomTypeDotIdNameImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitCustomType(this);
+    visitor.visitCustomTypeDotIdName(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ALittleVisitor) accept((ALittleVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public List<ALittleAllType> getAllTypeList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleAllType.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleCustomTypeDotId getCustomTypeDotId() {
-    return findChildByClass(ALittleCustomTypeDotId.class);
   }
 
   @Override

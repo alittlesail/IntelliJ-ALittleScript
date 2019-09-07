@@ -321,7 +321,8 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             }
         // 全局函数
         } else if (methodDec.getParent() instanceof ALittleNamespaceDec) {
-            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project, PsiHelper.PsiElementType.GLOBAL_METHOD, psiFile, mNamespace, "", true);
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.GLOBAL_METHOD, psiFile, mNamespace, "", true);
             for (PsiElement dec : decList) {
                 variants.add(LookupElementBuilder.create(dec.getText()).
                         withIcon(ALittleIcons.GLOBAL_METHOD).

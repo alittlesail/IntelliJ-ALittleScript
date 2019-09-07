@@ -119,7 +119,11 @@ public class PsiHelper {
     // 获取某个元素的命名域
     @NotNull
     public static String getNamespaceName(@NotNull PsiElement element) {
-        PsiFile psiFile = element.getContainingFile().getOriginalFile();
+        return getNamespaceName(element.getContainingFile().getOriginalFile());
+    }
+
+    @NotNull
+    public static String getNamespaceName(PsiFile psiFile) {
         if (psiFile == null) return "";
         for(PsiElement child = psiFile.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleNamespaceDec) {

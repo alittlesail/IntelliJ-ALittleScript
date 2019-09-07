@@ -9,20 +9,13 @@ import plugin.psi.*;
 
 import java.util.List;
 
-public class ALittleCustomTypeReference extends ALittleCustomTypeCommonReference<ALittleCustomType> {
-    public ALittleCustomTypeReference(@NotNull ALittleCustomType element, TextRange textRange) {
-        super(element, element, textRange);
+public class ALittleCustomTypeDotIdNameReference extends ALittleCustomTypeCommonReference<ALittleCustomTypeDotIdName> {
+   public ALittleCustomTypeDotIdNameReference(@NotNull ALittleCustomTypeDotIdName element, TextRange textRange) {
+        super((ALittleCustomType)element.getParent().getParent(), element, textRange);
 
+        ALittleCustomType customType = (ALittleCustomType)element.getParent().getParent();
+        mNamespace = customType.getIdContent().getText();
         mKey = element.getIdContent().getText();
-
-        ALittleCustomTypeDotId dotId = element.getCustomTypeDotId();
-        if (dotId != null) {
-            ALittleCustomTypeDotIdName dotIdName = dotId.getCustomTypeDotIdName();
-            if (dotIdName != null) {
-                mNamespace = mKey;
-                mKey = dotIdName.getText();
-            }
-        }
     }
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {

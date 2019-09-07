@@ -498,36 +498,25 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (namespaceNameDec DOT)? ID_CONTENT customTypeTemplate?
+  // ID_CONTENT customTypeDotId? customTypeTemplate?
   public static boolean customType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "customType")) return false;
     if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CUSTOM_TYPE, null);
-    r = customType_0(b, l + 1);
-    r = r && consumeToken(b, ID_CONTENT);
-    p = r; // pin = 2
-    r = r && customType_2(b, l + 1);
+    r = consumeToken(b, ID_CONTENT);
+    p = r; // pin = 1
+    r = r && report_error_(b, customType_1(b, l + 1));
+    r = p && customType_2(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
-  // (namespaceNameDec DOT)?
-  private static boolean customType_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "customType_0")) return false;
-    customType_0_0(b, l + 1);
+  // customTypeDotId?
+  private static boolean customType_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "customType_1")) return false;
+    customTypeDotId(b, l + 1);
     return true;
-  }
-
-  // namespaceNameDec DOT
-  private static boolean customType_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "customType_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = namespaceNameDec(b, l + 1);
-    r = r && consumeToken(b, DOT);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   // customTypeTemplate?
@@ -535,6 +524,32 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "customType_2")) return false;
     customTypeTemplate(b, l + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // DOT customTypeDotIdName
+  public static boolean customTypeDotId(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "customTypeDotId")) return false;
+    if (!nextTokenIs(b, DOT)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, CUSTOM_TYPE_DOT_ID, null);
+    r = consumeToken(b, DOT);
+    p = r; // pin = 1
+    r = r && customTypeDotIdName(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
+  // ID_CONTENT
+  public static boolean customTypeDotIdName(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "customTypeDotIdName")) return false;
+    if (!nextTokenIs(b, ID_CONTENT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, ID_CONTENT);
+    exit_section_(b, m, CUSTOM_TYPE_DOT_ID_NAME, r);
+    return r;
   }
 
   /* ********************************************************** */

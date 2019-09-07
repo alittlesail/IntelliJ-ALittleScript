@@ -248,11 +248,14 @@ public class ALittleGenerateLua {
             // 如果是类名
             } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                 // 如果是类名
-                String className = "";
-                ALittleNamespaceNameDec namespaceNameDec = customType.getNamespaceNameDec();
-                if (namespaceNameDec != null)
-                    className = namespaceNameDec.getIdContent().getText() + ".";
-                className += customType.getIdContent().getText();
+                String className = customType.getIdContent().getText();
+                ALittleCustomTypeDotId dotId = customType.getCustomTypeDotId();
+                if (dotId != null) {
+                    ALittleCustomTypeDotIdName dotIdName = dotId.getCustomTypeDotIdName();
+                    if (dotIdName != null) {
+                        className += "." + dotIdName.getText();
+                    }
+                }
 
                 // 如果有模板，那么就
                 List<String> templateParamList = new ArrayList<>();

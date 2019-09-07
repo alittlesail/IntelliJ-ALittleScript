@@ -202,6 +202,7 @@ public class ALittleReferenceUtil {
 
         if (element instanceof ALittleConstValue) return new ALittleConstValueReference((ALittleConstValue)element, range);
         if (element instanceof ALittleCustomType) return new ALittleCustomTypeReference((ALittleCustomType)element, range);
+        if (element instanceof ALittleCustomTypeDotIdName) return new ALittleCustomTypeDotIdNameReference((ALittleCustomTypeDotIdName)element, range);
 
         if (element instanceof ALittleEnumDec) return new ALittleEnumDecReference((ALittleEnumDec)element, range);
         if (element instanceof ALittleEnumNameDec) return new ALittleEnumNameDecReference((ALittleEnumNameDec)element, range);

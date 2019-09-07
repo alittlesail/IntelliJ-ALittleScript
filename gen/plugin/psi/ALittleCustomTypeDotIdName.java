@@ -8,13 +8,7 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public interface ALittleCustomType extends PsiElement {
-
-  @NotNull
-  List<ALittleAllType> getAllTypeList();
-
-  @Nullable
-  ALittleCustomTypeDotId getCustomTypeDotId();
+public interface ALittleCustomTypeDotIdName extends PsiElement {
 
   @NotNull
   PsiElement getIdContent();

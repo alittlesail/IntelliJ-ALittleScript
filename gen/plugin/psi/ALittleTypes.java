@@ -25,6 +25,8 @@ public interface ALittleTypes {
   IElementType CONST_VALUE = new ALittleElementType("CONST_VALUE");
   IElementType CO_MODIFIER = new ALittleElementType("CO_MODIFIER");
   IElementType CUSTOM_TYPE = new ALittleElementType("CUSTOM_TYPE");
+  IElementType CUSTOM_TYPE_DOT_ID = new ALittleElementType("CUSTOM_TYPE_DOT_ID");
+  IElementType CUSTOM_TYPE_DOT_ID_NAME = new ALittleElementType("CUSTOM_TYPE_DOT_ID_NAME");
   IElementType DO_WHILE_EXPR = new ALittleElementType("DO_WHILE_EXPR");
   IElementType ELSE_EXPR = new ALittleElementType("ELSE_EXPR");
   IElementType ELSE_IF_EXPR = new ALittleElementType("ELSE_IF_EXPR");
@@ -275,6 +277,12 @@ public interface ALittleTypes {
       }
       else if (type == CUSTOM_TYPE) {
         return new ALittleCustomTypeImpl(node);
+      }
+      else if (type == CUSTOM_TYPE_DOT_ID) {
+        return new ALittleCustomTypeDotIdImpl(node);
+      }
+      else if (type == CUSTOM_TYPE_DOT_ID_NAME) {
+        return new ALittleCustomTypeDotIdNameImpl(node);
       }
       else if (type == DO_WHILE_EXPR) {
         return new ALittleDoWhileExprImpl(node);

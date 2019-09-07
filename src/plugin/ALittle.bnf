@@ -235,7 +235,9 @@ op1Expr ::= op1 valueStat SEMI {pin=1}
 allType ::= primitiveType | genericType | customType
 
 // 自定义类型
-customType ::= (namespaceNameDec DOT)? ID_CONTENT customTypeTemplate? {pin=2}
+customType ::= ID_CONTENT customTypeDotId? customTypeTemplate? {pin=1}
+customTypeDotId ::= DOT customTypeDotIdName {pin=1}
+customTypeDotIdName ::= ID_CONTENT
 private customTypeTemplate ::= LESS allType customTypeTemplatePair* GREATER {pin=1}
 private customTypeTemplatePair ::= COMMA allType {pin=1}
 

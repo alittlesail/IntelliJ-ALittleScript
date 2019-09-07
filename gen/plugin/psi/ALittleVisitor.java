@@ -75,6 +75,14 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitCustomTypeDotId(@NotNull ALittleCustomTypeDotId o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCustomTypeDotIdName(@NotNull ALittleCustomTypeDotIdName o) {
+    visitPsiElement(o);
+  }
+
   public void visitDoWhileExpr(@NotNull ALittleDoWhileExpr o) {
     visitPsiElement(o);
   }
