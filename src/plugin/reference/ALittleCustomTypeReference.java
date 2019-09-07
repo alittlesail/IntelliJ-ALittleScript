@@ -185,7 +185,7 @@ public class ALittleCustomTypeReference extends ALittleReference<ALittleCustomTy
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        PsiFile psiFile = myElement.getContainingFile();
+        PsiFile psiFile = myElement.getContainingFile().getOriginalFile();
         List<LookupElement> variants = new ArrayList<>();
 
         // 查找对应命名域下的类名
