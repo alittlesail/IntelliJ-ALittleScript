@@ -35,7 +35,10 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         ALittleTreeChangeListener listener = getListener(element.getProject());
         if (listener == null) return null;
 
-        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(element.getContainingFile().getOriginalFile());
+        PsiFile psiFile = element.getContainingFile();
+        if (psiFile == null) return null;
+        psiFile = psiFile.getOriginalFile();
+        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(psiFile);
         if (map == null) return null;
 
         return map.get(element);

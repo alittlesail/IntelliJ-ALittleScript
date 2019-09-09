@@ -46,6 +46,9 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                 ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleUsingNameDec)dec).guessType();
                 guessList.add(guessInfo);
             }
+            if (!decList.isEmpty() && !mCustomType.getAllTypeList().isEmpty()) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "使用using定义的类不能再使用模板参数, namespace:" + mNamespace + ", key:" + mKey);
+            }
         }
         {
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
@@ -204,7 +207,10 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                         );
                     }
                 } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
-
+                    variants.add(LookupElementBuilder.create(dec.getText()).
+                            withIcon(ALittleIcons.CLASS).
+                            withTypeText(dec.getContainingFile().getName())
+                    );
                 }
             }
         }
