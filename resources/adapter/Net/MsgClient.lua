@@ -14,11 +14,11 @@ end
 function IMsgClient:SendRPC(msg_id, msg_body)
 end
 
-function IMsgClient.Invoke(client, msg_body, msg_id)
+function IMsgClient.Invoke(msg_id, client, msg_body)
 	client:Send(msg_id, msg_body, 0)
 end
 
-function IMsgClient.InvokeRPC(client, msg_body, msg_id)
+function IMsgClient.InvokeRPC(msg_id, client, msg_body)
 	return client:SendRPC(msg_id, msg_body)
 end
 
@@ -282,7 +282,7 @@ function MsgClient:SendRPC(msg_id, msg_body)
 	self._write_factory:SetRpcID(rpc_id)
 	self:MessageWrite(msg_id, msg_body)
 	self._interface:SendFactory(self._write_factory)
-	local info = {}
+	local info = {}()
 	info.co = co
 	info.rpc_id = rpc_id
 	self._id_map_rpc[rpc_id] = info

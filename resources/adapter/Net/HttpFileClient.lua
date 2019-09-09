@@ -8,18 +8,18 @@ local ___coroutine = coroutine
 
 IHttpFileClient = Class(nil, "ALittle.IHttpFileClient")
 
-function IHttpFileClient:SendDownloadRPC(content)
+function IHttpFileClient:SendDownloadRPC(method, content)
 end
 
-function IHttpFileClient:SendUploadRPC(content)
+function IHttpFileClient:SendUploadRPC(method, content)
 end
 
-function IHttpFileClient.InvokeDownload(client, content)
-	return client:SendDownloadRPC(content)
+function IHttpFileClient.InvokeDownload(method, client, content)
+	return client:SendDownloadRPC(method, content)
 end
 
-function IHttpFileClient.InvokeUpload(client, content)
-	return client:SendUploadRPC(content)
+function IHttpFileClient.InvokeUpload(method, client, content)
+	return client:SendUploadRPC(method, content)
 end
 
 IHttpFileInterface = Class(nil, "ALittle.IHttpFileInterface")
@@ -67,15 +67,16 @@ end
 assert(IHttpFileClient, " extends class:IHttpFileClient is nil")
 HttpFileClient = Class(IHttpFileClient, "ALittle.HttpFileClient")
 
-function HttpFileClient:Ctor(url, file_path, start_size, callback)
+function HttpFileClient:Ctor(ip, port, file_path, start_size, callback)
 	___rawset(self, "_interface", self.__class.__element[1]())
-	___rawset(self, "_url", url)
+	___rawset(self, "_ip", ip)
+	___rawset(self, "_port", port)
 	___rawset(self, "_file_path", file_path)
 	___rawset(self, "_start_size", start_size)
 	___rawset(self, "_callback", callback)
 end
 
-function HttpFileClient:SendDownloadRPC(content)
+function HttpFileClient:SendDownloadRPC(method, content)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程"
@@ -85,12 +86,13 @@ function HttpFileClient:SendDownloadRPC(content)
 	if self._start_size == nil then
 		self._start_size = 0
 	end
-	self._interface:SetURL(String_UrlAppendParamMap(self._url, content), self._file_path, true, self._start_size)
+	local url = "http://" .. self._ip .. ":" .. self._port .. "/" .. method
+	self._interface:SetURL(String_UrlAppendParamMap(url, content), self._file_path, true, self._start_size)
 	self._interface:Start()
 	return ___coroutine.yield()
 end
 
-function HttpFileClient:SendUploadRPC(content)
+function HttpFileClient:SendUploadRPC(method, content)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程", nil
@@ -100,7 +102,8 @@ function HttpFileClient:SendUploadRPC(content)
 	if self._start_size == nil then
 		self._start_size = 0
 	end
-	self._interface:SetURL(String_UrlAppendParamMap(self._url, content), self._file_path, false, self._start_size)
+	local url = "http://" .. self._ip .. ":" .. self._port .. "/" .. method
+	self._interface:SetURL(String_UrlAppendParamMap(url, content), self._file_path, false, self._start_size)
 	self._interface:Start()
 	return ___coroutine.yield()
 end

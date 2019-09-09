@@ -9,8 +9,8 @@ public class IMsgClient
     protected await fun SendRPC(int msg_id, any msg_body) : string, any {}
 
     // 提供框架调用
-    protected static Invoke(IMsgClient client, any msg_body, int msg_id) { client.Send(msg_id, msg_body, 0); }
-    protected await static InvokeRPC(IMsgClient client, any msg_body, int msg_id) : string, any { return client.SendRPC(msg_id, msg_body); }
+    protected static Invoke(int msg_id, IMsgClient client, any msg_body) { client.Send(msg_id, msg_body, 0); }
+    protected await static InvokeRPC(int msg_id, IMsgClient client, any msg_body) : string, any { return client.SendRPC(msg_id, msg_body); }
 }
 
 // 连接对象

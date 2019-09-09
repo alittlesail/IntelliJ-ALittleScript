@@ -31,10 +31,10 @@ public class PsiHelper {
         byte[] bytes = content.getBytes();
         int l = content.length();
         int h = l;
-        int step = l >> 5 + 1;
+        int step = (l >> 5) + 1;
 
         for (int i=l; i >= step; i-=step) {
-            h = h ^ (h << 5 + bytes[i] + h >> 2);
+            h = h ^ (h << 5 + bytes[i-1] + h >> 2);
         }
         return h;
     }

@@ -8,11 +8,11 @@ local ___coroutine = coroutine
 
 IHttpClient = Class(nil, "ALittle.IHttpClient")
 
-function IHttpClient:SendRPC(content)
+function IHttpClient:SendRPC(method, content)
 end
 
-function IHttpClient.Invoke(client, content)
-	return client:SendRPC(content)
+function IHttpClient.Invoke(method, client, content)
+	return client:SendRPC(method, content)
 end
 
 IHttpInterface = Class(nil, "ALittle.IHttpInterface")
@@ -54,22 +54,24 @@ end
 assert(IHttpClient, " extends class:IHttpClient is nil")
 HttpClient = Class(IHttpClient, "ALittle.HttpClient")
 
-function HttpClient:Ctor(url)
+function HttpClient:Ctor(ip, port)
 	___rawset(self, "_interface", self.__class.__element[1]())
-	___rawset(self, "_url", url)
+	___rawset(self, "_ip", ip)
+	___rawset(self, "_port", port)
 end
 
-function HttpClient:SendRPC(content)
+function HttpClient:SendRPC(method, content)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程", nil
 	end
 	self._co = co
 	__HttpClientMap[self._interface:GetID()] = self
+	local url = "http://" .. self._ip .. ":" .. self._port .. "/" .. method
 	if content == nil then
-		self._interface:SetURL(self._url, nil)
+		self._interface:SetURL(url, nil)
 	else
-		self._interface:SetURL(self._url, Json.encode(content))
+		self._interface:SetURL(url, Json.encode(content))
 	end
 	self._interface:Start()
 	return ___coroutine.yield()

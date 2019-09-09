@@ -148,13 +148,23 @@ public class ALittleGenerateLua {
         if (protoModifier == null) {
             throw new Exception("ncall第一个参数必须是带注解的全局函数");
         }
+
+        if (valueStatList.size() != 3) {
+            throw new Exception("ncall必须是三个参数");
+        }
+
+        ALittleReferenceUtil.GuessTypeInfo structInfo = valueStatList.get(2).guessType();
+        if (structInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+            throw new Exception("ncall的第三个参数必须是struct");
+        }
+        int msg_id = PsiHelper.JSHash(structInfo.value);
+
         String text = protoModifier.getText();
 
         String namespacePre = "ALittle.";
         if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
         String replaceTest = "";
-        int msg_id = 0;
         if (text.equals("@Http")) {
             replaceTest = "IHttpClient.Invoke";
         } else if (text.equals("@HttpUpload")) {
@@ -168,24 +178,16 @@ public class ALittleGenerateLua {
             } else {
                 replaceTest = "IMsgClient.InvokeRPC";
             }
-            if (valueStatList.size() >= 2) {
-                ALittleReferenceUtil.GuessTypeInfo structInfo = valueStatList.get(1).guessType();
-                if (structInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
-                    throw new Exception(structInfo.value + "的第二个参数必须是struct");
-                }
-                msg_id = PsiHelper.JSHash(structInfo.value);
-
-                GenerateReflectStructInfo(structInfo);
-            }
+            GenerateReflectStructInfo(structInfo);
 
             if (returnDec != null) {
                 List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
                 if (!allTypeList.isEmpty()) {
-                    ALittleReferenceUtil.GuessTypeInfo structInfo = allTypeList.get(0).guessType();
-                    if (structInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
-                        throw new Exception(structInfo.value + "的返回值必须是struct");
+                    ALittleReferenceUtil.GuessTypeInfo returnInfo = allTypeList.get(0).guessType();
+                    if (returnInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+                        throw new Exception(returnInfo.value + "的返回值必须是struct");
                     }
-                    GenerateReflectStructInfo(structInfo);
+                    GenerateReflectStructInfo(returnInfo);
                 }
             }
         } else {
@@ -194,11 +196,13 @@ public class ALittleGenerateLua {
 
         String content = namespacePre + replaceTest + "(";
         List<String> paramList = new ArrayList<>();
-        for (int i = 1; i < valueStatList.size(); ++i) {
-            paramList.add(GenerateValueStat(valueStatList.get(i)));
-        }
         if (text.equals("@Msg")) {
             paramList.add("" + msg_id);
+        } else {
+            paramList.add(structInfo.value);
+        }
+        for (int i = 1; i < valueStatList.size(); ++i) {
+            paramList.add(GenerateValueStat(valueStatList.get(i)));
         }
         content += String.join(", ", paramList);
         content += ")";
