@@ -78,7 +78,7 @@ protoModifier ::= HTTP | HTTP_DOWNLOAD | HTTP_UPLOAD |  MSG
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 命名域
-namespaceDec ::= registerModifier? namespace namespaceNameDec SEMI (globalMethodDec | classDec | enumDec | structDec | instanceDec | opAssignExpr | propertyValueExpr)* {pin=2}
+namespaceDec ::= registerModifier? namespace namespaceNameDec SEMI (globalMethodDec | classDec | enumDec | structDec | instanceDec | usingDec | opAssignExpr | propertyValueExpr)* {pin=2}
 namespaceNameDec ::= ID_CONTENT
 
 // 模板定义
@@ -105,6 +105,10 @@ private enumBodyDec ::= LBRACE (enumVarDec(COMMA enumVarDec)* COMMA?)? RBRACE {p
 
 // 全局变量
 instanceDec ::= accessModifier? varAssignExpr {pin=2}
+
+// using定义
+usingDec ::= accessModifier? using usingNameDec ASSIGN customType SEMI {pin=2}
+usingNameDec ::= ID_CONTENT
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

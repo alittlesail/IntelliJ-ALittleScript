@@ -241,80 +241,83 @@ public class ALittleGenerateLua {
         // 自定义类型
         ALittleCustomType customType = opNewStat.getCustomType();
         if (customType != null) {
-            ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
-            // 如果是结构体名，那么就当表来处理
-            if (guessType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
-                return "{}";
-            // 如果是类名
-            } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-                // 如果是类名
-                String className = customType.getIdContent().getText();
-                ALittleCustomTypeDotId dotId = customType.getCustomTypeDotId();
-                if (dotId != null) {
-                    ALittleCustomTypeDotIdName dotIdName = dotId.getCustomTypeDotIdName();
-                    if (dotIdName != null) {
-                        className += "." + dotIdName.getText();
-                    }
-                }
-
-                // 如果有模板，那么就
-                List<String> templateParamList = new ArrayList<>();
-                List<ALittleAllType> allTypeList = customType.getAllTypeList();
-                for (ALittleAllType allType : allTypeList) {
-                    ALittleReferenceUtil.GuessTypeInfo guessInfo = allType.guessType();
-                    if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-                        templateParamList.add(guessInfo.value);
-                    } else {
-                        templateParamList.add("nil");
-                    }
-                }
-
-                String content = "";
-                if (!allTypeList.isEmpty()) {
-                    String namespacePre = "ALittle.";
-                    if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-                    content = namespacePre + "Template(" + className;
-                    content += ", \"" + guessType.value + "\"";
-                    if (!templateParamList.isEmpty()) {
-                        content += ", " + String.join(", ", templateParamList);
-                    }
-                    content += ")(";
-                } else {
-                    content = className + "(";
-                }
-
-                List<String> paramList = new ArrayList<>();
-                List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
-                for (ALittleValueStat valueStat : valueStatList) {
-                    paramList.add(GenerateValueStat(valueStat));
-                }
-                content += String.join(", ", paramList);
-
-                content += ")";
-                return content;
-            // 如果是模板
-            } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
-                // 检查下标
-                ALittleTemplatePairDec templatePairDec = (ALittleTemplatePairDec)guessType.element;
-                ALittleTemplateDec templateDec = (ALittleTemplateDec)templatePairDec.getParent();
-                int index = templateDec.getTemplatePairDecList().indexOf(templatePairDec);
-
-                String content = "self.__class.__element[" + (index + 1) + "](";
-
-                List<String> paramList = new ArrayList<>();
-                List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
-                for (ALittleValueStat valueStat : valueStatList) {
-                    paramList.add(GenerateValueStat(valueStat));
-                }
-                content += String.join(", ", paramList);
-
-                content += ")";
-                return content;
+            String content = GenerateCustomType(customType);
+            content += "(";
+            List<String> paramList = new ArrayList<>();
+            List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
+            for (ALittleValueStat valueStat : valueStatList) {
+                paramList.add(GenerateValueStat(valueStat));
             }
+            content += String.join(", ", paramList);
+
+            content += ")";
+            return content;
         }
 
         throw new Exception("new 未知类型");
+    }
+
+    @NotNull
+    private String GenerateCustomType(ALittleCustomType customType) throws Exception {
+        ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
+        // 如果是结构体名，那么就当表来处理
+        if (guessType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
+            return "{}";
+            // 如果是类名
+        } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+            // 如果是类名
+            String className = customType.getIdContent().getText();
+            ALittleCustomTypeDotId dotId = customType.getCustomTypeDotId();
+            if (dotId != null) {
+                ALittleCustomTypeDotIdName dotIdName = dotId.getCustomTypeDotIdName();
+                if (dotIdName != null) {
+                    if (className.equals(mNamespaceName)) {
+                        className = dotIdName.getText();
+                    } else {
+                        className += "." + dotIdName.getText();
+                    }
+                }
+            }
+
+            // 如果有模板，那么就
+            List<String> templateParamList = new ArrayList<>();
+            List<ALittleAllType> allTypeList = customType.getAllTypeList();
+            for (ALittleAllType allType : allTypeList) {
+                ALittleReferenceUtil.GuessTypeInfo guessInfo = allType.guessType();
+                if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+                    templateParamList.add(guessInfo.value);
+                } else {
+                    templateParamList.add("nil");
+                }
+            }
+
+            String content = "";
+            if (!allTypeList.isEmpty()) {
+                String namespacePre = "ALittle.";
+                if (mNamespaceName.equals("ALittle")) namespacePre = "";
+
+                content = namespacePre + "Template(" + className;
+                content += ", \"" + guessType.value + "\"";
+                if (!templateParamList.isEmpty()) {
+                    content += ", " + String.join(", ", templateParamList);
+                }
+                content += ")";
+            } else {
+                content = className;
+            }
+
+            return content;
+            // 如果是模板
+        } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+            // 检查下标
+            ALittleTemplatePairDec templatePairDec = (ALittleTemplatePairDec)guessType.element;
+            ALittleTemplateDec templateDec = (ALittleTemplateDec)templatePairDec.getParent();
+            int index = templateDec.getTemplatePairDecList().indexOf(templatePairDec);
+
+            return "self.__class.__element[" + (index + 1) + "]";
+        }
+
+        throw new Exception("未知的表达式类型");
     }
 
     @NotNull
@@ -1030,6 +1033,32 @@ public class ALittleGenerateLua {
     @NotNull
     private String GeneratePropertyValueExpr(ALittlePropertyValueExpr root, String preTab) throws Exception {
         return preTab + GeneratePropertyValue(root.getPropertyValue()) + "\n";
+    }
+
+    @NotNull
+    private String GenerateUsingDec(ALittleUsingDec root, String preTab) throws Exception {
+        ALittleUsingNameDec nameDec = root.getUsingNameDec();
+        if (nameDec == null) throw new Exception("using 没有定义名称");
+
+        ALittleCustomType customType = root.getCustomType();
+        if (customType == null) {
+            return "";
+        }
+
+        ALittleReferenceUtil.GuessTypeInfo info = customType.guessType();
+        if (info.type != ALittleReferenceUtil.GuessType.GT_CLASS) {
+            return "";
+        }
+
+        String content = preTab;
+
+        ALittleAccessModifier accessModifierDec = root.getAccessModifier();
+        if (accessModifierDec == null || accessModifierDec.getText().equals("private")) {
+            content += "local ";
+        }
+
+        content += nameDec.getText() + " = " + GenerateCustomType(customType) + ";\n";
+        return content;
     }
 
     @NotNull
@@ -1926,6 +1955,9 @@ public class ALittleGenerateLua {
             // 处理函数调用
             } else if (child instanceof ALittlePropertyValueExpr) {
                 otherContent.append(GeneratePropertyValueExpr((ALittlePropertyValueExpr)child, ""));
+            // 处理using
+            } else if (child instanceof ALittleUsingDec) {
+                otherContent.append(GenerateUsingDec((ALittleUsingDec)child, ""));
             }
         }
 

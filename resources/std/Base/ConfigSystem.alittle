@@ -78,3 +78,5 @@ public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
         }
     }
 }
+
+public using NormalConfigSystem = ConfigSystem<NormalFileLoader, NormalFileSaver>;

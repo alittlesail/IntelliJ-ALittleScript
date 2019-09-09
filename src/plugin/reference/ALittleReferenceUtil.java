@@ -245,6 +245,8 @@ public class ALittleReferenceUtil {
 
         if (element instanceof ALittleTemplateDec) return new ALittleTemplateDecReference((ALittleTemplateDec)element, range);
         if (element instanceof ALittleTemplatePairDec) return new ALittleTemplatePairDecReference((ALittleTemplatePairDec)element, range);
+        if (element instanceof ALittleUsingDec) return new ALittleUsingDecReference((ALittleUsingDec)element, range);
+        if (element instanceof ALittleUsingNameDec) return new ALittleUsingNameDecReference((ALittleUsingNameDec)element, range);
         if (element instanceof ALittleValueFactorStat) return new ALittleValueFactorStatReference((ALittleValueFactorStat)element, range);
         if (element instanceof ALittleValueStat) return new ALittleValueStatReference((ALittleValueStat)element, range);
 

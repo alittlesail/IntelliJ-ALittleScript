@@ -124,6 +124,8 @@ public interface ALittleTypes {
   IElementType STRUCT_VAR_DEC = new ALittleElementType("STRUCT_VAR_DEC");
   IElementType TEMPLATE_DEC = new ALittleElementType("TEMPLATE_DEC");
   IElementType TEMPLATE_PAIR_DEC = new ALittleElementType("TEMPLATE_PAIR_DEC");
+  IElementType USING_DEC = new ALittleElementType("USING_DEC");
+  IElementType USING_NAME_DEC = new ALittleElementType("USING_NAME_DEC");
   IElementType VALUE_FACTOR_STAT = new ALittleElementType("VALUE_FACTOR_STAT");
   IElementType VALUE_STAT = new ALittleElementType("VALUE_STAT");
   IElementType VAR_ASSIGN_DEC = new ALittleElementType("VAR_ASSIGN_DEC");
@@ -221,6 +223,7 @@ public interface ALittleTypes {
   IElementType STRUCT = new ALittleTokenType("struct");
   IElementType THIS = new ALittleTokenType("this");
   IElementType TRUE = new ALittleTokenType("true");
+  IElementType USING = new ALittleTokenType("using");
   IElementType WHILE = new ALittleTokenType("while");
   IElementType YIELD = new ALittleTokenType("yield");
 
@@ -574,6 +577,12 @@ public interface ALittleTypes {
       }
       else if (type == TEMPLATE_PAIR_DEC) {
         return new ALittleTemplatePairDecImpl(node);
+      }
+      else if (type == USING_DEC) {
+        return new ALittleUsingDecImpl(node);
+      }
+      else if (type == USING_NAME_DEC) {
+        return new ALittleUsingNameDecImpl(node);
       }
       else if (type == VALUE_FACTOR_STAT) {
         return new ALittleValueFactorStatImpl(node);

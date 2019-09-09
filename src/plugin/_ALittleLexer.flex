@@ -86,6 +86,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "class"               { return CLASS; }
   "struct"              { return STRUCT; }
   "enum"                { return ENUM; }
+  "using"               { return USING; }
   "Ctor"                { return CTOR; }
   "get"                 { return GET; }
   "set"                 { return SET; }

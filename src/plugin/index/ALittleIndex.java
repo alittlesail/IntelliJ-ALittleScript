@@ -325,6 +325,21 @@ public class ALittleIndex {
                         fileAccessData.addALittleNameDec(nameDec);
                     }
                 }
+            } else if (child instanceof ALittleUsingDec) {
+                ALittleUsingDec dec = (ALittleUsingDec) child;
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+
+                ALittleUsingNameDec nameDec = dec.getUsingNameDec();
+                if (nameDec == null) continue;
+
+                allAccessData.addALittleNameDec(nameDec);
+                if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
+                    globalAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
+                    namespaceAccessData.addALittleNameDec(nameDec);
+                } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
+                    fileAccessData.addALittleNameDec(nameDec);
+                }
             }
         }
     }

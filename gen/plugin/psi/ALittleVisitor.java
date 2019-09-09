@@ -471,6 +471,14 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitUsingDec(@NotNull ALittleUsingDec o) {
+    visitPsiElement(o);
+  }
+
+  public void visitUsingNameDec(@NotNull ALittleUsingNameDec o) {
+    visitPsiElement(o);
+  }
+
   public void visitValueFactorStat(@NotNull ALittleValueFactorStat o) {
     visitPsiElement(o);
   }

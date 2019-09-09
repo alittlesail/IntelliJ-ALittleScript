@@ -38,6 +38,9 @@ public interface ALittleNamespaceDec extends PsiElement {
   List<ALittleStructDec> getStructDecList();
 
   @NotNull
+  List<ALittleUsingDec> getUsingDecList();
+
+  @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;
 
   @NotNull

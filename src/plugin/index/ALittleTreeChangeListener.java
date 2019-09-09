@@ -1,6 +1,5 @@
 package plugin.index;
 
-import aapt.pb.repackage.com.google.protobuf.MapEntry;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;

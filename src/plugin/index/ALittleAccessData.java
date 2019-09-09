@@ -26,6 +26,8 @@ public class ALittleAccessData {
             type = PsiHelper.PsiElementType.INSTANCE_NAME;
         } else if (nameDec instanceof ALittleMethodNameDec) {
             type = PsiHelper.PsiElementType.GLOBAL_METHOD;
+        } else if (nameDec instanceof ALittleUsingNameDec) {
+            type = PsiHelper.PsiElementType.USING_NAME;
         } else {
             return;
         }
@@ -71,6 +73,8 @@ public class ALittleAccessData {
             type = PsiHelper.PsiElementType.INSTANCE_NAME;
         } else if (nameDec instanceof ALittleMethodNameDec) {
             type = PsiHelper.PsiElementType.GLOBAL_METHOD;
+        } else if (nameDec instanceof ALittleUsingNameDec) {
+            type = PsiHelper.PsiElementType.USING_NAME;
         } else {
             return;
         }

@@ -95,9 +95,7 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
     public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
         List<InlayInfo> result = new ArrayList<>();
         // 获取类型
-        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = guessTypes();
-        if (guessTypeList.isEmpty()) return result;
-        ALittleReferenceUtil.GuessTypeInfo guessType = guessTypeList.get(0);
+        ALittleReferenceUtil.GuessTypeInfo guessType = myElement.guessType();
 
         // 如果是定义并赋值
         if (myElement.getParent() instanceof ALittleVarAssignDec) {

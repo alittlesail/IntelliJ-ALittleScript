@@ -1655,7 +1655,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // registerModifier? namespace namespaceNameDec SEMI (globalMethodDec | classDec | enumDec | structDec | instanceDec | opAssignExpr | propertyValueExpr)*
+  // registerModifier? namespace namespaceNameDec SEMI (globalMethodDec | classDec | enumDec | structDec | instanceDec | usingDec | opAssignExpr | propertyValueExpr)*
   public static boolean namespaceDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "namespaceDec")) return false;
     if (!nextTokenIs(b, "<namespace dec>", NAMESPACE, REGISTER)) return false;
@@ -1678,7 +1678,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (globalMethodDec | classDec | enumDec | structDec | instanceDec | opAssignExpr | propertyValueExpr)*
+  // (globalMethodDec | classDec | enumDec | structDec | instanceDec | usingDec | opAssignExpr | propertyValueExpr)*
   private static boolean namespaceDec_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "namespaceDec_4")) return false;
     while (true) {
@@ -1689,7 +1689,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // globalMethodDec | classDec | enumDec | structDec | instanceDec | opAssignExpr | propertyValueExpr
+  // globalMethodDec | classDec | enumDec | structDec | instanceDec | usingDec | opAssignExpr | propertyValueExpr
   private static boolean namespaceDec_4_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "namespaceDec_4_0")) return false;
     boolean r;
@@ -1698,6 +1698,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = enumDec(b, l + 1);
     if (!r) r = structDec(b, l + 1);
     if (!r) r = instanceDec(b, l + 1);
+    if (!r) r = usingDec(b, l + 1);
     if (!r) r = opAssignExpr(b, l + 1);
     if (!r) r = propertyValueExpr(b, l + 1);
     return r;
@@ -3208,6 +3209,42 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "templatePairDec_1")) return false;
     templateExtendsDec(b, l + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // accessModifier? using usingNameDec ASSIGN customType SEMI
+  public static boolean usingDec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "usingDec")) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, USING_DEC, "<using dec>");
+    r = usingDec_0(b, l + 1);
+    r = r && consumeToken(b, USING);
+    p = r; // pin = 2
+    r = r && report_error_(b, usingNameDec(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, ASSIGN)) && r;
+    r = p && report_error_(b, customType(b, l + 1)) && r;
+    r = p && consumeToken(b, SEMI) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // accessModifier?
+  private static boolean usingDec_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "usingDec_0")) return false;
+    accessModifier(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // ID_CONTENT
+  public static boolean usingNameDec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "usingNameDec")) return false;
+    if (!nextTokenIs(b, ID_CONTENT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, ID_CONTENT);
+    exit_section_(b, m, USING_NAME_DEC, r);
+    return r;
   }
 
   /* ********************************************************** */

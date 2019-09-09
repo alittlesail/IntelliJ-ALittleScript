@@ -41,6 +41,14 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
 
         {
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.USING_NAME, psiFile, mNamespace, mKey, true);
+            for (PsiElement dec : decList) {
+                ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleUsingNameDec)dec).guessType();
+                guessList.add(guessInfo);
+            }
+        }
+        {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
                     PsiHelper.PsiElementType.CLASS_NAME, psiFile, mNamespace, mKey, true);
 
             // 获取填充的内容，并计算类型
@@ -128,6 +136,14 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
         PsiFile psiFile = myElement.getContainingFile().getOriginalFile();
 
         List<ResolveResult> results = new ArrayList<>();
+
+        {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.USING_NAME, psiFile, mNamespace, mKey, true);
+            for (PsiElement dec : decList) {
+                results.add(new PsiElementResolveResult(dec));
+            }
+        }
         {
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
                     PsiHelper.PsiElementType.CLASS_NAME, psiFile, mNamespace, mKey, true);
@@ -168,6 +184,30 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
         Project project = myElement.getProject();
         PsiFile psiFile = myElement.getContainingFile().getOriginalFile();
         List<LookupElement> variants = new ArrayList<>();
+
+        // 查找该命名域下的
+        {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.USING_NAME, psiFile, mNamespace, "", true);
+            for (PsiElement dec : decList) {
+                try {
+                    ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleUsingNameDec)dec).guessType();
+                    if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+                        variants.add(LookupElementBuilder.create(dec.getText()).
+                                withIcon(ALittleIcons.CLASS).
+                                withTypeText(dec.getContainingFile().getName())
+                        );
+                    } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
+                        variants.add(LookupElementBuilder.create(dec.getText()).
+                                withIcon(ALittleIcons.STRUCT).
+                                withTypeText(dec.getContainingFile().getName())
+                        );
+                    }
+                } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+
+                }
+            }
+        }
 
         // 查找对应命名域下的类名
         {

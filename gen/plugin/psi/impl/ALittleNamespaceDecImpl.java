@@ -85,6 +85,12 @@ public class ALittleNamespaceDecImpl extends ASTWrapperPsiElement implements ALi
 
   @Override
   @NotNull
+  public List<ALittleUsingDec> getUsingDecList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleUsingDec.class);
+  }
+
+  @Override
+  @NotNull
   public GuessTypeInfo guessType() throws ALittleReferenceException {
     return ALittlePsiImplUtil.guessType(this);
   }

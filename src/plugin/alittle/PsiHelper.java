@@ -66,6 +66,7 @@ public class PsiHelper {
         STRUCT_NAME,
         INSTANCE_NAME,
         GLOBAL_METHOD,
+        USING_NAME,
     }
 
     // 获取访问权限类型
@@ -137,7 +138,7 @@ public class PsiHelper {
 
     // 获取这个元素所在的类
     public static ALittleClassDec findClassDecFromParent(@NotNull PsiElement dec) {
-        while (dec != null) {
+        while (dec != null && !(dec instanceof PsiFile)) {
             if (dec instanceof ALittleClassDec) {
                 return (ALittleClassDec)dec;
             }
