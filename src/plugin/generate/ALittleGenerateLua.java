@@ -199,7 +199,7 @@ public class ALittleGenerateLua {
         if (text.equals("@Msg")) {
             paramList.add("" + msg_id);
         } else {
-            paramList.add(structInfo.value);
+            paramList.add("\"" + structInfo.value + "\"");
         }
         for (int i = 1; i < valueStatList.size(); ++i) {
             paramList.add(GenerateValueStat(valueStatList.get(i)));
@@ -294,7 +294,12 @@ public class ALittleGenerateLua {
             for (ALittleAllType allType : allTypeList) {
                 ALittleReferenceUtil.GuessTypeInfo guessInfo = allType.guessType();
                 if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-                    templateParamList.add(guessInfo.value);
+                    String[] split = guessInfo.value.split("\\.");
+                    if (split.length == 2 && split[0].equals(mNamespaceName)) {
+                        templateParamList.add(split[1]);
+                    } else {
+                        templateParamList.add(guessInfo.value);
+                    }
                 } else {
                     templateParamList.add("nil");
                 }
@@ -1312,7 +1317,7 @@ public class ALittleGenerateLua {
 
             String pairType = ALittleReferenceUtil.CalcPairsType(valueStat);
 
-            // 如果foreach的参数数量不为2，那么就不用pairType
+            // 如果for in 遇到迭代函数，那么就不用pairType
             if (pairType.isEmpty()) {
                 content.append("for ")
                         .append(String.join(", ", pairStringList))

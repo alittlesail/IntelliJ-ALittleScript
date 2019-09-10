@@ -68,7 +68,7 @@ public class HttpClient<HC : IHttpInterface> : public IHttpClient
         if (content == null)
             this._interface.SetURL(url, null);
         else
-            this._interface.SetURL(url, Json.encode(content));
+            this._interface.SetURL(url, lua.json.encode(content));
         this._interface.Start();
 
         // 协程挂起，并等待返回值
@@ -83,7 +83,7 @@ public class HttpClient<HC : IHttpInterface> : public IHttpClient
     public fun HandleSucceed()
     {
         __HttpClientMap[this._interface.GetID()] = null;
-        auto error, auto param = pcall(Json.decode, this._interface.GetResponse());
+        auto error, auto param = pcall(lua.json.decode, this._interface.GetResponse());
         assert(coroutine.resume(this._co, error, param));
     }
 

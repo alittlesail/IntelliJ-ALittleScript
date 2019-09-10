@@ -18,7 +18,7 @@ public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
         if (content == null) return;
 
         // 解析配置文件
-        string error, any json_content = pcall(Json.decode, content);
+        string error, any json_content = pcall(lua.json.decode, content);
         if (error != null)
         {
             Log("Json Decode failed." .. file_path .. ", " .. error);
@@ -72,7 +72,7 @@ public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
     {
         // 保存配置值
         auto file = new FS();
-        if (!file.Save(this._file_path, Json.encode(this._config_map)))
+        if (!file.Save(this._file_path, lua.json.encode(this._config_map)))
         {
             Log("Save Congig Failed.", this._file_path);
         }

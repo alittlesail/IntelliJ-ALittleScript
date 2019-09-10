@@ -58,12 +58,13 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
         } else if (inExpr != null) {
             ALittleValueStat valueStat = inExpr.getValueStat();
             if (valueStat == null) return;
+            List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
 
             // 如果for的对象是any，那么就放过，不检查了
-            ALittleReferenceUtil.GuessTypeInfo guessType = valueStat.guessType();
+            List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = valueStat.guessTypes();
 
-            List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
-            if (guessType.type == ALittleReferenceUtil.GuessType.GT_LIST) {
+            // 检查List
+            if (guessTypeList.size() == 1 && guessTypeList.get(0).type == ALittleReferenceUtil.GuessType.GT_LIST) {
                 if (pairDecList.size() != 2) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(inExpr, "这里参数数量必须是2个");
                 }
@@ -75,7 +76,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
 
                 ALittleReferenceUtil.GuessTypeInfo valueGuessType = pairDecList.get(1).guessType();
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessType.listSubType, pairDecList.get(1), valueGuessType);
+                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessTypeList.get(0).listSubType, pairDecList.get(1), valueGuessType);
                 } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "变量格式错误，不能是:" + valueGuessType.value + " :" + e.getError());
                 }
@@ -83,21 +84,22 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                 return;
             }
 
-            if (guessType.type == ALittleReferenceUtil.GuessType.GT_MAP) {
+            // 检查Map
+            if (guessTypeList.size() == 1 && guessTypeList.get(0).type == ALittleReferenceUtil.GuessType.GT_MAP) {
                 if (pairDecList.size() != 2) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(inExpr, "这里参数数量必须是2个");
                 }
 
                 ALittleReferenceUtil.GuessTypeInfo keyGuessType = pairDecList.get(0).guessType();
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessType.mapKeyType, pairDecList.get(0), keyGuessType);
+                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessTypeList.get(0).mapKeyType, pairDecList.get(0), keyGuessType);
                 } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "key变量格式错误，不能是:" + keyGuessType.value + " :" + e.getError());
                 }
 
                 ALittleReferenceUtil.GuessTypeInfo valueGuessType = pairDecList.get(1).guessType();
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessType.mapValueType, pairDecList.get(1), valueGuessType);
+                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessTypeList.get(0).mapValueType, pairDecList.get(1), valueGuessType);
                 } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                     throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "value变量格式错误，不能是:" + valueGuessType.value + " :" + e.getError());
                 }
@@ -105,7 +107,19 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                 return;
             }
 
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "遍历对象类型必须是List,Map");
+            // 检查迭代函数
+            do {
+                if (guessTypeList.size() != 3) break;
+                if (guessTypeList.get(0).type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) break;
+                if (guessTypeList.get(0).functorAwait) break;
+                if (guessTypeList.get(0).functorParamList.size() != 2) break;
+                if (guessTypeList.get(0).functorReturnList.size() != 0) break;
+                if (!guessTypeList.get(0).functorParamList.get(0).value.equals(guessTypeList.get(1).value)) break;
+                if (!guessTypeList.get(0).functorParamList.get(1).value.equals(guessTypeList.get(2).value)) break;
+                return;
+            } while (false);
+
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "遍历对象类型必须是List,Map或者迭代函数");
         }
     }
 }

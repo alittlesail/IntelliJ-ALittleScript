@@ -10,8 +10,8 @@ private auto __len = String.len;
 private auto __find = String.find;
 private auto __concat = table.concat;
 
-private auto __JsonEncode = Json.encode;
-private auto __JsonDecode = Json.decode;
+private auto __JsonEncode = lua.json.encode;
+private auto __JsonDecode = lua.json.decode;
 
 // Json
 public static JsonEncode(any content) : string

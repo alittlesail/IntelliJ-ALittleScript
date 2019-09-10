@@ -71,7 +71,7 @@ function HttpClient:SendRPC(method, content)
 	if content == nil then
 		self._interface:SetURL(url, nil)
 	else
-		self._interface:SetURL(url, Json.encode(content))
+		self._interface:SetURL(url, json.encode(content))
 	end
 	self._interface:Start()
 	return ___coroutine.yield()
@@ -83,7 +83,7 @@ end
 
 function HttpClient:HandleSucceed()
 	__HttpClientMap[self._interface:GetID()] = nil
-	local error, param = pcall(Json.decode, self._interface:GetResponse())
+	local error, param = pcall(json.decode, self._interface:GetResponse())
 	assert(coroutine.resume(self._co, error, param))
 end
 

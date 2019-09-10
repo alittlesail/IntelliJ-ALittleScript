@@ -142,13 +142,25 @@ public class ALittleReferenceUtil {
     // 计算表达式需要使用什么样的变量方式
     @NotNull
     public static String CalcPairsType(ALittleValueStat valueStat) throws ALittleReferenceException {
-        GuessTypeInfo guessType = valueStat.guessType();
+        List<GuessTypeInfo> guessTypeList = valueStat.guessTypes();
         // 必须是模板容器
-        if (guessType.type == GuessType.GT_LIST) {
+        if (guessTypeList.size() == 1 && guessTypeList.get(0).type == GuessType.GT_LIST) {
             return "___ipairs";
-        } else if (guessType.type == GuessType.GT_MAP) {
+        } else if (guessTypeList.size() == 1 && guessTypeList.get(0).type == GuessType.GT_MAP) {
             return "___pairs";
         }
+
+        // 检查迭代函数
+        do {
+            if (guessTypeList.size() != 3) break;
+            if (guessTypeList.get(0).type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) break;
+            if (guessTypeList.get(0).functorAwait) break;
+            if (guessTypeList.get(0).functorParamList.size() != 2) break;
+            if (guessTypeList.get(0).functorReturnList.size() != 0) break;
+            if (!guessTypeList.get(0).functorParamList.get(0).value.equals(guessTypeList.get(1).value)) break;
+            if (!guessTypeList.get(0).functorParamList.get(1).value.equals(guessTypeList.get(2).value)) break;
+            return "";
+        } while (false);
 
         throw new ALittleReferenceException(valueStat, "该表达式不能遍历");
     }

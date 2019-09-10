@@ -106,9 +106,12 @@ public class LoopTimer : public LoopObject
             if (this._accumulate_delay_time < this._total_delay_time)
                 return;
             this._accumulate_delay_time = this._total_delay_time;
-            this._accumulate_count = 1;
-            this._func();
         }
+
+        if (this._accumulate_count >= 1) return;
+
+        this._accumulate_count = 1;
+        this._func();
     }
 
     // 启动

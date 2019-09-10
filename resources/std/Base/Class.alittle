@@ -175,6 +175,11 @@ protected static Template(ClassInfo clazz, string name, ...) : ClassInfo
     template = new ClassInfo();
     child[name] = template;
     // 复制
+    for (auto key, auto value in cast<Map<string,any>>(clazz))
+    {
+        if (type(value) == "function")
+            cast<Map<string,any>>(template)[key] = value;
+    }
     template.__super = clazz.__super;
     template.__name = name;
     template.__setter = clazz.__setter;
@@ -184,10 +189,7 @@ protected static Template(ClassInfo clazz, string name, ...) : ClassInfo
     // 复制模板
     int len = select("#", ...);
     for (int i = 1, len, 1)
-    {
-        ClassInfo info = select(i, ...);
-        list[i] = info;
-    }
+        list[i] = select(i, ...);
     template.__element = list;
 
     // 设置类模版的元表

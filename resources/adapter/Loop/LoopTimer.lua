@@ -81,9 +81,12 @@ function LoopTimer:Update(frame_time)
 			return
 		end
 		self._accumulate_delay_time = self._total_delay_time
-		self._accumulate_count = 1
-		self._func()
 	end
+	if self._accumulate_count >= 1 then
+		return
+	end
+	self._accumulate_count = 1
+	self._func()
 end
 
 function LoopTimer:Start()

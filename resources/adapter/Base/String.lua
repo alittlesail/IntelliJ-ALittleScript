@@ -14,8 +14,8 @@ local __sub = String.sub
 local __len = String.len
 local __find = String.find
 local __concat = table.concat
-local __JsonEncode = Json.encode
-local __JsonDecode = Json.decode
+local __JsonEncode = json.encode
+local __JsonDecode = json.decode
 function JsonEncode(content)
 	return __JsonEncode(content)
 end

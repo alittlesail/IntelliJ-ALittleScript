@@ -114,6 +114,11 @@ function Template(clazz, name, ...)
 	end
 	template = {}
 	child[name] = template
+	for key, value in ___pairs(clazz) do
+		if type(value) == "function" then
+			template[key] = value
+		end
+	end
 	template.__super = clazz.__super
 	template.__name = name
 	template.__setter = clazz.__setter
@@ -121,8 +126,7 @@ function Template(clazz, name, ...)
 	local list = {}
 	local len = select("#", ...)
 	for i = 1, len, 1 do
-		local info = select(i, ...)
-		list[i] = info
+		list[i] = select(i, ...)
 	end
 	template.__element = list
 	setmetatable(template, __class_mt)

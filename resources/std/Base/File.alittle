@@ -39,10 +39,10 @@ public class NormalFileSaver : public IFileSaver
 }
 
 // 获取当前路径
-public static File_GetCurrentPath() : string { return __CPPAPIlfs.currentdir(); }
+public static File_GetCurrentPath() : string { return lua.lfs.currentdir(); }
 
 // 设置当前路径
-public static File_SetCurrentPath(string path) : bool { return __CPPAPIlfs.chdir(path); }
+public static File_SetCurrentPath(string path) : bool { return lua.lfs.chdir(path); }
 
 // 重命名文件
 public static File_RenameFile(string path, string new_path) : bool { return os.rename(path, new_path); }
@@ -51,21 +51,19 @@ public static File_RenameFile(string path, string new_path) : bool { return os.r
 public static File_DeleteFile(string path) : bool { return os.remove(path); }
 
 // 获取文件属性
-public static File_GetFileAttr(string path) : FileAttr { return __CPPAPIlfs.attributes(path); }
+public static File_GetFileAttr(string path) : lua.fileattr { return lua.lfs.attributes(path); }
 
 // 遍历目录文件
-public static File_IteratorDir(string path) : any { return __CPPAPIlfs.dir(path); }
+public static File_IteratorDir(string path) : Functor<(string,string)>, string, string { return lua.lfs.dir(path); }
 
 // 获取某个目录以及子目录下的所有文件属性
-public static File_GetFileAttrByDir(string path, Map<string, FileAttr> file_map) : Map<string, FileAttr>
+public static File_GetFileAttrByDir(string path, Map<string, lua.fileattr> file_map) : Map<string, lua.fileattr>
 {
     // 初始化参数
     if (file_map == null)
-        file_map = new Map<string, FileAttr>();
+        file_map = new Map<string, lua.fileattr>();
     // 遍历路径
-    any dir_next = __CPPAPIlfs.dir(path);
-    any key, string file = next(dir_next);
-    while (file != null)
+    for (string file in lua.lfs.dir(path))
     {
         // 跳过当前目录，父级目录
         if (file != "." && file != "..")
@@ -73,7 +71,7 @@ public static File_GetFileAttrByDir(string path, Map<string, FileAttr> file_map)
             // 生成文件目录
             string file_path = path .. "/" .. file;
             // 获取文件属性
-            FileAttr attr = __CPPAPIlfs.attributes(file_path);
+            lua.fileattr attr = lua.lfs.attributes(file_path);
             // 如果是目录，那么就递归遍历
             if (attr.mode == "directory")
                 File_GetFileAttrByDir(file_path, file_map);
@@ -81,15 +79,13 @@ public static File_GetFileAttrByDir(string path, Map<string, FileAttr> file_map)
             else
                 file_map[file_path] = attr;
         }
-
-        key, file = next(dir_next, key);
     }
     // 返回结果
     return file_map;
 }
 
 // 删除文件夹(只对空文件夹有效)
-public static File_DeleteDir(string path) : bool { return __CPPAPIlfs.rmdir(path); }
+public static File_DeleteDir(string path) : bool { return lua.lfs.rmdir(path); }
 
 // 深度删除文件夹
 public static File_DeleteDeepDir(string path, bool log_path)
@@ -101,9 +97,7 @@ public static File_DeleteDeepDir(string path, bool log_path)
         return;
 
     // 遍历文件夹
-    any dir_next = __CPPAPIlfs.dir(path);
-    any key, string file = next(dir_next);
-    while (file != null)
+    for (string file in lua.lfs.dir(path))
     {
         // 跳过当前目录，父级目录
         if (file != "." && file != "..")
@@ -111,7 +105,7 @@ public static File_DeleteDeepDir(string path, bool log_path)
             // 生成文件目录
             string file_path = path .. "/" .. file;
             // 获取文件属性
-            FileAttr attr = __CPPAPIlfs.attributes(file_path);
+            lua.fileattr attr = lua.lfs.attributes(file_path);
             // 如果是目录，那么就递归删除文件夹
             if (attr.mode == "directory")
                 File_DeleteDeepDir(file_path, log_path);
@@ -123,15 +117,13 @@ public static File_DeleteDeepDir(string path, bool log_path)
                     Log("delete file:", file_path);
             }
         }
-
-        key, file = next(dir_next, key);
     }
     // 删除文件夹
     File_DeleteDir(path);
 }
 
 // 创建文件夹
-public static File_MakeDir(string path) : bool { return __CPPAPIlfs.mkdir(path); }
+public static File_MakeDir(string path) : bool { return lua.lfs.mkdir(path); }
 
 // 深度创建文件夹
 public static File_MakeDeepDir(string path)
@@ -145,7 +137,7 @@ public static File_MakeDeepDir(string path)
         // 计算当前要创建的路径
         cur_path = cur_path .. sub_path;
         // 创建路径
-        __CPPAPIlfs.mkdir(cur_path);
+        lua.lfs.mkdir(cur_path);
         // 添加分隔符
         cur_path = cur_path .. "/";
     }

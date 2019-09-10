@@ -42,11 +42,11 @@ function NormalFileSaver:Save(file_path, content)
 end
 
 function File_GetCurrentPath()
-	return __CPPAPIlfs.currentdir()
+	return lfs.currentdir()
 end
 
 function File_SetCurrentPath(path)
-	return __CPPAPIlfs.chdir(path)
+	return lfs.chdir(path)
 end
 
 function File_RenameFile(path, new_path)
@@ -58,36 +58,33 @@ function File_DeleteFile(path)
 end
 
 function File_GetFileAttr(path)
-	return __CPPAPIlfs.attributes(path)
+	return lfs.attributes(path)
 end
 
 function File_IteratorDir(path)
-	return __CPPAPIlfs.dir(path)
+	return lfs.dir(path)
 end
 
 function File_GetFileAttrByDir(path, file_map)
 	if file_map == nil then
 		file_map = {}
 	end
-	local dir_next = __CPPAPIlfs.dir(path)
-	local key, file = next(dir_next)
-	while file ~= nil do
+	for file in lfs.dir(path) do
 		if file ~= "." and file ~= ".." then
 			local file_path = path .. "/" .. file
-			local attr = __CPPAPIlfs.attributes(file_path)
+			local attr = lfs.attributes(file_path)
 			if attr.mode == "directory" then
 				File_GetFileAttrByDir(file_path, file_map)
 			else
 				file_map[file_path] = attr
 			end
 		end
-		key, file = next(dir_next, key)
 	end
 	return file_map
 end
 
 function File_DeleteDir(path)
-	return __CPPAPIlfs.rmdir(path)
+	return lfs.rmdir(path)
 end
 
 function File_DeleteDeepDir(path, log_path)
@@ -97,12 +94,10 @@ function File_DeleteDeepDir(path, log_path)
 	if File_GetFileAttr(path) == nil then
 		return
 	end
-	local dir_next = __CPPAPIlfs.dir(path)
-	local key, file = next(dir_next)
-	while file ~= nil do
+	for file in lfs.dir(path) do
 		if file ~= "." and file ~= ".." then
 			local file_path = path .. "/" .. file
-			local attr = __CPPAPIlfs.attributes(file_path)
+			local attr = lfs.attributes(file_path)
 			if attr.mode == "directory" then
 				File_DeleteDeepDir(file_path, log_path)
 			else
@@ -112,13 +107,12 @@ function File_DeleteDeepDir(path, log_path)
 				end
 			end
 		end
-		key, file = next(dir_next, key)
 	end
 	File_DeleteDir(path)
 end
 
 function File_MakeDir(path)
-	return __CPPAPIlfs.mkdir(path)
+	return lfs.mkdir(path)
 end
 
 function File_MakeDeepDir(path)
@@ -126,7 +120,7 @@ function File_MakeDeepDir(path)
 	local cur_path = ""
 	for index, sub_path in ___ipairs(path_list) do
 		cur_path = cur_path .. sub_path
-		__CPPAPIlfs.mkdir(cur_path)
+		lfs.mkdir(cur_path)
 		cur_path = cur_path .. "/"
 	end
 end

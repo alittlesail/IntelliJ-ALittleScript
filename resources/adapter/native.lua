@@ -1,5 +1,5 @@
 
-module("ALittleScript", package.seeall)
+module("ALittle", package.seeall)
 
 io = io
 bit = bit
@@ -36,7 +36,7 @@ local __os = os
 os = {}
 os.clock = __os.clock
 os.date = function(value, time)
-    if (value == "*t") return nil end
+    if (value == "*t") then return nil end
     return __os.date(value, time)
 end
 os.dateinfo = function(time)

@@ -16,7 +16,7 @@ function ConfigSystem:Ctor(file_path)
 	if content == nil then
 		return
 	end
-	local error, json_content = pcall(Json.decode, content)
+	local error, json_content = pcall(json.decode, content)
 	if error ~= nil then
 		Log("Json Decode failed." .. file_path .. ", " .. error)
 		return
@@ -62,9 +62,9 @@ end
 
 function ConfigSystem:SaveConfig()
 	local file = self.__class.__element[2]()
-	if not file:Save(self._file_path, Json.encode(self._config_map)) then
+	if not file:Save(self._file_path, json.encode(self._config_map)) then
 		Log("Save Congig Failed.", self._file_path)
 	end
 end
 
-NormalConfigSystem = Template(ConfigSystem, "ALittle.ConfigSystem<ALittle.NormalFileLoader,ALittle.NormalFileSaver>", ALittle.NormalFileLoader, ALittle.NormalFileSaver);
+NormalConfigSystem = Template(ConfigSystem, "ALittle.ConfigSystem<ALittle.NormalFileLoader,ALittle.NormalFileSaver>", NormalFileLoader, NormalFileSaver);

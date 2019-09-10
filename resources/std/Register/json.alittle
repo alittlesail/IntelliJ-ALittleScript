@@ -1,7 +1,7 @@
 
-register namespace ALittle;
+register namespace lua;
 
-protected class Json
+public class json
 {
     public static encode(any table) : string {}
     public static decode(string value) : any {}
