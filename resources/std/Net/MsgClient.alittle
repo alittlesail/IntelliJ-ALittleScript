@@ -47,15 +47,16 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
     private int _last_recv_time;
     private SafeIDCreator _id_creator;
     private Map<int, MsgClientRPCInfo> _id_map_rpc;
+    private Functor<()> _callback;
 
-    private Functor<(IMsgClient)> _connect_succeed_callback;
-    private Functor<(IMsgClient)> _connect_failed_callback;
-    private Functor<(IMsgClient)> _disconnected_callback;
+    private string _ip;
+    private int _port;
+    private thread _co;
 
-    // @param protocol 协议对象
     // @param heartbeat 心跳间隔时间(秒)
     // @param check_heartbeat 检测心跳是否有接受到回复
-    public Ctor(int heartbeat, bool check_heartbeat)
+    // @param callback 断开连接的回调
+    public Ctor(int heartbeat, bool check_heartbeat, Functor<()> callback)
     {
         // 创建客户端对象
         this._interface = new MI();
@@ -73,22 +74,27 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         this._id_map_rpc = new Map<int, MsgClientRPCInfo>();
 
         // 连接回调
-        this._connect_succeed_callback = null;
-        this._connect_failed_callback = null;
-        this._disconnected_callback = null;
+        this._callback = callback;
     }
 
-    public set connect_succeed_callback(Functor<(IMsgClient)> value) { this._connect_succeed_callback = value; }
-    public set connect_failed_callback(Functor<(IMsgClient)> value) { this._connect_failed_callback = value; }
-    public set disconnected_callback(Functor<(IMsgClient)> value) { this._disconnected_callback = value; }
-
     // 连接ip对象，ip也可以是域名
-    public fun Connect(string ip, int port)
+    public await fun Connect(string ip, int port) : string
     {
-        // 开始连接
-        this._interface.Connect(ip, port);
+        thread co = coroutine.running();
+        if (co == null)
+            return "当前不是协程";
+
+        this._co = co;
         // 注册到MsgSystem
         __MsgClientMap[this._interface.GetID()] = this;
+
+        this._ip = ip;
+        this._port = port;
+        // 开始连接
+        this._interface.Connect(ip, port);
+
+        // 协程挂起，并等待返回值
+        return yield;
     }
 
     // 判断是否已经连接成功
@@ -106,9 +112,10 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         this.SendHeartbeat();
         // 启动定时心跳
         this.StartHeartbeat();
-        // 通知逻辑
-        if (this._connect_succeed_callback != null)
-            this._connect_succeed_callback(this);
+
+        // 返回协程
+        __MsgClientMap[this._interface.GetID()] = null;
+        assert(coroutine.resume(this._co, null));
     }
 
     // 断开连接
@@ -118,16 +125,17 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         __MsgClientMap[this._interface.GetID()] = null;
 
         this.ClearRPC("连接断开了");
-        if (this._disconnected_callback != null)
-            this._disconnected_callback(this);
+        if (this._callback != null)
+            this._callback();
     }
 
     // 客户端链接服务端，失败
-    public fun HandleConnectFailed()
+    public fun HandleConnectFailed(string error)
     {
+        // 返回协程
         __MsgClientMap[this._interface.GetID()] = null;
-        if (this._connect_failed_callback != null)
-            this._connect_failed_callback(this);
+        if (error == null) error = this._ip..":"..this._port.."连接失败";
+        assert(coroutine.resume(this._co, error));
     }
 
     // 消息读取
@@ -360,8 +368,8 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
             // 主动关闭连接
             this.Close("心跳检测失败，主动断开连接");
             // 调用断开连接回调
-            if (this._disconnected_callback != null)
-            this._disconnected_callback(this);
+            if (this._callback != null)
+                this._callback();
         }
     }
 

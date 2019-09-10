@@ -38,7 +38,7 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
         String text = protoModifier.getText();
 
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        if (!text.equals("@Msg") || globalMethodDec.getMethodReturnDec() == null) {
+        if (!(text.equals("@Msg") && globalMethodDec.getMethodReturnDec() == null)) {
             guessList.add(ALittleReferenceUtil.sStringGuessTypeInfo);
         }
         guessList.addAll(guessInfo.functorReturnList);

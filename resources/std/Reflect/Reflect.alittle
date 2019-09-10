@@ -9,9 +9,8 @@ public struct ReflectInfo
     List<string> type_list;      // 变量类型列表
 }
 
-public struct ErrorJson
+public struct EmptyJson
 {
-    string error;
 }
 
 private auto __all_name_reflect = new Map<string, ReflectInfo>();

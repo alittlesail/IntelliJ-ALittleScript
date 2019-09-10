@@ -63,7 +63,7 @@ end
 local __all_callback = {}
 local __all_return_id = {}
 table.setweak(__all_callback, false, true)
-function RegMessageCallback(msg_id, callback, return_id)
+function RegMsgCallback(msg_id, callback, return_id)
 	if __all_callback[msg_id] ~= nil then
 		Error("RegMessageCallback消息回调函数注册失败，名字为" .. msg_id .. "已存在")
 		return

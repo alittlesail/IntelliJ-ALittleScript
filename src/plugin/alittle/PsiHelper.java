@@ -34,7 +34,7 @@ public class PsiHelper {
         int step = (l >> 5) + 1;
 
         for (int i=l; i >= step; i-=step) {
-            h = h ^ (h << 5 + bytes[i-1] + h >> 2);
+            h = h ^ ((h << 5) + bytes[i-1] + (h >> 2));
         }
         return h;
     }

@@ -21,6 +21,7 @@ import plugin.generate.ALittleGenerateLua;
 import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleFile;
+import plugin.reference.ALittleReferenceUtil;
 
 public class ALittleInitComponent implements BaseComponent {
     private boolean USED = false;
@@ -61,8 +62,12 @@ public class ALittleInitComponent implements BaseComponent {
                                 ALittleGenerateLua lua = new ALittleGenerateLua();
                                 try {
                                     lua.GenerateLua((ALittleFile) psiFile, false);
+                                } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+                                    System.out.println(psiFile.getName() + ":生成lua代码失败:" + e.getError());
+                                    e.printStackTrace();
                                 } catch (Exception e) {
                                     System.out.println(psiFile.getName() + ":生成lua代码失败:" + e.getMessage());
+                                    e.printStackTrace();
                                     break;
                                 }
                                 System.out.println(psiFile.getName() + ":生成lua代码成功");

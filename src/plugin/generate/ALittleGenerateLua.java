@@ -245,17 +245,22 @@ public class ALittleGenerateLua {
         // 自定义类型
         ALittleCustomType customType = opNewStat.getCustomType();
         if (customType != null) {
-            String content = GenerateCustomType(customType);
-            content += "(";
-            List<String> paramList = new ArrayList<>();
-            List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
-            for (ALittleValueStat valueStat : valueStatList) {
-                paramList.add(GenerateValueStat(valueStat));
-            }
-            content += String.join(", ", paramList);
+            ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
+            if (guessType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
+                return "{}";
+            } else {
+                String content = GenerateCustomType(customType);
+                content += "(";
+                List<String> paramList = new ArrayList<>();
+                List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
+                for (ALittleValueStat valueStat : valueStatList) {
+                    paramList.add(GenerateValueStat(valueStat));
+                }
+                content += String.join(", ", paramList);
 
-            content += ")";
-            return content;
+                content += ")";
+                return content;
+            }
         }
 
         throw new Exception("new 未知类型");
@@ -1875,16 +1880,21 @@ public class ALittleGenerateLua {
         if (protoModifier != null) {
             String text = protoModifier.getText();
 
-            if (paramDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有两个参数");
+            if (paramDec == null) throw new Exception("带" + text + "的全局函数，必须有两个参数");
             List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
-            if (oneDecList.size() != 2) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有两个参数");
+            if (oneDecList.size() != 2) throw new Exception("带" + text + "的全局函数，必须有两个参数");
             ALittleReferenceUtil.GuessTypeInfo guess_param = oneDecList.get(1).getAllType().guessType();
 
+            List<ALittleAllType> returnList = new ArrayList<>();
             ALittleMethodReturnDec returnDec = root.getMethodReturnDec();
-            if (returnDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有返回值");
-            List<ALittleAllType> returnList = returnDec.getAllTypeList();
-            if (returnList.size() != 1) throw new ALittleReferenceUtil.ALittleReferenceException(root, "带" + text + "的全局函数，必须有一个返回值");
-            ALittleReferenceUtil.GuessTypeInfo guess_return = returnList.get(0).guessType();
+            if (returnDec != null) {
+                returnList = returnDec.getAllTypeList();
+            }
+            if (returnList.size() > 1) throw new Exception("带" + text + "的全局函数，最多只能有一个返回值");
+            ALittleReferenceUtil.GuessTypeInfo guess_return = null;
+            if (returnList.size() == 1) {
+                guess_return = returnList.get(0).guessType();
+            }
 
             if (text.equals("@Http") || text.equals("@HttpDownload")) {
                 content.append(preTab)
@@ -1903,6 +1913,10 @@ public class ALittleGenerateLua {
                         .append(methodName)
                         .append(")\n");
             } else if (text.equals("@Msg")) {
+                String msg_id = "nil";
+                if (guess_return != null) {
+                    msg_id = "" + PsiHelper.JSHash(guess_return.value);
+                }
                 content.append(preTab)
                         .append(namespacePre)
                         .append("RegMsgCallback(")
@@ -1910,11 +1924,13 @@ public class ALittleGenerateLua {
                         .append(", ")
                         .append(methodName)
                         .append(", ")
-                        .append(PsiHelper.JSHash(guess_return.value))
+                        .append(msg_id)
                         .append(")\n");
 
                 GenerateReflectStructInfo(guess_param);
-                GenerateReflectStructInfo(guess_return);
+                if (guess_return != null) {
+                    GenerateReflectStructInfo(guess_return);
+                }
             }
         }
 

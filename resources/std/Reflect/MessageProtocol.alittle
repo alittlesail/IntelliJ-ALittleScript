@@ -54,7 +54,7 @@ protected struct ProtocolInvokeInfo
 private Map<int, Functor<(IMsgClient, any) : any>> __all_callback = new Map<int, Functor<(IMsgClient, any) : any>>();
 private Map<int, int> __all_return_id = new Map<int, int>();
 table.setweak(__all_callback, false, true);
-protected static RegMessageCallback(int msg_id, Functor<(IMsgClient, any) : any> callback, int return_id)
+protected static RegMsgCallback(int msg_id, Functor<(IMsgClient, any) : any> callback, int return_id)
 {
     if (__all_callback[msg_id] != null)
     {
