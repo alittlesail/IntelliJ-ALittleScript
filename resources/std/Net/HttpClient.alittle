@@ -10,6 +10,8 @@ public class IHttpClient
     protected await static Invoke(string method, IHttpClient client, any content) : string, any { return client.SendRPC(method, content); }
 }
 
+//客户端部分//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // 连接对象
 public class IHttpInterface
 {
@@ -20,26 +22,9 @@ public class IHttpInterface
     public fun GetResponse() : string {}
 }
 
-// 短连接所有的对象集合
+// 短连接所有的对象集合，提供客户端使用
 private Map<int, IHttpClient> __HttpClientMap = new Map<int, IHttpClient>();
 public static FindHttpClient(int id) : IHttpClient { return __HttpClientMap[id]; }
-
-private Map<string, Functor<(IHttpClient, any):any>> __all_callback = new Map<string, Functor<(IHttpClient, any):any>>();
-table.setweak(__all_callback, false, true);
-protected static RegHttpCallback(string method, Functor<(IHttpClient, any):any> callback)
-{
-    if (__all_callback[method] != null)
-    {
-        Error("RegHttpCallback消息回调函数注册失败，名字为"..method.."已存在");
-        return;
-    }
-    __all_callback[method] = callback;
-}
-// 获取回调函数
-public static FindHttpCallback(string method) : Functor<(IHttpClient, any):any>
-{
-    return __all_callback[method];
-}
 
 public class HttpClient<HC : IHttpInterface> : public IHttpClient
 {
@@ -83,8 +68,18 @@ public class HttpClient<HC : IHttpInterface> : public IHttpClient
     public fun HandleSucceed()
     {
         __HttpClientMap[this._interface.GetID()] = null;
-        auto error, auto param = pcall(lua.json.decode, this._interface.GetResponse());
-        assert(coroutine.resume(this._co, error, param));
+        auto error, Map<string, any> param = pcall(lua.json.decode, this._interface.GetResponse());
+        if (error != null)
+        {
+            assert(coroutine.resume(this._co, error, null));
+            return;
+        }
+        if (param["error"] != null)
+        {
+            assert(coroutine.resume(this._co, param["error"], null));
+            return;
+        }
+        assert(coroutine.resume(this._co, null, param));
     }
 
     public fun HandleFailed(string reason)
@@ -94,3 +89,38 @@ public class HttpClient<HC : IHttpInterface> : public IHttpClient
     }
 }
 
+//服务器部分//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+private auto __all_callback = new Map<string, Functor<await(IHttpClient, any):any>>();
+table.setweak(__all_callback, false, true);
+protected static RegHttpCallback(string method, Functor<await(IHttpClient, any):any> callback)
+{
+    if (__all_callback[method] != null)
+    {
+        Error("RegHttpCallback消息回调函数注册失败，名字为"..method.."已存在");
+        return;
+    }
+    __all_callback[method] = callback;
+}
+// 获取回调函数
+public static FindHttpCallback(string method) : Functor<await(IHttpClient, any):any>
+{
+    return __all_callback[method];
+}
+
+private auto __all_download_callback = new Map<string, Functor<await(IHttpClient, any):string, int>>();
+table.setweak(__all_download_callback, false, true);
+protected static RegHttpDownloadCallback(string method, Functor<await(IHttpClient, any):string, int> callback)
+{
+    if (__all_download_callback[method] != null)
+    {
+        Error("RegHttpDownloadCallback消息回调函数注册失败，名字为"..method.."已存在");
+        return;
+    }
+    __all_download_callback[method] = callback;
+}
+// 获取回调函数
+public static FindHttpDownloadCallback(string method) : Functor<await(IHttpClient, any):string, int>
+{
+    return __all_download_callback[method];
+}

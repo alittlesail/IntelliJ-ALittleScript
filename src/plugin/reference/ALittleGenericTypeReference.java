@@ -54,6 +54,10 @@ public class ALittleGenericTypeReference extends ALittleReference<ALittleGeneric
             info.functorParamList = new ArrayList<>();
             info.functorParamNameList = new ArrayList<>();
             info.functorReturnList = new ArrayList<>();
+            info.functorAwait = (dec.getCoModifier() != null && dec.getCoModifier().getText().equals("await"));
+            if (info.functorAwait) {
+                info.value = "Functor<await(";
+            }
 
             if (paramType != null) {
                 List<String> nameList = new ArrayList<>();

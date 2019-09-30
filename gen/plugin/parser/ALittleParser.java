@@ -1227,32 +1227,41 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Functor LESS LPAREN genericFunctorParamType? RPAREN genericFunctorReturnType? GREATER
+  // Functor LESS coModifier? LPAREN genericFunctorParamType? RPAREN genericFunctorReturnType? GREATER
   public static boolean genericFunctorType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "genericFunctorType")) return false;
     if (!nextTokenIs(b, FUNCTOR)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, GENERIC_FUNCTOR_TYPE, null);
-    r = consumeTokens(b, 1, FUNCTOR, LESS, LPAREN);
+    r = consumeTokens(b, 1, FUNCTOR, LESS);
     p = r; // pin = 1
-    r = r && report_error_(b, genericFunctorType_3(b, l + 1));
+    r = r && report_error_(b, genericFunctorType_2(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, LPAREN)) && r;
+    r = p && report_error_(b, genericFunctorType_4(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, RPAREN)) && r;
-    r = p && report_error_(b, genericFunctorType_5(b, l + 1)) && r;
+    r = p && report_error_(b, genericFunctorType_6(b, l + 1)) && r;
     r = p && consumeToken(b, GREATER) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
+  // coModifier?
+  private static boolean genericFunctorType_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorType_2")) return false;
+    coModifier(b, l + 1);
+    return true;
+  }
+
   // genericFunctorParamType?
-  private static boolean genericFunctorType_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "genericFunctorType_3")) return false;
+  private static boolean genericFunctorType_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorType_4")) return false;
     genericFunctorParamType(b, l + 1);
     return true;
   }
 
   // genericFunctorReturnType?
-  private static boolean genericFunctorType_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "genericFunctorType_5")) return false;
+  private static boolean genericFunctorType_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorType_6")) return false;
     genericFunctorReturnType(b, l + 1);
     return true;
   }

@@ -31,6 +31,12 @@ public class ALittleGenericFunctorTypeImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
+  public ALittleCoModifier getCoModifier() {
+    return findChildByClass(ALittleCoModifier.class);
+  }
+
+  @Override
+  @Nullable
   public ALittleGenericFunctorParamType getGenericFunctorParamType() {
     return findChildByClass(ALittleGenericFunctorParamType.class);
   }

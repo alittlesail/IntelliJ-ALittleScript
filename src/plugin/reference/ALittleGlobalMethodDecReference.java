@@ -66,6 +66,9 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
         checkStructExtends(oneDecList.get(1), (ALittleStructDec) paramGuessList.get(1).element);
 
         if (text.equals("@Http")) {
+            if (myElement.getCoModifier() == null || !myElement.getCoModifier().getText().equals("await"))
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，必须使用await修饰");
+
             if (returnGuessList.size() != 1) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，必须有一个返回值");
             // 第一个参数
             if (!paramGuessList.get(0).value.equals("ALittle.IHttpClient"))
@@ -76,11 +79,19 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
                 throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，返回值必须是struct");
             checkStructExtends(returnList.get(0), (ALittleStructDec) returnGuessList.get(0).element);
         } else if (text.equals("@HttpDownload")) {
-            if (!returnGuessList.isEmpty()) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，不能有返回值");
+            if (myElement.getCoModifier() == null || !myElement.getCoModifier().getText().equals("await"))
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，必须使用await修饰");
+
+            if (returnGuessList.size() != 2) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，必须有两个返回值，一个是string，一个是int");
+            if (!returnGuessList.get(0).value.equals("string")) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，第一个参数必须是string");
+            if (!returnGuessList.get(1).value.equals("int")) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，第二个参数必须是int");
             // 第一个参数
             if (!paramGuessList.get(0).value.equals("ALittle.IHttpFileClient"))
                 throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpFileClient");
         } else if (text.equals("@HttpUpload")) {
+            if (myElement.getCoModifier() == null || !myElement.getCoModifier().getText().equals("await"))
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，必须使用await修饰");
+
             if (returnGuessList.size() != 1) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，必须有一个返回值");
             // 第一个参数
             if (!paramGuessList.get(0).value.equals("ALittle.IHttpFileClient"))

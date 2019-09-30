@@ -1901,10 +1901,18 @@ public class ALittleGenerateLua {
                 guess_return = returnList.get(0).guessType();
             }
 
-            if (text.equals("@Http") || text.equals("@HttpDownload")) {
+            if (text.equals("@Http")) {
                 content.append(preTab)
                         .append(namespacePre)
                         .append("RegHttpCallback(\"")
+                        .append(guess_param.value)
+                        .append("\", ")
+                        .append(methodName)
+                        .append(")\n");
+            } else if (text.equals("@HttpDownload")) {
+                content.append(preTab)
+                        .append(namespacePre)
+                        .append("RegHttpDownloadCallback(\"")
                         .append(guess_param.value)
                         .append("\", ")
                         .append(methodName)

@@ -11,6 +11,9 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 public interface ALittleGenericFunctorType extends PsiElement {
 
   @Nullable
+  ALittleCoModifier getCoModifier();
+
+  @Nullable
   ALittleGenericFunctorParamType getGenericFunctorParamType();
 
   @Nullable

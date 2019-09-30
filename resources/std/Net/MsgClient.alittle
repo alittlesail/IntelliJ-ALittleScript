@@ -13,6 +13,8 @@ public class IMsgClient
     protected await static InvokeRPC(int msg_id, IMsgClient client, any msg_body) : string, any { return client.SendRPC(msg_id, msg_body); }
 }
 
+//客户端部分//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // 连接对象
 public class IMsgInterface
 {
@@ -30,7 +32,7 @@ struct MsgClientRPCInfo
     thread co;
 }
 
-// 长连接所有的对象集合
+// 长连接所有的对象集合，提供客户端使用
 private Map<int, IMsgClient> __MsgClientMap = new Map<int, IMsgClient>();
 public static FindMsgClient(int id) : IMsgClient { return __MsgClientMap[id]; }
 
@@ -452,3 +454,5 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         this._heartbeat_loop = null;
     }
 }
+
+//服务器部分///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
