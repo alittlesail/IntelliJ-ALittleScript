@@ -60,22 +60,6 @@ end
 function IMessageReadFactory:GetReadSize()
 end
 
-local __all_callback = {}
-local __all_return_id = {}
-table.setweak(__all_callback, false, true)
-function RegMsgCallback(msg_id, callback, return_id)
-	if __all_callback[msg_id] ~= nil then
-		Error("RegMessageCallback消息回调函数注册失败，名字为" .. msg_id .. "已存在")
-		return
-	end
-	__all_callback[msg_id] = callback
-	__all_return_id[msg_id] = return_id
-end
-
-function FindMessageCallback(msg_id)
-	return __all_callback[msg_id], __all_return_id[msg_id]
-end
-
 local PS_WriteBool
 PS_WriteBool = function(factory, var_info, var_value)
 	if var_value == nil then

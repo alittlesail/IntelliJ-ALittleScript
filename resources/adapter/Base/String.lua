@@ -229,3 +229,32 @@ function String_Replace(content, old_split, new_split)
 	return String_Join(list, new_split)
 end
 
+function String_HttpAnalysisValueMap(param, content)
+	local value_map = {}
+	local param_split_list = ALittle.String_Split(param, "&")
+	for index, param_content in ___ipairs(param_split_list) do
+		local value_split_list = ALittle.String_Split(param_content, "=")
+		if ALittle.table.maxn(value_split_list) == 2 then
+			if ALittle.String.sub(value_split_list[2], 1, 1) == "\"" and ALittle.String.sub(value_split_list[2], -1, -1) == "\"" then
+				value_map[value_split_list[1]] = ALittle.String.sub(value_split_list[2], 2, -2)
+			else
+				local number = ALittle.tonumber(value_split_list[2])
+				if number == nil then
+					value_map[value_split_list[1]] = value_split_list[2]
+				else
+					value_map[value_split_list[1]] = number
+				end
+			end
+		end
+	end
+	if ALittle.String.len(content) > 0 then
+		local error, value = pcall(json.decode, content)
+		if error ~= nil then
+			for k, v in ___pairs(value) do
+				value_map[k] = v
+			end
+		end
+	end
+	return value_map
+end
+

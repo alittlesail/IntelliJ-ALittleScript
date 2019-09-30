@@ -74,7 +74,7 @@ accessModifier ::= public | private | protected
 // 协程修饰符
 coModifier ::= async | await
 // 协议修饰符
-protoModifier ::= HTTP | HTTP_DOWNLOAD | HTTP_UPLOAD_BEGIN | HTTP_UPLOAD_END |  MSG
+protoModifier ::= HTTP | HTTP_DOWNLOAD | HTTP_UPLOAD |  MSG
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 命名域

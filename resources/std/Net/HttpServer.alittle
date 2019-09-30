@@ -1,0 +1,58 @@
+namespace ALittle;
+
+private auto __all_callback = new Map<string, Functor<await(IHttpClient, any):any>>();
+table.setweak(__all_callback, false, true);
+protected static RegHttpCallback(string method, Functor<await(IHttpClient, any):any> callback)
+{
+    if (__all_callback[method] != null)
+    {
+        Error("RegHttpCallback消息回调函数注册失败，名字为"..method.."已存在");
+        return;
+    }
+    __all_callback[method] = callback;
+}
+// 获取回调函数
+public static FindHttpCallback(string method) : Functor<await(IHttpClient, any):any>
+{
+    return __all_callback[method];
+}
+
+private auto __all_download_callback = new Map<string, Functor<await(IHttpClient, any):string, int>>();
+table.setweak(__all_download_callback, false, true);
+protected static RegHttpDownloadCallback(string method, Functor<await(IHttpClient, any):string, int> callback)
+{
+    if (__all_download_callback[method] != null)
+    {
+        Error("RegHttpDownloadCallback消息回调函数注册失败，名字为"..method.."已存在");
+        return;
+    }
+    __all_download_callback[method] = callback;
+}
+// 获取回调函数
+public static FindHttpDownloadCallback(string method) : Functor<await(IHttpClient, any):string, int>
+{
+    return __all_download_callback[method];
+}
+
+public class IHttpServerInterface
+{
+    public fun Close(int http_id) {}
+    public fun SendString(int http_id, string content) {}
+    public fun SendFile(int http_id, string file_path, int start_size) {}
+}
+
+public class HttpServer<HSI : IHttpServerInterface> : public ALittle.IHttpClient
+{
+    private int _http_id;
+    private HSI _interface;
+
+    public Ctor(int http_id)
+    {
+        this._http_id = http_id;
+        this._interface = new HSI();
+    }
+
+    public fun Close() { this._interface.Close(this._http_id); }
+    public fun SendString(string content) { this._interface.SendString(this._http_id, content); }
+    public fun SendFile(string file_path, int start_size) { this._interface.SendFile(this._http_id, file_path, start_size); }
+}

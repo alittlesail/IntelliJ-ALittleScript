@@ -50,26 +50,6 @@ protected struct ProtocolInvokeInfo
     List<ProtocolInvokeInfo> handle;
 }
 
-// 注册回调函数
-private Map<int, Functor<(IMsgClient, any) : any>> __all_callback = new Map<int, Functor<(IMsgClient, any) : any>>();
-private Map<int, int> __all_return_id = new Map<int, int>();
-table.setweak(__all_callback, false, true);
-protected static RegMsgCallback(int msg_id, Functor<(IMsgClient, any) : any> callback, int return_id)
-{
-    if (__all_callback[msg_id] != null)
-    {
-        Error("RegMessageCallback消息回调函数注册失败，名字为"..msg_id.."已存在");
-        return;
-    }
-    __all_callback[msg_id] = callback;
-    __all_return_id[msg_id] = return_id;
-}
-// 获取回调函数
-public static FindMessageCallback(int msg_id) : Functor<(IMsgClient, any) : any>, int
-{
-    return __all_callback[msg_id], __all_return_id[msg_id];
-}
-
 //序列化部分////////////////////////////////////////////////////////////////////////////////////////////////////////////-
 
 private static PS_WriteBool(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, bool var_value) : int

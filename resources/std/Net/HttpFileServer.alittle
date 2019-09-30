@@ -1,0 +1,71 @@
+
+namespace ALittle;
+
+private auto __all_callback = new Map<string, Functor<await(IHttpFileClient, any):any>>();
+table.setweak(__all_callback, false, true);
+protected static RegHttpFileCallback(string method, Functor<await(IHttpFileClient, any):any> callback)
+{
+    if (__all_callback[method] != null)
+    {
+        Error("RegHttpFileCallback消息回调函数注册失败，名字为"..method.."已存在");
+        return;
+    }
+    __all_callback[method] = callback;
+}
+// 获取回调函数
+public static FindHttpFileCallback(string method) : Functor<await(IHttpFileClient, any):any>
+{
+    return __all_callback[method];
+}
+
+public class IHttpFileServerInterface
+{
+    public fun Close(int http_id) {}
+    public fun SendString(int http_id, string content) {}
+    public fun StartReceiveFile(int http_id, string file_path, int start_size) : bool {}
+}
+
+public class HttpFileServer<HFSI : IHttpFileServerInterface> : public ALittle.IHttpFileClient
+{
+    private int _http_id;
+    private thread _co;
+    private string _file_path;
+    private HFSI _interface;
+
+    private bool _invoked;
+
+    public Ctor(int http_id, thread co)
+    {
+        this._http_id = http_id;
+        this._co = co;
+        this._invoked = false;
+        this._interface = new HFSI();
+    }
+
+    public await fun StartReceiveFile(string file_path, int start_size) : bool
+    {
+        if (this._invoked) return false;
+        this._invoked = true;
+
+        if (!this._interface.StartReceiveFile(this._http_id, file_path, start_size))
+            return false;
+        return yield;
+    }
+
+    public fun HandleReceiveResult(bool succeed)
+    {
+        assert(coroutine.resume(this._co, null, succeed));
+    }
+
+    public get invoked() : bool { return this._invoked; }
+
+    public fun SendString(string content)
+    {
+        this._interface.SendString(this._http_id, content);
+    }
+
+    public fun Clsoe()
+    {
+        this._interface.Close();
+    }
+}

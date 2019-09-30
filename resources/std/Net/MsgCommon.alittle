@@ -1,0 +1,267 @@
+
+namespace ALittle;
+
+// 二进制协议接口类
+public class IMsgClient
+{
+    // 提供子类继承
+    protected fun Send(int msg_id, any msg_body, int rpc_id) {}
+    protected await fun SendRPC(int msg_id, any msg_body) : string, any {}
+
+    // 提供客户端和服务器使用
+    public fun Close(string reason) {}
+
+    // 提供框架调用
+    protected static Invoke(int msg_id, IMsgClient client, any msg_body) { client.Send(msg_id, msg_body, 0); }
+    protected await static InvokeRPC(int msg_id, IMsgClient client, any msg_body) : string, any { return client.SendRPC(msg_id, msg_body); }
+}
+
+// 连接对象
+public class IMsgInterface
+{
+    public fun GetID() : int {}
+    public fun Connect(string ip, int port) {}
+    public fun IsConnected() : bool {}
+    public fun SendFactory(IMessageWriteFactory factory) {}
+    public fun Close() {}
+}
+
+// RPC结构信息
+struct MsgClientRPCInfo
+{
+    int rpc_id;
+    thread co;
+}
+
+// 用于长连接
+public class MsgCommon : public IMsgClient
+{
+    private IMsgInterface _interface;      // 网络对象
+    private IMessageWriteFactory _write_factory;     // 协议序列化对象
+    private Map<int, ProtocolInvokeInfo> _invoke_map;// 协议缓存数据
+
+    private int _last_recv_time;
+    private SafeIDCreator _id_creator;
+    private Map<int, MsgClientRPCInfo> _id_map_rpc;
+    private thread _co;
+
+    // @param heartbeat 心跳间隔时间(秒)
+    // @param check_heartbeat 检测心跳是否有接受到回复
+    // @param callback 断开连接的回调
+    public Ctor()
+    {
+        this._invoke_map = new Map<int, ProtocolInvokeInfo>();
+        this._last_recv_time = 0;
+
+        this._id_creator = new SafeIDCreator();
+        this._id_map_rpc = new Map<int, MsgClientRPCInfo>();
+    }
+
+    // 判断是否已经连接成功
+    public fun IsConnected() : bool
+    {
+        return this._interface.IsConnected();
+    }
+
+    // 消息读取
+    private fun MessageRead(IMessageReadFactory factory, int msg_id) : any
+    {
+        auto info = this._invoke_map[msg_id];
+        if (info == null)
+        {
+            auto error, auto invoke_info = pcall(CreateProtocolInvokeInfo, msg_id);
+            if (error != null)
+            {
+                Error(error);
+                return null;
+            }
+            info = invoke_info;
+            this._invoke_map[msg_id] = info;
+        }
+        return PS_ReadMessageForReceive(factory, info, factory.GetTotalSize());
+    }
+
+    // 序列化
+    public fun MessageWrite(int msg_id, any msg_body)
+    {
+        auto info = this._invoke_map[msg_id];
+        if (info == null)
+        {
+            auto error, auto invoke_info = pcall(CreateProtocolInvokeInfo, msg_id);
+            if (error != null)
+            {
+                Error(error);
+                return;
+            }
+            info = invoke_info;
+            this._invoke_map[msg_id] = info;
+        }
+        this._write_factory.ResetOffset();
+        PS_WriteMessageForSend(this._write_factory, info, msg_body);
+        this._write_factory.SetID(msg_id);
+    }
+
+    // 收到服务端发来的数据包
+    public fun HandleMessage(int id, int rpc_id, IMessageReadFactory factory)
+    {
+        // 消息id为0，心跳包返回
+        if (id == 0)
+        {
+            // 记录最后接受时间
+            this._last_recv_time = os.clock();
+            return;
+        }
+
+        // 如果是普通消息
+        if (rpc_id == 0)
+        {
+            // 获取函数对象
+            auto callback = FindMsgCallback(id);
+            if (callback == null)
+            {
+                Log("MsgSystem.HandleMessage can't find callback by id:" .. id);
+                return;
+            }
+
+            any msg = this.MessageRead(factory, id);
+            if (msg == null)
+            {
+                Log("MsgSystem.HandleMessage MessageRead failed by id:" .. id);
+                return;
+            }
+            callback(this, msg);
+            return;
+        }
+
+        // 如果rpc_id大于0，说明是对方发过来
+        if (rpc_id > 0)
+        {
+            this.HandleRPCRequest(id, rpc_id, factory);
+            return;
+        }
+
+        // 如果rpc_id小于0，说明是RPC回包
+        rpc_id = -rpc_id;
+        // 回收id
+        this._id_creator.ReleaseID(rpc_id);
+        MsgClientRPCInfo info = this._id_map_rpc[rpc_id];
+        if (info == null)
+        {
+            Log("MsgSystem.HandleMessage can't find rpc info by id:"..id);
+            return;
+        }
+        this._id_map_rpc[rpc_id] = null;
+
+        // 如果是RPC异常包
+        if (id == 1)
+        {
+            coroutine.resume(info.co, factory.ReadString());
+            return;
+        }
+
+        any msg = this.MessageRead(factory, id);
+        if (msg == null)
+        {
+            Log("MsgSystem.HandleMessage MessageRead failed by id:"..id);
+            return;
+        }
+        coroutine.resume(info.co, null, msg);
+    }
+
+    // 发送数据包
+    public fun Send(int msg_id, any msg_body, int rpc_id)
+    {
+        if (!this.IsConnected()) return;
+
+        this._write_factory.SetRpcID(rpc_id);
+        this.MessageWrite(msg_id, msg_body);
+        this._interface.SendFactory(this._write_factory);
+    }
+
+    // 发送RPC异常包
+    public fun SendRpcError(int rpc_id, string reason)
+    {
+        // 如果没有连接成功，那么直接返回
+        if (!this.IsConnected()) return;
+
+        // 发送心跳包
+        this._write_factory.ResetOffset();
+        // 设置id
+        this._write_factory.SetID(1);
+        this._write_factory.SetRpcID(-rpc_id);
+        this._write_factory.WriteString(reason);
+        this._interface.SendFactory(this._write_factory);
+    }
+
+    // 发送RPC包
+    public await fun SendRPC(int msg_id, any msg_body) : string, any
+    {
+        thread co = coroutine.running();
+        if (co == null)
+            return "当前不是协程", null;
+
+        if (!this.IsConnected())
+            return "连接还没成功", null;
+
+        int rpc_id = this._id_creator.CreateID();
+        this._write_factory.SetRpcID(rpc_id);
+        this.MessageWrite(msg_id, msg_body);
+        this._interface.SendFactory(this._write_factory);
+
+        MsgClientRPCInfo info = new MsgClientRPCInfo();
+        info.co = co;
+        info.rpc_id = rpc_id;
+        this._id_map_rpc[rpc_id] = info;
+        // 协程挂起，并等待返回值
+        return yield;
+    }
+
+    // 处理RPC请求
+    private async fun HandleRPCRequest(int id, int rpc_id, IMessageReadFactory factory)
+    {
+        // 获取函数对象
+        auto callback, int return_id = FindMsgRpcCallback(id);
+        if (callback == null)
+        {
+            this.SendRpcError(rpc_id, "没有注册消息RPC回调函数");
+            Log("MsgSystem.HandleMessage can't find callback by id:"..id);
+            return;
+        }
+
+        any msg = this.MessageRead(factory, id);
+        if (msg == null)
+        {
+            Log("MsgSystem.HandleMessage MessageRead failed by id:"..id);
+            return;
+        }
+
+        // 调用函数
+        auto error, any return_body = pcall(callback, this, msg);
+        if (error != true)
+        {
+            this.SendRpcError(rpc_id, return_body);
+            Log("MsgSystem.HandleMessage callback invoke failed! by id:"..id..", reason:"..error);
+            return;
+        }
+        this.Send(return_id, return_body, -rpc_id);
+    }
+
+    // 清理RPC
+    public fun ClearRPC(string reason)
+    {
+        // 先复制，再清理
+        Map<int, MsgClientRPCInfo> tmp = new Map<int, MsgClientRPCInfo>();
+        for (int rpc_id, MsgClientRPCInfo info in this._id_map_rpc)
+        {
+            this._id_creator.ReleaseID(rpc_id);
+            tmp[rpc_id] = info;
+        }
+        this._id_map_rpc = new Map<int, MsgClientRPCInfo>();
+        // 逐个调用表示失败
+        for (int rpc_id, MsgClientRPCInfo info in tmp)
+        {
+            auto result, auto reason = coroutine.resume(info.co, reason, null);
+            if (result != true) Error(reason);
+        }
+    }
+}

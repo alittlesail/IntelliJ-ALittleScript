@@ -6,15 +6,6 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-IHttpClient = Class(nil, "ALittle.IHttpClient")
-
-function IHttpClient:SendRPC(method, content)
-end
-
-function IHttpClient.Invoke(method, client, content)
-	return client:SendRPC(method, content)
-end
-
 IHttpInterface = Class(nil, "ALittle.IHttpInterface")
 
 function IHttpInterface:GetID()
@@ -84,33 +75,5 @@ end
 function HttpClient:HandleFailed(reason)
 	__HttpClientMap[self._interface:GetID()] = nil
 	assert(coroutine.resume(self._co, reason, nil))
-end
-
-local __all_callback = {}
-table.setweak(__all_callback, false, true)
-function RegHttpCallback(method, callback)
-	if __all_callback[method] ~= nil then
-		Error("RegHttpCallback消息回调函数注册失败，名字为" .. method .. "已存在")
-		return
-	end
-	__all_callback[method] = callback
-end
-
-function FindHttpCallback(method)
-	return __all_callback[method]
-end
-
-local __all_download_callback = {}
-table.setweak(__all_download_callback, false, true)
-function RegHttpDownloadCallback(method, callback)
-	if __all_download_callback[method] ~= nil then
-		Error("RegHttpDownloadCallback消息回调函数注册失败，名字为" .. method .. "已存在")
-		return
-	end
-	__all_download_callback[method] = callback
-end
-
-function FindHttpDownloadCallback(method)
-	return __all_download_callback[method]
 end
 

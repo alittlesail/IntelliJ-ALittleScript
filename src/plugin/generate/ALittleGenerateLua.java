@@ -1926,22 +1926,26 @@ public class ALittleGenerateLua {
                         .append(methodName)
                         .append(")\n");
             } else if (text.equals("@Msg")) {
-                String msg_id = "nil";
-                if (guess_return != null) {
-                    msg_id = "" + PsiHelper.JSHash(guess_return.value);
-                }
-                content.append(preTab)
-                        .append(namespacePre)
-                        .append("RegMsgCallback(")
-                        .append(PsiHelper.JSHash(guess_param.value))
-                        .append(", ")
-                        .append(methodName)
-                        .append(", ")
-                        .append(msg_id)
-                        .append(")\n");
-
                 GenerateReflectStructInfo(guess_param);
-                if (guess_return != null) {
+                if (guess_return == null) {
+                    content.append(preTab)
+                            .append(namespacePre)
+                            .append("RegMsgCallback(")
+                            .append(PsiHelper.JSHash(guess_param.value))
+                            .append(", ")
+                            .append(methodName)
+                            .append(")\n");
+                } else {
+                    content.append(preTab)
+                            .append(namespacePre)
+                            .append("RegMsgRpcCallback(")
+                            .append(PsiHelper.JSHash(guess_param.value))
+                            .append(", ")
+                            .append(methodName)
+                            .append(", ")
+                            .append(PsiHelper.JSHash(guess_return.value))
+                            .append(")\n");
+
                     GenerateReflectStructInfo(guess_return);
                 }
             }

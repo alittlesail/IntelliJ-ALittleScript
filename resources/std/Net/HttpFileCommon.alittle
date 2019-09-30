@@ -1,0 +1,17 @@
+
+namespace ALittle;
+
+// Http文件协议接口类，负责处理
+public class IHttpFileClient
+{
+    // 提供子类继承
+    protected await fun SendDownloadRPC(string method, any content) : string {}
+    protected await fun SendUploadRPC(string method, any content) : string, any {}
+
+    // 提供服务器使用的接口
+    public await fun StartReceiveFile(string file_path, int start_size) : bool {}
+
+    // 提供框架调用
+    protected await static InvokeDownload(string method, IHttpFileClient client, any content) : string { return client.SendDownloadRPC(method, content); }
+    protected await static InvokeUpload(string method, IHttpFileClient client, any content) : string, any { return client.SendUploadRPC(method, content); }
+}

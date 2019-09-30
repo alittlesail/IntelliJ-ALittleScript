@@ -102,6 +102,11 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
                 throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，返回值必须是struct");
             checkStructExtends(returnList.get(0), (ALittleStructDec) returnGuessList.get(0).element);
         } else if (text.equals("@Msg")) {
+            if (returnGuessList.size() > 0) {
+                if (myElement.getCoModifier() == null || !myElement.getCoModifier().getText().equals("await"))
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，并且有返回值，必须使用await修饰");
+            }
+
             if (returnGuessList.size() > 1) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，最多只能有一个返回值");
             // 第一个参数
             if (!paramGuessList.get(0).value.equals("ALittle.IMsgClient"))
