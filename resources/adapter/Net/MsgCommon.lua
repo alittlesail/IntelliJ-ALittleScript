@@ -27,6 +27,9 @@ end
 
 IMsgInterface = Class(nil, "ALittle.IMsgInterface")
 
+function IMsgInterface:SetID(id)
+end
+
 function IMsgInterface:GetID()
 end
 

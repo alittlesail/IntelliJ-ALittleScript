@@ -19,6 +19,7 @@ public class IMsgClient
 // 连接对象
 public class IMsgInterface
 {
+    public fun SetID(int id) {}
     public fun GetID() : int {}
     public fun Connect(string ip, int port) {}
     public fun IsConnected() : bool {}
