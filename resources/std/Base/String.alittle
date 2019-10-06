@@ -283,6 +283,20 @@ public static String_Replace(string content, string old_split, string new_split)
     return String_Join(list, new_split);
 }
 
+// 判断是不是手机号码
+public static String_IsPhoneNumber(string number) : bool
+{
+    auto len = String.len(number);
+    for (auto i = 1, len, 1)
+    {
+        auto byte = String.byte(number, i);
+        if (byte < 48) return false;
+        if (byte > 57) return false;
+    }
+
+    return true;
+}
+
 // 参数解析
 public static String_HttpAnalysisValueMap(string param, string content) : Map<string, any>
 {

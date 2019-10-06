@@ -14,6 +14,9 @@ end
 function IMsgClient:SendRPC(msg_id, msg_body)
 end
 
+function IMsgClient:GetID()
+end
+
 function IMsgClient:Close(reason)
 end
 
@@ -53,6 +56,10 @@ function MsgCommon:Ctor()
 	___rawset(self, "_last_recv_time", 0)
 	___rawset(self, "_id_creator", SafeIDCreator())
 	___rawset(self, "_id_map_rpc", {})
+end
+
+function MsgCommon:GetID()
+	return self._interface:GetID()
 end
 
 function MsgCommon:IsConnected()

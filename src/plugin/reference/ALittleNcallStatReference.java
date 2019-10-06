@@ -38,9 +38,7 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
         String text = protoModifier.getText();
 
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        if (!(text.equals("@Msg") && globalMethodDec.getMethodReturnDec() == null)) {
-            guessList.add(ALittleReferenceUtil.sStringGuessTypeInfo);
-        }
+        guessList.add(ALittleReferenceUtil.sStringGuessTypeInfo);
         guessList.addAll(guessInfo.functorReturnList);
 
         return guessList;
@@ -49,14 +47,14 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
     public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "pcall表达式不能没有参数");
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ncall表达式不能没有参数");
         }
 
         ALittleValueStat valueStat = valueStatList.get(0);
         // 第一个参数必须是函数
         ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
         if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "pcall表达式第一个参数必须是一个函数");
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "ncall表达式第一个参数必须是一个函数");
         }
 
         if (!(guessInfo.element instanceof ALittleGlobalMethodDec)) {
@@ -92,42 +90,34 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
             }
         }
 
-        boolean functorAwait = true;
-        if (text.equals("@Msg") && guessInfo.functorReturnList.isEmpty()) {
-            functorAwait = false;
-        }
-
-        // 检查这个函数是不是await
-        if (functorAwait) {
-            // 检查这次所在的函数必须要有await或者async修饰
-            PsiElement parent = myElement;
-            while (parent != null) {
-                if (parent instanceof ALittleNamespaceDec) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "全局表达式不能调用带有await的函数");
-                } else if (parent instanceof ALittleClassCtorDec) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "构造函数内不能调用带有await的函数");
-                } else if (parent instanceof ALittleClassGetterDec) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "getter函数内不能调用带有await的函数");
-                } else if (parent instanceof ALittleClassSetterDec) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "setter函数内不能调用带有await的函数");
-                } else if (parent instanceof ALittleClassMethodDec) {
-                    if (((ALittleClassMethodDec)parent).getCoModifier() == null) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
-                    }
-                    break;
-                } else if (parent instanceof ALittleClassStaticDec) {
-                    if (((ALittleClassStaticDec)parent).getCoModifier() == null) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
-                    }
-                    break;
-                } else if (parent instanceof ALittleGlobalMethodDec) {
-                    if (((ALittleGlobalMethodDec)parent).getCoModifier() == null) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
-                    }
-                    break;
+        // 检查这次所在的函数必须要有await或者async修饰
+        PsiElement parent = myElement;
+        while (parent != null) {
+            if (parent instanceof ALittleNamespaceDec) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "全局表达式不能调用带有await的函数");
+            } else if (parent instanceof ALittleClassCtorDec) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "构造函数内不能调用带有await的函数");
+            } else if (parent instanceof ALittleClassGetterDec) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "getter函数内不能调用带有await的函数");
+            } else if (parent instanceof ALittleClassSetterDec) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "setter函数内不能调用带有await的函数");
+            } else if (parent instanceof ALittleClassMethodDec) {
+                if (((ALittleClassMethodDec)parent).getCoModifier() == null) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
                 }
-                parent = parent.getParent();
+                break;
+            } else if (parent instanceof ALittleClassStaticDec) {
+                if (((ALittleClassStaticDec)parent).getCoModifier() == null) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
+                }
+                break;
+            } else if (parent instanceof ALittleGlobalMethodDec) {
+                if (((ALittleGlobalMethodDec)parent).getCoModifier() == null) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
+                }
+                break;
             }
+            parent = parent.getParent();
         }
     }
 

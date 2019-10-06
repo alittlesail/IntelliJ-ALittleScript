@@ -47,6 +47,10 @@ function MsgServer:Ctor(client_id, remote_ip, remote_port)
 	___rawset(self, "_client_id", client_id)
 	___rawset(self, "_remote_ip", remote_ip)
 	___rawset(self, "_remote_port", remote_port)
+	___rawset(self, "_client_account_id", 0)
+	___rawset(self, "_client_logining", false)
+	___rawset(self, "_web_account_id", "")
+	___rawset(self, "_web_is_logining", false)
 end
 
 function MsgServer.__getter:remote_ip()

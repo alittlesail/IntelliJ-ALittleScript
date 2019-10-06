@@ -173,11 +173,7 @@ public class ALittleGenerateLua {
             replaceTest = "IHttpFileClient.InvokeDownload";
         } else if (text.equals("@Msg")) {
             ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
-            if (returnDec == null) {
-                replaceTest = "IMsgClient.Invoke";
-            } else {
-                replaceTest = "IMsgClient.InvokeRPC";
-            }
+            replaceTest = "IMsgClient.InvokeRPC";
             GenerateReflectStructInfo(structInfo);
 
             if (returnDec != null) {
@@ -891,8 +887,13 @@ public class ALittleGenerateLua {
             }
         }
 
+        String[] split_list = guessInfo.value.split("\\.");
+        if (split_list.length != 2) return;
+
         String content = "{";
         content += "name = \"" + guessInfo.value + "\",\n";
+        content += "ns_name = \"" + split_list[0] + "\",\n";
+        content += "rl_name = \"" + split_list[1] + "\",\n";
         content += "name_list = {" + String.join(",", nameList) +"},\n";
         content += "type_list = {" + String.join(",", typeList) + "}\n";
         content += "}";
@@ -1054,7 +1055,10 @@ public class ALittleGenerateLua {
         ALittleUsingNameDec nameDec = root.getUsingNameDec();
         if (nameDec == null) throw new Exception("using 没有定义名称");
 
-        ALittleCustomType customType = root.getCustomType();
+        ALittleAllType allType = root.getAllType();
+        if (allType == null) return "";
+
+        ALittleCustomType customType = allType.getCustomType();
         if (customType == null) {
             return "";
         }
@@ -1074,6 +1078,43 @@ public class ALittleGenerateLua {
         content += nameDec.getText() + " = " + GenerateCustomType(customType) + ";\n";
         return content;
     }
+
+    @NotNull
+    private String GenerateNsendExpr(ALittleNsendExpr nsendExpr, String preTab) throws Exception {
+        List<ALittleValueStat> valueStatList = nsendExpr.getValueStatList();
+        if (valueStatList.isEmpty()) throw new Exception("nsend第一个参数必须是ALittle.IMsgClient的派生类");
+        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStatList.get(0).guessType();
+        if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgClient")) {
+            throw new Exception("nsend第一个参数必须是ALittle.IMsgClient的派生类");
+        }
+        if (valueStatList.size() != 2) {
+            throw new Exception("nsend必须是两个参数");
+        }
+
+        ALittleReferenceUtil.GuessTypeInfo structInfo = valueStatList.get(1).guessType();
+        if (structInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+            throw new Exception("nsend的第二个参数必须是struct");
+        }
+        int msg_id = PsiHelper.JSHash(structInfo.value);
+
+        String namespacePre = "ALittle.";
+        if (mNamespaceName.equals("ALittle")) namespacePre = "";
+
+        String replaceTest = "IMsgClient.Invoke";
+        GenerateReflectStructInfo(structInfo);
+
+        String content = preTab + namespacePre + replaceTest + "(";
+        List<String> paramList = new ArrayList<>();
+        paramList.add("" + msg_id);
+
+        for (int i = 1; i < valueStatList.size(); ++i) {
+            paramList.add(GenerateValueStat(valueStatList.get(i)));
+        }
+        content += String.join(", ", paramList);
+        content += ")\n";
+        return content;
+    }
+
 
     @NotNull
     private String GenerateOp1Expr(ALittleOp1Expr root, String preTab) throws Exception {
@@ -1457,6 +1498,8 @@ public class ALittleGenerateLua {
                 exprList.add(GenerateWrapExpr((ALittleWrapExpr)child, preTab));
             } else if (child instanceof ALittlePropertyValueExpr) {
                 exprList.add(GeneratePropertyValueExpr((ALittlePropertyValueExpr)child, preTab));
+            } else if (child instanceof ALittleNsendExpr) {
+                exprList.add(GenerateNsendExpr((ALittleNsendExpr)child, preTab));
             }
         }
 

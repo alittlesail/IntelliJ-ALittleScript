@@ -43,7 +43,7 @@
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553049610453" />
     <property name="jdk.selected.JAVA_MODULE" value="1.8" />
     <property name="last.edited.regexp" value="&quot;11\\\&quot;" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/std/Net" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/plugin" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.33989638" />
@@ -58,12 +58,8 @@
     <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
-      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="plugin.parser" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="plugin.psi" />
@@ -84,8 +80,12 @@
       <recent name="plugin.psi.impl" />
       <recent name="plugin.psi" />
     </key>
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="plugin.parser" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
+      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
     </key>
   </component>
   <component name="RunDashboard">

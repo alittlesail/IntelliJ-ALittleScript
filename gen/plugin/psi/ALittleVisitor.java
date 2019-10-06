@@ -219,6 +219,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitNsendExpr(@NotNull ALittleNsendExpr o) {
+    visitPsiElement(o);
+  }
+
   public void visitOp1(@NotNull ALittleOp1 o) {
     visitPsiElement(o);
   }

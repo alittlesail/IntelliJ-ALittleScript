@@ -8,6 +8,8 @@ public class IMsgClient
     protected fun Send(int msg_id, any msg_body, int rpc_id) {}
     protected await fun SendRPC(int msg_id, any msg_body) : string, any {}
 
+    // 获取连接ID
+    public fun GetID() : int {}
     // 提供客户端和服务器使用
     public fun Close(string reason) {}
 
@@ -57,6 +59,9 @@ public class MsgCommon : public IMsgClient
         this._id_creator = new SafeIDCreator();
         this._id_map_rpc = new Map<int, MsgClientRPCInfo>();
     }
+
+    // 获取ID
+    public fun GetID() : int { return this._interface.GetID(); }
 
     // 判断是否已经连接成功
     public fun IsConnected() : bool

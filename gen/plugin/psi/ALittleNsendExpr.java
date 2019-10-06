@@ -8,16 +8,10 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public interface ALittleUsingDec extends PsiElement {
+public interface ALittleNsendExpr extends PsiElement {
 
-  @Nullable
-  ALittleAccessModifier getAccessModifier();
-
-  @Nullable
-  ALittleAllType getAllType();
-
-  @Nullable
-  ALittleUsingNameDec getUsingNameDec();
+  @NotNull
+  List<ALittleValueStat> getValueStatList();
 
   @NotNull
   GuessTypeInfo guessType() throws ALittleReferenceException;

@@ -6,7 +6,7 @@ public static require(string path) {}
 
 // Issues an error when the value of its argument v is false (i.e., nil or false);
 // otherwise, returns all its arguments. message is an error message; when absent, it defaults to "assertion failed!"
-public static assert(bool condition, string msg) {}
+public static assert(bool c, string m) {}
 
 // Returns the type of its only argument, coded as a string.
 // The possible results of this function are

@@ -14,8 +14,8 @@ public class ALittleUsingDecReference extends ALittleReference<ALittleUsingDec> 
 
     @NotNull
     public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        if (myElement.getCustomType() != null) {
-            return myElement.getCustomType().guessTypes();
+        if (myElement.getAllType() != null) {
+            return myElement.getAllType().guessTypes();
         }
         return new ArrayList<>();
     }

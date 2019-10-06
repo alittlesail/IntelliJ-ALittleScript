@@ -102,6 +102,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "return"              { return RETURN; }
   "yield"               { return YIELD; }
   "break"               { return BREAK; }
+  "nsend"               { return NSEND; }
   "Map"                 { return MAP; }
   "List"                { return LIST; }
   "Functor"             { return FUNCTOR; }

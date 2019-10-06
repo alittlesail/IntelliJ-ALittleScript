@@ -182,6 +182,23 @@ public class ALittleReferenceUtil {
         return IsClassSuper(guessType.element, parent);
     }
 
+    // 判断
+    public static boolean IsClassSuper(PsiElement child, @NotNull String parent) throws ALittleReferenceException {
+        if (!(child instanceof ALittleClassDec)) return false;
+        ALittleClassDec childClass = (ALittleClassDec)child;
+
+        ALittleClassExtendsDec extendsDec = childClass.getClassExtendsDec();
+        if (extendsDec == null) return false;
+
+        ALittleClassNameDec nameDec = extendsDec.getClassNameDec();
+        if (nameDec == null) return false;
+
+        GuessTypeInfo guessType = nameDec.guessType();
+        if (guessType.value.equals(parent)) return true;
+
+        return IsClassSuper(guessType.element, parent);
+    }
+
     // 判断 parent是否是child的父类
     public static boolean IsStructSuper(PsiElement child, PsiElement parent) throws ALittleReferenceException {
         if (!(child instanceof ALittleStructDec)) return false;
@@ -268,6 +285,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleWrapValueStat) return new ALittleWrapValueStatReference((ALittleWrapValueStat)element, range);
 
         if (element instanceof ALittleNcallStat) return new ALittleNcallStatReference((ALittleNcallStat)element, range);
+        if (element instanceof ALittleNsendExpr) return new ALittleNsendExprReference((ALittleNsendExpr)element, range);
 
         return null;
     }

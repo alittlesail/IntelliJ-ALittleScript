@@ -205,6 +205,11 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                                 withIcon(ALittleIcons.STRUCT).
                                 withTypeText(dec.getContainingFile().getName())
                         );
+                    } else {
+                        variants.add(LookupElementBuilder.create(dec.getText()).
+                                withIcon(ALittleIcons.PROPERTY).
+                                withTypeText(dec.getContainingFile().getName())
+                        );
                     }
                 } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
                     variants.add(LookupElementBuilder.create(dec.getText()).

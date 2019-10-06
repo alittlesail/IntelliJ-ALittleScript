@@ -5,6 +5,8 @@ namespace ALittle;
 public struct ReflectInfo
 {
     string name;                 // 带命名域的结构体名
+    string ns_name;              // 所在命名域名
+    string rl_name;              // 实际名
     List<string> name_list;      // 变量名列表
     List<string> type_list;      // 变量类型列表
 }

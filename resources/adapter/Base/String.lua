@@ -229,6 +229,20 @@ function String_Replace(content, old_split, new_split)
 	return String_Join(list, new_split)
 end
 
+function String_IsPhoneNumber(number)
+	local len = String.len(number)
+	for i = 1, len, 1 do
+		local byte = String.byte(number, i)
+		if byte < 48 then
+			return false
+		end
+		if byte > 57 then
+			return false
+		end
+	end
+	return true
+end
+
 function String_HttpAnalysisValueMap(param, content)
 	local value_map = {}
 	local param_split_list = ALittle.String_Split(param, "&")

@@ -14,14 +14,14 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public class ALittleUsingDecImpl extends ASTWrapperPsiElement implements ALittleUsingDec {
+public class ALittleNsendExprImpl extends ASTWrapperPsiElement implements ALittleNsendExpr {
 
-  public ALittleUsingDecImpl(@NotNull ASTNode node) {
+  public ALittleNsendExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitUsingDec(this);
+    visitor.visitNsendExpr(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -30,21 +30,9 @@ public class ALittleUsingDecImpl extends ASTWrapperPsiElement implements ALittle
   }
 
   @Override
-  @Nullable
-  public ALittleAccessModifier getAccessModifier() {
-    return findChildByClass(ALittleAccessModifier.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleAllType getAllType() {
-    return findChildByClass(ALittleAllType.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleUsingNameDec getUsingNameDec() {
-    return findChildByClass(ALittleUsingNameDec.class);
+  @NotNull
+  public List<ALittleValueStat> getValueStatList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleValueStat.class);
   }
 
   @Override
