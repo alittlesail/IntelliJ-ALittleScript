@@ -1938,13 +1938,13 @@ public class ALittleGenerateLua {
             if (returnDec != null) {
                 returnList = returnDec.getAllTypeList();
             }
-            if (returnList.size() > 1) throw new Exception("带" + text + "的全局函数，最多只能有一个返回值");
             ALittleReferenceUtil.GuessTypeInfo guess_return = null;
             if (returnList.size() == 1) {
                 guess_return = returnList.get(0).guessType();
             }
 
             if (text.equals("@Http")) {
+                if (returnList.size() != 1) throw new Exception("带" + text + "的全局函数，有且仅有一个返回值");
                 content.append(preTab)
                         .append(namespacePre)
                         .append("RegHttpCallback(\"")
@@ -1953,6 +1953,7 @@ public class ALittleGenerateLua {
                         .append(methodName)
                         .append(")\n");
             } else if (text.equals("@HttpDownload")) {
+                if (returnList.size() != 2) throw new Exception("带" + text + "的全局函数，有且仅有两个返回值");
                 content.append(preTab)
                         .append(namespacePre)
                         .append("RegHttpDownloadCallback(\"")
@@ -1961,6 +1962,7 @@ public class ALittleGenerateLua {
                         .append(methodName)
                         .append(")\n");
             } else if (text.equals("@HttpUpload")) {
+                if (returnList.size() != 1) throw new Exception("带" + text + "的全局函数，有且仅有一个返回值");
                 content.append(preTab)
                         .append(namespacePre)
                         .append("RegHttpFileCallback(\"")
@@ -1969,6 +1971,7 @@ public class ALittleGenerateLua {
                         .append(methodName)
                         .append(")\n");
             } else if (text.equals("@Msg")) {
+                if (returnList.size() > 1) throw new Exception("带" + text + "的全局函数，最多只有一个返回值");
                 GenerateReflectStructInfo(guess_param);
                 if (guess_return == null) {
                     content.append(preTab)

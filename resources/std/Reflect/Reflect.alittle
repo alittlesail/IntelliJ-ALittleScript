@@ -22,10 +22,7 @@ table.setweak(__all_id_reflect, false, true);
 protected static RegReflect(string name, ReflectInfo info)
 {
     if (__all_name_reflect[name] != null)
-    {
-        Error("RegReflect 反射信息注册失败，名字为"..name.."已存在");
         return;
-    }
     int hash = JSHash(name);
     ReflectInfo old_info = __all_id_reflect[hash];
     if (old_info != null)

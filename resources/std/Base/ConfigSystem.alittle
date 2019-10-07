@@ -39,16 +39,22 @@ public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
 
     public fun GetInt(string key, int default) : int
     {
-        return math.floor(tonumber(this.GetConfig(key, default)));
+        auto value = this.GetConfig(key, default);
+        if (value == null) value = 0;
+        return math.floor(tonumber(value));
     }
 
     public fun GetDouble(string key, double default) : double
     {
-        return tonumber(this.GetConfig(key, default));
+        auto value = this.GetConfig(key, default);
+        if (value == null) value = 0;
+        return tonumber(value);
     }
 
     public fun GetString(string key, string default) : string
     {
+        auto value = this.GetConfig(key, default);
+        if (value == null) value = "";
         return tostring(this.GetConfig(key, default));
     }
 

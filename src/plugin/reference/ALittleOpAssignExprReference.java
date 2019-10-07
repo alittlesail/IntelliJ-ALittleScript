@@ -49,13 +49,26 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
             return;
         }
 
+        ALittleOpAssign opAssign = myElement.getOpAssign();
+        if (opAssign == null)
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "没有赋值符号");
+        String opString = opAssign.getText();
+
         ALittleReferenceUtil.GuessTypeInfo pairGuessType = propertyValueList.get(0).guessType();
         ALittleReferenceUtil.GuessTypeInfo valueGuessType = valueStat.guessType();
 
-        try {
-            ALittleReferenceOpUtil.guessTypeEqual(propertyValueList.get(0), pairGuessType, valueStat, valueGuessType);
-        } catch (ALittleReferenceUtil.ALittleReferenceException e) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "等号左边的变量和表达式的类型不同:" + e.getError());
+        if (opString.equals("=")) {
+            try {
+                ALittleReferenceOpUtil.guessTypeEqual(propertyValueList.get(0), pairGuessType, valueStat, valueGuessType);
+            } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+                throw new ALittleReferenceUtil.ALittleReferenceException(e.getElement(), "等号左边的变量和表达式的类型不同:" + e.getError());
+            }
+        } else {
+            if (!pairGuessType.value.equals("int") && !pairGuessType.value.equals("double") && !pairGuessType.value.equals("I64"))
+                throw new ALittleReferenceUtil.ALittleReferenceException(propertyValueList.get(0), opString + "左边必须是int, double, I64");
+
+            if (!valueGuessType.value.equals("int") && !valueGuessType.value.equals("double") && !valueGuessType.value.equals("I64"))
+                throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, opString + "右边必须是int, double, I64");
         }
     }
 }

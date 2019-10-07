@@ -11,7 +11,6 @@ local __all_id_reflect = {}
 table.setweak(__all_id_reflect, false, true)
 function RegReflect(name, info)
 	if __all_name_reflect[name] ~= nil then
-		Error("RegReflect 反射信息注册失败，名字为" .. name .. "已存在")
 		return
 	end
 	local hash = JSHash(name)

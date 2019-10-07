@@ -33,14 +33,26 @@ function ConfigSystem:GetConfig(key, default)
 end
 
 function ConfigSystem:GetInt(key, default)
-	return math.floor(tonumber(self:GetConfig(key, default)))
+	local value = self:GetConfig(key, default)
+	if value == nil then
+		value = 0
+	end
+	return math.floor(tonumber(value))
 end
 
 function ConfigSystem:GetDouble(key, default)
-	return tonumber(self:GetConfig(key, default))
+	local value = self:GetConfig(key, default)
+	if value == nil then
+		value = 0
+	end
+	return tonumber(value)
 end
 
 function ConfigSystem:GetString(key, default)
+	local value = self:GetConfig(key, default)
+	if value == nil then
+		value = ""
+	end
 	return tostring(self:GetConfig(key, default))
 end
 
