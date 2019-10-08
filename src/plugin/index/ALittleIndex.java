@@ -106,7 +106,6 @@ public class ALittleIndex {
             loadDir(psi_mgr, root);
         }
 
-
         if (!StdLibraryProvider.isPluginSelf(mProject)) {
             try {
                 // 适配代码
