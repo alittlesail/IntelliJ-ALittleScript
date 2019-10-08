@@ -161,17 +161,18 @@ public class MsgCommon : public IMsgClient
         // 如果是RPC异常包
         if (id == 1)
         {
-            coroutine.resume(info.co, factory.ReadString());
+            assert(coroutine.resume(info.co, factory.ReadString()));
             return;
         }
 
         any msg = this.MessageRead(factory, id);
         if (msg == null)
         {
+            assert(coroutine.resume(info.co, "MsgSystem.HandleMessage MessageRead failed by id:"..id));
             Log("MsgSystem.HandleMessage MessageRead failed by id:"..id);
             return;
         }
-        coroutine.resume(info.co, null, msg);
+        assert(coroutine.resume(info.co, null, msg));
     }
 
     // 发送数据包
@@ -237,16 +238,23 @@ public class MsgCommon : public IMsgClient
         any msg = this.MessageRead(factory, id);
         if (msg == null)
         {
+            this.SendRpcError(rpc_id, "MsgSystem.HandleMessage MessageRead failed by id:"..id);
             Log("MsgSystem.HandleMessage MessageRead failed by id:"..id);
             return;
         }
 
         // 调用函数
         auto error, any return_body = pcall(callback, this, msg);
-        if (error != true)
+        if (error != null)
         {
-            this.SendRpcError(rpc_id, return_body);
+            this.SendRpcError(rpc_id, error);
             Log("MsgSystem.HandleMessage callback invoke failed! by id:"..id..", reason:"..error);
+            return;
+        }
+        if (return_body == null)
+        {
+            this.SendRpcError(rpc_id, "MsgSystem.HandleMessage callback have not return! by id:"..id);
+            Log("MsgSystem.HandleMessage callback have not return! by id:"..id);
             return;
         }
         this.Send(return_id, return_body, -rpc_id);

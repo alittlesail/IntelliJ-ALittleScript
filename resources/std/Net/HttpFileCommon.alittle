@@ -9,7 +9,7 @@ public class IHttpFileClient
     protected await fun SendUploadRPC(string method, any content) : string, any {}
 
     // 提供服务器使用的接口
-    public await fun StartReceiveFile(string file_path, int start_size) : bool {}
+    public await fun StartReceiveFile(string file_path, int start_size) : string {}
 
     // 提供框架调用
     protected await static InvokeDownload(string method, IHttpFileClient client, any content) : string { return client.SendDownloadRPC(method, content); }

@@ -89,10 +89,9 @@ local __sub = String.sub
 local __len = String.len
 local __byte = String.byte
 local __assert = assert
-local CreateSubInfo
-CreateSubInfo = function(sub_type, split_index)
+function CreateCSVSubInfo(sub_type, split_index)
 	if __find(sub_type, "List", 1) == 1 then
-		return CreateArrayInfo(sub_type, split_index)
+		return CreateCSVArrayInfo(sub_type, split_index)
 	end
 	if __find(sub_type, "Map", 1) == 1 then
 		__assert(false, "不支持Map解析")
@@ -103,21 +102,19 @@ CreateSubInfo = function(sub_type, split_index)
 		sub_info.func = func
 		return sub_info
 	end
-	return CreateMessageInfo(sub_type, split_index)
+	return CreateCSVInfoImpl(sub_type, split_index)
 end
 
-local CreateArrayInfo
-CreateArrayInfo = function(var_type, split_index)
+function CreateCSVArrayInfo(var_type, split_index)
 	__assert(split_index > 0, "分隔符数量不足")
 	local invoke_info = {}
 	invoke_info.func = CSV_ReadArray
 	invoke_info.split = __split_list[split_index]
-	invoke_info.sub_info = CreateSubInfo(__sub(var_type, 6, -2), split_index - 1)
+	invoke_info.sub_info = CreateCSVSubInfo(__sub(var_type, 6, -2), split_index - 1)
 	return invoke_info
 end
 
-local CreateMessageInfo
-CreateMessageInfo = function(var_type, split_index)
+function CreateCSVInfoImpl(var_type, split_index)
 	__assert(split_index > 0, "分隔符数量不足")
 	local reflect_info = FindReflectByName(var_type)
 	__assert(reflect_info ~= nil, "FindReflectByName调用失败! 未知类型:" .. var_type)
@@ -128,7 +125,7 @@ CreateMessageInfo = function(var_type, split_index)
 	invoke_info.handle = handle
 	local handle_count = 0
 	for index, var_name in ___ipairs(reflect_info.name_list) do
-		local var_info = CreateSubInfo(reflect_info.type_list[index], split_index - 1)
+		local var_info = CreateCSVSubInfo(reflect_info.type_list[index], split_index - 1)
 		var_info.var_name = var_name
 		handle_count = handle_count + 1
 		handle[handle_count] = var_info
@@ -146,7 +143,7 @@ function CreateCSVInfo(reflect_info)
 	invoke_info.handle = handle
 	local handle_count = 0
 	for index, var_name in ___ipairs(reflect_info.name_list) do
-		local var_info = CreateSubInfo(reflect_info.type_list[index], split_index - 1)
+		local var_info = CreateCSVSubInfo(reflect_info.type_list[index], split_index - 1)
 		var_info.var_name = var_name
 		handle_count = handle_count + 1
 		handle[handle_count] = var_info

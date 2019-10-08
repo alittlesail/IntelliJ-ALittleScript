@@ -94,10 +94,10 @@ private auto __sub = String.sub;
 private auto __len = String.len;
 private auto __byte = String.byte;
 private auto __assert = assert;
-private static CreateSubInfo(string sub_type, int split_index) : CSVInvokeInfo
+protected static CreateCSVSubInfo(string sub_type, int split_index) : CSVInvokeInfo
 {
     if (__find(sub_type, "List", 1) == 1)
-        return CreateArrayInfo(sub_type, split_index);
+        return CreateCSVArrayInfo(sub_type, split_index);
 
     if (__find(sub_type, "Map", 1) == 1)
         __assert(false, "不支持Map解析");
@@ -110,21 +110,21 @@ private static CreateSubInfo(string sub_type, int split_index) : CSVInvokeInfo
         return sub_info;
     }
 
-    return CreateMessageInfo(sub_type, split_index);
+    return CreateCSVInfoImpl(sub_type, split_index);
 }
 
-private static CreateArrayInfo(string var_type, int split_index) : CSVInvokeInfo
+protected static CreateCSVArrayInfo(string var_type, int split_index) : CSVInvokeInfo
 {
     __assert(split_index > 0, "分隔符数量不足");
 
     auto invoke_info = new CSVInvokeInfo();
     invoke_info.func = CSV_ReadArray;
     invoke_info.split = __split_list[split_index];
-    invoke_info.sub_info = CreateSubInfo(__sub(var_type, 6, -2), split_index - 1);
+    invoke_info.sub_info = CreateCSVSubInfo(__sub(var_type, 6, -2), split_index - 1);
     return invoke_info;
 }
 
-private static CreateMessageInfo(string var_type, int split_index) : CSVInvokeInfo
+protected static CreateCSVInfoImpl(string var_type, int split_index) : CSVInvokeInfo
 {
     __assert(split_index > 0, "分隔符数量不足");
 
@@ -140,7 +140,7 @@ private static CreateMessageInfo(string var_type, int split_index) : CSVInvokeIn
     auto handle_count = 0;
     for (auto index, auto var_name in reflect_info.name_list)
     {
-        auto var_info = CreateSubInfo(reflect_info.type_list[index], split_index - 1);
+        auto var_info = CreateCSVSubInfo(reflect_info.type_list[index], split_index - 1);
         var_info.var_name = var_name;
         handle_count = handle_count + 1;
         handle[handle_count] = var_info;
@@ -162,7 +162,7 @@ protected static CreateCSVInfo(ReflectInfo reflect_info) : CSVInvokeInfo
     auto handle_count = 0;
     for (auto index, auto var_name in reflect_info.name_list)
     {
-        auto var_info = CreateSubInfo(reflect_info.type_list[index], split_index - 1);
+        auto var_info = CreateCSVSubInfo(reflect_info.type_list[index], split_index - 1);
         var_info.var_name = var_name;
         handle_count = handle_count + 1;
         handle[handle_count] = var_info;

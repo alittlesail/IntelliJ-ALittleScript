@@ -22,7 +22,7 @@ public class IHttpFileServerInterface
 {
     public fun Close(int http_id) {}
     public fun SendString(int http_id, string content) {}
-    public fun StartReceiveFile(int http_id, string file_path, int start_size) : bool {}
+    public fun StartReceiveFile(int http_id, string file_path, int start_size) {}
 }
 
 public class HttpFileServer<HFSI : IHttpFileServerInterface> : public ALittle.IHttpFileClient
@@ -42,19 +42,17 @@ public class HttpFileServer<HFSI : IHttpFileServerInterface> : public ALittle.IH
         this._interface = new HFSI();
     }
 
-    public await fun StartReceiveFile(string file_path, int start_size) : bool
+    public await fun StartReceiveFile(string file_path, int start_size) : string
     {
-        if (this._invoked) return false;
+        if (this._invoked) return "StartReceiveFile已经被调用过";
         this._invoked = true;
-
-        if (!this._interface.StartReceiveFile(this._http_id, file_path, start_size))
-            return false;
+        this._interface.StartReceiveFile(this._http_id, file_path, start_size);
         return yield;
     }
 
-    public fun HandleReceiveResult(bool succeed)
+    public fun HandleReceiveResult(string reason)
     {
-        assert(coroutine.resume(this._co, null, succeed));
+        assert(coroutine.resume(this._co, reason));
     }
 
     public get invoked() : bool { return this._invoked; }

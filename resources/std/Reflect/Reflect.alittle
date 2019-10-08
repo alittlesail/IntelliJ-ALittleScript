@@ -11,19 +11,12 @@ public struct ReflectInfo
     List<string> type_list;      // 变量类型列表
 }
 
-public struct EmptyJson
-{
-}
-
 private auto __all_name_reflect = new Map<string, ReflectInfo>();
-table.setweak(__all_name_reflect, false, true);
 private auto __all_id_reflect = new Map<int, ReflectInfo>();
-table.setweak(__all_id_reflect, false, true);
-protected static RegReflect(string name, ReflectInfo info)
+protected static RegReflect(int hash, string name, ReflectInfo info)
 {
     if (__all_name_reflect[name] != null)
         return;
-    int hash = JSHash(name);
     ReflectInfo old_info = __all_id_reflect[hash];
     if (old_info != null)
     {

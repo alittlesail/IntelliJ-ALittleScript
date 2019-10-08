@@ -24,19 +24,6 @@ public static JsonDecode(string content) : any
     return __JsonDecode(content);
 }
 
-// 哈希函数
-public static JSHash(string str) : int
-{
-    auto l = __len(str);
-    auto h = l;
-    auto step = __rshift(l, 5) + 1;
-
-    for (auto i=l,step,-step)
-        h = __bxor(h, (__lshift(h, 5) + __byte(str, i) + __rshift(h, 2)));
-
-    return h;
-}
-
 // 深度复制表
 public static String_CopyTable(any info) : any
 {
@@ -326,7 +313,7 @@ public static String_HttpAnalysisValueMap(string param, string content) : Map<st
     if (ALittle.String.len(content) > 0)
     {
         auto error, Map<string, any> value = pcall(lua.json.decode, content);
-        if (error != null)
+        if (error == null)
         {
             for (auto k, auto v in value)
                 value_map[k] = v;

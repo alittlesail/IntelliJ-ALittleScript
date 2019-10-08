@@ -363,8 +363,7 @@ local __sub = String.sub
 local __len = String.len
 local __byte = String.byte
 local __assert = assert
-local CreateSubInfo
-CreateSubInfo = function(sub_type)
+function CreateSubInfo(sub_type)
 	if __find(sub_type, "List", 1) == 1 then
 		return CreateArrayInfo(sub_type)
 	end
@@ -381,8 +380,7 @@ CreateSubInfo = function(sub_type)
 	return CreateMessageInfo(sub_type)
 end
 
-local CreateArrayInfo
-CreateArrayInfo = function(var_type)
+function CreateArrayInfo(var_type)
 	local invoke_info = {}
 	invoke_info.wfunc = PS_WriteArray
 	invoke_info.rfunc = PS_ReadArray
@@ -390,8 +388,7 @@ CreateArrayInfo = function(var_type)
 	return invoke_info
 end
 
-local CreateMapInfo
-CreateMapInfo = function(var_type)
+function CreateMapInfo(var_type)
 	local invoke_info = {}
 	local sub_type = __sub(var_type, 5, -2)
 	local comma_index = 0
@@ -418,15 +415,13 @@ CreateMapInfo = function(var_type)
 	return invoke_info
 end
 
-local CreateMessageInfo
-CreateMessageInfo = function(var_type)
+function CreateMessageInfo(var_type)
 	local reflect_info = FindReflectByName(var_type)
 	__assert(reflect_info ~= nil, "FindReflect调用失败! 未知类型:" .. var_type)
 	return CreateMessageInfoImpl(reflect_info)
 end
 
-local CreateMessageInfoImpl
-CreateMessageInfoImpl = function(reflect_info)
+function CreateMessageInfoImpl(reflect_info)
 	local invoke_info = {}
 	invoke_info.wfunc = PS_WriteMessage
 	invoke_info.rfunc = PS_ReadMessage

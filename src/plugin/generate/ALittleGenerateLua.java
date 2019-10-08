@@ -1107,7 +1107,7 @@ public class ALittleGenerateLua {
         List<String> paramList = new ArrayList<>();
         paramList.add("" + msg_id);
 
-        for (int i = 1; i < valueStatList.size(); ++i) {
+        for (int i = 0; i < valueStatList.size(); ++i) {
             paramList.add(GenerateValueStat(valueStatList.get(i)));
         }
         content += String.join(", ", paramList);
@@ -2057,7 +2057,9 @@ public class ALittleGenerateLua {
 
         for (Map.Entry<String, String> entry : mReflectMap.entrySet()) {
             content.append(namespacePre)
-                    .append("RegReflect(\"")
+                    .append("RegReflect(")
+                    .append(PsiHelper.JSHash(entry.getKey()))
+                    .append(", \"")
                     .append(entry.getKey())
                     .append("\", ")
                     .append(entry.getValue())

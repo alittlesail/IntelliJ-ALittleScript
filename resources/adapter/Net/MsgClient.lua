@@ -44,7 +44,6 @@ function MsgClient:HandleConnectSucceed()
 	self._last_recv_time = 0
 	self:SendHeartbeat()
 	self:StartHeartbeat()
-	__MsgClientMap[self._interface:GetID()] = nil
 	assert(coroutine.resume(self._co, nil))
 end
 
@@ -128,7 +127,7 @@ function MsgClient:StartHeartbeat()
 	if self._heartbeat_loop ~= nil then
 		return
 	end
-	self._heartbeat_loop = LoopFunction(Bind(self.SendHeartbeat, self, nil), -1, self._heartbeat, 1)
+	self._heartbeat_loop = LoopFunction(Bind(self.SendHeartbeat, self, nil), -1, self._heartbeat * 1000, 1)
 	self._heartbeat_loop:Start()
 end
 

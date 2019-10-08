@@ -24,16 +24,6 @@ function JsonDecode(content)
 	return __JsonDecode(content)
 end
 
-function JSHash(str)
-	local l = __len(str)
-	local h = l
-	local step = __rshift(l, 5) + 1
-	for i = l, step, -step do
-		h = __bxor(h, (__lshift(h, 5) + __byte(str, i) + __rshift(h, 2)))
-	end
-	return h
-end
-
 function String_CopyTable(info)
 	local new_info = {}
 	for key, value in ___pairs(info) do
@@ -263,7 +253,7 @@ function String_HttpAnalysisValueMap(param, content)
 	end
 	if ALittle.String.len(content) > 0 then
 		local error, value = pcall(json.decode, content)
-		if error ~= nil then
+		if error == nil then
 			for k, v in ___pairs(value) do
 				value_map[k] = v
 			end

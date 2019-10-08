@@ -67,4 +67,6 @@ public static Error(...)
         print(__concat(new_arg, "\t"));
     else
         __log(__concat(new_arg, "\t"), 2);
+
+
 }

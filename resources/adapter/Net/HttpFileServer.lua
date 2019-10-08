@@ -47,17 +47,15 @@ end
 
 function HttpFileServer:StartReceiveFile(file_path, start_size)
 	if self._invoked then
-		return false
+		return "StartReceiveFile已经被调用过"
 	end
 	self._invoked = true
-	if not self._interface:StartReceiveFile(self._http_id, file_path, start_size) then
-		return false
-	end
+	self._interface:StartReceiveFile(self._http_id, file_path, start_size)
 	return ___coroutine.yield()
 end
 
-function HttpFileServer:HandleReceiveResult(succeed)
-	assert(coroutine.resume(self._co, nil, succeed))
+function HttpFileServer:HandleReceiveResult(reason)
+	assert(coroutine.resume(self._co, reason))
 end
 
 function HttpFileServer:SendString(content)

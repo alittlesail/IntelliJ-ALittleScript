@@ -341,7 +341,7 @@ private auto __sub = String.sub;
 private auto __len = String.len;
 private auto __byte = String.byte;
 private auto __assert = assert;
-private static CreateSubInfo(string sub_type) : ProtocolInvokeInfo
+protected static CreateSubInfo(string sub_type) : ProtocolInvokeInfo
 {
     if (__find(sub_type, "List", 1) == 1)
         return CreateArrayInfo(sub_type);
@@ -358,7 +358,7 @@ private static CreateSubInfo(string sub_type) : ProtocolInvokeInfo
     return CreateMessageInfo(sub_type);
 }
 
-private static CreateArrayInfo(string var_type) : ProtocolInvokeInfo
+protected static CreateArrayInfo(string var_type) : ProtocolInvokeInfo
 {
     auto invoke_info = new ProtocolInvokeInfo();
     invoke_info.wfunc = PS_WriteArray;
@@ -367,7 +367,7 @@ private static CreateArrayInfo(string var_type) : ProtocolInvokeInfo
     return invoke_info;
 }
 
-private static CreateMapInfo(string var_type) : ProtocolInvokeInfo
+protected static CreateMapInfo(string var_type) : ProtocolInvokeInfo
 {
     auto invoke_info = new ProtocolInvokeInfo();
     auto sub_type = __sub(var_type, 5, -2);
@@ -398,14 +398,14 @@ private static CreateMapInfo(string var_type) : ProtocolInvokeInfo
     return invoke_info;
 }
 
-private static CreateMessageInfo(string var_type) : ProtocolInvokeInfo
+protected static CreateMessageInfo(string var_type) : ProtocolInvokeInfo
 {
     auto reflect_info = FindReflectByName(var_type);
     __assert(reflect_info != null, "FindReflect调用失败! 未知类型:" .. var_type);
     return CreateMessageInfoImpl(reflect_info);
 }
 
-private static CreateMessageInfoImpl(ReflectInfo reflect_info) : ProtocolInvokeInfo
+protected static CreateMessageInfoImpl(ReflectInfo reflect_info) : ProtocolInvokeInfo
 {
     auto invoke_info = new ProtocolInvokeInfo();
     invoke_info.wfunc = PS_WriteMessage;

@@ -68,7 +68,6 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         this.StartHeartbeat();
 
         // 返回协程
-        __MsgClientMap[this._interface.GetID()] = null;
         assert(coroutine.resume(this._co, null));
     }
 
@@ -183,7 +182,7 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
             return;
         if (this._heartbeat_loop != null)
             return;
-        this._heartbeat_loop = new LoopFunction(bind(this.SendHeartbeat, this, null), -1, this._heartbeat, 1);
+        this._heartbeat_loop = new LoopFunction(bind(this.SendHeartbeat, this, null), -1, this._heartbeat * 1000, 1);
         this._heartbeat_loop.Start();
     }
     // 停止发送心跳包

@@ -128,15 +128,16 @@ function MsgCommon:HandleMessage(id, rpc_id, factory)
 	end
 	self._id_map_rpc[rpc_id] = nil
 	if id == 1 then
-		coroutine.resume(info.co, factory:ReadString())
+		assert(coroutine.resume(info.co, factory:ReadString()))
 		return
 	end
 	local msg = self:MessageRead(factory, id)
 	if msg == nil then
+		assert(coroutine.resume(info.co, "MsgSystem.HandleMessage MessageRead failed by id:" .. id))
 		Log("MsgSystem.HandleMessage MessageRead failed by id:" .. id)
 		return
 	end
-	coroutine.resume(info.co, nil, msg)
+	assert(coroutine.resume(info.co, nil, msg))
 end
 
 function MsgCommon:Send(msg_id, msg_body, rpc_id)
@@ -187,13 +188,19 @@ function MsgCommon:HandleRPCRequest(id, rpc_id, factory)
 	end
 	local msg = self:MessageRead(factory, id)
 	if msg == nil then
+		self:SendRpcError(rpc_id, "MsgSystem.HandleMessage MessageRead failed by id:" .. id)
 		Log("MsgSystem.HandleMessage MessageRead failed by id:" .. id)
 		return
 	end
 	local error, return_body = pcall(callback, self, msg)
-	if error ~= true then
-		self:SendRpcError(rpc_id, return_body)
+	if error ~= nil then
+		self:SendRpcError(rpc_id, error)
 		Log("MsgSystem.HandleMessage callback invoke failed! by id:" .. id .. ", reason:" .. error)
+		return
+	end
+	if return_body == nil then
+		self:SendRpcError(rpc_id, "MsgSystem.HandleMessage callback have not return! by id:" .. id)
+		Log("MsgSystem.HandleMessage callback have not return! by id:" .. id)
 		return
 	end
 	self:Send(return_id, return_body, -rpc_id)

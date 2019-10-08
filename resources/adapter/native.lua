@@ -5,10 +5,7 @@ io = io
 bit = bit
 coroutine = coroutine
 require = require
-local __assert = assert
-assert = function(condition, message)
-    __assert(condition, message or "")
-end
+assert = assert
 type = type
 collectgarbage = collectgarbage
 local __pcall = pcall
