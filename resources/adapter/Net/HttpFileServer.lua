@@ -55,7 +55,10 @@ function HttpFileServer:StartReceiveFile(file_path, start_size)
 end
 
 function HttpFileServer:HandleReceiveResult(reason)
-	assert(coroutine.resume(self._co, reason))
+	local result, reason = coroutine.resume(self._co, reason)
+	if not result then
+		ALittle.Error(reason)
+	end
 end
 
 function HttpFileServer:SendString(content)
@@ -63,6 +66,6 @@ function HttpFileServer:SendString(content)
 end
 
 function HttpFileServer:Clsoe()
-	self._interface:Close()
+	self._interface:Close(self._http_id)
 end
 

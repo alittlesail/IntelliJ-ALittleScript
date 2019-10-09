@@ -52,7 +52,8 @@ public class HttpFileServer<HFSI : IHttpFileServerInterface> : public ALittle.IH
 
     public fun HandleReceiveResult(string reason)
     {
-        assert(coroutine.resume(this._co, reason));
+        auto result, auto reason = coroutine.resume(this._co, reason);
+        if (!result) ALittle.Error(reason);
     }
 
     public get invoked() : bool { return this._invoked; }
@@ -64,6 +65,6 @@ public class HttpFileServer<HFSI : IHttpFileServerInterface> : public ALittle.IH
 
     public fun Clsoe()
     {
-        this._interface.Close();
+        this._interface.Close(this._http_id);
     }
 }
