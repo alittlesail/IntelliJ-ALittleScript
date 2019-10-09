@@ -18,16 +18,6 @@ local floor = math.floor
 local time = os.time
 local maxn = table.maxn
 local random = math.random
-local JsonEncode = json.encode
-local JsonDecode = json.decode
-function JsonEncode(content)
-	return JsonEncode(content)
-end
-
-function JsonDecode(content)
-	return JsonDecode(content)
-end
-
 function String_CopyTable(info)
 	local new_info = {}
 	for key, value in ___pairs(info) do

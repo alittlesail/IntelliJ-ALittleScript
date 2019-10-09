@@ -14,20 +14,6 @@ private auto time = lua.os.time;
 private auto maxn = lua.table.maxn;
 private auto random = lua.math.random;
 
-private auto JsonEncode = lua.json.encode;
-private auto JsonDecode = lua.json.decode;
-
-// Json
-public static JsonEncode(any content) : string
-{
-    return JsonEncode(content);
-}
-
-public static JsonDecode(string content) : any
-{
-    return JsonDecode(content);
-}
-
 // 深度复制表
 public static String_CopyTable(any info) : any
 {

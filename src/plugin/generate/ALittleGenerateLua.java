@@ -276,7 +276,7 @@ public class ALittleGenerateLua {
             if (dotId != null) {
                 ALittleCustomTypeDotIdName dotIdName = dotId.getCustomTypeDotIdName();
                 if (dotIdName != null) {
-                    if (className.equals(mNamespaceName)) {
+                    if (className.equals(mNamespaceName) || className.equals("lua")) {
                         className = dotIdName.getText();
                     } else {
                         className += "." + dotIdName.getText();
@@ -291,7 +291,7 @@ public class ALittleGenerateLua {
                 ALittleReferenceUtil.GuessTypeInfo guessInfo = allType.guessType();
                 if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
                     String[] split = guessInfo.value.split("\\.");
-                    if (split.length == 2 && split[0].equals(mNamespaceName)) {
+                    if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
                         templateParamList.add(split[1]);
                     } else {
                         templateParamList.add(guessInfo.value);

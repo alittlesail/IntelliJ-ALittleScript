@@ -16,7 +16,7 @@ MsgClientTemplate = Class(MsgCommon, "ALittle.MsgClientTemplate")
 
 function MsgClientTemplate:Ctor(heartbeat, check_heartbeat, callback)
 	___rawset(self, "_interface", self.__class.__element[1]())
-	___rawset(self, "_write_factory", lua.MessageWriteFactory())
+	___rawset(self, "_write_factory", MessageWriteFactory())
 	___rawset(self, "_heartbeat", heartbeat)
 	___rawset(self, "_heartbeat_loop", nil)
 	___rawset(self, "_check_heartbeat", nil)
