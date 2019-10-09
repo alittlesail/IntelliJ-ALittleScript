@@ -19,6 +19,9 @@ end
 function ICSVFile:GetColCount()
 end
 
+local floor = math.floor
+local tonumber = tonumber
+local maxn = table.maxn
 local CSV_ReadBool
 CSV_ReadBool = function(content, value)
 	return content == "true"
@@ -29,7 +32,7 @@ CSV_ReadInt = function(content, value)
 	if content == "" then
 		return 0
 	end
-	return math.floor(tonumber(content))
+	return floor(tonumber(content))
 end
 
 local CSV_ReadLongLong
@@ -37,7 +40,7 @@ CSV_ReadLongLong = function(content, value)
 	if content == "" then
 		return 0
 	end
-	return math.floor(tonumber(content))
+	return floor(tonumber(content))
 end
 
 local CSV_ReadString
@@ -69,7 +72,7 @@ end
 
 function CSV_ReadMessage(content, value)
 	local list = String_Split(content, value.split)
-	local t = table.create()
+	local t = {}
 	for index, handle in ___ipairs(value.handle) do
 		t[handle.var_name] = handle.func(list[index], handle)
 	end
@@ -83,18 +86,15 @@ __csv_read_data_map["I64"] = CSV_ReadLongLong
 __csv_read_data_map["string"] = CSV_ReadString
 __csv_read_data_map["double"] = CSV_ReadDouble
 __split_list = {"#", "*", "|"}
-__split_list_last = __split_list[table.maxn(__split_list)]
-local __find = String.find
-local __sub = String.sub
-local __len = String.len
-local __byte = String.byte
-local __assert = assert
+__split_list_last = __split_list[maxn(__split_list)]
+local find = Find
+local sub = string.sub
 function CreateCSVSubInfo(sub_type, split_index)
-	if __find(sub_type, "List", 1) == 1 then
+	if find(sub_type, "List", 1) == 1 then
 		return CreateCSVArrayInfo(sub_type, split_index)
 	end
-	if __find(sub_type, "Map", 1) == 1 then
-		__assert(false, "不支持Map解析")
+	if find(sub_type, "Map", 1) == 1 then
+		Assert(false, "不支持Map解析")
 	end
 	local func = __csv_read_data_map[sub_type]
 	if func ~= nil then
@@ -106,18 +106,18 @@ function CreateCSVSubInfo(sub_type, split_index)
 end
 
 function CreateCSVArrayInfo(var_type, split_index)
-	__assert(split_index > 0, "分隔符数量不足")
+	Assert(split_index > 0, "分隔符数量不足")
 	local invoke_info = {}
 	invoke_info.func = CSV_ReadArray
 	invoke_info.split = __split_list[split_index]
-	invoke_info.sub_info = CreateCSVSubInfo(__sub(var_type, 6, -2), split_index - 1)
+	invoke_info.sub_info = CreateCSVSubInfo(sub(var_type, 6, -2), split_index - 1)
 	return invoke_info
 end
 
 function CreateCSVInfoImpl(var_type, split_index)
-	__assert(split_index > 0, "分隔符数量不足")
+	Assert(split_index > 0, "分隔符数量不足")
 	local reflect_info = FindReflectByName(var_type)
-	__assert(reflect_info ~= nil, "FindReflectByName调用失败! 未知类型:" .. var_type)
+	Assert(reflect_info ~= nil, "FindReflectByName调用失败! 未知类型:" .. var_type)
 	local invoke_info = {}
 	invoke_info.split = __split_list[split_index]
 	invoke_info.func = CSV_ReadMessage
@@ -134,8 +134,8 @@ function CreateCSVInfoImpl(var_type, split_index)
 end
 
 function CreateCSVInfo(reflect_info)
-	local split_index = table.maxn(__split_list)
-	__assert(split_index > 0, "分隔符数量不足")
+	local split_index = maxn(__split_list)
+	Assert(split_index > 0, "分隔符数量不足")
 	local invoke_info = {}
 	invoke_info.split = __split_list[split_index]
 	invoke_info.func = CSV_ReadMessage

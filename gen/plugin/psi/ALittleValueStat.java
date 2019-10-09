@@ -47,7 +47,7 @@ public interface ALittleValueStat extends PsiElement {
   ALittleOpNewStat getOpNewStat();
 
   @Nullable
-  ALittlePcallStat getPcallStat();
+  ALittleTcallStat getTcallStat();
 
   @Nullable
   ALittleValueFactorStat getValueFactorStat();

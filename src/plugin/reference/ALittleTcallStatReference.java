@@ -9,8 +9,8 @@ import plugin.psi.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ALittlePcallStatReference extends ALittleReference<ALittlePcallStat> {
-    public ALittlePcallStatReference(@NotNull ALittlePcallStat element, TextRange textRange) {
+public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat> {
+    public ALittleTcallStatReference(@NotNull ALittleTcallStat element, TextRange textRange) {
         super(element, textRange);
     }
 

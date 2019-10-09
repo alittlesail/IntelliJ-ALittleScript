@@ -69,6 +69,8 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   //             wrapExpr |
   //             propertyValueExpr |
   //             nsendExpr |
+  //             throwExpr |
+  //             assertExpr |
   //             emptyExpr
   public static boolean allExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "allExpr")) return false;
@@ -86,6 +88,8 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = wrapExpr(b, l + 1);
     if (!r) r = propertyValueExpr(b, l + 1);
     if (!r) r = nsendExpr(b, l + 1);
+    if (!r) r = throwExpr(b, l + 1);
+    if (!r) r = assertExpr(b, l + 1);
     if (!r) r = emptyExpr(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -101,6 +105,61 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = genericType(b, l + 1);
     if (!r) r = customType(b, l + 1);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // assert LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI
+  public static boolean assertExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assertExpr")) return false;
+    if (!nextTokenIs(b, ASSERT)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, ASSERT_EXPR, null);
+    r = consumeTokens(b, 1, ASSERT, LPAREN);
+    p = r; // pin = 1
+    r = r && report_error_(b, assertExpr_2(b, l + 1));
+    r = p && report_error_(b, consumeTokens(b, -1, RPAREN, SEMI)) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (valueStat (COMMA valueStat)*)?
+  private static boolean assertExpr_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assertExpr_2")) return false;
+    assertExpr_2_0(b, l + 1);
+    return true;
+  }
+
+  // valueStat (COMMA valueStat)*
+  private static boolean assertExpr_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assertExpr_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = valueStat(b, l + 1);
+    r = r && assertExpr_2_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (COMMA valueStat)*
+  private static boolean assertExpr_2_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assertExpr_2_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!assertExpr_2_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "assertExpr_2_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // COMMA valueStat
+  private static boolean assertExpr_2_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assertExpr_2_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && valueStat(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -2696,61 +2755,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // pcall LPAREN (valueStat (COMMA valueStat)*)? RPAREN
-  public static boolean pcallStat(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pcallStat")) return false;
-    if (!nextTokenIs(b, PCALL)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, PCALL_STAT, null);
-    r = consumeTokens(b, 1, PCALL, LPAREN);
-    p = r; // pin = 1
-    r = r && report_error_(b, pcallStat_2(b, l + 1));
-    r = p && consumeToken(b, RPAREN) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  // (valueStat (COMMA valueStat)*)?
-  private static boolean pcallStat_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pcallStat_2")) return false;
-    pcallStat_2_0(b, l + 1);
-    return true;
-  }
-
-  // valueStat (COMMA valueStat)*
-  private static boolean pcallStat_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pcallStat_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = valueStat(b, l + 1);
-    r = r && pcallStat_2_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (COMMA valueStat)*
-  private static boolean pcallStat_2_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pcallStat_2_0_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!pcallStat_2_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "pcallStat_2_0_1", c)) break;
-    }
-    return true;
-  }
-
-  // COMMA valueStat
-  private static boolean pcallStat_2_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pcallStat_2_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, COMMA);
-    r = r && valueStat(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // bool | double | int | I64 | any | string
   public static boolean primitiveType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "primitiveType")) return false;
@@ -3209,6 +3213,61 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // tcall LPAREN (valueStat (COMMA valueStat)*)? RPAREN
+  public static boolean tcallStat(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tcallStat")) return false;
+    if (!nextTokenIs(b, TCALL)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, TCALL_STAT, null);
+    r = consumeTokens(b, 1, TCALL, LPAREN);
+    p = r; // pin = 1
+    r = r && report_error_(b, tcallStat_2(b, l + 1));
+    r = p && consumeToken(b, RPAREN) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (valueStat (COMMA valueStat)*)?
+  private static boolean tcallStat_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tcallStat_2")) return false;
+    tcallStat_2_0(b, l + 1);
+    return true;
+  }
+
+  // valueStat (COMMA valueStat)*
+  private static boolean tcallStat_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tcallStat_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = valueStat(b, l + 1);
+    r = r && tcallStat_2_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (COMMA valueStat)*
+  private static boolean tcallStat_2_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tcallStat_2_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!tcallStat_2_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "tcallStat_2_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // COMMA valueStat
+  private static boolean tcallStat_2_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tcallStat_2_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && valueStat(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // LESS templatePairDec (COMMA templatePairDec)? GREATER
   public static boolean templateDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "templateDec")) return false;
@@ -3278,6 +3337,61 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // throw LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI
+  public static boolean throwExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "throwExpr")) return false;
+    if (!nextTokenIs(b, THROW)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, THROW_EXPR, null);
+    r = consumeTokens(b, 1, THROW, LPAREN);
+    p = r; // pin = 1
+    r = r && report_error_(b, throwExpr_2(b, l + 1));
+    r = p && report_error_(b, consumeTokens(b, -1, RPAREN, SEMI)) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (valueStat (COMMA valueStat)*)?
+  private static boolean throwExpr_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "throwExpr_2")) return false;
+    throwExpr_2_0(b, l + 1);
+    return true;
+  }
+
+  // valueStat (COMMA valueStat)*
+  private static boolean throwExpr_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "throwExpr_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = valueStat(b, l + 1);
+    r = r && throwExpr_2_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (COMMA valueStat)*
+  private static boolean throwExpr_2_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "throwExpr_2_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!throwExpr_2_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "throwExpr_2_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // COMMA valueStat
+  private static boolean throwExpr_2_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "throwExpr_2_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && valueStat(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // accessModifier? using usingNameDec ASSIGN allType SEMI
   public static boolean usingDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "usingDec")) return false;
@@ -3328,7 +3442,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | pcallStat | ncallStat | methodParamTailDec
+  // opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | tcallStat | ncallStat | methodParamTailDec
   public static boolean valueStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "valueStat")) return false;
     boolean r;
@@ -3344,7 +3458,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = valueFactorStat(b, l + 1);
     if (!r) r = opNewListStat(b, l + 1);
     if (!r) r = bindStat(b, l + 1);
-    if (!r) r = pcallStat(b, l + 1);
+    if (!r) r = tcallStat(b, l + 1);
     if (!r) r = ncallStat(b, l + 1);
     if (!r) r = methodParamTailDec(b, l + 1);
     exit_section_(b, l, m, r, false, null);

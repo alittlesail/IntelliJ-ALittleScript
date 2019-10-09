@@ -7,7 +7,7 @@ local ___ipairs = ipairs
 local ___coroutine = coroutine
 
 local __all_callback = {}
-table.setweak(__all_callback, false, true)
+Setweak(__all_callback, false, true)
 function RegMsgCallback(msg_id, callback)
 	if __all_callback[msg_id] ~= nil then
 		Error("RegMsgCallback消息回调函数注册失败，名字为" .. msg_id .. "已存在")
@@ -22,7 +22,7 @@ end
 
 local __all_rpc_callback = {}
 local __all_rpc_return_id = {}
-table.setweak(__all_rpc_callback, false, true)
+Setweak(__all_rpc_callback, false, true)
 function RegMsgRpcCallback(msg_id, callback, return_id)
 	if __all_rpc_callback[msg_id] ~= nil then
 		Error("RegMsgRpcCallback消息回调函数注册失败，名字为" .. msg_id .. "已存在")
@@ -42,7 +42,7 @@ MsgServer = Class(MsgCommon, "ALittle.MsgServer")
 function MsgServer:Ctor(client_id, remote_ip, remote_port)
 	___rawset(self, "_interface", self.__class.__element[1]())
 	self._interface:SetID(client_id)
-	___rawset(self, "_write_factory", self.__class.__element[2]())
+	___rawset(self, "_write_factory", lua.MessageWriteFactory())
 	___rawset(self, "_is_connected", true)
 	___rawset(self, "_client_id", client_id)
 	___rawset(self, "_remote_ip", remote_ip)
@@ -92,7 +92,7 @@ RouteServer = Class(MsgCommon, "ALittle.RouteServer")
 function RouteServer:Ctor(connect_key, route_type, route_num)
 	___rawset(self, "_interface", self.__class.__element[1]())
 	self._interface:SetID(connect_key)
-	___rawset(self, "_write_factory", self.__class.__element[2]())
+	___rawset(self, "_write_factory", lua.MessageWriteFactory())
 	___rawset(self, "_is_connected", true)
 	___rawset(self, "_connect_key", connect_key)
 	___rawset(self, "_route_type", route_type)

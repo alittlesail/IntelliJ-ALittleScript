@@ -1,4 +1,19 @@
+
 namespace ALittle;
+
+private auto open = lua.io.open;
+private auto rename = lua.os.rename;
+private auto remove = lua.os.remove;
+private auto maxn = lua.table.maxn;
+private auto sub = lua.String.sub;
+private auto len = lua.String.len;
+private auto upper = lua.String.upper;
+private auto attributes = lua.lfs.attributes;
+private auto dir = lua.lfs.dir;
+private auto currentdir = lua.lfs.currentdir;
+private auto chdir = lua.lfs.chdir;
+private auto rmdir = lua.lfs.rmdir;
+private auto mkdir = lua.lfs.mkdir;
 
 // 文件加载接口
 public class IFileLoader
@@ -11,7 +26,7 @@ public class NormalFileLoader : public IFileLoader
 {
     public fun Load(string file_path) : string
     {
-        auto file = io.open(file_path, "r");
+        auto file = open(file_path, "r");
         if (file == null) return null;
         auto content = file.read("*a");
         file.close();
@@ -30,7 +45,7 @@ public class NormalFileSaver : public IFileSaver
 {
     public fun Save(string file_path, string content) : bool
     {
-        auto file = io.open(file_path, "w");
+        auto file = open(file_path, "w");
         if (file == null) return false;
         file.write(content);
         file.close();
@@ -39,22 +54,22 @@ public class NormalFileSaver : public IFileSaver
 }
 
 // 获取当前路径
-public static File_GetCurrentPath() : string { return lua.lfs.currentdir(); }
+public static File_GetCurrentPath() : string { return currentdir(); }
 
 // 设置当前路径
-public static File_SetCurrentPath(string path) : bool { return lua.lfs.chdir(path); }
+public static File_SetCurrentPath(string path) : bool { return chdir(path); }
 
 // 重命名文件
-public static File_RenameFile(string path, string new_path) : bool { return os.rename(path, new_path); }
+public static File_RenameFile(string path, string new_path) : bool { return rename(path, new_path); }
 
 // 删除文件
-public static File_DeleteFile(string path) : bool { return os.remove(path); }
+public static File_DeleteFile(string path) : bool { return remove(path); }
 
 // 获取文件属性
-public static File_GetFileAttr(string path) : lua.fileattr { return lua.lfs.attributes(path); }
+public static File_GetFileAttr(string path) : lua.fileattr { return attributes(path); }
 
 // 遍历目录文件
-public static File_IteratorDir(string path) : Functor<(string,string)>, string, string { return lua.lfs.dir(path); }
+public static File_IteratorDir(string path) : Functor<(string,string)>, string, string { return dir(path); }
 
 // 获取某个目录以及子目录下的所有文件属性
 public static File_GetFileAttrByDir(string path, Map<string, lua.fileattr> file_map) : Map<string, lua.fileattr>
@@ -63,7 +78,7 @@ public static File_GetFileAttrByDir(string path, Map<string, lua.fileattr> file_
     if (file_map == null)
         file_map = new Map<string, lua.fileattr>();
     // 遍历路径
-    for (string file in lua.lfs.dir(path))
+    for (string file in dir(path))
     {
         // 跳过当前目录，父级目录
         if (file != "." && file != "..")
@@ -71,7 +86,7 @@ public static File_GetFileAttrByDir(string path, Map<string, lua.fileattr> file_
             // 生成文件目录
             string file_path = path .. "/" .. file;
             // 获取文件属性
-            lua.fileattr attr = lua.lfs.attributes(file_path);
+            lua.fileattr attr = attributes(file_path);
             // 如果是目录，那么就递归遍历
             if (attr.mode == "directory")
                 File_GetFileAttrByDir(file_path, file_map);
@@ -85,7 +100,7 @@ public static File_GetFileAttrByDir(string path, Map<string, lua.fileattr> file_
 }
 
 // 删除文件夹(只对空文件夹有效)
-public static File_DeleteDir(string path) : bool { return lua.lfs.rmdir(path); }
+public static File_DeleteDir(string path) : bool { return rmdir(path); }
 
 // 深度删除文件夹
 public static File_DeleteDeepDir(string path, bool log_path)
@@ -97,7 +112,7 @@ public static File_DeleteDeepDir(string path, bool log_path)
         return;
 
     // 遍历文件夹
-    for (string file in lua.lfs.dir(path))
+    for (string file in dir(path))
     {
         // 跳过当前目录，父级目录
         if (file != "." && file != "..")
@@ -105,7 +120,7 @@ public static File_DeleteDeepDir(string path, bool log_path)
             // 生成文件目录
             string file_path = path .. "/" .. file;
             // 获取文件属性
-            lua.fileattr attr = lua.lfs.attributes(file_path);
+            lua.fileattr attr = attributes(file_path);
             // 如果是目录，那么就递归删除文件夹
             if (attr.mode == "directory")
                 File_DeleteDeepDir(file_path, log_path);
@@ -123,7 +138,7 @@ public static File_DeleteDeepDir(string path, bool log_path)
 }
 
 // 创建文件夹
-public static File_MakeDir(string path) : bool { return lua.lfs.mkdir(path); }
+public static File_MakeDir(string path) : bool { return mkdir(path); }
 
 // 深度创建文件夹
 public static File_MakeDeepDir(string path)
@@ -137,7 +152,7 @@ public static File_MakeDeepDir(string path)
         // 计算当前要创建的路径
         cur_path = cur_path .. sub_path;
         // 创建路径
-        lua.lfs.mkdir(cur_path);
+        mkdir(cur_path);
         // 添加分隔符
         cur_path = cur_path .. "/";
     }
@@ -147,31 +162,31 @@ public static File_MakeDeepDir(string path)
 public static File_GetFileNameByPath(string file_path) : string
 {
     auto list = String_SplitSepList(file_path, ["/","\\"]);
-    auto len = table.maxn(list);
-    if (len <= 0) return file_path;
-    return list[len];
+    auto l = maxn(list);
+    if (l <= 0) return file_path;
+    return list[l];
 }
 
 // 从路径中获取路径
 public static File_GetFilePathByPath(string file_path) : string
 {
     string new_file_path = File_GetFileNameByPath(file_path);
-    return String.sub(file_path, 1, -String.len(new_file_path) - 2);
+    return sub(file_path, 1, -len(new_file_path) - 2);
 }
 
 // 从路径中获取扩展名
 public static File_GetFileExtByPath(string file_path) : string
 {
     auto list = String_Split(file_path, ".");
-    auto len = table.maxn(list);
-    if (len <= 0) return file_path;
-    return list[len];
+    auto l = maxn(list);
+    if (l <= 0) return file_path;
+    return list[l];
 }
 
 // 从路径中获取扩展名并改为大写
 public static File_GetFileExtByPathAndUpper(string file_path) : string
 {
-    return String.upper(File_GetFileExtByPath(file_path));
+    return upper(File_GetFileExtByPath(file_path));
 }
 
 // 从路径中获取文件名(不带后缀)
@@ -179,7 +194,7 @@ public static File_GetJustFileNameByPath(string file_path) : string
 {
     string new_file_path = File_GetFileNameByPath(file_path);
     auto list = String_Split(new_file_path, ".");
-    int len = table.maxn(list);
-    if (len <= 1) return new_file_path;
-    return list[len - 1];
+    int l = maxn(list);
+    if (l <= 1) return new_file_path;
+    return list[l - 1];
 }

@@ -40,7 +40,7 @@ function LoopSystem:Ctor(weak)
 	___rawset(self, "_loop_cache", {})
 	___rawset(self, "_cache_empty", true)
 	if weak then
-		table.setweak(self._loop_updaters, true, false)
+		Setweak(self._loop_updaters, true, false)
 	end
 end
 

@@ -35,7 +35,7 @@ public class EventDispatcher
             // 创建回调映射表
             callback_table = new Map<any, Map<Functor<(any, Event)>, bool> >();
             // 设置为弱引用表
-            table.setweak(callback_table, true, false);
+            Setweak(callback_table, true, false);
             // 保存表
             this._listeners[event_type] = callback_table;
         }

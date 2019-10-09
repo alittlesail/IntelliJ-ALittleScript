@@ -16,7 +16,7 @@ MsgClient = Class(MsgCommon, "ALittle.MsgClient")
 
 function MsgClient:Ctor(heartbeat, check_heartbeat, callback)
 	___rawset(self, "_interface", self.__class.__element[1]())
-	___rawset(self, "_write_factory", self.__class.__element[2]())
+	___rawset(self, "_write_factory", lua.MessageWriteFactory())
 	___rawset(self, "_heartbeat", heartbeat)
 	___rawset(self, "_heartbeat_loop", nil)
 	___rawset(self, "_check_heartbeat", nil)
@@ -44,7 +44,10 @@ function MsgClient:HandleConnectSucceed()
 	self._last_recv_time = 0
 	self:SendHeartbeat()
 	self:StartHeartbeat()
-	assert(coroutine.resume(self._co, nil))
+	local result, reason = coroutine.resume(self._co, nil)
+	if result ~= true then
+		Error(reason)
+	end
 end
 
 function MsgClient:HandleDisconnect()
@@ -61,7 +64,10 @@ function MsgClient:HandleConnectFailed(error)
 	if error == nil then
 		error = self._ip .. ":" .. self._port .. "连接失败"
 	end
-	assert(coroutine.resume(self._co, error))
+	local result, reason = coroutine.resume(self._co, error)
+	if result ~= true then
+		Error(reason)
+	end
 end
 
 function MsgClient:Close(reason)

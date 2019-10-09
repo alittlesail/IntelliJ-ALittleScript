@@ -25,7 +25,7 @@ public class IMsgInterface
     public fun GetID() : int {}
     public fun Connect(string ip, int port) {}
     public fun IsConnected() : bool {}
-    public fun SendFactory(IMessageWriteFactory factory) {}
+    public fun SendFactory(lua.MessageWriteFactory factory) {}
     public fun Close() {}
 }
 
@@ -33,20 +33,20 @@ public class IMsgInterface
 struct MsgClientRPCInfo
 {
     int rpc_id;
-    thread co;
+    lua.thread co;
 }
 
 // 用于长连接
 public class MsgCommon : public IMsgClient
 {
     private IMsgInterface _interface;      // 网络对象
-    private IMessageWriteFactory _write_factory;     // 协议序列化对象
+    private lua.MessageWriteFactory _write_factory;     // 协议序列化对象
     private Map<int, ProtocolInvokeInfo> _invoke_map;// 协议缓存数据
 
     private int _last_recv_time;
     private SafeIDCreator _id_creator;
     private Map<int, MsgClientRPCInfo> _id_map_rpc;
-    private thread _co;
+    private lua.thread _co;
 
     // @param heartbeat 心跳间隔时间(秒)
     // @param check_heartbeat 检测心跳是否有接受到回复
@@ -70,12 +70,12 @@ public class MsgCommon : public IMsgClient
     }
 
     // 消息读取
-    private fun MessageRead(IMessageReadFactory factory, int msg_id) : any
+    private fun MessageRead(lua.MessageReadFactory factory, int msg_id) : any
     {
         auto info = this._invoke_map[msg_id];
         if (info == null)
         {
-            auto error, auto invoke_info = pcall(CreateProtocolInvokeInfo, msg_id);
+            auto error, auto invoke_info = tcall(CreateProtocolInvokeInfo, msg_id);
             if (error != null)
             {
                 Error(error);
@@ -93,7 +93,7 @@ public class MsgCommon : public IMsgClient
         auto info = this._invoke_map[msg_id];
         if (info == null)
         {
-            auto error, auto invoke_info = pcall(CreateProtocolInvokeInfo, msg_id);
+            auto error, auto invoke_info = tcall(CreateProtocolInvokeInfo, msg_id);
             if (error != null)
             {
                 Error(error);
@@ -108,13 +108,13 @@ public class MsgCommon : public IMsgClient
     }
 
     // 收到服务端发来的数据包
-    public fun HandleMessage(int id, int rpc_id, IMessageReadFactory factory)
+    public fun HandleMessage(int id, int rpc_id, lua.MessageReadFactory factory)
     {
         // 消息id为0，心跳包返回
         if (id == 0)
         {
             // 记录最后接受时间
-            this._last_recv_time = os.clock();
+            this._last_recv_time = lua.os.clock();
             return;
         }
 
@@ -161,18 +161,21 @@ public class MsgCommon : public IMsgClient
         // 如果是RPC异常包
         if (id == 1)
         {
-            assert(coroutine.resume(info.co, factory.ReadString()));
+            auto result, auto reason = lua.coroutine.resume(info.co, factory.ReadString());
+            if (result != true) Error(reason);
             return;
         }
 
         any msg = this.MessageRead(factory, id);
         if (msg == null)
         {
-            assert(coroutine.resume(info.co, "MsgSystem.HandleMessage MessageRead failed by id:"..id));
+            auto result, auto reason = lua.coroutine.resume(info.co, "MsgSystem.HandleMessage MessageRead failed by id:"..id);
+            if (result != true) Error(reason);
             Log("MsgSystem.HandleMessage MessageRead failed by id:"..id);
             return;
         }
-        assert(coroutine.resume(info.co, null, msg));
+        auto result, auto reason = lua.coroutine.resume(info.co, null, msg);
+        if (result != true) Error(reason);
     }
 
     // 发送数据包
@@ -203,7 +206,7 @@ public class MsgCommon : public IMsgClient
     // 发送RPC包
     public await fun SendRPC(int msg_id, any msg_body) : string, any
     {
-        thread co = coroutine.running();
+        auto co = lua.coroutine.running();
         if (co == null)
             return "当前不是协程", null;
 
@@ -224,7 +227,7 @@ public class MsgCommon : public IMsgClient
     }
 
     // 处理RPC请求
-    private async fun HandleRPCRequest(int id, int rpc_id, IMessageReadFactory factory)
+    private async fun HandleRPCRequest(int id, int rpc_id, lua.MessageReadFactory factory)
     {
         // 获取函数对象
         auto callback, int return_id = FindMsgRpcCallback(id);
@@ -244,7 +247,7 @@ public class MsgCommon : public IMsgClient
         }
 
         // 调用函数
-        auto error, any return_body = pcall(callback, this, msg);
+        auto error, any return_body = tcall(callback, this, msg);
         if (error != null)
         {
             this.SendRpcError(rpc_id, error);
@@ -274,7 +277,7 @@ public class MsgCommon : public IMsgClient
         // 逐个调用表示失败
         for (int rpc_id, MsgClientRPCInfo info in tmp)
         {
-            auto result, auto reason = coroutine.resume(info.co, reason, null);
+            auto result, auto reason = lua.coroutine.resume(info.co, reason, null);
             if (result != true) Error(reason);
         }
     }

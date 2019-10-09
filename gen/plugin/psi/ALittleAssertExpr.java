@@ -8,7 +8,7 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public interface ALittlePcallStat extends PsiElement {
+public interface ALittleAssertExpr extends PsiElement {
 
   @NotNull
   List<ALittleValueStat> getValueStatList();

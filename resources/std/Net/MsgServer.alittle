@@ -2,7 +2,7 @@
 namespace ALittle;
 
 private auto __all_callback = new Map<int, Functor<(IMsgClient, any)>>();
-table.setweak(__all_callback, false, true);
+Setweak(__all_callback, false, true);
 protected static RegMsgCallback(int msg_id, Functor<(IMsgClient, any)> callback)
 {
     if (__all_callback[msg_id] != null)
@@ -21,7 +21,7 @@ public static FindMsgCallback(int msg_id) : Functor<(IMsgClient, any)>
 // 注册回调函数
 private auto __all_rpc_callback = new Map<int, Functor<await(IMsgClient, any): any>>();
 private auto __all_rpc_return_id = new Map<int, int>();
-table.setweak(__all_rpc_callback, false, true);
+Setweak(__all_rpc_callback, false, true);
 protected static RegMsgRpcCallback(int msg_id, Functor<await(IMsgClient, any) : any> callback, int return_id)
 {
     if (__all_rpc_callback[msg_id] != null)
@@ -38,7 +38,7 @@ public static FindMsgRpcCallback(int msg_id) : Functor<await(IMsgClient, any) : 
     return __all_rpc_callback[msg_id], __all_rpc_return_id[msg_id];
 }
 
-public class MsgServer<MI : IMsgInterface, MWF : IMessageWriteFactory> : public MsgCommon
+public class MsgServer<MI : IMsgInterface> : public MsgCommon
 {
     private int _client_id;
     private string _remote_ip;
@@ -56,7 +56,7 @@ public class MsgServer<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         this._interface = new MI();
 
         this._interface.SetID(client_id);
-        this._write_factory = new MWF();
+        this._write_factory = new lua.MessageWriteFactory();
         this._is_connected = true;
 
         this._client_id = client_id;
@@ -99,7 +99,7 @@ public class MsgServer<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
     }
 }
 
-public class RouteServer<MI : IMsgInterface, MWF : IMessageWriteFactory> : public MsgCommon
+public class RouteServer<MI : IMsgInterface> : public MsgCommon
 {
     private int _connect_key;
     private int _route_type;
@@ -111,7 +111,7 @@ public class RouteServer<MI : IMsgInterface, MWF : IMessageWriteFactory> : publi
         // 创建客户端对象
         this._interface = new MI();
         this._interface.SetID(connect_key);
-        this._write_factory = new MWF();
+        this._write_factory = new lua.MessageWriteFactory();
         this._is_connected = true;
 
         this._connect_key = connect_key;

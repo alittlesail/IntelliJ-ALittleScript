@@ -103,8 +103,8 @@ public class ALittleValueStatImpl extends ASTWrapperPsiElement implements ALittl
 
   @Override
   @Nullable
-  public ALittlePcallStat getPcallStat() {
-    return findChildByClass(ALittlePcallStat.class);
+  public ALittleTcallStat getTcallStat() {
+    return findChildByClass(ALittleTcallStat.class);
   }
 
   @Override

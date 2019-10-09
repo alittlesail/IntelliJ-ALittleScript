@@ -19,6 +19,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitAssertExpr(@NotNull ALittleAssertExpr o) {
+    visitPsiElement(o);
+  }
+
   public void visitAutoType(@NotNull ALittleAutoType o) {
     visitPsiElement(o);
   }
@@ -379,10 +383,6 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitPcallStat(@NotNull ALittlePcallStat o) {
-    visitPsiElement(o);
-  }
-
   public void visitPrimitiveType(@NotNull ALittlePrimitiveType o) {
     visitPsiElement(o);
   }
@@ -467,11 +467,19 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitTcallStat(@NotNull ALittleTcallStat o) {
+    visitPsiElement(o);
+  }
+
   public void visitTemplateDec(@NotNull ALittleTemplateDec o) {
     visitPsiElement(o);
   }
 
   public void visitTemplatePairDec(@NotNull ALittleTemplatePairDec o) {
+    visitPsiElement(o);
+  }
+
+  public void visitThrowExpr(@NotNull ALittleThrowExpr o) {
     visitPsiElement(o);
   }
 

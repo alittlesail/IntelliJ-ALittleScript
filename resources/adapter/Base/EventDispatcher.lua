@@ -23,7 +23,7 @@ function EventDispatcher:AddEventListener(event_type, object, callback)
 	local callback_table = self._listeners[event_type]
 	if callback_table == nil then
 		callback_table = {}
-		table.setweak(callback_table, true, false)
+		Setweak(callback_table, true, false)
 		self._listeners[event_type] = callback_table
 	end
 	local callback_value = callback_table[object]

@@ -103,6 +103,8 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "yield"               { return YIELD; }
   "break"               { return BREAK; }
   "nsend"               { return NSEND; }
+  "throw"               { return THROW; }
+  "assert"              { return ASSERT; }
   "Map"                 { return MAP; }
   "List"                { return LIST; }
   "Functor"             { return FUNCTOR; }
@@ -115,7 +117,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "auto"                { return AUTO; }
   "new"                 { return NEW; }
   "bind"                { return BIND; }
-  "pcall"               { return PCALL; }
+  "tcall"               { return TCALL; }
   "ncall"               { return NCALL; }
   "true"                { return TRUE; }
   "false"               { return FALSE; }

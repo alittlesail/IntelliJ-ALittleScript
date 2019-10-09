@@ -17,7 +17,7 @@ public static FindHttpClient(int id) : IHttpClient { return __HttpClientMap[id];
 public class HttpClient<HC : IHttpInterface> : public IHttpClient
 {
     private HC _interface;
-    private thread _co;
+    private lua.thread _co;
     private string _ip;
     private int _port;
 
@@ -30,7 +30,7 @@ public class HttpClient<HC : IHttpInterface> : public IHttpClient
 
     protected await fun SendRPC(string method, any content) : string, any
     {
-        thread co = coroutine.running();
+        auto co = lua.coroutine.running();
         if (co == null)
             return "当前不是协程", null;
 
@@ -56,23 +56,27 @@ public class HttpClient<HC : IHttpInterface> : public IHttpClient
     public fun HandleSucceed()
     {
         __HttpClientMap[this._interface.GetID()] = null;
-        auto error, Map<string, any> param = pcall(lua.json.decode, this._interface.GetResponse());
+        auto error, Map<string, any> param = tcall(lua.json.decode, this._interface.GetResponse());
         if (error != null)
         {
-            assert(coroutine.resume(this._co, error, null));
+            auto result, auto reason = lua.coroutine.resume(this._co, error, null);
+            if (result != true) Error(reason);
             return;
         }
         if (param["error"] != null)
         {
-            assert(coroutine.resume(this._co, param["error"], null));
+            auto result, auto reason = lua.coroutine.resume(this._co, param["error"], null);
+            if (result != true) Error(reason);
             return;
         }
-        assert(coroutine.resume(this._co, null, param));
+        auto result, auto reason = lua.coroutine.resume(this._co, null, param);
+        if (result != true) Error(reason);
     }
 
     public fun HandleFailed(string reason)
     {
         __HttpClientMap[this._interface.GetID()] = null;
-        assert(coroutine.resume(this._co, reason, null));
+        auto result, auto reason = lua.coroutine.resume(this._co, reason, null);
+        if (result != true) Error(reason);
     }
 }

@@ -1,12 +1,8 @@
 
-register namespace ALittle;
+register namespace lua;
 
 // require a script
 public static require(string path) {}
-
-// Issues an error when the value of its argument v is false (i.e., nil or false);
-// otherwise, returns all its arguments. message is an error message; when absent, it defaults to "assertion failed!"
-public static assert(bool c, string m) {}
 
 // Returns the type of its only argument, coded as a string.
 // The possible results of this function are
@@ -33,8 +29,7 @@ public static collectgarbage(string cmd) {}
 // A global variable (not a function) that holds the global environment (that is, _G._G = _G).
 // Lua itself does not use this variable;
 // changing its value does not affect any environment, nor vice-versa. (Use setfenv to change environments.)
-public class G {}
-public G _G;
+public Map<string, any> _G;
 
 // Receives an argument of any type and converts it to a string in a reasonable format.
 // For complete control of how numbers are converted, use string.format.
@@ -96,3 +91,10 @@ public static rawset(any table, any index, any value) {}
 // print is not intended for formatted output, but only as a quick way to show a value, typically for debugging.
 // For formatted output, use string.format.
 public static print(...) {}
+
+// Calls function f with the given arguments in protected mode.
+// This means that any error inside f is not propagated; instead, pcall catches the error and returns a status code.
+// Its first result is the status code (a boolean), which is true if the call succeeds without errors.
+// In such case, pcall also returns all results from the call, after this first result.
+// In case of any error, pcall returns false plus the error message.
+public static pcall(...) : bool, string {}

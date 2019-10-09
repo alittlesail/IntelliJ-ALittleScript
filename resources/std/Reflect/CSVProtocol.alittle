@@ -1,7 +1,7 @@
 
 namespace ALittle;
 
-protected class ICSVFile
+public class ICSVFile
 {
     public fun Close() {}
     public fun ReadCell(int lua_row, int lua_col) : string {}
@@ -9,7 +9,7 @@ protected class ICSVFile
     public fun GetColCount() : int {}
 }
 
-protected struct CSVInvokeInfo
+public struct CSVInvokeInfo
 {
     Functor<(string, CSVInvokeInfo):any> func;
 
@@ -26,6 +26,10 @@ protected struct CSVInvokeInfo
 
 //回调注册部分//////////////////////////////////////////////////////////////////////////////////////////////////////////-
 
+private auto floor = lua.math.floor;
+private auto tonumber = lua.tonumber;
+private auto maxn = lua.table.maxn;
+
 private static CSV_ReadBool(string content, CSVInvokeInfo value) : bool
 {
     return content == "true";
@@ -34,13 +38,13 @@ private static CSV_ReadBool(string content, CSVInvokeInfo value) : bool
 private static CSV_ReadInt(string content, CSVInvokeInfo value) : int
 {
     if (content == "") return 0;
-    return math.floor(tonumber(content));
+    return floor(tonumber(content));
 }
 
 private static CSV_ReadLongLong(string content, CSVInvokeInfo value) : I64
 {
     if (content == "") return 0;
-    return math.floor(tonumber(content));
+    return floor(tonumber(content));
 }
 
 private static CSV_ReadString(string content, CSVInvokeInfo value) : string
@@ -70,7 +74,7 @@ private static CSV_ReadArray(string content, CSVInvokeInfo value) : List<any>
 protected static CSV_ReadMessage(string content, CSVInvokeInfo value) : any
 {
     auto list = String_Split(content, value.split);
-    Map<string, any> t = table.create();
+    Map<string, any> t = new Map<string, any>();
     for (auto index, auto handle in value.handle)
     {
         t[handle.var_name] = handle.func(list[index], handle);
@@ -86,21 +90,18 @@ __csv_read_data_map["string"] = CSV_ReadString;
 __csv_read_data_map["double"] = CSV_ReadDouble;
 
 protected auto __split_list = ["#","*","|"];
-protected auto __split_list_last = __split_list[table.maxn(__split_list)];
+protected auto __split_list_last = __split_list[maxn(__split_list)];
 
 //构造部分//////////////////////////////////////////////////////////////////////////////////////////////////////////-
-private auto __find = String.find;
-private auto __sub = String.sub;
-private auto __len = String.len;
-private auto __byte = String.byte;
-private auto __assert = assert;
+private auto find = Find;
+private auto sub = lua.String.sub;
 protected static CreateCSVSubInfo(string sub_type, int split_index) : CSVInvokeInfo
 {
-    if (__find(sub_type, "List", 1) == 1)
+    if (find(sub_type, "List", 1) == 1)
         return CreateCSVArrayInfo(sub_type, split_index);
 
-    if (__find(sub_type, "Map", 1) == 1)
-        __assert(false, "不支持Map解析");
+    if (find(sub_type, "Map", 1) == 1)
+        assert(false, "不支持Map解析");
 
     auto func = __csv_read_data_map[sub_type];
     if (func != null)
@@ -115,21 +116,21 @@ protected static CreateCSVSubInfo(string sub_type, int split_index) : CSVInvokeI
 
 protected static CreateCSVArrayInfo(string var_type, int split_index) : CSVInvokeInfo
 {
-    __assert(split_index > 0, "分隔符数量不足");
+    assert(split_index > 0, "分隔符数量不足");
 
     auto invoke_info = new CSVInvokeInfo();
     invoke_info.func = CSV_ReadArray;
     invoke_info.split = __split_list[split_index];
-    invoke_info.sub_info = CreateCSVSubInfo(__sub(var_type, 6, -2), split_index - 1);
+    invoke_info.sub_info = CreateCSVSubInfo(sub(var_type, 6, -2), split_index - 1);
     return invoke_info;
 }
 
 protected static CreateCSVInfoImpl(string var_type, int split_index) : CSVInvokeInfo
 {
-    __assert(split_index > 0, "分隔符数量不足");
+    assert(split_index > 0, "分隔符数量不足");
 
     auto reflect_info = FindReflectByName(var_type);
-    __assert(reflect_info != null, "FindReflectByName调用失败! 未知类型:" .. var_type);
+    assert(reflect_info != null, "FindReflectByName调用失败! 未知类型:" .. var_type);
 
     auto invoke_info = new CSVInvokeInfo();
     invoke_info.split = __split_list[split_index];
@@ -150,8 +151,8 @@ protected static CreateCSVInfoImpl(string var_type, int split_index) : CSVInvoke
 
 protected static CreateCSVInfo(ReflectInfo reflect_info) : CSVInvokeInfo
 {
-    int split_index = table.maxn(__split_list);
-    __assert(split_index > 0, "分隔符数量不足");
+    int split_index = maxn(__split_list);
+    assert(split_index > 0, "分隔符数量不足");
 
     auto invoke_info = new CSVInvokeInfo();
     invoke_info.split = __split_list[split_index];

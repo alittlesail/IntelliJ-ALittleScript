@@ -2,7 +2,7 @@
 namespace ALittle;
 
 private auto __all_callback = new Map<string, Functor<await(IHttpFileClient, any):any>>();
-table.setweak(__all_callback, false, true);
+Setweak(__all_callback, false, true);
 protected static RegHttpFileCallback(string method, Functor<await(IHttpFileClient, any):any> callback)
 {
     if (__all_callback[method] != null)
@@ -28,13 +28,13 @@ public class IHttpFileServerInterface
 public class HttpFileServer<HFSI : IHttpFileServerInterface> : public ALittle.IHttpFileClient
 {
     private int _http_id;
-    private thread _co;
+    private lua.thread _co;
     private string _file_path;
     private HFSI _interface;
 
     private bool _invoked;
 
-    public Ctor(int http_id, thread co)
+    public Ctor(int http_id, lua.thread co)
     {
         this._http_id = http_id;
         this._co = co;
@@ -52,7 +52,7 @@ public class HttpFileServer<HFSI : IHttpFileServerInterface> : public ALittle.IH
 
     public fun HandleReceiveResult(string reason)
     {
-        auto result, auto reason = coroutine.resume(this._co, reason);
+        auto result, auto reason = lua.coroutine.resume(this._co, reason);
         if (!result) ALittle.Error(reason);
     }
 

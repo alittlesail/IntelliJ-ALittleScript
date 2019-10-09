@@ -1,7 +1,7 @@
 namespace ALittle;
 
 private auto __all_callback = new Map<string, Functor<await(IHttpClient, any):any>>();
-table.setweak(__all_callback, false, true);
+Setweak(__all_callback, false, true);
 protected static RegHttpCallback(string method, Functor<await(IHttpClient, any):any> callback)
 {
     if (__all_callback[method] != null)
@@ -18,7 +18,7 @@ public static FindHttpCallback(string method) : Functor<await(IHttpClient, any):
 }
 
 private auto __all_download_callback = new Map<string, Functor<await(IHttpClient, any):string, int>>();
-table.setweak(__all_download_callback, false, true);
+Setweak(__all_download_callback, false, true);
 protected static RegHttpDownloadCallback(string method, Functor<await(IHttpClient, any):string, int> callback)
 {
     if (__all_download_callback[method] != null)

@@ -5,6 +5,11 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
+local select = select
+local unpack = unpack
+local tostring = tostring
+local setmetatable = setmetatable
+local coroutine = coroutine
 local __functor_mt = {}
 local __functor_mt__call
 __functor_mt__call = function(caller, ...)

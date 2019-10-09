@@ -88,12 +88,18 @@ end
 
 function HttpFileClient:HandleSucceed()
 	__HttpFileClientMap[self._interface:GetID()] = nil
-	assert(coroutine.resume(self._co, nil, nil))
+	local result, reason = coroutine.resume(self._co, nil, nil)
+	if result ~= true then
+		Error(reason)
+	end
 end
 
 function HttpFileClient:HandleFailed(reason)
 	__HttpFileClientMap[self._interface:GetID()] = nil
-	assert(coroutine.resume(self._co, reason, nil))
+	local result, reason = coroutine.resume(self._co, reason, nil)
+	if result ~= true then
+		Error(reason)
+	end
 end
 
 function HttpFileClient:HandleProcess()

@@ -119,13 +119,13 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GeneratePcallStat(ALittlePcallStat pcallStat) throws Exception {
+    private String GenerateTcallStat(ALittleTcallStat pcallStat) throws Exception {
         List<ALittleValueStat> valueStatList = pcallStat.getValueStatList();
 
         String namespacePre = "ALittle.";
         if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
-        String content = namespacePre + "pcall(";
+        String content = namespacePre + "TCall(";
         List<String> paramList = new ArrayList<>();
         for (ALittleValueStat valueStat : valueStatList) {
             paramList.add(GenerateValueStat(valueStat));
@@ -801,8 +801,8 @@ public class ALittleGenerateLua {
         ALittleBindStat bindStat = rootStat.getBindStat();
         if (bindStat != null) return GenerateBindStat(bindStat);
 
-        ALittlePcallStat pcallStat = rootStat.getPcallStat();
-        if (pcallStat != null) return GeneratePcallStat(pcallStat);
+        ALittleTcallStat tcallStat = rootStat.getTcallStat();
+        if (tcallStat != null) return GenerateTcallStat(tcallStat);
 
         ALittleNcallStat ncallStat = rootStat.getNcallStat();
         if (ncallStat != null) return GenerateNcallStat(ncallStat);
@@ -1115,6 +1115,55 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    @NotNull
+    private String GenerateThrowExpr(ALittleThrowExpr throwExpr, String preTab) throws Exception {
+        List<ALittleValueStat> valueStatList = throwExpr.getValueStatList();
+        if (valueStatList.isEmpty()) throw new Exception("throw第一个参数必须是string类型");
+        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStatList.get(0).guessType();
+        if (!guessInfo.value.equals("string")) {
+            throw new Exception("throw第一个参数必须是string类型");
+        }
+        if (valueStatList.size() != 1) {
+            throw new Exception("throw只有一个参数");
+        }
+
+        String namespacePre = "ALittle.";
+        if (mNamespaceName.equals("ALittle")) namespacePre = "";
+
+        String replaceTest = "Throw";
+        String content = preTab + namespacePre + replaceTest + "(";
+        List<String> paramList = new ArrayList<>();
+        for (int i = 0; i < valueStatList.size(); ++i) {
+            paramList.add(GenerateValueStat(valueStatList.get(i)));
+        }
+        content += String.join(", ", paramList);
+        content += ")\n";
+        return content;
+    }
+
+    @NotNull
+    private String GenerateAssertExpr(ALittleAssertExpr assertExpr, String preTab) throws Exception {
+        List<ALittleValueStat> valueStatList = assertExpr.getValueStatList();
+        if (valueStatList.size() != 2) throw new Exception("assert有且仅有两个参数，第一个是任意类型，第二个是string类型");
+
+        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStatList.get(1).guessType();
+        if (!guessInfo.value.equals("string")) {
+            throw new Exception("assert第二个参数必须是string类型");
+        }
+
+        String namespacePre = "ALittle.";
+        if (mNamespaceName.equals("ALittle")) namespacePre = "";
+
+        String replaceTest = "Assert";
+        String content = preTab + namespacePre + replaceTest + "(";
+        List<String> paramList = new ArrayList<>();
+        for (int i = 0; i < valueStatList.size(); ++i) {
+            paramList.add(GenerateValueStat(valueStatList.get(i)));
+        }
+        content += String.join(", ", paramList);
+        content += ")\n";
+        return content;
+    }
 
     @NotNull
     private String GenerateOp1Expr(ALittleOp1Expr root, String preTab) throws Exception {
@@ -1500,6 +1549,10 @@ public class ALittleGenerateLua {
                 exprList.add(GeneratePropertyValueExpr((ALittlePropertyValueExpr)child, preTab));
             } else if (child instanceof ALittleNsendExpr) {
                 exprList.add(GenerateNsendExpr((ALittleNsendExpr)child, preTab));
+            } else if (child instanceof ALittleThrowExpr) {
+                exprList.add(GenerateThrowExpr((ALittleThrowExpr)child, preTab));
+            } else if (child instanceof ALittleAssertExpr) {
+                exprList.add(GenerateAssertExpr((ALittleAssertExpr)child, preTab));
             }
         }
 

@@ -18,7 +18,7 @@ public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
         if (content == null) return;
 
         // 解析配置文件
-        string error, any json_content = pcall(lua.json.decode, content);
+        string error, any json_content = tcall(lua.json.decode, content);
         if (error != null)
         {
             Log("Json Decode failed." .. file_path .. ", " .. error);
@@ -41,21 +41,21 @@ public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
     {
         auto value = this.GetConfig(key, default);
         if (value == null) value = 0;
-        return math.floor(tonumber(value));
+        return lua.math.floor(lua.tonumber(value));
     }
 
     public fun GetDouble(string key, double default) : double
     {
         auto value = this.GetConfig(key, default);
         if (value == null) value = 0;
-        return tonumber(value);
+        return lua.tonumber(value);
     }
 
     public fun GetString(string key, string default) : string
     {
         auto value = this.GetConfig(key, default);
         if (value == null) value = "";
-        return tostring(this.GetConfig(key, default));
+        return lua.tostring(this.GetConfig(key, default));
     }
 
     public fun SetConfig(string key, any value, bool not_save)

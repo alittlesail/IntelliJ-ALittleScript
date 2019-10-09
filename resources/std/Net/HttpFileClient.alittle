@@ -20,7 +20,7 @@ public static FindHttpFileClient(int id) : IHttpFileClient { return __HttpFileCl
 public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
 {
     private HFC _interface;
-    private thread _co;
+    private lua.thread _co;
     private string _ip;
     private int _port;
     private string _file_path;
@@ -39,7 +39,7 @@ public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
 
     public await fun SendDownloadRPC(string method, any content) : string
     {
-        thread co = coroutine.running();
+        auto co = lua.coroutine.running();
         if (co == null)
             return "当前不是协程";
 
@@ -60,7 +60,7 @@ public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
 
     public await fun SendUploadRPC(string method, any content) : string, any
     {
-        thread co = coroutine.running();
+        auto co = lua.coroutine.running();
         if (co == null)
             return "当前不是协程", null;
 
@@ -92,13 +92,15 @@ public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
     public fun HandleSucceed()
     {
         __HttpFileClientMap[this._interface.GetID()] = null;
-        assert(coroutine.resume(this._co, null, null));
+        auto result, auto reason = lua.coroutine.resume(this._co, null, null);
+        if (result != true) Error(reason);
     }
 
     public fun HandleFailed(string reason)
     {
         __HttpFileClientMap[this._interface.GetID()] = null;
-        assert(coroutine.resume(this._co, reason, null));
+        auto result, auto reason = lua.coroutine.resume(this._co, reason, null);
+        if (result != true) Error(reason);
     }
 
     public fun HandleProcess()

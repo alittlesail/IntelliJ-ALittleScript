@@ -6,7 +6,7 @@ private Map<int, IMsgClient> __MsgClientMap = new Map<int, IMsgClient>();
 public static FindMsgClient(int id) : IMsgClient { return __MsgClientMap[id]; }
 
 // 用于长连接
-public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public MsgCommon
+public class MsgClient<MI : IMsgInterface> : public MsgCommon
 {
     private int _heartbeat;                 // 心跳间隔时间
     private LoopFunction _heartbeat_loop;   //
@@ -23,7 +23,7 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
     {
         // 创建客户端对象
         this._interface = new MI();
-        this._write_factory = new MWF();
+        this._write_factory = new lua.MessageWriteFactory();
         // 定时心跳
         this._heartbeat = heartbeat;
         this._heartbeat_loop = null;
@@ -40,7 +40,7 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
     // 连接ip对象，ip也可以是域名
     public await fun Connect(string ip, int port) : string
     {
-        thread co = coroutine.running();
+        auto co = lua.coroutine.running();
         if (co == null)
             return "当前不是协程";
 
@@ -68,7 +68,8 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         this.StartHeartbeat();
 
         // 返回协程
-        assert(coroutine.resume(this._co, null));
+        auto result, auto reason = lua.coroutine.resume(this._co, null);
+        if (result != true) Error(reason);
     }
 
     // 断开连接
@@ -88,7 +89,8 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         // 返回协程
         __MsgClientMap[this._interface.GetID()] = null;
         if (error == null) error = this._ip..":"..this._port.."连接失败";
-        assert(coroutine.resume(this._co, error));
+        auto result, auto reason = lua.coroutine.resume(this._co, error);
+        if (result != true) Error(reason);
     }
 
     // 关闭连接
@@ -125,7 +127,7 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         if (this._check_heartbeat)
         {
             // 获取当前时间
-            int send_time = os.clock();
+            int send_time = lua.os.clock();
             // 计算合适的间隔时间
             double default_delta = this._heartbeat / 2;
 
@@ -134,7 +136,7 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
             if (delta_time > default_delta)
             delta_time = default_delta;
             // 定时检查
-            LoopFunction check_loop = new LoopFunction(bind(this.CheckHeartbeat, this, send_time, math.floor(delta_time), math.floor(delta_time)), 1, math.floor(delta_time), 1);
+            LoopFunction check_loop = new LoopFunction(bind(this.CheckHeartbeat, this, send_time, lua.math.floor(delta_time), lua.math.floor(delta_time)), 1, lua.math.floor(delta_time), 1);
             check_loop.Start();
         }
     }
@@ -146,7 +148,7 @@ public class MsgClient<MI : IMsgInterface, MWF : IMessageWriteFactory> : public 
         // 所以确认当前时间和发送时间是否在delta_time范围内，否则必须重新创建一个LoopFunction
 
         // 获取当前时间
-        int invoke_time = os.time();
+        int invoke_time = lua.os.time();
         // 计算真实的间隔时间
         int interval = invoke_time - send_time;
         // 如果真实的间隔时间，小于制定的间隔时间，那么重新创建一个LoopFunction

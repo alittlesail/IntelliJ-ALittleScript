@@ -1,7 +1,7 @@
 
-register namespace ALittle;
+register namespace lua;
 
-public class File
+public class file
 {
     public fun close() {}
     public fun flush() {}
@@ -22,5 +22,5 @@ public class io
     // "a+": append update mode, previous data is preserved, writing is only allowed at the end of file.
     // The mode string can also have a 'b' at the end, which is needed in some systems to open the file in binary mode.
     // This string is exactly what is used in the standard C function fopen.
-    public static open(string file_name, string mode) : File {}
+    public static open(string file_name, string mode) : file {}
 }

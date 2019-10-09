@@ -1,40 +1,11 @@
 
 namespace ALittle;
 
-// 序列化接口类
-public class IMessageWriteFactory
-{
-    public fun SetID(int id) {}
-    public fun SetRpcID(int id) {}
-    public fun ResetOffset() {}
-    public fun GetOffset() : int {}
-    public fun SetInt(int offset, int value) {}
-
-    public fun WriteBool(bool value) : int {}
-    public fun WriteInt(int value) : int {}
-    public fun WriteLongLong(I64 value) : int {}
-    public fun WriteString(string value) : int {}
-    public fun WriteDouble(double value) : int {}
-}
-
-// 反序列化接口类
-public class IMessageReadFactory
-{
-    public fun GetTotalSize() : int {}
-
-    public fun ReadBool() : bool {}
-    public fun ReadInt() : int {}
-    public fun ReadLongLong() : I64 {}
-    public fun ReadString() : string {}
-    public fun ReadDouble() : double {}
-    public fun GetReadSize() : int {}
-}
-
 protected struct ProtocolInvokeInfo
 {
     // 当前结构体的序列化和反序列化方法
-    Functor<(IMessageWriteFactory, ProtocolInvokeInfo, any):int> wfunc;
-    Functor<(IMessageReadFactory, ProtocolInvokeInfo, int):any, int> rfunc;
+    Functor<(lua.MessageWriteFactory, ProtocolInvokeInfo, any):int> wfunc;
+    Functor<(lua.MessageReadFactory, ProtocolInvokeInfo, int):any, int> rfunc;
 
     // 当这个结构体是上级的成员变量时，那么这个不为空
     string var_name;
@@ -52,66 +23,66 @@ protected struct ProtocolInvokeInfo
 
 //序列化部分////////////////////////////////////////////////////////////////////////////////////////////////////////////-
 
-private static PS_WriteBool(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, bool var_value) : int
+private static PS_WriteBool(lua.MessageWriteFactory factory, ProtocolInvokeInfo var_info, bool var_value) : int
 {
     if (var_value == null)
         return factory.WriteBool(false);
     return factory.WriteBool(var_value);
 }
 
-private static PS_WriteInt(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, int var_value) : int
+private static PS_WriteInt(lua.MessageWriteFactory factory, ProtocolInvokeInfo var_info, int var_value) : int
 {
     if (var_value == null)
         return factory.WriteInt(0);
     return factory.WriteInt(var_value);
 }
 
-private static PS_WriteString(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, string var_value) : int
+private static PS_WriteString(lua.MessageWriteFactory factory, ProtocolInvokeInfo var_info, string var_value) : int
 {
     if (var_value == null)
         return factory.WriteString("");
     return factory.WriteString(var_value);
 }
 
-private static PS_WriteDouble(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, double var_value) : int
+private static PS_WriteDouble(lua.MessageWriteFactory factory, ProtocolInvokeInfo var_info, double var_value) : int
 {
     if (var_value == null)
         return factory.WriteDouble(0);
     return factory.WriteDouble(var_value);
 }
 
-private static PS_WriteLongLong(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, I64 var_value) : int
+private static PS_WriteI64(lua.MessageWriteFactory factory, ProtocolInvokeInfo var_info, I64 var_value) : int
 {
     if (var_value == null)
-        return factory.WriteLongLong(0);
-    return factory.WriteLongLong(var_value);
+        return factory.WriteI64(0);
+    return factory.WriteI64(var_value);
 }
 
-private static PS_WriteArray(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, List<any> var_value) : int
+private static PS_WriteArray(lua.MessageWriteFactory factory, ProtocolInvokeInfo var_info, List<any> var_value) : int
 {
     if (var_value == null)
         return factory.WriteInt(0);
     auto offset = factory.GetOffset();
-    auto len = factory.WriteInt(0);
+    auto l = factory.WriteInt(0);
     auto sub_info = var_info.sub_info;
     auto sub_func = sub_info.wfunc;
     auto count = 0;
     for (auto index, auto value in var_value)
     {
-        len = len + sub_func(factory, sub_info, value);
+        l = l + sub_func(factory, sub_info, value);
         count = count + 1;
     }
     factory.SetInt(offset, count);
-    return len;
+    return l;
 }
 
-private static PS_WriteMap(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, Map<string, any> var_value) : int
+private static PS_WriteMap(lua.MessageWriteFactory factory, ProtocolInvokeInfo var_info, Map<string, any> var_value) : int
 {
     if (var_value == null)
         return factory.WriteInt(0);
 
     auto offset = factory.GetOffset();
-    auto len = factory.WriteInt(0);
+    auto l = factory.WriteInt(0);
     auto key_info = var_info.key_info;
     auto key_func = key_info.wfunc;
     auto value_info = var_info.value_info;
@@ -119,15 +90,15 @@ private static PS_WriteMap(IMessageWriteFactory factory, ProtocolInvokeInfo var_
     auto count = 0;
     for (auto key, auto value in var_value)
     {
-        len = len + key_func(factory, key_info, key);
-        len = len + value_func(factory, value_info, value);
+        l = l + key_func(factory, key_info, key);
+        l = l + value_func(factory, value_info, value);
         count = count + 1;
     }
     factory.SetInt(offset, count);
-    return len;
+    return l;
 }
 
-private static PS_WriteMessage(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, any var_value) : int
+private static PS_WriteMessage(lua.MessageWriteFactory factory, ProtocolInvokeInfo var_info, any var_value) : int
 {
     if (var_value == null)
     {
@@ -148,7 +119,7 @@ private static PS_WriteMessage(IMessageWriteFactory factory, ProtocolInvokeInfo 
     return pre_size + size;
 }
 
-protected static PS_WriteMessageForSend(IMessageWriteFactory factory, ProtocolInvokeInfo var_info, any var_value) : int
+protected static PS_WriteMessageForSend(lua.MessageWriteFactory factory, ProtocolInvokeInfo var_info, any var_value) : int
 {
     if (var_value == null)
     {
@@ -168,58 +139,58 @@ protected static PS_WriteMessageForSend(IMessageWriteFactory factory, ProtocolIn
 
 //反序列化部分//////////////////////////////////////////////////////////////////////////////////////////////////////////-
 
-private static PS_ReadBool(IMessageReadFactory factory, ProtocolInvokeInfo var_info, int len) : bool, int
+private static PS_ReadBool(lua.MessageReadFactory factory, ProtocolInvokeInfo var_info, int l) : bool, int
 {
-    if (len == 0)
+    if (l == 0)
         return false, 0;
-    if (len < 1)
+    if (l < 1)
         return false, -1;
     return factory.ReadBool(), 1;
 }
 
-private static PS_ReadInt(IMessageReadFactory factory, ProtocolInvokeInfo var_info, int len) : int, int
+private static PS_ReadInt(lua.MessageReadFactory factory, ProtocolInvokeInfo var_info, int l) : int, int
 {
-    if (len == 0)
+    if (l == 0)
         return 0, 0;
-    if (len < 4)
+    if (l < 4)
         return 0, -1;
     return factory.ReadInt(), 4;
 }
 
-private static PS_ReadString(IMessageReadFactory factory, ProtocolInvokeInfo var_info, int len) : string, int
+private static PS_ReadString(lua.MessageReadFactory factory, ProtocolInvokeInfo var_info, int l) : string, int
 {
-    if (len == 0)
+    if (l == 0)
         return "", 0;
     return factory.ReadString(), factory.GetReadSize();
 }
 
-private static PS_ReadDouble(IMessageReadFactory factory, ProtocolInvokeInfo var_info, int len) : double, int
+private static PS_ReadDouble(lua.MessageReadFactory factory, ProtocolInvokeInfo var_info, int l) : double, int
 {
-    if (len == 0)
+    if (l == 0)
         return 0, 0;
-    if (len < 8)
+    if (l < 8)
         return 0, -1;
     return factory.ReadDouble(), 8;
 }
 
-private static PS_ReadLongLong(IMessageReadFactory factory, ProtocolInvokeInfo var_info, int len) : I64, int
+private static PS_ReadI64(lua.MessageReadFactory factory, ProtocolInvokeInfo var_info, int l) : I64, int
 {
-    if (len == 0)
+    if (l == 0)
         return 0, 0;
-    if (len < 8)
+    if (l < 8)
         return 0, -1;
-    return factory.ReadLongLong(), 8;
+    return factory.ReadI64(), 8;
 }
 
-private static PS_ReadArray(IMessageReadFactory factory, ProtocolInvokeInfo var_info, int len) : List<any>, int
+private static PS_ReadArray(lua.MessageReadFactory factory, ProtocolInvokeInfo var_info, int l) : List<any>, int
 {
-    if (len == 0)
+    if (l == 0)
         return new List<any>(), 0;
-    auto save_len = len;
-    if (len < 4)
+    auto save_len = l;
+    if (l < 4)
         return null, -1;
     auto count = factory.ReadInt();
-    len = len - 4;
+    l = l - 4;
     if (count < 0)
         return null, -1;
     auto sub_info = var_info.sub_info;
@@ -228,23 +199,23 @@ private static PS_ReadArray(IMessageReadFactory factory, ProtocolInvokeInfo var_
     auto value_list = new List<any>();
     for (auto index = 1, count, 1)
     {
-        value_list[index], sub_len = sub_func(factory, sub_info, len);
+        value_list[index], sub_len = sub_func(factory, sub_info, l);
         if (sub_len < 0)
             return null, sub_len;
-        len = len - (sub_len);
+        l = l - (sub_len);
     }
-    return value_list, save_len - len;
+    return value_list, save_len - l;
 }
 
-private static PS_ReadMap(IMessageReadFactory factory, ProtocolInvokeInfo var_info, int len) : Map<string, any>, int
+private static PS_ReadMap(lua.MessageReadFactory factory, ProtocolInvokeInfo var_info, int l) : Map<string, any>, int
 {
-    if (len == 0)
+    if (l == 0)
         return new Map<string, any>(), 0;
-    auto save_len = len;
-    if (len < 4)
+    auto save_len = l;
+    if (l < 4)
         return null, -1;
     auto count = factory.ReadInt();
-    len = len - 4;
+    l = l - 4;
     if (count < 0)
         return null, -1;
     auto key_info = var_info.key_info;
@@ -254,22 +225,22 @@ private static PS_ReadMap(IMessageReadFactory factory, ProtocolInvokeInfo var_in
     auto value_map = new Map<string, any>();
     for (auto index = 1, count, 1)
     {
-        auto key, auto key_len = key_func(factory, key_info, len);
+        auto key, auto key_len = key_func(factory, key_info, l);
         if (key_len < 0)
             return null, key_len;
-        len = len - key_len;
-        auto value, auto value_len = value_func(factory, value_info, len);
+        l = l - key_len;
+        auto value, auto value_len = value_func(factory, value_info, l);
         if (value_len < 0)
             return null, value_len;
-        len = len - value_len;
+        l = l - value_len;
         value_map[key] = value;
     }
-    return value_map, save_len - len;
+    return value_map, save_len - l;
 }
 
-private static PS_ReadMessage(IMessageReadFactory factory, ProtocolInvokeInfo var_info, int len) : any, int
+private static PS_ReadMessage(lua.MessageReadFactory factory, ProtocolInvokeInfo var_info, int l) : any, int
 {
-    if (len == 0)
+    if (l == 0)
     {
         auto value_map = new Map<string, any>();
         auto sub_len = 0;
@@ -277,12 +248,12 @@ private static PS_ReadMessage(IMessageReadFactory factory, ProtocolInvokeInfo va
             value_map[info.var_name], sub_len = info.rfunc(factory, info, 0);
         return value_map, 0;
     }
-    if (len < 4)
+    if (l < 4)
         return null, -1;
     auto object_len = factory.ReadInt();
-    len = len - 4;
+    l = l - 4;
     auto save_len = 4;
-    if (object_len > len)
+    if (object_len > l)
         return null, -1;
     save_len = save_len + object_len;
     auto sub_len = 0;
@@ -297,9 +268,9 @@ private static PS_ReadMessage(IMessageReadFactory factory, ProtocolInvokeInfo va
     return value_map, save_len;
 }
 
-protected static PS_ReadMessageForReceive(IMessageReadFactory factory, ProtocolInvokeInfo var_info, int len) : any, int
+protected static PS_ReadMessageForReceive(lua.MessageReadFactory factory, ProtocolInvokeInfo var_info, int l) : any, int
 {
-    if (len == 0)
+    if (l == 0)
     {
         auto value_map = new Map<string, any>();
         auto sub_len = 0;
@@ -311,12 +282,12 @@ protected static PS_ReadMessageForReceive(IMessageReadFactory factory, ProtocolI
     auto value_map = new Map<string, any>();
     for (auto index, auto info in var_info.handle)
     {
-        value_map[info.var_name], sub_len = info.rfunc(factory, info, len);
+        value_map[info.var_name], sub_len = info.rfunc(factory, info, l);
         if (sub_len < 0)
             return null, sub_len;
-        len = len - sub_len;
+        l = l - sub_len;
     }
-    return value_map, len;
+    return value_map, l;
 }
 
 //回调注册部分//////////////////////////////////////////////////////////////////////////////////////////////////////////-
@@ -324,28 +295,27 @@ protected static PS_ReadMessageForReceive(IMessageReadFactory factory, ProtocolI
 private auto __ps_write_data_map = new Map<string, any>();
 __ps_write_data_map["bool"] = PS_WriteBool;
 __ps_write_data_map["int"] = PS_WriteInt;
-__ps_write_data_map["I64"] = PS_WriteLongLong;
+__ps_write_data_map["I64"] = PS_WriteI64;
 __ps_write_data_map["string"] = PS_WriteString;
 __ps_write_data_map["double"] = PS_WriteDouble;
 
 private auto __ps_read_data_map = new Map<string, any>();
 __ps_read_data_map["bool"] = PS_ReadBool;
 __ps_read_data_map["int"] = PS_ReadInt;
-__ps_read_data_map["I64"] = PS_ReadLongLong;
+__ps_read_data_map["I64"] = PS_ReadI64;
 __ps_read_data_map["string"] = PS_ReadString;
 __ps_read_data_map["double"] = PS_ReadDouble;
 
 //构造部分//////////////////////////////////////////////////////////////////////////////////////////////////////////-
-private auto __find = String.find;
-private auto __sub = String.sub;
-private auto __len = String.len;
-private auto __byte = String.byte;
-private auto __assert = assert;
+private auto find = Find;
+private auto sub = lua.String.sub;
+private auto len = lua.String.len;
+private auto byte = lua.String.byte;
 protected static CreateSubInfo(string sub_type) : ProtocolInvokeInfo
 {
-    if (__find(sub_type, "List", 1) == 1)
+    if (find(sub_type, "List", 1) == 1)
         return CreateArrayInfo(sub_type);
-    if (__find(sub_type, "Map", 1) == 1)
+    if (find(sub_type, "Map", 1) == 1)
         return CreateMapInfo(sub_type);
     auto wfunc = __ps_write_data_map[sub_type];
     if (wfunc != null)
@@ -363,20 +333,20 @@ protected static CreateArrayInfo(string var_type) : ProtocolInvokeInfo
     auto invoke_info = new ProtocolInvokeInfo();
     invoke_info.wfunc = PS_WriteArray;
     invoke_info.rfunc = PS_ReadArray;
-    invoke_info.sub_info = CreateSubInfo(__sub(var_type, 6, -2));
+    invoke_info.sub_info = CreateSubInfo(sub(var_type, 6, -2));
     return invoke_info;
 }
 
 protected static CreateMapInfo(string var_type) : ProtocolInvokeInfo
 {
     auto invoke_info = new ProtocolInvokeInfo();
-    auto sub_type = __sub(var_type, 5, -2);
+    auto sub_type = sub(var_type, 5, -2);
     auto comma_index = 0;
-    auto sub_type_len = __len(sub_type);
+    auto sub_type_len = len(sub_type);
     auto ltgt = 0;
     for (int i = 1, sub_type_len, 1)
     {
-        auto code = __byte(sub_type, i);
+        auto code = byte(sub_type, i);
         if (code == 60)
             ltgt = ltgt + 1;
         elseif (code == 62)
@@ -393,15 +363,15 @@ protected static CreateMapInfo(string var_type) : ProtocolInvokeInfo
     assert(comma_index != 0, "can'f find comma in var_type:" .. var_type);
     invoke_info.wfunc = PS_WriteMap;
     invoke_info.rfunc = PS_ReadMap;
-    invoke_info.key_info = CreateSubInfo(__sub(sub_type, 1, comma_index - 1));
-    invoke_info.value_info = CreateSubInfo(__sub(sub_type, comma_index + 1));
+    invoke_info.key_info = CreateSubInfo(sub(sub_type, 1, comma_index - 1));
+    invoke_info.value_info = CreateSubInfo(sub(sub_type, comma_index + 1));
     return invoke_info;
 }
 
 protected static CreateMessageInfo(string var_type) : ProtocolInvokeInfo
 {
     auto reflect_info = FindReflectByName(var_type);
-    __assert(reflect_info != null, "FindReflect调用失败! 未知类型:" .. var_type);
+    assert(reflect_info != null, "FindReflect调用失败! 未知类型:" .. var_type);
     return CreateMessageInfoImpl(reflect_info);
 }
 
@@ -426,6 +396,6 @@ protected static CreateMessageInfoImpl(ReflectInfo reflect_info) : ProtocolInvok
 protected static CreateProtocolInvokeInfo(int msg_id) : ProtocolInvokeInfo
 {
     auto reflect_info = FindReflectById(msg_id);
-    __assert(reflect_info != null, "FindReflect调用失败! 未知ID:" .. msg_id);
+    assert(reflect_info != null, "FindReflect调用失败! 未知ID:" .. msg_id);
     return CreateMessageInfoImpl(reflect_info);
 }

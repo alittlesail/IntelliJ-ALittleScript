@@ -5,6 +5,12 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
+local rawget = rawget
+local rawset = rawset
+local tostring = tostring
+local setmetatable = setmetatable
+local type = type
+local select = select
 local __object_index_function
 __object_index_function = function(object, key)
 	local clazz = rawget(object, "__class")

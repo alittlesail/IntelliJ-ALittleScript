@@ -35,7 +35,7 @@ function CSVConfig:ReadCell(lua_row, lua_col)
 end
 
 function CSVConfig:LoadCell(row)
-	local value = table.create()
+	local value = {}
 	for index, handle in ___ipairs(self._csv_info.handle) do
 		value[handle.var_name] = handle.func(self._csv_file:ReadCell(row, index), handle)
 	end
@@ -143,7 +143,7 @@ function SingleKeyTableConfig:Ctor(reflect_info)
 	___rawset(self, "_reflect_info", reflect_info)
 	___rawset(self, "_key_map", {})
 	___rawset(self, "_cache_map", {})
-	table.setweak(self._cache_map, false, true)
+	Setweak(self._cache_map, false, true)
 end
 
 function SingleKeyTableConfig.__getter:key_map()
@@ -261,7 +261,7 @@ function DoubleKeyTableConfig:Ctor(reflect_info)
 	___rawset(self, "_reflect_info", reflect_info)
 	___rawset(self, "_key_map", {})
 	___rawset(self, "_cache_map", {})
-	table.setweak(self._cache_map, false, true)
+	Setweak(self._cache_map, false, true)
 end
 
 function DoubleKeyTableConfig:Init(loader)

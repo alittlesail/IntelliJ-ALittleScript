@@ -1,4 +1,12 @@
+
 namespace ALittle;
+
+private auto rawget = lua.rawget;
+private auto rawset = lua.rawset;
+private auto tostring = lua.tostring;
+private auto setmetatable = lua.setmetatable;
+private auto type = lua.type;
+private auto select = lua.select;
 
 public struct ClassInfo
 {

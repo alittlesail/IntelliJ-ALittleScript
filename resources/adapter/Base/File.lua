@@ -5,6 +5,19 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
+local open = io.open
+local rename = os.rename
+local remove = os.remove
+local maxn = table.maxn
+local sub = string.sub
+local len = string.len
+local upper = string.upper
+local attributes = lfs.attributes
+local dir = lfs.dir
+local currentdir = lfs.currentdir
+local chdir = lfs.chdir
+local rmdir = lfs.rmdir
+local mkdir = lfs.mkdir
 IFileLoader = Class(nil, "ALittle.IFileLoader")
 
 function IFileLoader:Load(file_path)
@@ -14,7 +27,7 @@ assert(IFileLoader, " extends class:IFileLoader is nil")
 NormalFileLoader = Class(IFileLoader, "ALittle.NormalFileLoader")
 
 function NormalFileLoader:Load(file_path)
-	local file = io.open(file_path, "r")
+	local file = open(file_path, "r")
 	if file == nil then
 		return nil
 	end
@@ -32,7 +45,7 @@ assert(IFileSaver, " extends class:IFileSaver is nil")
 NormalFileSaver = Class(IFileSaver, "ALittle.NormalFileSaver")
 
 function NormalFileSaver:Save(file_path, content)
-	local file = io.open(file_path, "w")
+	local file = open(file_path, "w")
 	if file == nil then
 		return false
 	end
@@ -42,37 +55,37 @@ function NormalFileSaver:Save(file_path, content)
 end
 
 function File_GetCurrentPath()
-	return lfs.currentdir()
+	return currentdir()
 end
 
 function File_SetCurrentPath(path)
-	return lfs.chdir(path)
+	return chdir(path)
 end
 
 function File_RenameFile(path, new_path)
-	return os.rename(path, new_path)
+	return rename(path, new_path)
 end
 
 function File_DeleteFile(path)
-	return os.remove(path)
+	return remove(path)
 end
 
 function File_GetFileAttr(path)
-	return lfs.attributes(path)
+	return attributes(path)
 end
 
 function File_IteratorDir(path)
-	return lfs.dir(path)
+	return dir(path)
 end
 
 function File_GetFileAttrByDir(path, file_map)
 	if file_map == nil then
 		file_map = {}
 	end
-	for file in lfs.dir(path) do
+	for file in dir(path) do
 		if file ~= "." and file ~= ".." then
 			local file_path = path .. "/" .. file
-			local attr = lfs.attributes(file_path)
+			local attr = attributes(file_path)
 			if attr.mode == "directory" then
 				File_GetFileAttrByDir(file_path, file_map)
 			else
@@ -84,7 +97,7 @@ function File_GetFileAttrByDir(path, file_map)
 end
 
 function File_DeleteDir(path)
-	return lfs.rmdir(path)
+	return rmdir(path)
 end
 
 function File_DeleteDeepDir(path, log_path)
@@ -94,10 +107,10 @@ function File_DeleteDeepDir(path, log_path)
 	if File_GetFileAttr(path) == nil then
 		return
 	end
-	for file in lfs.dir(path) do
+	for file in dir(path) do
 		if file ~= "." and file ~= ".." then
 			local file_path = path .. "/" .. file
-			local attr = lfs.attributes(file_path)
+			local attr = attributes(file_path)
 			if attr.mode == "directory" then
 				File_DeleteDeepDir(file_path, log_path)
 			else
@@ -112,7 +125,7 @@ function File_DeleteDeepDir(path, log_path)
 end
 
 function File_MakeDir(path)
-	return lfs.mkdir(path)
+	return mkdir(path)
 end
 
 function File_MakeDeepDir(path)
@@ -120,45 +133,45 @@ function File_MakeDeepDir(path)
 	local cur_path = ""
 	for index, sub_path in ___ipairs(path_list) do
 		cur_path = cur_path .. sub_path
-		lfs.mkdir(cur_path)
+		mkdir(cur_path)
 		cur_path = cur_path .. "/"
 	end
 end
 
 function File_GetFileNameByPath(file_path)
 	local list = String_SplitSepList(file_path, {"/", "\\"})
-	local len = table.maxn(list)
-	if len <= 0 then
+	local l = maxn(list)
+	if l <= 0 then
 		return file_path
 	end
-	return list[len]
+	return list[l]
 end
 
 function File_GetFilePathByPath(file_path)
 	local new_file_path = File_GetFileNameByPath(file_path)
-	return String.sub(file_path, 1, -String.len(new_file_path) - 2)
+	return sub(file_path, 1, -len(new_file_path) - 2)
 end
 
 function File_GetFileExtByPath(file_path)
 	local list = String_Split(file_path, ".")
-	local len = table.maxn(list)
-	if len <= 0 then
+	local l = maxn(list)
+	if l <= 0 then
 		return file_path
 	end
-	return list[len]
+	return list[l]
 end
 
 function File_GetFileExtByPathAndUpper(file_path)
-	return String.upper(File_GetFileExtByPath(file_path))
+	return upper(File_GetFileExtByPath(file_path))
 end
 
 function File_GetJustFileNameByPath(file_path)
 	local new_file_path = File_GetFileNameByPath(file_path)
 	local list = String_Split(new_file_path, ".")
-	local len = table.maxn(list)
-	if len <= 1 then
+	local l = maxn(list)
+	if l <= 1 then
 		return new_file_path
 	end
-	return list[len - 1]
+	return list[l - 1]
 end
 

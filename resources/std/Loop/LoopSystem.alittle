@@ -27,7 +27,7 @@ public class LoopSystem
         this._loop_cache = new Map<LoopObject, bool>();
         this._cache_empty = true;
 
-        if (weak) table.setweak(this._loop_updaters, true, false);
+        if (weak) Setweak(this._loop_updaters, true, false);
     }
 
     // 添加updater

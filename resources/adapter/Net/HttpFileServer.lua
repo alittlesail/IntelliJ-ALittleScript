@@ -7,7 +7,7 @@ local ___ipairs = ipairs
 local ___coroutine = coroutine
 
 local __all_callback = {}
-table.setweak(__all_callback, false, true)
+Setweak(__all_callback, false, true)
 function RegHttpFileCallback(method, callback)
 	if __all_callback[method] ~= nil then
 		Error("RegHttpFileCallback消息回调函数注册失败，名字为" .. method .. "已存在")

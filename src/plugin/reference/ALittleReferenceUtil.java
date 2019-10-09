@@ -251,7 +251,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleOpAssignExpr) return new ALittleOpAssignExprReference((ALittleOpAssignExpr)element, range);
         if (element instanceof ALittleOpNewListStat) return new ALittleOpNewListStatReference((ALittleOpNewListStat)element, range);
         if (element instanceof ALittleOpNewStat) return new ALittleOpNewStatReference((ALittleOpNewStat)element, range);
-        if (element instanceof ALittlePcallStat) return new ALittlePcallStatReference((ALittlePcallStat)element, range);
+        if (element instanceof ALittleTcallStat) return new ALittleTcallStatReference((ALittleTcallStat)element, range);
         if (element instanceof ALittlePrimitiveType) return new ALittlePrimitiveTypeReference((ALittlePrimitiveType)element, range);
 
         if (element instanceof ALittlePropertyValueBracketValue) return new ALittlePropertyValueBracketValueReference((ALittlePropertyValueBracketValue)element, range);
@@ -286,6 +286,7 @@ public class ALittleReferenceUtil {
 
         if (element instanceof ALittleNcallStat) return new ALittleNcallStatReference((ALittleNcallStat)element, range);
         if (element instanceof ALittleNsendExpr) return new ALittleNsendExprReference((ALittleNsendExpr)element, range);
+        if (element instanceof ALittleThrowExpr) return new ALittleThrowExprReference((ALittleThrowExpr)element, range);
 
         return null;
     }

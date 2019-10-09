@@ -1,6 +1,12 @@
 
 namespace ALittle;
 
+private auto select = lua.select;
+private auto unpack = lua.unpack;
+private auto tostring = lua.tostring;
+private auto setmetatable = lua.setmetatable;
+private auto coroutine = lua.coroutine;
+
 struct FunctorMetatable
 {
     any __call;

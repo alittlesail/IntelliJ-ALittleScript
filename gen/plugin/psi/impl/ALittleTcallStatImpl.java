@@ -14,14 +14,14 @@ import com.intellij.psi.PsiReference;
 import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
 import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 
-public class ALittlePcallStatImpl extends ASTWrapperPsiElement implements ALittlePcallStat {
+public class ALittleTcallStatImpl extends ASTWrapperPsiElement implements ALittleTcallStat {
 
-  public ALittlePcallStatImpl(@NotNull ASTNode node) {
+  public ALittleTcallStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitPcallStat(this);
+    visitor.visitTcallStat(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

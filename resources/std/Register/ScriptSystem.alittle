@@ -1,0 +1,30 @@
+
+register namespace lua;
+
+protected class ScriptSystem
+{
+    public fun Log(string content, int level) {}
+    public fun Throw(string content) {}
+
+    public fun RunScriptFile(string path, bool crypt_mode) : bool {}
+    public fun RunEngineScript(string path) : bool {}
+
+    public fun BaseFilePath() : string {}
+    public fun ExternalFilePath() : string {}
+
+    public fun Trim(string value) : string {}
+    public fun Sha1(string content) : string {}
+    public fun Base64Decode(string content) : string {}
+    public fun Base64Encode(string content) : string {}
+    public fun StringMD5(string content) : string {}
+    public fun FileMD5(string path) : string {}
+
+    public fun UTF82GBK(string content) : string {}
+    public fun GBK2UTF8(string content) : string {}
+
+    public fun GetUTF8ByteCountByOffset(string content, int offset) : int {}
+    public fun GetUTF8Length(string content) : int {}
+    public fun CalcUTF8LengthOfWord(string content, int word_count) : int {}
+}
+
+public ScriptSystem A_ScriptSystem;

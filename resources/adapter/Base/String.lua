@@ -6,22 +6,26 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-local __lshift = bit.lshift
-local __rshift = bit.rshift
-local __bxor = bit.bxor
-local __byte = String.byte
-local __sub = String.sub
-local __len = String.len
-local __find = String.find
-local __concat = table.concat
-local __JsonEncode = json.encode
-local __JsonDecode = json.decode
+local byte = string.byte
+local sub = string.sub
+local len = string.len
+local find = Find
+local concat = table.concat
+local type = type
+local tostring = tostring
+local tonumber = tonumber
+local floor = math.floor
+local time = os.time
+local maxn = table.maxn
+local random = math.random
+local JsonEncode = json.encode
+local JsonDecode = json.decode
 function JsonEncode(content)
-	return __JsonEncode(content)
+	return JsonEncode(content)
 end
 
 function JsonDecode(content)
-	return __JsonDecode(content)
+	return JsonDecode(content)
 end
 
 function String_CopyTable(info)
@@ -36,6 +40,10 @@ function String_CopyTable(info)
 	return new_info
 end
 
+function String_Trim(content)
+	return A_ScriptSystem:Trim(content)
+end
+
 function String_Split(target, sep)
 	if target == nil then
 		return {}
@@ -47,15 +55,15 @@ function String_Split(target, sep)
 	local fields_count = 0
 	local start_pos = 1
 	while true do
-		local start_index = __find(target, sep, start_pos)
+		local start_index = find(target, sep, start_pos)
 		if start_index == nil then
 			fields_count = fields_count + 1
-			fields[fields_count] = __sub(target, start_pos)
+			fields[fields_count] = sub(target, start_pos)
 			break
 		end
 		fields_count = fields_count + 1
-		fields[fields_count] = __sub(target, start_pos, start_index - 1)
-		start_pos = start_index + __len(sep)
+		fields[fields_count] = sub(target, start_pos, start_index - 1)
+		start_pos = start_index + len(sep)
 	end
 	return fields
 end
@@ -74,26 +82,26 @@ function String_SplitSepList(target, sep_list)
 		local start_index
 		local end_index
 		for _, sep in ___ipairs(sep_list) do
-			local start_index_tmp = __find(target, sep, start_pos)
+			local start_index_tmp = find(target, sep, start_pos)
 			if start_index_tmp ~= nil then
 				if start_index == nil or start_index_tmp < start_index then
 					start_index = start_index_tmp
-					end_index = start_index + __len(sep) - 1
+					end_index = start_index + len(sep) - 1
 				end
 			end
 		end
 		if start_index == nil then
-			local value = __sub(target, start_pos)
-			if __len(value) > 0 then
+			local value = sub(target, start_pos)
+			if len(value) > 0 then
 				fields_count = fields_count + 1
-				fields[fields_count] = __sub(target, start_pos)
+				fields[fields_count] = sub(target, start_pos)
 			end
 			break
 		end
-		local value = __sub(target, start_pos, start_index - 1)
-		if __len(value) > 0 then
+		local value = sub(target, start_pos, start_index - 1)
+		if len(value) > 0 then
 			fields_count = fields_count + 1
-			fields[fields_count] = __sub(target, start_pos, start_index - 1)
+			fields[fields_count] = sub(target, start_pos, start_index - 1)
 		end
 		start_pos = end_index + 1
 	end
@@ -101,11 +109,11 @@ function String_SplitSepList(target, sep_list)
 end
 
 function String_Join(list, sep)
-	return __concat(list, sep)
+	return concat(list, sep)
 end
 
 function String_UrlAppendParam(url, param)
-	if String.find(url, "?", 1) == nil then
+	if find(url, "?", 1) == nil then
 		url = url .. "?"
 	else
 		url = url .. "&"
@@ -120,7 +128,7 @@ function String_UrlAppendParamMap(url, param)
 		count = count + 1
 		list[count] = key .. "=" .. tostring(value)
 	end
-	if String.find(url, "?", 1) == nil then
+	if find(url, "?", 1) == nil then
 		url = url .. "?"
 	else
 		url = url .. "&"
@@ -132,28 +140,28 @@ function String_UrlAnalyse(url)
 	local info = {}
 	info.value_map = {}
 	local start_pos = 1
-	local start_index = String.find(url, "http://", start_pos)
+	local start_index = find(url, "http://", start_pos)
 	if start_index ~= nil then
 		info.protocol = "http"
-		start_pos = start_index + String.len("http://")
+		start_pos = start_index + len("http://")
 	else
-		start_index = String.find(url, "https://", start_pos)
+		start_index = find(url, "https://", start_pos)
 		if start_index ~= nil then
 			info.protocol = "https"
-			start_pos = start_index + String.len("https://")
+			start_pos = start_index + len("https://")
 		end
 	end
 	local ip_and_port = nil
-	start_index = String.find(url, "/", start_pos)
+	start_index = find(url, "/", start_pos)
 	if start_index ~= nil then
-		ip_and_port = String.sub(url, start_pos, start_index - 1)
+		ip_and_port = sub(url, start_pos, start_index - 1)
 	else
-		ip_and_port = String.sub(url, start_pos)
+		ip_and_port = sub(url, start_pos)
 	end
-	local ip_start = String.find(ip_and_port, ":", 1)
+	local ip_start = find(ip_and_port, ":", 1)
 	if ip_start ~= nil then
-		info.ip = String.sub(ip_and_port, 1, ip_start - 1)
-		info.port = math.floor(tonumber(String.sub(ip_and_port, ip_start + 1)))
+		info.ip = sub(ip_and_port, 1, ip_start - 1)
+		info.port = floor(tonumber(sub(ip_and_port, ip_start + 1)))
 	else
 		info.ip = ip_and_port
 		info.port = 80
@@ -165,17 +173,17 @@ function String_UrlAnalyse(url)
 		return info
 	end
 	start_pos = start_index
-	start_index = String.find(url, "?", start_pos)
+	start_index = find(url, "?", start_pos)
 	if start_index ~= nil then
-		info.path = String.sub(url, start_pos, start_index - 1)
+		info.path = sub(url, start_pos, start_index - 1)
 	else
-		info.path = String.sub(url, start_pos)
+		info.path = sub(url, start_pos)
 	end
 	if start_index == nil then
 		return info
 	end
 	start_pos = start_index + 1
-	local param_list = String_Split(String.sub(url, start_pos), "&")
+	local param_list = String_Split(sub(url, start_pos), "&")
 	for k, v in ___ipairs(param_list) do
 		local param_list_list = String_Split(v, "=")
 		if param_list_list[1] ~= nil and param_list_list[2] ~= nil then
@@ -188,13 +196,12 @@ end
 StringGenerateID = Class(nil, "ALittle.StringGenerateID")
 
 function StringGenerateID:Ctor()
-	math.randomseed(os.time())
 	___rawset(self, "_string_last_index", 0)
 	___rawset(self, "_string_last_time", 0)
 end
 
 function StringGenerateID:GenID(pre)
-	local cur_time = os.time()
+	local cur_time = time()
 	if cur_time ~= self._string_last_time then
 		self._string_last_time = cur_time
 		self._string_last_index = 0
@@ -205,7 +212,7 @@ function StringGenerateID:GenID(pre)
 	if pre ~= nil then
 		result = pre .. "-"
 	end
-	result = result .. self._string_last_time .. "-" .. self._string_last_index .. "-" .. math.random(0, 10000) .. "-" .. math.random(0, 10000)
+	result = result .. self._string_last_time .. "-" .. self._string_last_index .. "-" .. random(0, 10000) .. "-" .. random(0, 10000)
 	return result
 end
 
@@ -220,13 +227,13 @@ function String_Replace(content, old_split, new_split)
 end
 
 function String_IsPhoneNumber(number)
-	local len = String.len(number)
-	for i = 1, len, 1 do
-		local byte = String.byte(number, i)
-		if byte < 48 then
+	local l = len(number)
+	for i = 1, l, 1 do
+		local value = byte(number, i)
+		if value < 48 then
 			return false
 		end
-		if byte > 57 then
+		if value > 57 then
 			return false
 		end
 	end
@@ -238,9 +245,9 @@ function String_HttpAnalysisValueMap(param, content)
 	local param_split_list = ALittle.String_Split(param, "&")
 	for index, param_content in ___ipairs(param_split_list) do
 		local value_split_list = ALittle.String_Split(param_content, "=")
-		if ALittle.table.maxn(value_split_list) == 2 then
-			if ALittle.String.sub(value_split_list[2], 1, 1) == "\"" and ALittle.String.sub(value_split_list[2], -1, -1) == "\"" then
-				value_map[value_split_list[1]] = ALittle.String.sub(value_split_list[2], 2, -2)
+		if maxn(value_split_list) == 2 then
+			if sub(value_split_list[2], 1, 1) == "\"" and sub(value_split_list[2], -1, -1) == "\"" then
+				value_map[value_split_list[1]] = sub(value_split_list[2], 2, -2)
 			else
 				local number = ALittle.tonumber(value_split_list[2])
 				if number == nil then
@@ -251,8 +258,8 @@ function String_HttpAnalysisValueMap(param, content)
 			end
 		end
 	end
-	if ALittle.String.len(content) > 0 then
-		local error, value = pcall(json.decode, content)
+	if len(content) > 0 then
+		local error, value = TCall(json.decode, content)
 		if error == nil then
 			for k, v in ___pairs(value) do
 				value_map[k] = v
@@ -260,5 +267,81 @@ function String_HttpAnalysisValueMap(param, content)
 		end
 	end
 	return value_map
+end
+
+function String_SplitUTF8(content, out)
+	local result = {}
+	local l = len(content)
+	local offset = 0
+	local count = 0
+	while l > offset do
+		local byte_count = A_ScriptSystem:GetUTF8ByteCountByOffset(content, offset)
+		count = count + 1
+		result[count] = sub(content, offset + 1, offset + byte_count)
+		offset = offset + byte_count
+	end
+	out.list = result
+	out.count = count
+end
+
+function String_MD5(content)
+	return A_ScriptSystem:StringMD5(content)
+end
+
+function String_FileMD5(path)
+	return A_ScriptSystem:FileMD5(path)
+end
+
+function String_Sha1(content)
+	return A_ScriptSystem:Sha1(content)
+end
+
+function String_Base64Decode(content)
+	return A_ScriptSystem:Base64Decode(content)
+end
+
+function String_Base64Encode(content)
+	return A_ScriptSystem:Base64Encode(content)
+end
+
+function String_UTF8ToGBK(content)
+	return A_ScriptSystem:UTF82GBK(content)
+end
+
+function String_GBKToUTF8(content)
+	return A_ScriptSystem:GBK2UTF8(content)
+end
+
+function String_GetUTF8Length(content)
+	return A_ScriptSystem:GetUTF8Length(content)
+end
+
+function String_CalcUTF8LengthOfWord(content, word_count)
+	return A_ScriptSystem:CalcUTF8LengthOfWord(content, word_count)
+end
+
+function String_FormatTime2Remain(remain_time)
+	local room_time_desc = ""
+	if remain_time > TimeSecond.ONE_DAY_SECONDS then
+		local count = math.floor(remain_time / TimeSecond.ONE_DAY_SECONDS)
+		remain_time = remain_time - count * TimeSecond.ONE_DAY_SECONDS
+		room_time_desc = room_time_desc .. count .. "天"
+	end
+	if remain_time > TimeSecond.ONE_HOUR_SECONDS then
+		local count = math.floor(remain_time / TimeSecond.ONE_HOUR_SECONDS)
+		remain_time = remain_time - count * TimeSecond.ONE_HOUR_SECONDS
+		room_time_desc = room_time_desc .. count .. "小时"
+	end
+	if remain_time > TimeSecond.ONE_MINUTE_SECONDS then
+		local count = math.floor(remain_time / TimeSecond.ONE_MINUTE_SECONDS)
+		remain_time = remain_time - count * TimeSecond.ONE_MINUTE_SECONDS
+		room_time_desc = room_time_desc .. count .. "分钟"
+	end
+	if remain_time > 0 then
+		local count = math.floor(remain_time / TimeSecond.ONE_MINUTE_SECONDS)
+		remain_time = remain_time - count * TimeSecond.ONE_MINUTE_SECONDS
+		room_time_desc = room_time_desc .. remain_time .. "秒"
+	end
+	return room_time_desc
 end
 

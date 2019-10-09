@@ -115,9 +115,9 @@ public class LoopFunction : public LoopObject
         if (time < total_time)
         {
             double float_count = total_time / this._total_interval_time;
-            int count = math.floor(float_count);
+            int count = lua.math.floor(float_count);
             this._accumulate_count = count;
-            this._accumulate_time = math.floor((float_count - count) * this._total_interval_time);
+            this._accumulate_time = lua.math.floor((float_count - count) * this._total_interval_time);
             return 0, false;
         }
         // 设置累积次数为总次数

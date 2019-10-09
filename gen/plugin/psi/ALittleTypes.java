@@ -11,6 +11,7 @@ public interface ALittleTypes {
   IElementType ACCESS_MODIFIER = new ALittleElementType("ACCESS_MODIFIER");
   IElementType ALL_EXPR = new ALittleElementType("ALL_EXPR");
   IElementType ALL_TYPE = new ALittleElementType("ALL_TYPE");
+  IElementType ASSERT_EXPR = new ALittleElementType("ASSERT_EXPR");
   IElementType AUTO_TYPE = new ALittleElementType("AUTO_TYPE");
   IElementType BIND_STAT = new ALittleElementType("BIND_STAT");
   IElementType CLASS_CTOR_DEC = new ALittleElementType("CLASS_CTOR_DEC");
@@ -101,7 +102,6 @@ public interface ALittleTypes {
   IElementType OP_ASSIGN_EXPR = new ALittleElementType("OP_ASSIGN_EXPR");
   IElementType OP_NEW_LIST_STAT = new ALittleElementType("OP_NEW_LIST_STAT");
   IElementType OP_NEW_STAT = new ALittleElementType("OP_NEW_STAT");
-  IElementType PCALL_STAT = new ALittleElementType("PCALL_STAT");
   IElementType PRIMITIVE_TYPE = new ALittleElementType("PRIMITIVE_TYPE");
   IElementType PROPERTY_VALUE = new ALittleElementType("PROPERTY_VALUE");
   IElementType PROPERTY_VALUE_BRACKET_VALUE = new ALittleElementType("PROPERTY_VALUE_BRACKET_VALUE");
@@ -123,8 +123,10 @@ public interface ALittleTypes {
   IElementType STRUCT_EXTENDS_DEC = new ALittleElementType("STRUCT_EXTENDS_DEC");
   IElementType STRUCT_NAME_DEC = new ALittleElementType("STRUCT_NAME_DEC");
   IElementType STRUCT_VAR_DEC = new ALittleElementType("STRUCT_VAR_DEC");
+  IElementType TCALL_STAT = new ALittleElementType("TCALL_STAT");
   IElementType TEMPLATE_DEC = new ALittleElementType("TEMPLATE_DEC");
   IElementType TEMPLATE_PAIR_DEC = new ALittleElementType("TEMPLATE_PAIR_DEC");
+  IElementType THROW_EXPR = new ALittleElementType("THROW_EXPR");
   IElementType USING_DEC = new ALittleElementType("USING_DEC");
   IElementType USING_NAME_DEC = new ALittleElementType("USING_NAME_DEC");
   IElementType VALUE_FACTOR_STAT = new ALittleElementType("VALUE_FACTOR_STAT");
@@ -138,6 +140,7 @@ public interface ALittleTypes {
 
   IElementType ANY = new ALittleTokenType("any");
   IElementType APOS = new ALittleTokenType("'");
+  IElementType ASSERT = new ALittleTokenType("assert");
   IElementType ASSIGN = new ALittleTokenType("=");
   IElementType ASYNC = new ALittleTokenType("async");
   IElementType AUTO = new ALittleTokenType("auto");
@@ -199,7 +202,6 @@ public interface ALittleTypes {
   IElementType NSEND = new ALittleTokenType("nsend");
   IElementType NULL = new ALittleTokenType("null");
   IElementType PARAM_TAIL = new ALittleTokenType("...");
-  IElementType PCALL = new ALittleTokenType("pcall");
   IElementType PLUS = new ALittleTokenType("+");
   IElementType PLUS_ASSIGN = new ALittleTokenType("+=");
   IElementType PLUS_PLUS = new ALittleTokenType("++");
@@ -223,7 +225,9 @@ public interface ALittleTypes {
   IElementType STRING = new ALittleTokenType("string");
   IElementType STRING_CONTENT = new ALittleTokenType("STRING_CONTENT");
   IElementType STRUCT = new ALittleTokenType("struct");
+  IElementType TCALL = new ALittleTokenType("tcall");
   IElementType THIS = new ALittleTokenType("this");
+  IElementType THROW = new ALittleTokenType("throw");
   IElementType TRUE = new ALittleTokenType("true");
   IElementType USING = new ALittleTokenType("using");
   IElementType WHILE = new ALittleTokenType("while");
@@ -240,6 +244,9 @@ public interface ALittleTypes {
       }
       else if (type == ALL_TYPE) {
         return new ALittleAllTypeImpl(node);
+      }
+      else if (type == ASSERT_EXPR) {
+        return new ALittleAssertExprImpl(node);
       }
       else if (type == AUTO_TYPE) {
         return new ALittleAutoTypeImpl(node);
@@ -511,9 +518,6 @@ public interface ALittleTypes {
       else if (type == OP_NEW_STAT) {
         return new ALittleOpNewStatImpl(node);
       }
-      else if (type == PCALL_STAT) {
-        return new ALittlePcallStatImpl(node);
-      }
       else if (type == PRIMITIVE_TYPE) {
         return new ALittlePrimitiveTypeImpl(node);
       }
@@ -577,11 +581,17 @@ public interface ALittleTypes {
       else if (type == STRUCT_VAR_DEC) {
         return new ALittleStructVarDecImpl(node);
       }
+      else if (type == TCALL_STAT) {
+        return new ALittleTcallStatImpl(node);
+      }
       else if (type == TEMPLATE_DEC) {
         return new ALittleTemplateDecImpl(node);
       }
       else if (type == TEMPLATE_PAIR_DEC) {
         return new ALittleTemplatePairDecImpl(node);
+      }
+      else if (type == THROW_EXPR) {
+        return new ALittleThrowExprImpl(node);
       }
       else if (type == USING_DEC) {
         return new ALittleUsingDecImpl(node);

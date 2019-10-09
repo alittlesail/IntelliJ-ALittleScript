@@ -1,6 +1,10 @@
 
 namespace ALittle;
 
+private auto concat = lua.table.concat;
+private auto select = lua.select;
+private auto tostring = lua.tostring;
+
 // 设置自定义的日志函数，如果没有设置，那么默认使用lua的print
 // func回调的第一个参数是打印的内容，第二个参数是打印的等级参考LogLevel枚举
 public enum LogLevel
@@ -10,14 +14,6 @@ public enum LogLevel
     ERROR = 2,
 }
 
-private Functor<(string, int)> __log;
-public static SetLogCallback(Functor<(string, int)> func)
-{
-    __log = func;
-}
-
-private auto __push = table.push;
-private auto __concat = table.concat;
 public static Log(...)
 {
     // 创建列表
@@ -27,12 +23,8 @@ public static Log(...)
     // 遍历参数
     // 把参数变成字符串添加到列表中
     for (int i = 1, arg_count, 1)
-        __push(new_arg, tostring(select(i, ...)));
-    // 打印出来
-    if (__log == null)
-        print(__concat(new_arg, "\t"));
-    else
-        __log(__concat(new_arg, "\t"), 0);
+        Push(new_arg, tostring(select(i, ...)));
+    A_ScriptSystem.Log(concat(new_arg, "\t"), 0);
 }
 
 public static Warn(...)
@@ -44,12 +36,8 @@ public static Warn(...)
     // 遍历参数
     // 把参数变成字符串添加到列表中
     for (int i = 1, arg_count, 1)
-        __push(new_arg, tostring(select(i, ...)));
-    // 打印出来
-    if (__log == null)
-        print(__concat(new_arg, "\t"));
-    else
-        __log(__concat(new_arg, "\t"), 1);
+        Push(new_arg, tostring(select(i, ...)));
+    A_ScriptSystem.Log(concat(new_arg, "\t"), 1);
 }
 
 public static Error(...)
@@ -61,12 +49,6 @@ public static Error(...)
     // 遍历参数
     // 把参数变成字符串添加到列表中
     for (int i = 1, arg_count, 1)
-        __push(new_arg, tostring(select(i, ...)));
-    // 打印出来
-    if (__log == null)
-        print(__concat(new_arg, "\t"));
-    else
-        __log(__concat(new_arg, "\t"), 2);
-
-
+        Push(new_arg, tostring(select(i, ...)));
+    A_ScriptSystem.Log(concat(new_arg, "\t"), 2);
 }

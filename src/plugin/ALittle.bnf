@@ -165,6 +165,8 @@ allExpr ::= varAssignExpr |
             wrapExpr |
             propertyValueExpr |
             nsendExpr |
+            throwExpr |
+            assertExpr |
             emptyExpr
 
 // 空语句
@@ -238,6 +240,12 @@ op1Expr ::= op1 valueStat SEMI {pin=1}
 // nsend
 nsendExpr ::= nsend LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI {pin=1}
 
+// throw
+throwExpr ::= throw LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI {pin=1}
+
+// assert
+assertExpr ::= assert LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI {pin=1}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 所有类型
 allType ::= primitiveType | genericType | customType
@@ -265,7 +273,7 @@ autoType ::= auto
 
 //复合值///////////////////////////////////////////////////////////////////
 // 复合值
-valueStat ::= opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | pcallStat | ncallStat | methodParamTailDec
+valueStat ::= opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | tcallStat | ncallStat | methodParamTailDec
 valueFactorStat ::= wrapValueStat | constValue | propertyValue | reflectValue
 
 // new
@@ -274,8 +282,8 @@ opNewStat ::= new (customType | genericType) LPAREN (valueStat (COMMA valueStat)
 opNewListStat ::= LBRACK (valueStat (COMMA valueStat)*)? RBRACK {pin=1}
 // bind
 bindStat ::= bind LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
-// pcall
-pcallStat ::= pcall LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
+// tcall
+tcallStat ::= tcall LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
 // ncall
 ncallStat ::= ncall LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
 // 值

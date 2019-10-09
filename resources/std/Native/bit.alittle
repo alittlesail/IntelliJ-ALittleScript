@@ -1,5 +1,5 @@
 
-register namespace ALittle;
+register namespace lua;
 
 public class bit
 {

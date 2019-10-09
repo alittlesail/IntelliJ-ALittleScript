@@ -31,6 +31,12 @@ public class ALittleAllExprImpl extends ASTWrapperPsiElement implements ALittleA
 
   @Override
   @Nullable
+  public ALittleAssertExpr getAssertExpr() {
+    return findChildByClass(ALittleAssertExpr.class);
+  }
+
+  @Override
+  @Nullable
   public ALittleDoWhileExpr getDoWhileExpr() {
     return findChildByClass(ALittleDoWhileExpr.class);
   }
@@ -87,6 +93,12 @@ public class ALittleAllExprImpl extends ASTWrapperPsiElement implements ALittleA
   @Nullable
   public ALittleReturnExpr getReturnExpr() {
     return findChildByClass(ALittleReturnExpr.class);
+  }
+
+  @Override
+  @Nullable
+  public ALittleThrowExpr getThrowExpr() {
+    return findChildByClass(ALittleThrowExpr.class);
   }
 
   @Override

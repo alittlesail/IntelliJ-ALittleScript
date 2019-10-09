@@ -69,7 +69,7 @@ end
 function MsgCommon:MessageRead(factory, msg_id)
 	local info = self._invoke_map[msg_id]
 	if info == nil then
-		local error, invoke_info = pcall(CreateProtocolInvokeInfo, msg_id)
+		local error, invoke_info = TCall(CreateProtocolInvokeInfo, msg_id)
 		if error ~= nil then
 			Error(error)
 			return nil
@@ -83,7 +83,7 @@ end
 function MsgCommon:MessageWrite(msg_id, msg_body)
 	local info = self._invoke_map[msg_id]
 	if info == nil then
-		local error, invoke_info = pcall(CreateProtocolInvokeInfo, msg_id)
+		local error, invoke_info = TCall(CreateProtocolInvokeInfo, msg_id)
 		if error ~= nil then
 			Error(error)
 			return
@@ -128,16 +128,25 @@ function MsgCommon:HandleMessage(id, rpc_id, factory)
 	end
 	self._id_map_rpc[rpc_id] = nil
 	if id == 1 then
-		assert(coroutine.resume(info.co, factory:ReadString()))
+		local result, reason = coroutine.resume(info.co, factory:ReadString())
+		if result ~= true then
+			Error(reason)
+		end
 		return
 	end
 	local msg = self:MessageRead(factory, id)
 	if msg == nil then
-		assert(coroutine.resume(info.co, "MsgSystem.HandleMessage MessageRead failed by id:" .. id))
+		local result, reason = coroutine.resume(info.co, "MsgSystem.HandleMessage MessageRead failed by id:" .. id)
+		if result ~= true then
+			Error(reason)
+		end
 		Log("MsgSystem.HandleMessage MessageRead failed by id:" .. id)
 		return
 	end
-	assert(coroutine.resume(info.co, nil, msg))
+	local result, reason = coroutine.resume(info.co, nil, msg)
+	if result ~= true then
+		Error(reason)
+	end
 end
 
 function MsgCommon:Send(msg_id, msg_body, rpc_id)
@@ -192,7 +201,7 @@ function MsgCommon:HandleRPCRequest(id, rpc_id, factory)
 		Log("MsgSystem.HandleMessage MessageRead failed by id:" .. id)
 		return
 	end
-	local error, return_body = pcall(callback, self, msg)
+	local error, return_body = TCall(callback, self, msg)
 	if error ~= nil then
 		self:SendRpcError(rpc_id, error)
 		Log("MsgSystem.HandleMessage callback invoke failed! by id:" .. id .. ", reason:" .. error)

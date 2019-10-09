@@ -60,20 +60,32 @@ end
 
 function HttpClient:HandleSucceed()
 	__HttpClientMap[self._interface:GetID()] = nil
-	local error, param = pcall(json.decode, self._interface:GetResponse())
+	local error, param = TCall(json.decode, self._interface:GetResponse())
 	if error ~= nil then
-		assert(coroutine.resume(self._co, error, nil))
+		local result, reason = coroutine.resume(self._co, error, nil)
+		if result ~= true then
+			Error(reason)
+		end
 		return
 	end
 	if param["error"] ~= nil then
-		assert(coroutine.resume(self._co, param["error"], nil))
+		local result, reason = coroutine.resume(self._co, param["error"], nil)
+		if result ~= true then
+			Error(reason)
+		end
 		return
 	end
-	assert(coroutine.resume(self._co, nil, param))
+	local result, reason = coroutine.resume(self._co, nil, param)
+	if result ~= true then
+		Error(reason)
+	end
 end
 
 function HttpClient:HandleFailed(reason)
 	__HttpClientMap[self._interface:GetID()] = nil
-	assert(coroutine.resume(self._co, reason, nil))
+	local result, reason = coroutine.resume(self._co, reason, nil)
+	if result ~= true then
+		Error(reason)
+	end
 end
 

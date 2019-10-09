@@ -16,7 +16,7 @@ function ConfigSystem:Ctor(file_path)
 	if content == nil then
 		return
 	end
-	local error, json_content = pcall(json.decode, content)
+	local error, json_content = TCall(json.decode, content)
 	if error ~= nil then
 		Log("Json Decode failed." .. file_path .. ", " .. error)
 		return

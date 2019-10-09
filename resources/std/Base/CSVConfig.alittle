@@ -41,7 +41,7 @@ protected class CSVConfig
 
     private fun LoadCell(int row) : any
     {
-        Map<string, any> value = table.create();
+        Map<string, any> value = new Map<string, any>();
         for (int index, auto handle in this._csv_info.handle)
         {
             value[handle.var_name] = handle.func(this._csv_file.ReadCell(row, index), handle);
@@ -87,7 +87,7 @@ class KeyValueConfig
         string value = this._data[key];
         if (value == null) return default;
         if (value == "") return 0;
-        return math.floor(tonumber(value));
+        return lua.math.floor(lua.tonumber(value));
     }
 
     public fun GetDouble(string key, double default) : double
@@ -95,7 +95,7 @@ class KeyValueConfig
         string value = this._data[key];
         if (value == null) return default;
         if (value == "") return 0;
-        return tonumber(value);
+        return lua.tonumber(value);
     }
 
     public fun GetIntList(string key, List<int> default) : List<int>
@@ -107,7 +107,7 @@ class KeyValueConfig
         for (auto index, auto v in list)
         {
             if (v == "") int_list[index] = 0;
-            else int_list[index] = math.floor(tonumber(v));
+            else int_list[index] = lua.math.floor(lua.tonumber(v));
         }
         return int_list;
     }
@@ -121,7 +121,7 @@ class KeyValueConfig
         for (auto index, auto v in list)
         {
             if (v == "") double_list[index] = 0;
-            else double_list[index] = tonumber(v);
+            else double_list[index] = lua.tonumber(v);
         }
         return double_list;
     }
@@ -144,7 +144,7 @@ class SingleKeyTableConfig<T> : public CSVConfig
         this._reflect_info = reflect_info;
         this._key_map = new Map<any, int>();
         this._cache_map = new Map<any, any>();
-        table.setweak(this._cache_map, false, true);
+        Setweak(this._cache_map, false, true);
     }
 
     public get key_map() : Map<any, int> { return this._key_map; }
@@ -165,7 +165,7 @@ class SingleKeyTableConfig<T> : public CSVConfig
             if (value != null)
             {
                 if (is_number)
-                    this._key_map[tonumber(value)] = row;
+                    this._key_map[lua.tonumber(value)] = row;
                 else
                     this._key_map[value] = row;
             }
@@ -214,7 +214,7 @@ class SingleKeyTableIndexConfig<T>
         {
             any value;
             if (is_number)
-                value = tonumber(this._parent.ReadCell(row, col_index));
+                value = lua.tonumber(this._parent.ReadCell(row, col_index));
             else
                 value = this._parent.ReadCell(row, col_index);
 
@@ -268,7 +268,7 @@ class DoubleKeyTableConfig<T> : public CSVConfig
         this._reflect_info = reflect_info;
         this._key_map = new Map<any, Map<any, int>>();
         this._cache_map = new Map<any, Map<any, any>>();
-        table.setweak(this._cache_map, false, true);
+        Setweak(this._cache_map, false, true);
     }
 
     public fun Init(ICSVFile loader)
@@ -291,11 +291,11 @@ class DoubleKeyTableConfig<T> : public CSVConfig
             {
                 if (first_is_number)
                 {
-                    tmp = this._key_map[tonumber(value)];
+                    tmp = this._key_map[lua.tonumber(value)];
                     if (tmp == null)
                     {
                         tmp = new Map<any, int>();
-                        this._key_map[tonumber(value)] = tmp;
+                        this._key_map[lua.tonumber(value)] = tmp;
                     }
                 }
                 else
@@ -313,7 +313,7 @@ class DoubleKeyTableConfig<T> : public CSVConfig
             if (value != null)
             {
                 if (second_is_number)
-                    tmp[tonumber(value)] = row;
+                    tmp[lua.tonumber(value)] = row;
                 else
                     tmp[value] = row;
             }

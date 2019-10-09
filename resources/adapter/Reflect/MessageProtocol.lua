@@ -5,61 +5,6 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-IMessageWriteFactory = Class(nil, "ALittle.IMessageWriteFactory")
-
-function IMessageWriteFactory:SetID(id)
-end
-
-function IMessageWriteFactory:SetRpcID(id)
-end
-
-function IMessageWriteFactory:ResetOffset()
-end
-
-function IMessageWriteFactory:GetOffset()
-end
-
-function IMessageWriteFactory:SetInt(offset, value)
-end
-
-function IMessageWriteFactory:WriteBool(value)
-end
-
-function IMessageWriteFactory:WriteInt(value)
-end
-
-function IMessageWriteFactory:WriteLongLong(value)
-end
-
-function IMessageWriteFactory:WriteString(value)
-end
-
-function IMessageWriteFactory:WriteDouble(value)
-end
-
-IMessageReadFactory = Class(nil, "ALittle.IMessageReadFactory")
-
-function IMessageReadFactory:GetTotalSize()
-end
-
-function IMessageReadFactory:ReadBool()
-end
-
-function IMessageReadFactory:ReadInt()
-end
-
-function IMessageReadFactory:ReadLongLong()
-end
-
-function IMessageReadFactory:ReadString()
-end
-
-function IMessageReadFactory:ReadDouble()
-end
-
-function IMessageReadFactory:GetReadSize()
-end
-
 local PS_WriteBool
 PS_WriteBool = function(factory, var_info, var_value)
 	if var_value == nil then
@@ -92,12 +37,12 @@ PS_WriteDouble = function(factory, var_info, var_value)
 	return factory:WriteDouble(var_value)
 end
 
-local PS_WriteLongLong
-PS_WriteLongLong = function(factory, var_info, var_value)
+local PS_WriteI64
+PS_WriteI64 = function(factory, var_info, var_value)
 	if var_value == nil then
-		return factory:WriteLongLong(0)
+		return factory:WriteI64(0)
 	end
-	return factory:WriteLongLong(var_value)
+	return factory:WriteI64(var_value)
 end
 
 local PS_WriteArray
@@ -106,16 +51,16 @@ PS_WriteArray = function(factory, var_info, var_value)
 		return factory:WriteInt(0)
 	end
 	local offset = factory:GetOffset()
-	local len = factory:WriteInt(0)
+	local l = factory:WriteInt(0)
 	local sub_info = var_info.sub_info
 	local sub_func = sub_info.wfunc
 	local count = 0
 	for index, value in ___ipairs(var_value) do
-		len = len + sub_func(factory, sub_info, value)
+		l = l + sub_func(factory, sub_info, value)
 		count = count + 1
 	end
 	factory:SetInt(offset, count)
-	return len
+	return l
 end
 
 local PS_WriteMap
@@ -124,19 +69,19 @@ PS_WriteMap = function(factory, var_info, var_value)
 		return factory:WriteInt(0)
 	end
 	local offset = factory:GetOffset()
-	local len = factory:WriteInt(0)
+	local l = factory:WriteInt(0)
 	local key_info = var_info.key_info
 	local key_func = key_info.wfunc
 	local value_info = var_info.value_info
 	local value_func = value_info.wfunc
 	local count = 0
 	for key, value in ___pairs(var_value) do
-		len = len + key_func(factory, key_info, key)
-		len = len + value_func(factory, value_info, value)
+		l = l + key_func(factory, key_info, key)
+		l = l + value_func(factory, value_info, value)
 		count = count + 1
 	end
 	factory:SetInt(offset, count)
-	return len
+	return l
 end
 
 local PS_WriteMessage
@@ -179,68 +124,68 @@ function PS_WriteMessageForSend(factory, var_info, var_value)
 end
 
 local PS_ReadBool
-PS_ReadBool = function(factory, var_info, len)
-	if len == 0 then
+PS_ReadBool = function(factory, var_info, l)
+	if l == 0 then
 		return false, 0
 	end
-	if len < 1 then
+	if l < 1 then
 		return false, -1
 	end
 	return factory:ReadBool(), 1
 end
 
 local PS_ReadInt
-PS_ReadInt = function(factory, var_info, len)
-	if len == 0 then
+PS_ReadInt = function(factory, var_info, l)
+	if l == 0 then
 		return 0, 0
 	end
-	if len < 4 then
+	if l < 4 then
 		return 0, -1
 	end
 	return factory:ReadInt(), 4
 end
 
 local PS_ReadString
-PS_ReadString = function(factory, var_info, len)
-	if len == 0 then
+PS_ReadString = function(factory, var_info, l)
+	if l == 0 then
 		return "", 0
 	end
 	return factory:ReadString(), factory:GetReadSize()
 end
 
 local PS_ReadDouble
-PS_ReadDouble = function(factory, var_info, len)
-	if len == 0 then
+PS_ReadDouble = function(factory, var_info, l)
+	if l == 0 then
 		return 0, 0
 	end
-	if len < 8 then
+	if l < 8 then
 		return 0, -1
 	end
 	return factory:ReadDouble(), 8
 end
 
-local PS_ReadLongLong
-PS_ReadLongLong = function(factory, var_info, len)
-	if len == 0 then
+local PS_ReadI64
+PS_ReadI64 = function(factory, var_info, l)
+	if l == 0 then
 		return 0, 0
 	end
-	if len < 8 then
+	if l < 8 then
 		return 0, -1
 	end
-	return factory:ReadLongLong(), 8
+	return factory:ReadI64(), 8
 end
 
 local PS_ReadArray
-PS_ReadArray = function(factory, var_info, len)
-	if len == 0 then
+PS_ReadArray = function(factory, var_info, l)
+	if l == 0 then
 		return {}, 0
 	end
-	local save_len = len
-	if len < 4 then
+	local save_len = l
+	if l < 4 then
 		return nil, -1
 	end
 	local count = factory:ReadInt()
-	len = len - 4
+	l = l - 4
 	if count < 0 then
 		return nil, -1
 	end
@@ -249,26 +194,26 @@ PS_ReadArray = function(factory, var_info, len)
 	local sub_len = 0
 	local value_list = {}
 	for index = 1, count, 1 do
-		value_list[index], sub_len = sub_func(factory, sub_info, len)
+		value_list[index], sub_len = sub_func(factory, sub_info, l)
 		if sub_len < 0 then
 			return nil, sub_len
 		end
-		len = len - (sub_len)
+		l = l - (sub_len)
 	end
-	return value_list, save_len - len
+	return value_list, save_len - l
 end
 
 local PS_ReadMap
-PS_ReadMap = function(factory, var_info, len)
-	if len == 0 then
+PS_ReadMap = function(factory, var_info, l)
+	if l == 0 then
 		return {}, 0
 	end
-	local save_len = len
-	if len < 4 then
+	local save_len = l
+	if l < 4 then
 		return nil, -1
 	end
 	local count = factory:ReadInt()
-	len = len - 4
+	l = l - 4
 	if count < 0 then
 		return nil, -1
 	end
@@ -278,24 +223,24 @@ PS_ReadMap = function(factory, var_info, len)
 	local value_func = value_info.rfunc
 	local value_map = {}
 	for index = 1, count, 1 do
-		local key, key_len = key_func(factory, key_info, len)
+		local key, key_len = key_func(factory, key_info, l)
 		if key_len < 0 then
 			return nil, key_len
 		end
-		len = len - key_len
-		local value, value_len = value_func(factory, value_info, len)
+		l = l - key_len
+		local value, value_len = value_func(factory, value_info, l)
 		if value_len < 0 then
 			return nil, value_len
 		end
-		len = len - value_len
+		l = l - value_len
 		value_map[key] = value
 	end
-	return value_map, save_len - len
+	return value_map, save_len - l
 end
 
 local PS_ReadMessage
-PS_ReadMessage = function(factory, var_info, len)
-	if len == 0 then
+PS_ReadMessage = function(factory, var_info, l)
+	if l == 0 then
 		local value_map = {}
 		local sub_len = 0
 		for index, info in ___ipairs(var_info.handle) do
@@ -303,13 +248,13 @@ PS_ReadMessage = function(factory, var_info, len)
 		end
 		return value_map, 0
 	end
-	if len < 4 then
+	if l < 4 then
 		return nil, -1
 	end
 	local object_len = factory:ReadInt()
-	len = len - 4
+	l = l - 4
 	local save_len = 4
-	if object_len > len then
+	if object_len > l then
 		return nil, -1
 	end
 	save_len = save_len + object_len
@@ -325,8 +270,8 @@ PS_ReadMessage = function(factory, var_info, len)
 	return value_map, save_len
 end
 
-function PS_ReadMessageForReceive(factory, var_info, len)
-	if len == 0 then
+function PS_ReadMessageForReceive(factory, var_info, l)
+	if l == 0 then
 		local value_map = {}
 		local sub_len = 0
 		for index, info in ___ipairs(var_info.handle) do
@@ -337,37 +282,36 @@ function PS_ReadMessageForReceive(factory, var_info, len)
 	local sub_len = 0
 	local value_map = {}
 	for index, info in ___ipairs(var_info.handle) do
-		value_map[info.var_name], sub_len = info.rfunc(factory, info, len)
+		value_map[info.var_name], sub_len = info.rfunc(factory, info, l)
 		if sub_len < 0 then
 			return nil, sub_len
 		end
-		len = len - sub_len
+		l = l - sub_len
 	end
-	return value_map, len
+	return value_map, l
 end
 
 local __ps_write_data_map = {}
 __ps_write_data_map["bool"] = PS_WriteBool
 __ps_write_data_map["int"] = PS_WriteInt
-__ps_write_data_map["I64"] = PS_WriteLongLong
+__ps_write_data_map["I64"] = PS_WriteI64
 __ps_write_data_map["string"] = PS_WriteString
 __ps_write_data_map["double"] = PS_WriteDouble
 local __ps_read_data_map = {}
 __ps_read_data_map["bool"] = PS_ReadBool
 __ps_read_data_map["int"] = PS_ReadInt
-__ps_read_data_map["I64"] = PS_ReadLongLong
+__ps_read_data_map["I64"] = PS_ReadI64
 __ps_read_data_map["string"] = PS_ReadString
 __ps_read_data_map["double"] = PS_ReadDouble
-local __find = String.find
-local __sub = String.sub
-local __len = String.len
-local __byte = String.byte
-local __assert = assert
+local find = Find
+local sub = string.sub
+local len = string.len
+local byte = string.byte
 function CreateSubInfo(sub_type)
-	if __find(sub_type, "List", 1) == 1 then
+	if find(sub_type, "List", 1) == 1 then
 		return CreateArrayInfo(sub_type)
 	end
-	if __find(sub_type, "Map", 1) == 1 then
+	if find(sub_type, "Map", 1) == 1 then
 		return CreateMapInfo(sub_type)
 	end
 	local wfunc = __ps_write_data_map[sub_type]
@@ -384,18 +328,18 @@ function CreateArrayInfo(var_type)
 	local invoke_info = {}
 	invoke_info.wfunc = PS_WriteArray
 	invoke_info.rfunc = PS_ReadArray
-	invoke_info.sub_info = CreateSubInfo(__sub(var_type, 6, -2))
+	invoke_info.sub_info = CreateSubInfo(sub(var_type, 6, -2))
 	return invoke_info
 end
 
 function CreateMapInfo(var_type)
 	local invoke_info = {}
-	local sub_type = __sub(var_type, 5, -2)
+	local sub_type = sub(var_type, 5, -2)
 	local comma_index = 0
-	local sub_type_len = __len(sub_type)
+	local sub_type_len = len(sub_type)
 	local ltgt = 0
 	for i = 1, sub_type_len, 1 do
-		local code = __byte(sub_type, i)
+		local code = byte(sub_type, i)
 		if code == 60 then
 			ltgt = ltgt + 1
 		elseif code == 62 then
@@ -407,17 +351,17 @@ function CreateMapInfo(var_type)
 			end
 		end
 	end
-	assert(comma_index ~= 0, "can'f find comma in var_type:" .. var_type)
+	Assert(comma_index ~= 0, "can'f find comma in var_type:" .. var_type)
 	invoke_info.wfunc = PS_WriteMap
 	invoke_info.rfunc = PS_ReadMap
-	invoke_info.key_info = CreateSubInfo(__sub(sub_type, 1, comma_index - 1))
-	invoke_info.value_info = CreateSubInfo(__sub(sub_type, comma_index + 1))
+	invoke_info.key_info = CreateSubInfo(sub(sub_type, 1, comma_index - 1))
+	invoke_info.value_info = CreateSubInfo(sub(sub_type, comma_index + 1))
 	return invoke_info
 end
 
 function CreateMessageInfo(var_type)
 	local reflect_info = FindReflectByName(var_type)
-	__assert(reflect_info ~= nil, "FindReflect调用失败! 未知类型:" .. var_type)
+	Assert(reflect_info ~= nil, "FindReflect调用失败! 未知类型:" .. var_type)
 	return CreateMessageInfoImpl(reflect_info)
 end
 
@@ -439,7 +383,7 @@ end
 
 function CreateProtocolInvokeInfo(msg_id)
 	local reflect_info = FindReflectById(msg_id)
-	__assert(reflect_info ~= nil, "FindReflect调用失败! 未知ID:" .. msg_id)
+	Assert(reflect_info ~= nil, "FindReflect调用失败! 未知ID:" .. msg_id)
 	return CreateMessageInfoImpl(reflect_info)
 end
 

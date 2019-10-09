@@ -51,7 +51,7 @@ public class LoopList : public LoopObject
             {
                 if (this._cur_index > index)
                     -- this._cur_index;
-                table.remove(this._update_list, index);
+                lua.table.remove(this._update_list, index);
                 -- this._count;
                 break;
             }

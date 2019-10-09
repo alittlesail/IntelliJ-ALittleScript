@@ -7,7 +7,7 @@ local ___ipairs = ipairs
 local ___coroutine = coroutine
 
 local __all_callback = {}
-table.setweak(__all_callback, false, true)
+Setweak(__all_callback, false, true)
 function RegHttpCallback(method, callback)
 	if __all_callback[method] ~= nil then
 		Error("RegHttpCallback消息回调函数注册失败，名字为" .. method .. "已存在")
@@ -21,7 +21,7 @@ function FindHttpCallback(method)
 end
 
 local __all_download_callback = {}
-table.setweak(__all_download_callback, false, true)
+Setweak(__all_download_callback, false, true)
 function RegHttpDownloadCallback(method, callback)
 	if __all_download_callback[method] ~= nil then
 		Error("RegHttpDownloadCallback消息回调函数注册失败，名字为" .. method .. "已存在")

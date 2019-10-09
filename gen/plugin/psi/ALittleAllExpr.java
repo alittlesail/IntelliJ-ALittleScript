@@ -11,6 +11,9 @@ import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
 public interface ALittleAllExpr extends PsiElement {
 
   @Nullable
+  ALittleAssertExpr getAssertExpr();
+
+  @Nullable
   ALittleDoWhileExpr getDoWhileExpr();
 
   @Nullable
@@ -39,6 +42,9 @@ public interface ALittleAllExpr extends PsiElement {
 
   @Nullable
   ALittleReturnExpr getReturnExpr();
+
+  @Nullable
+  ALittleThrowExpr getThrowExpr();
 
   @Nullable
   ALittleVarAssignExpr getVarAssignExpr();
