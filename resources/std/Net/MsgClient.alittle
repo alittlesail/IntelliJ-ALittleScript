@@ -6,7 +6,7 @@ private Map<int, IMsgClient> __MsgClientMap = new Map<int, IMsgClient>();
 public static FindMsgClient(int id) : IMsgClient { return __MsgClientMap[id]; }
 
 // 用于长连接
-public class MsgClient<MI : IMsgInterface> : public MsgCommon
+public class MsgClientTemplate<MI : IMsgInterface> : public MsgCommon
 {
     private int _heartbeat;                 // 心跳间隔时间
     private LoopFunction _heartbeat_loop;   //

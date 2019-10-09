@@ -17,7 +17,7 @@ public class IHttpFileInterface
 private Map<int, IHttpFileClient> __HttpFileClientMap = new Map<int, IHttpFileClient>();
 public static FindHttpFileClient(int id) : IHttpFileClient { return __HttpFileClientMap[id]; }
 
-public class HttpFileClient<HFC : IHttpFileInterface> : public IHttpFileClient
+public class HttpFileClientTemplate<HFC : IHttpFileInterface> : public IHttpFileClient
 {
     private HFC _interface;
     private lua.thread _co;

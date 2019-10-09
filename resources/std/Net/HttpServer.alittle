@@ -41,7 +41,7 @@ public class IHttpServerInterface
     public fun SendFile(int http_id, string file_path, int start_size) {}
 }
 
-public class HttpServer<HSI : IHttpServerInterface> : public ALittle.IHttpClient
+public class HttpServerTemplate<HSI : IHttpServerInterface> : public ALittle.IHttpClient
 {
     private int _http_id;
     private HSI _interface;

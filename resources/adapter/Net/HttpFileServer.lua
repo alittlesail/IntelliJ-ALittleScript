@@ -32,20 +32,20 @@ function IHttpFileServerInterface:StartReceiveFile(http_id, file_path, start_siz
 end
 
 assert(ALittle.IHttpFileClient, " extends class:ALittle.IHttpFileClient is nil")
-HttpFileServer = Class(ALittle.IHttpFileClient, "ALittle.HttpFileServer")
+HttpFileServerTemplate = Class(ALittle.IHttpFileClient, "ALittle.HttpFileServerTemplate")
 
-function HttpFileServer:Ctor(http_id, co)
+function HttpFileServerTemplate:Ctor(http_id, co)
 	___rawset(self, "_http_id", http_id)
 	___rawset(self, "_co", co)
 	___rawset(self, "_invoked", false)
 	___rawset(self, "_interface", self.__class.__element[1]())
 end
 
-function HttpFileServer.__getter:invoked()
+function HttpFileServerTemplate.__getter:invoked()
 	return self._invoked
 end
 
-function HttpFileServer:StartReceiveFile(file_path, start_size)
+function HttpFileServerTemplate:StartReceiveFile(file_path, start_size)
 	if self._invoked then
 		return "StartReceiveFile已经被调用过"
 	end
@@ -54,18 +54,18 @@ function HttpFileServer:StartReceiveFile(file_path, start_size)
 	return ___coroutine.yield()
 end
 
-function HttpFileServer:HandleReceiveResult(reason)
+function HttpFileServerTemplate:HandleReceiveResult(reason)
 	local result, reason = coroutine.resume(self._co, reason)
 	if not result then
 		ALittle.Error(reason)
 	end
 end
 
-function HttpFileServer:SendString(content)
+function HttpFileServerTemplate:SendString(content)
 	self._interface:SendString(self._http_id, content)
 end
 
-function HttpFileServer:Clsoe()
+function HttpFileServerTemplate:Clsoe()
 	self._interface:Close(self._http_id)
 end
 

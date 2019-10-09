@@ -37,9 +37,9 @@ function FindMsgRpcCallback(msg_id)
 end
 
 assert(MsgCommon, " extends class:MsgCommon is nil")
-MsgServer = Class(MsgCommon, "ALittle.MsgServer")
+MsgServerTemplate = Class(MsgCommon, "ALittle.MsgServerTemplate")
 
-function MsgServer:Ctor(client_id, remote_ip, remote_port)
+function MsgServerTemplate:Ctor(client_id, remote_ip, remote_port)
 	___rawset(self, "_interface", self.__class.__element[1]())
 	self._interface:SetID(client_id)
 	___rawset(self, "_write_factory", lua.MessageWriteFactory())
@@ -53,28 +53,28 @@ function MsgServer:Ctor(client_id, remote_ip, remote_port)
 	___rawset(self, "_web_is_logining", false)
 end
 
-function MsgServer.__getter:remote_ip()
+function MsgServerTemplate.__getter:remote_ip()
 	return self._remote_ip
 end
 
-function MsgServer.__getter:remote_port()
+function MsgServerTemplate.__getter:remote_port()
 	return self._remote_port
 end
 
-function MsgServer:IsConnected()
+function MsgServerTemplate:IsConnected()
 	return self._is_connected
 end
 
-function MsgServer:HandleConnected()
+function MsgServerTemplate:HandleConnected()
 	self._is_connected = true
 end
 
-function MsgServer:HandleDisconnected()
+function MsgServerTemplate:HandleDisconnected()
 	self._is_connected = false
 	self:ClearRPC("连接断开了")
 end
 
-function MsgServer:Close(reason)
+function MsgServerTemplate:Close(reason)
 	if not self._is_connected then
 		return
 	end
@@ -87,9 +87,9 @@ function MsgServer:Close(reason)
 end
 
 assert(MsgCommon, " extends class:MsgCommon is nil")
-RouteServer = Class(MsgCommon, "ALittle.RouteServer")
+RouteServerTemplate = Class(MsgCommon, "ALittle.RouteServerTemplate")
 
-function RouteServer:Ctor(connect_key, route_type, route_num)
+function RouteServerTemplate:Ctor(connect_key, route_type, route_num)
 	___rawset(self, "_interface", self.__class.__element[1]())
 	self._interface:SetID(connect_key)
 	___rawset(self, "_write_factory", lua.MessageWriteFactory())
@@ -99,28 +99,28 @@ function RouteServer:Ctor(connect_key, route_type, route_num)
 	___rawset(self, "_route_num", route_num)
 end
 
-function RouteServer.__getter:route_type()
+function RouteServerTemplate.__getter:route_type()
 	return self._route_type
 end
 
-function RouteServer.__getter:route_num()
+function RouteServerTemplate.__getter:route_num()
 	return self._route_num
 end
 
-function RouteServer:IsConnected()
+function RouteServerTemplate:IsConnected()
 	return self._is_connected
 end
 
-function RouteServer:HandleConnected()
+function RouteServerTemplate:HandleConnected()
 	self._is_connected = true
 end
 
-function RouteServer:HandleDisconnected()
+function RouteServerTemplate:HandleDisconnected()
 	self._is_connected = false
 	self:ClearRPC("连接断开了")
 end
 
-function RouteServer:Close(reason)
+function RouteServerTemplate:Close(reason)
 	if not self._is_connected then
 		return
 	end

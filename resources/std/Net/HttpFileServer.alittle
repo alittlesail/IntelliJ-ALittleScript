@@ -25,7 +25,7 @@ public class IHttpFileServerInterface
     public fun StartReceiveFile(int http_id, string file_path, int start_size) {}
 }
 
-public class HttpFileServer<HFSI : IHttpFileServerInterface> : public ALittle.IHttpFileClient
+public class HttpFileServerTemplate<HFSI : IHttpFileServerInterface> : public ALittle.IHttpFileClient
 {
     private int _http_id;
     private lua.thread _co;

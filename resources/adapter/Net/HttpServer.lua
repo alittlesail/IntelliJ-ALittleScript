@@ -46,22 +46,22 @@ function IHttpServerInterface:SendFile(http_id, file_path, start_size)
 end
 
 assert(ALittle.IHttpClient, " extends class:ALittle.IHttpClient is nil")
-HttpServer = Class(ALittle.IHttpClient, "ALittle.HttpServer")
+HttpServerTemplate = Class(ALittle.IHttpClient, "ALittle.HttpServerTemplate")
 
-function HttpServer:Ctor(http_id)
+function HttpServerTemplate:Ctor(http_id)
 	___rawset(self, "_http_id", http_id)
 	___rawset(self, "_interface", self.__class.__element[1]())
 end
 
-function HttpServer:Close()
+function HttpServerTemplate:Close()
 	self._interface:Close(self._http_id)
 end
 
-function HttpServer:SendString(content)
+function HttpServerTemplate:SendString(content)
 	self._interface:SendString(self._http_id, content)
 end
 
-function HttpServer:SendFile(file_path, start_size)
+function HttpServerTemplate:SendFile(file_path, start_size)
 	self._interface:SendFile(self._http_id, file_path, start_size)
 end
 

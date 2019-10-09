@@ -35,9 +35,9 @@ function FindHttpFileClient(id)
 end
 
 assert(IHttpFileClient, " extends class:IHttpFileClient is nil")
-HttpFileClient = Class(IHttpFileClient, "ALittle.HttpFileClient")
+HttpFileClientTemplate = Class(IHttpFileClient, "ALittle.HttpFileClientTemplate")
 
-function HttpFileClient:Ctor(ip, port, file_path, start_size, callback)
+function HttpFileClientTemplate:Ctor(ip, port, file_path, start_size, callback)
 	___rawset(self, "_interface", self.__class.__element[1]())
 	___rawset(self, "_ip", ip)
 	___rawset(self, "_port", port)
@@ -46,7 +46,7 @@ function HttpFileClient:Ctor(ip, port, file_path, start_size, callback)
 	___rawset(self, "_callback", callback)
 end
 
-function HttpFileClient:SendDownloadRPC(method, content)
+function HttpFileClientTemplate:SendDownloadRPC(method, content)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程"
@@ -62,7 +62,7 @@ function HttpFileClient:SendDownloadRPC(method, content)
 	return ___coroutine.yield()
 end
 
-function HttpFileClient:SendUploadRPC(method, content)
+function HttpFileClientTemplate:SendUploadRPC(method, content)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程", nil
@@ -78,15 +78,15 @@ function HttpFileClient:SendUploadRPC(method, content)
 	return ___coroutine.yield()
 end
 
-function HttpFileClient:Stop()
+function HttpFileClientTemplate:Stop()
 	self._interface:Stop()
 end
 
-function HttpFileClient:GetTotalSize()
+function HttpFileClientTemplate:GetTotalSize()
 	return self._interface:GetTotalSize()
 end
 
-function HttpFileClient:HandleSucceed()
+function HttpFileClientTemplate:HandleSucceed()
 	__HttpFileClientMap[self._interface:GetID()] = nil
 	local result, reason = coroutine.resume(self._co, nil, nil)
 	if result ~= true then
@@ -94,7 +94,7 @@ function HttpFileClient:HandleSucceed()
 	end
 end
 
-function HttpFileClient:HandleFailed(reason)
+function HttpFileClientTemplate:HandleFailed(reason)
 	__HttpFileClientMap[self._interface:GetID()] = nil
 	local result, reason = coroutine.resume(self._co, reason, nil)
 	if result ~= true then
@@ -102,7 +102,7 @@ function HttpFileClient:HandleFailed(reason)
 	end
 end
 
-function HttpFileClient:HandleProcess()
+function HttpFileClientTemplate:HandleProcess()
 	if self._callback ~= nil then
 		self._callback(self._interface)
 	end

@@ -29,15 +29,15 @@ function FindHttpClient(id)
 end
 
 assert(IHttpClient, " extends class:IHttpClient is nil")
-HttpClient = Class(IHttpClient, "ALittle.HttpClient")
+HttpClientTemplate = Class(IHttpClient, "ALittle.HttpClientTemplate")
 
-function HttpClient:Ctor(ip, port)
+function HttpClientTemplate:Ctor(ip, port)
 	___rawset(self, "_interface", self.__class.__element[1]())
 	___rawset(self, "_ip", ip)
 	___rawset(self, "_port", port)
 end
 
-function HttpClient:SendRPC(method, content)
+function HttpClientTemplate:SendRPC(method, content)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程", nil
@@ -54,11 +54,11 @@ function HttpClient:SendRPC(method, content)
 	return ___coroutine.yield()
 end
 
-function HttpClient:Stop()
+function HttpClientTemplate:Stop()
 	self._interface:Stop()
 end
 
-function HttpClient:HandleSucceed()
+function HttpClientTemplate:HandleSucceed()
 	__HttpClientMap[self._interface:GetID()] = nil
 	local error, param = TCall(json.decode, self._interface:GetResponse())
 	if error ~= nil then
@@ -81,7 +81,7 @@ function HttpClient:HandleSucceed()
 	end
 end
 
-function HttpClient:HandleFailed(reason)
+function HttpClientTemplate:HandleFailed(reason)
 	__HttpClientMap[self._interface:GetID()] = nil
 	local result, reason = coroutine.resume(self._co, reason, nil)
 	if result ~= true then

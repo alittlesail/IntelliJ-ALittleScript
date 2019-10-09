@@ -14,7 +14,7 @@ public class IHttpInterface
 private Map<int, IHttpClient> __HttpClientMap = new Map<int, IHttpClient>();
 public static FindHttpClient(int id) : IHttpClient { return __HttpClientMap[id]; }
 
-public class HttpClient<HC : IHttpInterface> : public IHttpClient
+public class HttpClientTemplate<HC : IHttpInterface> : public IHttpClient
 {
     private HC _interface;
     private lua.thread _co;
