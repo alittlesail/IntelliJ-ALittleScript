@@ -232,14 +232,14 @@ end
 
 function String_HttpAnalysisValueMap(param, content)
 	local value_map = {}
-	local param_split_list = ALittle.String_Split(param, "&")
+	local param_split_list = String_Split(param, "&")
 	for index, param_content in ___ipairs(param_split_list) do
-		local value_split_list = ALittle.String_Split(param_content, "=")
+		local value_split_list = String_Split(param_content, "=")
 		if maxn(value_split_list) == 2 then
 			if sub(value_split_list[2], 1, 1) == "\"" and sub(value_split_list[2], -1, -1) == "\"" then
 				value_map[value_split_list[1]] = sub(value_split_list[2], 2, -2)
 			else
-				local number = ALittle.tonumber(value_split_list[2])
+				local number = tonumber(value_split_list[2])
 				if number == nil then
 					value_map[value_split_list[1]] = value_split_list[2]
 				else

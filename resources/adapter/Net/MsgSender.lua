@@ -6,15 +6,15 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-local __MsgClientMap = {}
-function FindMsgClient(id)
-	return __MsgClientMap[id]
+local __MsgSenderMap = {}
+function FindMsgSender(id)
+	return __MsgSenderMap[id]
 end
 
-assert(MsgCommon, " extends class:MsgCommon is nil")
-MsgClientTemplate = Class(MsgCommon, "ALittle.MsgClientTemplate")
+assert(IMsgCommon, " extends class:IMsgCommon is nil")
+MsgSenderTemplate = Class(IMsgCommon, "ALittle.MsgSenderTemplate")
 
-function MsgClientTemplate:Ctor(heartbeat, check_heartbeat, callback)
+function MsgSenderTemplate:Ctor(heartbeat, check_heartbeat, callback)
 	___rawset(self, "_interface", self.__class.__element[1]())
 	___rawset(self, "_write_factory", MessageWriteFactory())
 	___rawset(self, "_heartbeat", heartbeat)
@@ -27,20 +27,20 @@ function MsgClientTemplate:Ctor(heartbeat, check_heartbeat, callback)
 	___rawset(self, "_callback", callback)
 end
 
-function MsgClientTemplate:Connect(ip, port)
+function MsgSenderTemplate:Connect(ip, port)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程"
 	end
 	self._co = co
-	__MsgClientMap[self._interface:GetID()] = self
+	__MsgSenderMap[self._interface:GetID()] = self
 	self._ip = ip
 	self._port = port
 	self._interface:Connect(ip, port)
 	return ___coroutine.yield()
 end
 
-function MsgClientTemplate:HandleConnectSucceed()
+function MsgSenderTemplate:HandleConnectSucceed()
 	self._last_recv_time = 0
 	self:SendHeartbeat()
 	self:StartHeartbeat()
@@ -50,17 +50,17 @@ function MsgClientTemplate:HandleConnectSucceed()
 	end
 end
 
-function MsgClientTemplate:HandleDisconnect()
+function MsgSenderTemplate:HandleDisconnect()
 	self:StopHeartbeat()
-	__MsgClientMap[self._interface:GetID()] = nil
+	__MsgSenderMap[self._interface:GetID()] = nil
 	self:ClearRPC("连接断开了")
 	if self._callback ~= nil then
 		self._callback()
 	end
 end
 
-function MsgClientTemplate:HandleConnectFailed(error)
-	__MsgClientMap[self._interface:GetID()] = nil
+function MsgSenderTemplate:HandleConnectFailed(error)
+	__MsgSenderMap[self._interface:GetID()] = nil
 	if error == nil then
 		error = self._ip .. ":" .. self._port .. "连接失败"
 	end
@@ -70,17 +70,17 @@ function MsgClientTemplate:HandleConnectFailed(error)
 	end
 end
 
-function MsgClientTemplate:Close(reason)
+function MsgSenderTemplate:Close(reason)
 	self:StopHeartbeat()
 	self._interface:Close()
 	if reason == nil then
 		reason = "主动关闭连接"
 	end
 	self:ClearRPC(reason)
-	__MsgClientMap[self._interface:GetID()] = nil
+	__MsgSenderMap[self._interface:GetID()] = nil
 end
 
-function MsgClientTemplate:SendHeartbeat(max_ms)
+function MsgSenderTemplate:SendHeartbeat(max_ms)
 	if self._interface:IsConnected() == false then
 		return
 	end
@@ -103,7 +103,7 @@ function MsgClientTemplate:SendHeartbeat(max_ms)
 	end
 end
 
-function MsgClientTemplate:CheckHeartbeat(send_time, cmp_time, delta_time)
+function MsgSenderTemplate:CheckHeartbeat(send_time, cmp_time, delta_time)
 	local invoke_time = os.time()
 	local interval = invoke_time - send_time
 	if delta_time > interval then
@@ -123,7 +123,7 @@ function MsgClientTemplate:CheckHeartbeat(send_time, cmp_time, delta_time)
 	end
 end
 
-function MsgClientTemplate:StartHeartbeat()
+function MsgSenderTemplate:StartHeartbeat()
 	if self._heartbeat == nil then
 		return
 	end
@@ -137,7 +137,7 @@ function MsgClientTemplate:StartHeartbeat()
 	self._heartbeat_loop:Start()
 end
 
-function MsgClientTemplate:StopHeartbeat()
+function MsgSenderTemplate:StopHeartbeat()
 	if self._heartbeat_loop == nil then
 		return
 	end

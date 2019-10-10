@@ -6,67 +6,74 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-IMsgClient = Class(nil, "ALittle.IMsgClient")
-
-function IMsgClient:Send(msg_id, msg_body, rpc_id)
+local __all_callback = {}
+Setweak(__all_callback, false, true)
+function RegMsgCallback(msg_id, callback)
+	if __all_callback[msg_id] ~= nil then
+		Error("RegMsgCallback消息回调函数注册失败，名字为" .. msg_id .. "已存在")
+		return
+	end
+	__all_callback[msg_id] = callback
 end
 
-function IMsgClient:SendRPC(msg_id, msg_body)
+function FindMsgCallback(msg_id)
+	return __all_callback[msg_id]
 end
 
-function IMsgClient:GetID()
+local __all_rpc_callback = {}
+local __all_rpc_return_id = {}
+Setweak(__all_rpc_callback, false, true)
+function RegMsgRpcCallback(msg_id, callback, return_id)
+	if __all_rpc_callback[msg_id] ~= nil then
+		Error("RegMsgRpcCallback消息回调函数注册失败，名字为" .. msg_id .. "已存在")
+		return
+	end
+	__all_rpc_callback[msg_id] = callback
+	__all_rpc_return_id[msg_id] = return_id
 end
 
-function IMsgClient:Close(reason)
+function FindMsgRpcCallback(msg_id)
+	return __all_rpc_callback[msg_id], __all_rpc_return_id[msg_id]
 end
 
-function IMsgClient.Invoke(msg_id, client, msg_body)
-	client:Send(msg_id, msg_body, 0)
+IMsgCommonNative = Class(nil, "ALittle.IMsgCommonNative")
+
+function IMsgCommonNative:SetID(id)
 end
 
-function IMsgClient.InvokeRPC(msg_id, client, msg_body)
-	return client:SendRPC(msg_id, msg_body)
+function IMsgCommonNative:GetID()
 end
 
-IMsgInterface = Class(nil, "ALittle.IMsgInterface")
-
-function IMsgInterface:SetID(id)
+function IMsgCommonNative:Connect(ip, port)
 end
 
-function IMsgInterface:GetID()
+function IMsgCommonNative:IsConnected()
 end
 
-function IMsgInterface:Connect(ip, port)
+function IMsgCommonNative:SendFactory(factory)
 end
 
-function IMsgInterface:IsConnected()
+function IMsgCommonNative:Close()
 end
 
-function IMsgInterface:SendFactory(factory)
-end
+IMsgCommon = Class(nil, "ALittle.IMsgCommon")
 
-function IMsgInterface:Close()
-end
-
-assert(IMsgClient, " extends class:IMsgClient is nil")
-MsgCommon = Class(IMsgClient, "ALittle.MsgCommon")
-
-function MsgCommon:Ctor()
+function IMsgCommon:Ctor()
 	___rawset(self, "_invoke_map", {})
 	___rawset(self, "_last_recv_time", 0)
 	___rawset(self, "_id_creator", SafeIDCreator())
 	___rawset(self, "_id_map_rpc", {})
 end
 
-function MsgCommon:GetID()
+function IMsgCommon:GetID()
 	return self._interface:GetID()
 end
 
-function MsgCommon:IsConnected()
+function IMsgCommon:IsConnected()
 	return self._interface:IsConnected()
 end
 
-function MsgCommon:MessageRead(factory, msg_id)
+function IMsgCommon:MessageRead(factory, msg_id)
 	local info = self._invoke_map[msg_id]
 	if info == nil then
 		local error, invoke_info = TCall(CreateProtocolInvokeInfo, msg_id)
@@ -80,7 +87,7 @@ function MsgCommon:MessageRead(factory, msg_id)
 	return PS_ReadMessageForReceive(factory, info, factory:GetTotalSize())
 end
 
-function MsgCommon:MessageWrite(msg_id, msg_body)
+function IMsgCommon:MessageWrite(msg_id, msg_body)
 	local info = self._invoke_map[msg_id]
 	if info == nil then
 		local error, invoke_info = TCall(CreateProtocolInvokeInfo, msg_id)
@@ -96,7 +103,7 @@ function MsgCommon:MessageWrite(msg_id, msg_body)
 	self._write_factory:SetID(msg_id)
 end
 
-function MsgCommon:HandleMessage(id, rpc_id, factory)
+function IMsgCommon:HandleMessage(id, rpc_id, factory)
 	if id == 0 then
 		self._last_recv_time = os.clock()
 		return
@@ -149,7 +156,7 @@ function MsgCommon:HandleMessage(id, rpc_id, factory)
 	end
 end
 
-function MsgCommon:Send(msg_id, msg_body, rpc_id)
+function IMsgCommon:Send(msg_id, msg_body, rpc_id)
 	if not self:IsConnected() then
 		return
 	end
@@ -158,7 +165,7 @@ function MsgCommon:Send(msg_id, msg_body, rpc_id)
 	self._interface:SendFactory(self._write_factory)
 end
 
-function MsgCommon:SendRpcError(rpc_id, reason)
+function IMsgCommon:SendRpcError(rpc_id, reason)
 	if not self:IsConnected() then
 		return
 	end
@@ -169,7 +176,7 @@ function MsgCommon:SendRpcError(rpc_id, reason)
 	self._interface:SendFactory(self._write_factory)
 end
 
-function MsgCommon:SendRPC(msg_id, msg_body)
+function IMsgCommon:SendRPC(msg_id, msg_body)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程", nil
@@ -188,7 +195,7 @@ function MsgCommon:SendRPC(msg_id, msg_body)
 	return ___coroutine.yield()
 end
 
-function MsgCommon:HandleRPCRequest(id, rpc_id, factory)
+function IMsgCommon:HandleRPCRequest(id, rpc_id, factory)
 	local callback, return_id = FindMsgRpcCallback(id)
 	if callback == nil then
 		self:SendRpcError(rpc_id, "没有注册消息RPC回调函数")
@@ -214,9 +221,9 @@ function MsgCommon:HandleRPCRequest(id, rpc_id, factory)
 	end
 	self:Send(return_id, return_body, -rpc_id)
 end
-MsgCommon.HandleRPCRequest = CoWrap(MsgCommon.HandleRPCRequest)
+IMsgCommon.HandleRPCRequest = CoWrap(IMsgCommon.HandleRPCRequest)
 
-function MsgCommon:ClearRPC(reason)
+function IMsgCommon:ClearRPC(reason)
 	local tmp = {}
 	for rpc_id, info in ___pairs(self._id_map_rpc) do
 		self._id_creator:ReleaseID(rpc_id)
@@ -229,5 +236,21 @@ function MsgCommon:ClearRPC(reason)
 			Error(reason)
 		end
 	end
+end
+
+function IMsgCommon:Close(reason)
+	if reason == nil then
+		reason = "主动关闭连接"
+	end
+	self:ClearRPC(reason)
+	self._interface:Close()
+end
+
+function IMsgCommon.Invoke(msg_id, client, msg_body)
+	client:Send(msg_id, msg_body, 0)
+end
+
+function IMsgCommon.InvokeRPC(msg_id, client, msg_body)
+	return client:SendRPC(msg_id, msg_body)
 end
 

@@ -4,6 +4,7 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -25,7 +26,12 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
         ALittleValueStat valueStat = valueStatList.get(0);
         ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
         if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "ncall表达式第一个参数必须是一个函数");
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "ncall表达式第一个参数必须是一个全局函数");
+        }
+
+        // 必须是一个全局函数
+        if (!(guessInfo.element instanceof ALittleGlobalMethodDec)) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "ncall表达式第一个参数必须是一个全局函数");
         }
 
         // 检查注解
@@ -34,8 +40,6 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
         if (protoModifier == null) {
             throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "ncall表达式第一个参数必须是一个带@注解的全局函数");
         }
-
-        String text = protoModifier.getText();
 
         List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
         guessList.add(ALittleReferenceUtil.sStringGuessTypeInfo);
@@ -54,7 +58,7 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
         // 第一个参数必须是函数
         ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
         if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "ncall表达式第一个参数必须是一个函数");
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "ncall表达式第一个参数必须是一个全局函数");
         }
 
         if (!(guessInfo.element instanceof ALittleGlobalMethodDec)) {
@@ -81,10 +85,28 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
 
         // 遍历所有的表达式，看下是否符合
         for (int i = 1; i < valueStatList.size(); ++i) {
-            ALittleReferenceUtil.GuessTypeInfo param_guess_info = guessInfo.functorParamList.get(i - 1);
             ALittleValueStat paramValueStat = valueStatList.get(i);
+            ALittleReferenceUtil.GuessTypeInfo valueGuessInfo = paramValueStat.guessType();
+
+            // 第二个参数要特殊处理，根据不同的注解进行调整
+            if (i == 1) {
+                if (text.equals("@Http") && !ALittleReferenceUtil.IsClassSuper(valueGuessInfo.element, "ALittle.IHttpSender")) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ncall调用带" + text + "注解的函数时，第二个参数必须是ALittle.IHttpSender的派生类");
+                }
+
+                if ((text.equals("@HttpUpload") || text.equals("@HttpDownload")) && !ALittleReferenceUtil.IsClassSuper(valueGuessInfo.element, "ALittle.IHttpFileSender")) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ncall调用带" + text + "注解的函数时，第二个参数必须是ALittle.IHttpFileSender的派生类");
+                }
+
+                if (text.equals("@Msg") && !ALittleReferenceUtil.IsClassSuper(valueGuessInfo.element, "ALittle.IMsgCommon")) {
+                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ncall调用带" + text + "注解的函数时，第二个参数必须是ALittle.IMsgCommon的派生类");
+                }
+                continue;
+            }
+
+            ALittleReferenceUtil.GuessTypeInfo paramGuessInfo = guessInfo.functorParamList.get(i - 1);
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(myElement, param_guess_info, paramValueStat, paramValueStat.guessType());
+                ALittleReferenceOpUtil.guessTypeEqual(myElement, paramGuessInfo, paramValueStat, valueGuessInfo);
             } catch (ALittleReferenceUtil.ALittleReferenceException e) {
                 throw new ALittleReferenceUtil.ALittleReferenceException(paramValueStat, "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
             }

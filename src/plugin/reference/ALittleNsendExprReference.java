@@ -21,13 +21,13 @@ public class ALittleNsendExprReference extends ALittleReference<ALittleNsendExpr
         }
 
         if (valueStatList.size() != 2)
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "nsend只有两个参数，第一个是ALittle.IMsgClient或派生类，第二个是struct");
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "nsend只有两个参数，第一个是ALittle.IMsgCommon或派生类，第二个是struct");
 
-        // 第一个参数必须是ALittle.IMsgClient的派生类
+        // 第一个参数必须是ALittle.IMsgCommon的派生类
         ALittleValueStat valueStat = valueStatList.get(0);
         ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
-        if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgClient")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "nsend表达式第一个参数必须是ALittle.IMsgClient的派生类");
+        if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgCommon")) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "nsend表达式第一个参数必须是ALittle.IMsgCommon的派生类");
         }
 
         // 第二个参数必须是struct
@@ -47,13 +47,13 @@ public class ALittleNsendExprReference extends ALittleReference<ALittleNsendExpr
         }
 
         if (valueStatList.size() != 2)
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "nsend只有两个参数，第一个是ALittle.IMsgClient或派生类，第二个是struct");
+            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "nsend只有两个参数，第一个是ALittle.IMsgCommon的派生类，第二个是struct");
 
-        // 第一个参数必须是ALittle.IMsgClient的派生类
+        // 第一个参数必须是ALittle.IMsgCommon的派生类
         ALittleValueStat valueStat = valueStatList.get(0);
         ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
-        if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgClient")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "nsend表达式第一个参数必须是ALittle.IMsgClient的派生类");
+        if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgCommon")) {
+            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "nsend表达式第一个参数必须是ALittle.IMsgCommon的派生类");
         }
 
         // 第二个参数必须是struct

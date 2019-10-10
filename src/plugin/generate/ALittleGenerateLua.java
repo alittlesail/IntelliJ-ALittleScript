@@ -166,14 +166,14 @@ public class ALittleGenerateLua {
 
         String replaceTest = "";
         if (text.equals("@Http")) {
-            replaceTest = "IHttpClient.Invoke";
+            replaceTest = "IHttpSender.Invoke";
         } else if (text.equals("@HttpUpload")) {
-            replaceTest = "IHttpFileClient.InvokeUpload";
+            replaceTest = "IHttpFileSender.InvokeUpload";
         } else if (text.equals("@HttpDownload")) {
-            replaceTest = "IHttpFileClient.InvokeDownload";
+            replaceTest = "IHttpFileSender.InvokeDownload";
         } else if (text.equals("@Msg")) {
             ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
-            replaceTest = "IMsgClient.InvokeRPC";
+            replaceTest = "IMsgCommon.InvokeRPC";
             GenerateReflectStructInfo(structInfo);
 
             if (returnDec != null) {
@@ -1082,10 +1082,10 @@ public class ALittleGenerateLua {
     @NotNull
     private String GenerateNsendExpr(ALittleNsendExpr nsendExpr, String preTab) throws Exception {
         List<ALittleValueStat> valueStatList = nsendExpr.getValueStatList();
-        if (valueStatList.isEmpty()) throw new Exception("nsend第一个参数必须是ALittle.IMsgClient的派生类");
+        if (valueStatList.isEmpty()) throw new Exception("nsend第一个参数必须是ALittle.IMsgCommon的派生类");
         ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStatList.get(0).guessType();
-        if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgClient")) {
-            throw new Exception("nsend第一个参数必须是ALittle.IMsgClient的派生类");
+        if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgCommon")) {
+            throw new Exception("nsend第一个参数必须是ALittle.IMsgCommon的派生类");
         }
         if (valueStatList.size() != 2) {
             throw new Exception("nsend必须是两个参数");
@@ -1100,7 +1100,7 @@ public class ALittleGenerateLua {
         String namespacePre = "ALittle.";
         if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
-        String replaceTest = "IMsgClient.Invoke";
+        String replaceTest = "IMsgCommon.Invoke";
         GenerateReflectStructInfo(structInfo);
 
         String content = preTab + namespacePre + replaceTest + "(";

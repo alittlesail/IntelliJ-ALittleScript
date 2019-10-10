@@ -6,44 +6,53 @@ local ___pairs = pairs
 local ___ipairs = ipairs
 local ___coroutine = coroutine
 
-IHttpInterface = Class(nil, "ALittle.IHttpInterface")
+IHttpSenderNative = Class(nil, "ALittle.IHttpSenderNative")
 
-function IHttpInterface:GetID()
+function IHttpSenderNative:GetID()
 end
 
-function IHttpInterface:SetURL(url, content)
+function IHttpSenderNative:SetURL(url, content)
 end
 
-function IHttpInterface:Start()
+function IHttpSenderNative:Start()
 end
 
-function IHttpInterface:Stop()
+function IHttpSenderNative:Stop()
 end
 
-function IHttpInterface:GetResponse()
+function IHttpSenderNative:GetResponse()
 end
 
-local __HttpClientMap = {}
-function FindHttpClient(id)
-	return __HttpClientMap[id]
+IHttpSender = Class(nil, "ALittle.IHttpSender")
+
+function IHttpSender:SendRPC(method, content)
 end
 
-assert(IHttpClient, " extends class:IHttpClient is nil")
-HttpClientTemplate = Class(IHttpClient, "ALittle.HttpClientTemplate")
+function IHttpSender.Invoke(method, client, content)
+	return client:SendRPC(method, content)
+end
 
-function HttpClientTemplate:Ctor(ip, port)
+local __HttpSenderMap = {}
+function FindHttpSender(id)
+	return __HttpSenderMap[id]
+end
+
+assert(IHttpSender, " extends class:IHttpSender is nil")
+HttpSenderTemplate = Class(IHttpSender, "ALittle.HttpSenderTemplate")
+
+function HttpSenderTemplate:Ctor(ip, port)
 	___rawset(self, "_interface", self.__class.__element[1]())
 	___rawset(self, "_ip", ip)
 	___rawset(self, "_port", port)
 end
 
-function HttpClientTemplate:SendRPC(method, content)
+function HttpSenderTemplate:SendRPC(method, content)
 	local co = coroutine.running()
 	if co == nil then
 		return "当前不是协程", nil
 	end
 	self._co = co
-	__HttpClientMap[self._interface:GetID()] = self
+	__HttpSenderMap[self._interface:GetID()] = self
 	local url = "http://" .. self._ip .. ":" .. self._port .. "/" .. method
 	if content == nil then
 		self._interface:SetURL(url, nil)
@@ -54,12 +63,12 @@ function HttpClientTemplate:SendRPC(method, content)
 	return ___coroutine.yield()
 end
 
-function HttpClientTemplate:Stop()
+function HttpSenderTemplate:Stop()
 	self._interface:Stop()
 end
 
-function HttpClientTemplate:HandleSucceed()
-	__HttpClientMap[self._interface:GetID()] = nil
+function HttpSenderTemplate:HandleSucceed()
+	__HttpSenderMap[self._interface:GetID()] = nil
 	local error, param = TCall(json.decode, self._interface:GetResponse())
 	if error ~= nil then
 		local result, reason = coroutine.resume(self._co, error, nil)
@@ -81,8 +90,8 @@ function HttpClientTemplate:HandleSucceed()
 	end
 end
 
-function HttpClientTemplate:HandleFailed(reason)
-	__HttpClientMap[self._interface:GetID()] = nil
+function HttpSenderTemplate:HandleFailed(reason)
+	__HttpSenderMap[self._interface:GetID()] = nil
 	local result, reason = coroutine.resume(self._co, reason, nil)
 	if result ~= true then
 		Error(reason)

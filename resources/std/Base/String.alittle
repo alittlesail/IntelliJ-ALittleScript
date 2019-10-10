@@ -283,10 +283,10 @@ public static String_IsPhoneNumber(string number) : bool
 public static String_HttpAnalysisValueMap(string param, string content) : Map<string, any>
 {
     auto value_map = new Map<string, any>();
-    auto param_split_list = ALittle.String_Split(param, "&");
+    auto param_split_list = String_Split(param, "&");
     for (auto index, auto param_content in param_split_list)
     {
-        auto value_split_list = ALittle.String_Split(param_content, "=");
+        auto value_split_list = String_Split(param_content, "=");
         if (maxn(value_split_list) == 2)
         {
             if (sub(value_split_list[2], 1, 1) == "\""
@@ -296,7 +296,7 @@ public static String_HttpAnalysisValueMap(string param, string content) : Map<st
             }
             else
             {
-                auto number = ALittle.tonumber(value_split_list[2]);
+                auto number = lua.tonumber(value_split_list[2]);
                 if (number == null)
                     value_map[value_split_list[1]] = value_split_list[2];
                 else

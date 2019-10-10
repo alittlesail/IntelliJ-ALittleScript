@@ -71,8 +71,8 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
 
             if (returnGuessList.size() != 1) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，必须有一个返回值");
             // 第一个参数
-            if (!paramGuessList.get(0).value.equals("ALittle.IHttpClient"))
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpClient");
+            if (!paramGuessList.get(0).value.equals("ALittle.IHttpReceiver"))
+                throw new ALittleReferenceUtil.ALittleReferenceException(oneDecList.get(0), "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpReceiver");
 
             // 返回值
             if (returnGuessList.get(0).type != ALittleReferenceUtil.GuessType.GT_STRUCT)
@@ -86,16 +86,16 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
             if (!returnGuessList.get(0).value.equals("string")) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，第一个参数必须是string");
             if (!returnGuessList.get(1).value.equals("int")) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，第二个参数必须是int");
             // 第一个参数
-            if (!paramGuessList.get(0).value.equals("ALittle.IHttpFileClient"))
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpFileClient");
+            if (!paramGuessList.get(0).value.equals("ALittle.IHttpReceiver"))
+                throw new ALittleReferenceUtil.ALittleReferenceException(oneDecList.get(0), "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpReceiver");
         } else if (text.equals("@HttpUpload")) {
             if (myElement.getCoModifier() == null || !myElement.getCoModifier().getText().equals("await"))
                 throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，必须使用await修饰");
 
             if (returnGuessList.size() != 1) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，必须有一个返回值");
             // 第一个参数
-            if (!paramGuessList.get(0).value.equals("ALittle.IHttpFileClient"))
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpFileClient");
+            if (!paramGuessList.get(0).value.equals("ALittle.IHttpFileReceiver"))
+                throw new ALittleReferenceUtil.ALittleReferenceException(oneDecList.get(0), "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpFileReceiver");
 
             // 返回值
             if (returnGuessList.get(0).type != ALittleReferenceUtil.GuessType.GT_STRUCT)
@@ -109,8 +109,8 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
 
             if (returnGuessList.size() > 1) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，最多只能有一个返回值");
             // 第一个参数
-            if (!paramGuessList.get(0).value.equals("ALittle.IMsgClient"))
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "带" + text + "的全局函数，第一个参数必须是ALittle.IMsgClient");
+            if (!paramGuessList.get(0).value.equals("ALittle.IMsgCommon"))
+                throw new ALittleReferenceUtil.ALittleReferenceException(oneDecList.get(0), "带" + text + "的全局函数，第一个参数必须是ALittle.IMsgCommon");
 
             // 返回值
             if (!returnGuessList.isEmpty()) {
