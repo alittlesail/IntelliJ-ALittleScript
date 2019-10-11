@@ -1688,7 +1688,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // COLON allType (COMMA allType)*
+  // COLON ((allType (COMMA allType)* methodReturnTailPairDec?) | methodReturnTailDec)
   public static boolean methodReturnDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "methodReturnDec")) return false;
     if (!nextTokenIs(b, COLON)) return false;
@@ -1696,30 +1696,84 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, METHOD_RETURN_DEC, null);
     r = consumeToken(b, COLON);
     p = r; // pin = 1
-    r = r && report_error_(b, allType(b, l + 1));
-    r = p && methodReturnDec_2(b, l + 1) && r;
+    r = r && methodReturnDec_1(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
+  // (allType (COMMA allType)* methodReturnTailPairDec?) | methodReturnTailDec
+  private static boolean methodReturnDec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "methodReturnDec_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = methodReturnDec_1_0(b, l + 1);
+    if (!r) r = methodReturnTailDec(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // allType (COMMA allType)* methodReturnTailPairDec?
+  private static boolean methodReturnDec_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "methodReturnDec_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = allType(b, l + 1);
+    r = r && methodReturnDec_1_0_1(b, l + 1);
+    r = r && methodReturnDec_1_0_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
   // (COMMA allType)*
-  private static boolean methodReturnDec_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "methodReturnDec_2")) return false;
+  private static boolean methodReturnDec_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "methodReturnDec_1_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!methodReturnDec_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "methodReturnDec_2", c)) break;
+      if (!methodReturnDec_1_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "methodReturnDec_1_0_1", c)) break;
     }
     return true;
   }
 
   // COMMA allType
-  private static boolean methodReturnDec_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "methodReturnDec_2_0")) return false;
+  private static boolean methodReturnDec_1_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "methodReturnDec_1_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
     r = r && allType(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // methodReturnTailPairDec?
+  private static boolean methodReturnDec_1_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "methodReturnDec_1_0_2")) return false;
+    methodReturnTailPairDec(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // TYPE_TAIL
+  public static boolean methodReturnTailDec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "methodReturnTailDec")) return false;
+    if (!nextTokenIs(b, TYPE_TAIL)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TYPE_TAIL);
+    exit_section_(b, m, METHOD_RETURN_TAIL_DEC, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // COMMA methodReturnTailDec
+  static boolean methodReturnTailPairDec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "methodReturnTailPairDec")) return false;
+    if (!nextTokenIs(b, COMMA)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && methodReturnTailDec(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }

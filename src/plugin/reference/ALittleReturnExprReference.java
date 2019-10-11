@@ -5,6 +5,8 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessParamTail;
+import plugin.guess.ALittleGuessReturnTail;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -64,6 +66,7 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
         
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         List<ALittleAllType> returnTypeList = new ArrayList<>();
+        ALittleMethodReturnTailDec returnTailDec = null;
 
         // 获取对应的函数对象
         PsiElement parent = myElement;
@@ -78,17 +81,26 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
             } else if (parent instanceof ALittleClassMethodDec) {
                 ALittleClassMethodDec methodDec = (ALittleClassMethodDec) parent;
                 ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
-                if (returnDec != null) returnTypeList = returnDec.getAllTypeList();
+                if (returnDec != null) {
+                    returnTypeList = returnDec.getAllTypeList();
+                    returnTailDec = returnDec.getMethodReturnTailDec();
+                }
                 break;
             } else if (parent instanceof ALittleClassStaticDec) {
                 ALittleClassStaticDec methodDec = (ALittleClassStaticDec) parent;
                 ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
-                if (returnDec != null) returnTypeList = returnDec.getAllTypeList();
+                if (returnDec != null) {
+                    returnTypeList = returnDec.getAllTypeList();
+                    returnTailDec = returnDec.getMethodReturnTailDec();
+                }
                 break;
             } else if (parent instanceof ALittleGlobalMethodDec) {
                 ALittleGlobalMethodDec methodDec = (ALittleGlobalMethodDec) parent;
                 ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
-                if (returnDec != null) returnTypeList = returnDec.getAllTypeList();
+                if (returnDec != null) {
+                    returnTypeList = returnDec.getAllTypeList();
+                    returnTailDec = returnDec.getMethodReturnTailDec();
+                }
                 break;
             }
 
@@ -101,15 +113,45 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
         if (valueStatList.size() == 1 && returnTypeList.size() > 1) {
             ALittleValueStat valueStat = valueStatList.get(0);
             guessTypeList = valueStat.guessTypes();
-            if (guessTypeList.size() != returnTypeList.size()) {
-                throw new ALittleGuessException(myElement, "return的函数调用的返回值数量和函数定义的返回值数量不相等");
+            boolean hasValueTail = !guessTypeList.isEmpty()
+                    && guessTypeList.get(guessTypeList.size() - 1) instanceof ALittleGuessReturnTail;
+            if (hasValueTail) guessTypeList.remove(guessTypeList.size() - 1);
+
+            if (returnTailDec == null) {
+                if (hasValueTail) {
+                    if (guessTypeList.size() < returnTypeList.size()) {
+                        throw new ALittleGuessException(myElement, "return的函数调用的返回值数量超过函数定义的返回值数量");
+                    }
+                } else {
+                    if (guessTypeList.size() != returnTypeList.size()) {
+                        throw new ALittleGuessException(myElement, "return的函数调用的返回值数量和函数定义的返回值数量不相等");
+                    }
+                }
+            } else {
+                if (hasValueTail) {
+                    // 不用检查
+                } else {
+                    if (guessTypeList.size() < returnTypeList.size()) {
+                        throw new ALittleGuessException(myElement, "return的函数调用的返回值数量少于函数定义的返回值数量");
+                    }
+                }
             }
         } else {
-            if (returnTypeList.size() != valueStatList.size()) {
-                throw new ALittleGuessException(myElement, "return的返回值数量和函数定义的返回值数量不相等");
+            if (returnTailDec == null) {
+                if (valueStatList.size() != returnTypeList.size()) {
+                    throw new ALittleGuessException(myElement, "return的返回值数量和函数定义的返回值数量不相等");
+                }
+            } else {
+                if (valueStatList.size() < returnTypeList.size()) {
+                    throw new ALittleGuessException(myElement, "return的返回值数量少于函数定义的返回值数量");
+                }
             }
             guessTypeList = new ArrayList<>();
             for (ALittleValueStat valueStat : valueStatList) {
+                ALittleGuess guess = valueStat.guessType();
+                if (guess instanceof ALittleGuessParamTail) {
+                    throw new ALittleGuessException(valueStat, "return表达式不能返回\"...\"");
+                }
                 guessTypeList.add(valueStat.guessType());
             }
         }
@@ -122,8 +164,12 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
             } else {
                 targetValueStat = valueStatList.get(0);
             }
+            if (guessTypeList.get(i) instanceof ALittleGuessReturnTail) break;
+            if (i >= returnTypeList.size()) break;
+            ALittleGuess returnTypeGuess = returnTypeList.get(i).guessType();
+            if (returnTypeGuess instanceof ALittleGuessReturnTail) break;
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(returnTypeList.get(i), returnTypeList.get(i).guessType(), targetValueStat, guessTypeList.get(i));
+                ALittleReferenceOpUtil.guessTypeEqual(returnTypeList.get(i), returnTypeGuess, targetValueStat, guessTypeList.get(i));
             } catch (ALittleGuessException e) {
                 throw new ALittleGuessException(targetValueStat, "return的第" + (i + 1) + "个返回值数量和函数定义的返回值类型不同:" + e.getError());
             }

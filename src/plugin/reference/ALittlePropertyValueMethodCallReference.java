@@ -82,7 +82,11 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         }
 
         if (preType instanceof ALittleGuessFunctor) {
-            guessList.addAll(((ALittleGuessFunctor)preType).functorReturnList);
+            ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
+            guessList.addAll(preTypeFunctor.functorReturnList);
+            if (preTypeFunctor.functorReturnTail != null) {
+                guessList.add(preTypeFunctor.functorReturnTail);
+            }
         }
 
         return guessList;
@@ -105,10 +109,12 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
 
             for (int i = 0; i < valueStatList.size(); ++i) {
                 ALittleValueStat valueStat = valueStatList.get(i);
-                ALittleGuess guessTypeInfo = valueStat.guessType();
+                ALittleGuess guess = valueStat.guessType();
+                // 如果参数返回的类型是tail，那么就可以不用检查
+                if (guess instanceof ALittleGuessReturnTail) continue;
                 if (i >= preTypeFunctor.functorParamList.size()) break;
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(myElement, preTypeFunctor.functorParamList.get(i), valueStat, guessTypeInfo);
+                    ALittleReferenceOpUtil.guessTypeEqual(myElement, preTypeFunctor.functorParamList.get(i), valueStat, guess);
                 } catch (ALittleGuessException e) {
                     throw new ALittleGuessException(valueStat, "第" + (i + 1) + "个参数类型和函数定义的参数类型不同:" + e.getError());
                 }

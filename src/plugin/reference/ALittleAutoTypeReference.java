@@ -30,17 +30,26 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
             if (valueStat == null) {
                 throw new ALittleGuessException(myElement, "auto 没有赋值对象，无法推导类型");
             }
-            // 获取等号坐标的变量定义列表
+            // 获取等号左边的变量定义列表
             List<ALittleVarAssignDec> pairDecList = varAssignExpr.getVarAssignDecList();
             // 计算当前是第几个参数
             int index = pairDecList.indexOf(varAssignDec);
             // 获取函数对应的那个返回值类型
             List<ALittleGuess> methodCallGuessList = valueStat.guessTypes();
-            if (index >= methodCallGuessList.size()) {
-                throw new ALittleGuessException(myElement, "auto 没有赋值对象，无法推导类型");
+            boolean hasTail = !methodCallGuessList.isEmpty() && methodCallGuessList.get(methodCallGuessList.size() - 1) instanceof ALittleGuessReturnTail;
+            if (hasTail) {
+                methodCallGuessList.remove(methodCallGuessList.size() - 1);
+                if (index >= methodCallGuessList.size()) {
+                    guessList.add(ALittleGuessPrimitive.sAnyGuess);
+                } else {
+                    guessList.add(methodCallGuessList.get(index));
+                }
+            } else {
+                if (index >= methodCallGuessList.size()) {
+                    throw new ALittleGuessException(myElement, "auto 没有赋值对象，无法推导类型");
+                }
+                guessList.add(methodCallGuessList.get(index));
             }
-
-            guessList.add(methodCallGuessList.get(index));
         // 处理for循环定义
         } else if (parent instanceof ALittleForPairDec) {
             // 获取父节点

@@ -5,12 +5,11 @@ public class thread { }
 
 public class coroutine
 {
-    // 唤醒协程对象
-    // 参数
-    // co 协程对象
-    // reason 应答成功时填null，应答失败时填失败的原因
-    // param  应答成功时填对应的参数，应答失败时填null
-    public static resume(thread co, string reason, any param) : bool, string {}
+    // Starts or continues the execution of coroutine co.
+    // The first time you resume a coroutine,
+    // it starts running its body. The values val1, ··· are passed as the arguments to the body function.
+    // If the coroutine has yielded, resume restarts it; the values val1, ··· are passed as the results from the yield.     If the coroutine runs without any errors, resume returns true plus any values passed to yield (if the coroutine yields) or any values returned by the body function (if the coroutine terminates). If there is any error, resume returns false plus the error message.
+    public static resume(thread co, ...) : bool, ... {}
 
     // Returns the running coroutine, or nil when called by the main thread.
     public static running() : thread {}

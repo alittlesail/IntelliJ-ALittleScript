@@ -14,31 +14,19 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public class ALittleMethodReturnDecImpl extends ASTWrapperPsiElement implements ALittleMethodReturnDec {
+public class ALittleMethodReturnTailDecImpl extends ASTWrapperPsiElement implements ALittleMethodReturnTailDec {
 
-  public ALittleMethodReturnDecImpl(@NotNull ASTNode node) {
+  public ALittleMethodReturnTailDecImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitMethodReturnDec(this);
+    visitor.visitMethodReturnTailDec(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ALittleVisitor) accept((ALittleVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public List<ALittleAllType> getAllTypeList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleAllType.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleMethodReturnTailDec getMethodReturnTailDec() {
-    return findChildByClass(ALittleMethodReturnTailDec.class);
   }
 
   @Override

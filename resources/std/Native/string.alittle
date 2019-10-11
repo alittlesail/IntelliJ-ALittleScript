@@ -42,5 +42,5 @@ public class String
     //     so the function does a plain "find substring" operation, with no characters in pattern being considered "magic".
     // Note that if plain is given, then init must be given as well.
     // If the pattern has captures, then in a successful match the captured values are also returned, after the two indices.
-    public static find(string content, string substring, int init, bool plain) : int, int {}
+    public static find(string content, string substring, int init, bool plain) : int, int, ... {}
 }

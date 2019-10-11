@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessReturnTail;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -35,12 +36,18 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
             if (methodCallGuessList.isEmpty()) {
                 throw new ALittleGuessException(valueStat, "调用的函数没有返回值");
             }
-            if (methodCallGuessList.size() < propertyValueList.size()) {
-                throw new ALittleGuessException(valueStat, "调用的函数返回值数量少于定义的变量数量");
+            boolean hasTail = methodCallGuessList.get(methodCallGuessList.size() - 1) instanceof ALittleGuessReturnTail;
+            if (hasTail) {
+                methodCallGuessList.remove(methodCallGuessList.size() - 1);
+            } else {
+                if (methodCallGuessList.size() < propertyValueList.size()) {
+                    throw new ALittleGuessException(valueStat, "调用的函数返回值数量少于定义的变量数量");
+                }
             }
 
             for (int i = 0; i < propertyValueList.size(); ++i) {
                 ALittlePropertyValue pairDec = propertyValueList.get(i);
+                if (i >= methodCallGuessList.size()) break;
                 try {
                     ALittleReferenceOpUtil.guessTypeEqual(pairDec, pairDec.guessType(), valueStat, methodCallGuessList.get(i));
                 } catch (ALittleGuessException e) {

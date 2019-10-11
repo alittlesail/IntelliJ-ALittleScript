@@ -62,6 +62,9 @@ public class ALittleGuessFunctor extends ALittleGuess {
         if (functorParamTail != null && functorParamTail.isChanged()) {
             return true;
         }
+        if (functorReturnTail != null && functorReturnTail.isChanged()) {
+            return true;
+        }
         return ALittleTreeChangeListener.getGuessTypeList(element) == null;
     }
 }

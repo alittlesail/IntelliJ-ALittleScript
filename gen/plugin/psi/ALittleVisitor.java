@@ -211,6 +211,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitMethodReturnTailDec(@NotNull ALittleMethodReturnTailDec o) {
+    visitPsiElement(o);
+  }
+
   public void visitNamespaceDec(@NotNull ALittleNamespaceDec o) {
     visitPsiElement(o);
   }

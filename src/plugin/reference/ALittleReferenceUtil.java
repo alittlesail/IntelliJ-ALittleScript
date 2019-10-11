@@ -109,6 +109,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleMethodNameDec) return new ALittleMethodNameDecReference((ALittleMethodNameDec)element, range);
         if (element instanceof ALittleMethodParamNameDec) return new ALittleMethodParamNameDecReference((ALittleMethodParamNameDec)element, range);
         if (element instanceof ALittleMethodParamTailDec) return new ALittleMethodParamTailDecReference((ALittleMethodParamTailDec)element, range);
+        if (element instanceof ALittleMethodReturnTailDec) return new ALittleMethodReturnTailDecReference((ALittleMethodReturnTailDec)element, range);
 
         if (element instanceof ALittleNamespaceDec) return new ALittleNamespaceDecReference((ALittleNamespaceDec)element, range);
         if (element instanceof ALittleNamespaceNameDec) return new ALittleNamespaceNameDecReference((ALittleNamespaceNameDec)element, range);

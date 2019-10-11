@@ -59,6 +59,7 @@ public interface ALittleTypes {
   IElementType METHOD_PARAM_ONE_DEC = new ALittleElementType("METHOD_PARAM_ONE_DEC");
   IElementType METHOD_PARAM_TAIL_DEC = new ALittleElementType("METHOD_PARAM_TAIL_DEC");
   IElementType METHOD_RETURN_DEC = new ALittleElementType("METHOD_RETURN_DEC");
+  IElementType METHOD_RETURN_TAIL_DEC = new ALittleElementType("METHOD_RETURN_TAIL_DEC");
   IElementType NAMESPACE_DEC = new ALittleElementType("NAMESPACE_DEC");
   IElementType NAMESPACE_NAME_DEC = new ALittleElementType("NAMESPACE_NAME_DEC");
   IElementType NCALL_STAT = new ALittleElementType("NCALL_STAT");
@@ -388,6 +389,9 @@ public interface ALittleTypes {
       }
       else if (type == METHOD_RETURN_DEC) {
         return new ALittleMethodReturnDecImpl(node);
+      }
+      else if (type == METHOD_RETURN_TAIL_DEC) {
+        return new ALittleMethodReturnTailDecImpl(node);
       }
       else if (type == NAMESPACE_DEC) {
         return new ALittleNamespaceDecImpl(node);

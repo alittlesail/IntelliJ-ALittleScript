@@ -103,6 +103,10 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 for (ALittleAllType allType : allTypeList) {
                     info.functorReturnList.add(allType.guessType());
                 }
+                ALittleMethodReturnTailDec tailDec = returnDec.getMethodReturnTailDec();
+                if (tailDec != null) {
+                    info.functorReturnTail = tailDec.guessType();
+                }
             }
             info.UpdateValue();
             guessList.add(info);
@@ -135,6 +139,10 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 for (ALittleAllType allType : allTypeList) {
                     info.functorReturnList.add(allType.guessType());
                 }
+                ALittleMethodReturnTailDec tailDec = returnDec.getMethodReturnTailDec();
+                if (tailDec != null) {
+                    info.functorReturnTail = tailDec.guessType();
+                }
             }
             info.UpdateValue();
             guessList.add(info);
@@ -166,6 +174,10 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
                 for (ALittleAllType allType : allTypeList) {
                     info.functorReturnList.add(allType.guessType());
+                }
+                ALittleMethodReturnTailDec tailDec = returnDec.getMethodReturnTailDec();
+                if (tailDec != null) {
+                    info.functorReturnTail = tailDec.guessType();
                 }
             }
             info.UpdateValue();

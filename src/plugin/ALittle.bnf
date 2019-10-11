@@ -127,6 +127,7 @@ enumVarDec::= ID_CONTENT (ASSIGN (DIGIT_CONTENT | STRING_CONTENT))? {pin=1}
 methodParamOneDec ::= allType methodParamNameDec {pin=1}
 methodParamNameDec ::= ID_CONTENT
 methodParamTailDec ::= TYPE_TAIL
+methodReturnTailDec ::= TYPE_TAIL
 methodParamDec ::= LPAREN ((methodParamOneDec methodParamPairDec* methodParamTailPairDec?) | methodParamTailDec)? RPAREN {pin=1}
 private methodParamPairDec ::= COMMA methodParamOneDec
 private methodParamTailPairDec ::= COMMA methodParamTailDec
@@ -135,7 +136,8 @@ methodBodyDec ::= LBRACE allExpr* RBRACE {pin=1}
 // 函数名部分
 methodNameDec ::= ID_CONTENT
 // 函数返回值类型
-methodReturnDec ::= COLON allType (COMMA allType)* {pin=1}
+methodReturnDec ::= COLON ((allType (COMMA allType)* methodReturnTailPairDec?) | methodReturnTailDec) {pin=1}
+private methodReturnTailPairDec ::= COMMA methodReturnTailDec
 
 // 类构造函数定义
 classCtorDec ::= accessModifier? Ctor methodParamDec methodBodyDec {pin=2}

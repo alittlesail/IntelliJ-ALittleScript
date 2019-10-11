@@ -695,6 +695,8 @@ public class ALittleReferenceOpUtil {
                 || leftGuessFunctor.functorAwait != rightGuessFunctor.functorAwait
                 || leftGuessFunctor.functorParamTail == null && rightGuessFunctor.functorParamTail != null
                 || leftGuessFunctor.functorParamTail != null && rightGuessFunctor.functorParamTail == null
+                || leftGuessFunctor.functorReturnTail == null && rightGuessFunctor.functorReturnTail != null
+                || leftGuessFunctor.functorReturnTail != null && rightGuessFunctor.functorReturnTail == null
             ) {
                 throw new ALittleGuessException(rightSrc, "要求是" + leftGuess.value + ",不能是:" + rightGuess.value);
             }

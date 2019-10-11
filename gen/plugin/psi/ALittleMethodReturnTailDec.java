@@ -8,13 +8,7 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public interface ALittleMethodReturnDec extends PsiElement {
-
-  @NotNull
-  List<ALittleAllType> getAllTypeList();
-
-  @Nullable
-  ALittleMethodReturnTailDec getMethodReturnTailDec();
+public interface ALittleMethodReturnTailDec extends PsiElement {
 
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;
