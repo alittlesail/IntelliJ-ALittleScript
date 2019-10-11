@@ -56,6 +56,8 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
                 if (!(guess instanceof ALittleGuessClass)) {
                     throw new ALittleGuessException(myElement, "不能继承于一个模板类, namespace:" + mNamespace + ", key:" + mKey);
                 }
+
+                // TODO 支持继承类模板
                 ALittleGuessClass guessClass = (ALittleGuessClass)guess;
                 if (!guessClass.templateList.isEmpty()) {
                     throw new ALittleGuessException(myElement, "不能继承于一个模板类, namespace:" + mNamespace + ", key:" + mKey);

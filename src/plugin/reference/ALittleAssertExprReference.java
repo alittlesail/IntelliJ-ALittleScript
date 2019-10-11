@@ -28,8 +28,8 @@ public class ALittleAssertExprReference extends ALittleReference<ALittleAssertEx
             throw new ALittleGuessException(myElement, "assert有且仅有两个参数，第一个是任意类型，第二个是string");
 
         ALittleValueStat valueStat = valueStatList.get(1);
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (!guessInfo.value.equals("string")) {
+        ALittleGuess guess = valueStat.guessType();
+        if (!guess.value.equals("string")) {
             throw new ALittleGuessException(valueStat, "assert表达式第二个参数必须是string类型");
         }
 
@@ -46,8 +46,8 @@ public class ALittleAssertExprReference extends ALittleReference<ALittleAssertEx
             throw new ALittleGuessException(myElement, "assert有且仅有两个参数，第一个是任意类型，第二个是string");
 
         ALittleValueStat valueStat = valueStatList.get(1);
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (!guessInfo.value.equals("string")) {
+        ALittleGuess guess = valueStat.guessType();
+        if (!guess.value.equals("string")) {
             throw new ALittleGuessException(valueStat, "assert表达式第二个参数必须是string类型");
         }
     }

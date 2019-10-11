@@ -4,6 +4,8 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.ALittleUsingDec;
 import plugin.psi.ALittleUsingNameDec;
 

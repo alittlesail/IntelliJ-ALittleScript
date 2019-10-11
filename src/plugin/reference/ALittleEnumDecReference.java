@@ -27,7 +27,8 @@ public class ALittleEnumDecReference extends ALittleReference<ALittleEnumDec> {
             throw new ALittleGuessException(myElement, "没有定义枚举名");
         }
 
-        ALittleGuessEnum info = new ALittleGuessEnum(mNamespace + "." + enumNameDec.getIdContent().getText(), myElement);
+        ALittleGuessEnum info = new ALittleGuessEnum(mNamespace, enumNameDec.getIdContent().getText(), myElement);
+        info.UpdateValue();
 
         List<ALittleGuess> guessTypeList = new ArrayList<>();
         guessTypeList.add(info);

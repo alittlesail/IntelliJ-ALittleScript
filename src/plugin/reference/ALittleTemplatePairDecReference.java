@@ -2,6 +2,10 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessClass;
+import plugin.guess.ALittleGuessClassTemplate;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.ALittleAllType;
 import plugin.psi.ALittleTemplatePairDec;
 
@@ -16,19 +20,17 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guessList = new ArrayList<>();
-        ALittleGuess info = new ALittleGuess();
-        info.type = ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE;
-        info.value = myElement.getIdContent().getText();
-        info.element = myElement;
         ALittleAllType allType = myElement.getAllType();
         if (allType != null) {
-            info.classTemplateExtends = allType.guessType();
-            if (info.classTemplateExtends.type != ALittleReferenceUtil.GuessType.GT_CLASS) {
+            ALittleGuess guess = allType.guessType();
+            if (!(guess instanceof ALittleGuessClass)) {
                 throw new ALittleGuessException(allType, "继承的对象必须是一个类");
             }
+            ALittleGuessClassTemplate info = new ALittleGuessClassTemplate(myElement, guess);
+            info.UpdateValue();
+            guessList.add(info);
         }
 
-        guessList.add(info);
         return guessList;
     }
 

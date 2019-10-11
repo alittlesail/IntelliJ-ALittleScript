@@ -6,10 +6,15 @@ public class ALittleGuessList extends ALittleGuess {
     public @NotNull ALittleGuess subType;
 
     public ALittleGuessList(@NotNull ALittleGuess sub) {
-        super("List<" + sub.value + ">");
         subType = sub;
     }
 
+    @Override
+    public void UpdateValue() {
+        value = "List<" + subType.value + ">";
+    }
+
+    @Override
     public boolean isChanged() {
         return subType.isChanged();
     }

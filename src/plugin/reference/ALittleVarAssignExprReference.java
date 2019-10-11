@@ -2,6 +2,8 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 
 import java.util.ArrayList;

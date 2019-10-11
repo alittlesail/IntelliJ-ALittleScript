@@ -4,6 +4,7 @@ import com.intellij.lang.annotation.*;
 import com.intellij.psi.*;
 import net.sf.cglib.asm.$MethodVisitor;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuessException;
 import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
 
@@ -17,7 +18,7 @@ public class ALittleAnnotator implements Annotator {
                 ((ALittleReferenceInterface) ref).checkError();
                 ((ALittleReferenceInterface) ref).colorAnnotator(holder);
             }
-        } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+        } catch (ALittleGuessException e) {
             if (holder.getCurrentAnnotationSession().getFile().equals(e.getElement().getContainingFile())) {
                 holder.createErrorAnnotation(e.getElement(), e.getError());
             }

@@ -8,12 +8,18 @@ import plugin.psi.ALittleTemplatePairDec;
 public class ALittleGuessClassTemplate extends ALittleGuess {
     public ALittleGuess templateExtends;
     public @NotNull ALittleTemplatePairDec element;
+
     public ALittleGuessClassTemplate(@NotNull ALittleTemplatePairDec e, ALittleGuess t) {
-        super(e.getIdContent().getText());
         element = e;
         templateExtends = t;
     }
 
+    @Override
+    public void UpdateValue() {
+        value = element.getIdContent().getText();
+    }
+
+    @Override
     public boolean isChanged() {
         if (templateExtends != null && templateExtends.isChanged()) {
             return true;

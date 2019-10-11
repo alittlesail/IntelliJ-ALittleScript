@@ -3,6 +3,7 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.*;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -20,12 +21,12 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
 
         List<ALittleStructVarDec> varDecList = dec.getStructVarDecList();
         for (ALittleStructVarDec varDec : varDecList) {
-            ALittleGuess guessInfo = varDec.guessType();
-            if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
-                checkStructExtends(element, (ALittleStructDec)guessInfo.element);
-            } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+            ALittleGuess guess = varDec.guessType();
+            if (guess instanceof ALittleGuessStruct) {
+                checkStructExtends(element, ((ALittleGuessStruct)guess).element);
+            } else if (guess instanceof ALittleGuessClass) {
                 throw new ALittleGuessException(element, "协议接口的参数内部不能使用类");
-            } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+            } else if (guess instanceof ALittleGuessFunctor) {
                 throw new ALittleGuessException(element, "协议接口的参数内部不能使用函数");
             }
         }
@@ -61,9 +62,9 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
         if (paramGuessList.size() != 2) throw new ALittleGuessException(paramDec, "带" + text + "的全局函数，必须有两个参数");
 
         // 第二个参数
-        if (paramGuessList.get(1).type != ALittleReferenceUtil.GuessType.GT_STRUCT)
+        if (paramGuessList.get(1) instanceof ALittleGuessStruct)
             throw new ALittleGuessException(myElement, "带" + text + "的全局函数，第二个参数必须是struct");
-        checkStructExtends(oneDecList.get(1), (ALittleStructDec) paramGuessList.get(1).element);
+        checkStructExtends(oneDecList.get(1), ((ALittleGuessStruct)paramGuessList.get(1)).element);
 
         if (text.equals("@Http")) {
             if (myElement.getCoModifier() == null || !myElement.getCoModifier().getText().equals("await"))
@@ -75,9 +76,9 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
                 throw new ALittleGuessException(oneDecList.get(0), "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpReceiver");
 
             // 返回值
-            if (returnGuessList.get(0).type != ALittleReferenceUtil.GuessType.GT_STRUCT)
+            if (returnGuessList.get(0) instanceof ALittleGuessStruct)
                 throw new ALittleGuessException(myElement, "带" + text + "的全局函数，返回值必须是struct");
-            checkStructExtends(returnList.get(0), (ALittleStructDec) returnGuessList.get(0).element);
+            checkStructExtends(returnList.get(0), ((ALittleGuessStruct)returnGuessList.get(0)).element);
         } else if (text.equals("@HttpDownload")) {
             if (myElement.getCoModifier() == null || !myElement.getCoModifier().getText().equals("await"))
                 throw new ALittleGuessException(myElement, "带" + text + "的全局函数，必须使用await修饰");
@@ -98,9 +99,9 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
                 throw new ALittleGuessException(oneDecList.get(0), "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpFileReceiver");
 
             // 返回值
-            if (returnGuessList.get(0).type != ALittleReferenceUtil.GuessType.GT_STRUCT)
+            if (returnGuessList.get(0) instanceof ALittleGuessStruct)
                 throw new ALittleGuessException(myElement, "带" + text + "的全局函数，返回值必须是struct");
-            checkStructExtends(returnList.get(0), (ALittleStructDec) returnGuessList.get(0).element);
+            checkStructExtends(returnList.get(0), ((ALittleGuessStruct)returnGuessList.get(0)).element);
         } else if (text.equals("@Msg")) {
             if (returnGuessList.size() > 0) {
                 if (myElement.getCoModifier() == null || !myElement.getCoModifier().getText().equals("await"))
@@ -114,9 +115,9 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
 
             // 返回值
             if (!returnGuessList.isEmpty()) {
-                if (returnGuessList.get(0).type != ALittleReferenceUtil.GuessType.GT_STRUCT)
+                if (returnGuessList.get(0) instanceof ALittleGuessStruct)
                     throw new ALittleGuessException(myElement, "带" + text + "的全局函数，返回值必须是struct");
-                checkStructExtends(returnList.get(0), (ALittleStructDec) returnGuessList.get(0).element);
+                checkStructExtends(returnList.get(0), ((ALittleGuessStruct)returnGuessList.get(0)).element);
             }
         }
     }

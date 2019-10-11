@@ -4,6 +4,10 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessFunctor;
+import plugin.guess.ALittleGuessPrimitive;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -23,14 +27,14 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
 
         // 第一个参数必须是函数
         ALittleValueStat valueStat = valueStatList.get(0);
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+        ALittleGuess guess = valueStat.guessType();
+        if (!(guess instanceof ALittleGuessFunctor)) {
             throw new ALittleGuessException(valueStat, "pcall表达式第一个参数必须是一个函数");
         }
 
         List<ALittleGuess> guessList = new ArrayList<>();
-        guessList.add(ALittleReferenceUtil.sStringGuessTypeInfo);
-        guessList.addAll(guessInfo.functorReturnList);
+        guessList.add(ALittleGuessPrimitive.sStringGuess);
+        guessList.addAll(((ALittleGuessFunctor)guess).functorReturnList);
 
         return guessList;
     }
@@ -43,33 +47,33 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
 
         ALittleValueStat valueStat = valueStatList.get(0);
         // 第一个参数必须是函数
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+        ALittleGuess guess = valueStat.guessType();
+        if (!(guess instanceof ALittleGuessFunctor)) {
             throw new ALittleGuessException(valueStat, "pcall表达式第一个参数必须是一个函数");
         }
+        ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
 
         // 后面跟的参数数量不能超过这个函数的参数个数
-        if (valueStatList.size() - 1 > guessInfo.functorParamList.size()) {
-            if (guessInfo.functorParamTail == null) {
+        if (valueStatList.size() - 1 > guessFunctor.functorParamList.size()) {
+            if (guessFunctor.functorParamTail == null) {
                 throw new ALittleGuessException(myElement, "pcall表达式参数太多了");
-            } else {
-                throw new ALittleGuessException(myElement, "pcall表达式参数太多了，即使被pcall的函数定义了参数占位符(...)也不行!");
             }
         }
 
         // 遍历所有的表达式，看下是否符合
         for (int i = 1; i < valueStatList.size(); ++i) {
-            ALittleGuess param_guess_info = guessInfo.functorParamList.get(i - 1);
+            if (i-1 >= guessFunctor.functorParamList.size()) break;
+            ALittleGuess paramGuessInfo = guessFunctor.functorParamList.get(i - 1);
             ALittleValueStat paramValueStat = valueStatList.get(i);
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(myElement, param_guess_info, paramValueStat, paramValueStat.guessType());
+                ALittleReferenceOpUtil.guessTypeEqual(myElement, paramGuessInfo, paramValueStat, paramValueStat.guessType());
             } catch (ALittleGuessException e) {
                 throw new ALittleGuessException(paramValueStat, "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
             }
         }
 
         // 检查这个函数是不是await
-        if (guessInfo.functorAwait) {
+        if (guessFunctor.functorAwait) {
             // 检查这次所在的函数必须要有await或者async修饰
             PsiElement parent = myElement;
             while (parent != null) {
@@ -112,15 +116,16 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
 
         ALittleValueStat valueStat = valueStatList.get(0);
         // 第一个参数必须是函数
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+        ALittleGuess guess = valueStat.guessType();
+        if (!(guess instanceof ALittleGuessFunctor)) {
             throw new ALittleGuessException(valueStat, "pcall表达式第一个参数必须是一个函数");
         }
+        ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
 
         // 构建对象
         for (int i = 0; i < valueStatList.size() - 1; ++i) {
-            if (i >= guessInfo.functorParamNameList.size()) break;
-            String name = guessInfo.functorParamNameList.get(i);
+            if (i >= guessFunctor.functorParamNameList.size()) break;
+            String name = guessFunctor.functorParamNameList.get(i);
             valueStat = valueStatList.get(i + 1);
             result.add(new InlayInfo(name, valueStat.getNode().getStartOffset()));
         }

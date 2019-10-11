@@ -47,8 +47,7 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
                     PsiHelper.PsiElementType.USING_NAME, psiFile, mNamespace, mKey, true);
             for (PsiElement dec : decList) {
-                ALittleGuess guessInfo = ((ALittleUsingNameDec)dec).guessType();
-                guessList.add(guessInfo);
+                guessList.add(((ALittleUsingNameDec)dec).guessType());
             }
             if (!decList.isEmpty() && !mCustomType.getAllTypeList().isEmpty()) {
                 throw new ALittleGuessException(myElement, "使用using定义的类不能再使用模板参数, namespace:" + mNamespace + ", key:" + mKey);
@@ -85,12 +84,14 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                     if (srcClassNameDec == null)
                         throw new ALittleGuessException(mCustomType, "类模板没有定义类名");
 
-                    ALittleGuessClass info = new ALittleGuessClass(guessClass.element);
+                    ALittleGuessClass info = new ALittleGuessClass(PsiHelper.getNamespaceName(srcClassDec),
+                            srcClassNameDec.getIdContent().getText(),
+                            guessClass.element);
                     info.templateList.addAll(guessClass.templateList);
                     for (int i = 0; i < guessClass.templateList.size(); ++i) {
                         info.templateMap.put(guessClass.templateList.get(i).value, srcGuessList.get(i));
                     }
-                    info.UpdateValue(PsiHelper.getNamespaceName(srcClassDec), srcClassNameDec.getIdContent().getText());
+                    info.UpdateValue();
                     guess = info;
                 }
 

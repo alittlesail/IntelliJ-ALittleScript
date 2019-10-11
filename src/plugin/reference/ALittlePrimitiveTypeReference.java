@@ -2,6 +2,9 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessPrimitive;
 import plugin.psi.ALittlePrimitiveType;
 
 import java.util.ArrayList;
@@ -14,7 +17,7 @@ public class ALittlePrimitiveTypeReference extends ALittleReference<ALittlePrimi
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        List<ALittleGuess> guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get(myElement.getText());
+        List<ALittleGuess> guessTypeList = ALittleGuessPrimitive.sPrimitiveGuessMap.get(myElement.getText());
         if (guessTypeList == null) guessTypeList = new ArrayList<>();
         return guessTypeList;
     }

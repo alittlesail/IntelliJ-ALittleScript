@@ -27,8 +27,8 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
         if (stepExpr != null) {
             if (stepExpr.getForStartStat() == null) return;
 
-            ALittleGuess startGuessType = stepExpr.getForStartStat().getForPairDec().guessType();
-            if (!startGuessType.value.equals("int") && startGuessType.value.equals("I64")) {
+            ALittleGuess startGuess = stepExpr.getForStartStat().getForPairDec().guessType();
+            if (!startGuess.value.equals("int") && startGuess.value.equals("I64")) {
                 throw new ALittleGuessException(stepExpr.getForStartStat().getForPairDec(), "这个变量必须是int或I64类型");
             }
 
@@ -37,26 +37,26 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                 throw new ALittleGuessException(stepExpr.getForStartStat(), "没有初始化表达式");
             }
 
-            ALittleGuess guessType = valueStat.guessType();
-            if (!guessType.value.equals("int") && !guessType.value.equals("I64") && !guessType.value.equals("double")) {
-                throw new ALittleGuessException(valueStat, "等号右边的表达式类型必须是int,I64,double 不能是:" + guessType.value);
+            ALittleGuess guess = valueStat.guessType();
+            if (!guess.value.equals("int") && !guess.value.equals("I64") && !guess.value.equals("double")) {
+                throw new ALittleGuessException(valueStat, "等号右边的表达式类型必须是int,I64,double 不能是:" + guess.value);
             }
 
             // 结束表达式
             ALittleForEndStat endStat = stepExpr.getForEndStat();
             ALittleForStepStat stepStat = stepExpr.getForStepStat();
             if (endStat != null) {
-                guessType = endStat.getValueStat().guessType();
-                if (!guessType.value.equals("int") && !guessType.value.equals("I64") && !guessType.value.equals("double")) {
-                    throw new ALittleGuessException(endStat, "for的结束条件表达式类型必须是int,I64,double, 不能是:" + guessType.value);
+                ALittleGuess endGuess = endStat.getValueStat().guessType();
+                if (!endGuess.value.equals("int") && !endGuess.value.equals("I64") && !endGuess.value.equals("double")) {
+                    throw new ALittleGuessException(endStat, "for的结束条件表达式类型必须是int,I64,double, 不能是:" + endGuess.value);
                 }
             }
 
             // 步长表达式
             if (stepStat != null) {
-                guessType = stepStat.getValueStat().guessType();
-                if (!guessType.value.equals("int") && !guessType.value.equals("I64") && !guessType.value.equals("double")) {
-                    throw new ALittleGuessException(stepStat, "for的步长条件表达式类型必须是int,I64,double, 不能是:" + guessType.value);
+                ALittleGuess stepGuess = stepStat.getValueStat().guessType();
+                if (!stepGuess.value.equals("int") && !stepGuess.value.equals("I64") && !stepGuess.value.equals("double")) {
+                    throw new ALittleGuessException(stepStat, "for的步长条件表达式类型必须是int,I64,double, 不能是:" + stepGuess.value);
                 }
             }
         } else if (inExpr != null) {
@@ -69,20 +69,23 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
 
             // 检查List
             if (guessList.size() == 1 && guessList.get(0) instanceof ALittleGuessList) {
-                ALittleGuessList guess0List = (ALittleGuessList)guessList.get(0);
+                ALittleGuessList guess = (ALittleGuessList)guessList.get(0);
 
+                // for变量必须是2个
                 if (pairDecList.size() != 2) {
                     throw new ALittleGuessException(inExpr, "这里参数数量必须是2个");
                 }
 
+                // 第一个参数必须是 int或者I64
                 ALittleGuess keyGuessType = pairDecList.get(0).guessType();
                 if (!keyGuessType.value.equals("int") && !keyGuessType.value.equals("I64")) {
                     throw new ALittleGuessException(pairDecList.get(0), "这个变量必须是int或I64类型");
                 }
 
+                // 第二个参数必须和List元素相等
                 ALittleGuess valueGuessType = pairDecList.get(1).guessType();
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guess0List.subType, pairDecList.get(1), valueGuessType);
+                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guess.subType, pairDecList.get(1), valueGuessType);
                 } catch (ALittleGuessException e) {
                     throw new ALittleGuessException(e.getElement(), "变量格式错误，不能是:" + valueGuessType.value + " :" + e.getError());
                 }
@@ -94,10 +97,12 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
             if (guessList.size() == 1 && guessList.get(0) instanceof ALittleGuessMap) {
                 ALittleGuessMap guessMap = (ALittleGuessMap)guessList.get(0);
 
+                // for变量必须是2个
                 if (pairDecList.size() != 2) {
                     throw new ALittleGuessException(inExpr, "这里参数数量必须是2个");
                 }
 
+                // 第一个参数必须和Map的key元素相等
                 ALittleGuess keyGuessType = pairDecList.get(0).guessType();
                 try {
                     ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessMap.keyType, pairDecList.get(0), keyGuessType);
@@ -105,6 +110,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                     throw new ALittleGuessException(e.getElement(), "key变量格式错误，不能是:" + keyGuessType.value + " :" + e.getError());
                 }
 
+                // 第二个参数必须和Map的key元素相等
                 ALittleGuess valueGuessType = pairDecList.get(1).guessType();
                 try {
                     ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessMap.valueType, pairDecList.get(1), valueGuessType);

@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
+import plugin.guess.*;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
@@ -31,12 +32,12 @@ public class ALittleReflectValueReference extends ALittleReference<ALittleReflec
             throw new ALittleGuessException(myElement, "没有指定反射对象");
         }
 
-        ALittleGuess guessType = customType.guessType();
-        if (guessType.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+        ALittleGuess guess = customType.guessType();
+        if (!(guess instanceof ALittleGuessStruct)) {
             throw new ALittleGuessException(myElement, "反射对象必须是一个struct");
         }
 
-        checkStructExtends((ALittleStructDec)guessType.element);
+        checkStructExtends(((ALittleGuessStruct)guess).element);
     }
 
     private void checkStructExtends(@NotNull ALittleStructDec dec) throws ALittleGuessException {
@@ -46,12 +47,12 @@ public class ALittleReflectValueReference extends ALittleReference<ALittleReflec
 
         List<ALittleStructVarDec> varDecList = dec.getStructVarDecList();
         for (ALittleStructVarDec varDec : varDecList) {
-            ALittleGuess guessInfo = varDec.guessType();
-            if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
-                checkStructExtends((ALittleStructDec)guessInfo.element);
-            } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+            ALittleGuess guess = varDec.guessType();
+            if (guess instanceof ALittleGuessStruct) {
+                checkStructExtends(((ALittleGuessStruct)guess).element);
+            } else if (guess instanceof ALittleGuessClass) {
                 throw new ALittleGuessException(myElement, "反射对象内部不能使用类");
-            } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+            } else if (guess instanceof ALittleGuessFunctor) {
                 throw new ALittleGuessException(myElement, "反射对象内部不能使用函数");
             }
         }

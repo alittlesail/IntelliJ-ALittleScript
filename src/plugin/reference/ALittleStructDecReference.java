@@ -3,6 +3,9 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessStruct;
 import plugin.psi.ALittleStructDec;
 import plugin.psi.ALittleStructNameDec;
 import plugin.psi.ALittleStructVarDec;
@@ -24,10 +27,8 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
             throw new ALittleGuessException(myElement, "没有定义结构体名");
         }
 
-        ALittleGuess info = new ALittleGuess();
-        info.type = ALittleReferenceUtil.GuessType.GT_STRUCT;
-        info.value = mNamespace + "." + structNameDec.getIdContent().getText();
-        info.element = myElement;
+        ALittleGuessStruct info = new ALittleGuessStruct(mNamespace, structNameDec.getIdContent().getText(), myElement);
+        info.UpdateValue();
 
         List<ALittleGuess> guessTypeList = new ArrayList<>();
         guessTypeList.add(info);

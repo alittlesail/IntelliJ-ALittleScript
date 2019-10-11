@@ -3,6 +3,9 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessParamTail;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -15,10 +18,8 @@ public class ALittleMethodParamTailDecReference extends ALittleReference<ALittle
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        ALittleGuess info = new ALittleGuess();
-        info.type = ALittleReferenceUtil.GuessType.GT_PARAM_TAIL;
-        info.value = myElement.getText();
-        info.element = myElement;
+        ALittleGuessParamTail info = new ALittleGuessParamTail(myElement.getText());
+        info.UpdateValue();
         List<ALittleGuess> guessList = new ArrayList<>();
         guessList.add(info);
         return guessList;

@@ -28,7 +28,7 @@ public class ALittleGuessPrimitive extends ALittleGuess {
     }
 
     public ALittleGuessPrimitive(@NotNull String v) {
-        super(v);
+        value = v;
     }
 
     public boolean isChanged() {

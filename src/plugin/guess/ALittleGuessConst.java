@@ -13,9 +13,10 @@ public class ALittleGuessConst extends ALittleGuess {
     }
 
     public ALittleGuessConst(@NotNull String v) {
-        super(v);
+        value = v;
     }
 
+    @Override
     public boolean isChanged() {
         return false;
     }

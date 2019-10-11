@@ -16,6 +16,7 @@ import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
+import plugin.guess.*;
 import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
@@ -28,7 +29,7 @@ import java.util.Map;
 public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALittlePropertyValueDotIdName> {
     private List<PsiElement> mGetterList;
     private List<PsiElement> mSetterList;
-    private ALittleGuess mClassGuessInfo;
+    private ALittleGuessClass mClassGuess;
 
     public ALittlePropertyValueDotIdNameReference(@NotNull ALittlePropertyValueDotIdName element, TextRange textRange) {
         super(element, textRange);
@@ -36,107 +37,74 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
     @NotNull
     private ALittleGuess replaceTemplate(@NotNull ALittleGuess guess) throws ALittleGuessException {
-        if (mClassGuessInfo == null || mClassGuessInfo.classTemplateMap == null) return guess;
+        if (mClassGuess == null) return guess;
 
-        if (guess.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
-            if (!mClassGuessInfo.classTemplateMap.containsKey(guess.value)) {
-                throw new ALittleGuessException(myElement, mClassGuessInfo.value + "没有定义模板" + guess.value);
+        if (guess instanceof ALittleGuessClassTemplate) {
+            if (!mClassGuess.templateMap.containsKey(guess.value)) {
+                throw new ALittleGuessException(myElement, mClassGuess.value + "没有定义模板" + guess.value);
             }
-            return mClassGuessInfo.classTemplateMap.get(guess.value);
+            return mClassGuess.templateMap.get(guess.value);
         }
 
-        if (guess.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-            ALittleGuess info = new ALittleGuess();
-            info.type = guess.type;
-            info.element = guess.element;
-            info.functorAwait = guess.functorAwait;
-            info.functorParamTail = guess.functorParamTail;
-            info.value = "Functor<(";
-            if (info.functorAwait) {
-                info.value = "Functor<await(";
-            }
+        if (guess instanceof ALittleGuessFunctor) {
+            ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
+            ALittleGuessFunctor info = new ALittleGuessFunctor(guessFunctor.element);
+            info.functorAwait = guessFunctor.functorAwait;
+            info.functorParamTail = guessFunctor.functorParamTail;
+            info.functorParamNameList.addAll(guessFunctor.functorParamNameList);
+            info.functorReturnTail = guessFunctor.functorReturnTail;
 
-            info.functorParamList = new ArrayList<>();
-            info.functorParamNameList = new ArrayList<>();
-            info.functorParamNameList.addAll(guess.functorParamNameList);
-
-            List<String> typeList = new ArrayList<>();
             int start_index = 0;
-            if (guess.element instanceof ALittleClassMethodDec) {
-                info.functorParamList.add(mClassGuessInfo);
-                typeList.add(mClassGuessInfo.value);
+            if (guessFunctor.element instanceof ALittleClassMethodDec) {
+                info.functorParamList.add(mClassGuess);
                 start_index = 1;
             }
-            for (int i = start_index; i < guess.functorParamList.size(); ++i) {
-                ALittleGuess guessInfo = replaceTemplate(guess.functorParamList.get(i));
+            for (int i = start_index; i < guessFunctor.functorParamList.size(); ++i) {
+                ALittleGuess guessInfo = replaceTemplate(guessFunctor.functorParamList.get(i));
                 info.functorParamList.add(guessInfo);
-                typeList.add(guessInfo.value);
             }
-            info.value += String.join(",", typeList) + ")";
-            info.functorReturnList = new ArrayList<>();
-            typeList = new ArrayList<>();
-            for (int i = 0; i < guess.functorReturnList.size(); ++i) {
-                ALittleGuess guessInfo = replaceTemplate(guess.functorReturnList.get(i));
+            for (int i = 0; i < guessFunctor.functorReturnList.size(); ++i) {
+                ALittleGuess guessInfo = replaceTemplate(guessFunctor.functorReturnList.get(i));
                 info.functorReturnList.add(guessInfo);
-                typeList.add(guessInfo.value);
             }
-            if (!typeList.isEmpty()) info.value += ":";
-            info.value += String.join(",", typeList);
+            info.UpdateValue();
 
             return info;
         }
 
-        if (guess.type == ALittleReferenceUtil.GuessType.GT_LIST) {
-            ALittleGuess subInfo = replaceTemplate(guess.listSubType);
-            ALittleGuess info = new ALittleGuess();
-            info.type = guess.type;
-            info.value = "List<" + subInfo.value + ">";
-            info.element = guess.element;
-            info.listSubType = subInfo;
+        if (guess instanceof ALittleGuessList) {
+            ALittleGuessList guessList = (ALittleGuessList)guess;
+            ALittleGuess subInfo = replaceTemplate(guessList.subType);
+            ALittleGuessList info = new ALittleGuessList(subInfo);
+            info.UpdateValue();
             return info;
         }
 
-        if (guess.type == ALittleReferenceUtil.GuessType.GT_MAP) {
-            ALittleGuess keyInfo = replaceTemplate(guess.mapKeyType);
-            ALittleGuess valueInfo = replaceTemplate(guess.mapValueType);
+        if (guess instanceof ALittleGuessMap) {
+            ALittleGuessMap guessMap = (ALittleGuessMap)guess;
+            ALittleGuess keyInfo = replaceTemplate(guessMap.keyType);
+            ALittleGuess valueInfo = replaceTemplate(guessMap.valueType);
 
-            ALittleGuess info = new ALittleGuess();
-            info.type = guess.type;
-            info.value = "Map<" + keyInfo.value + "," + valueInfo.value + ">";
-            info.element = guess.element;
-            info.mapKeyType = keyInfo;
-            info.mapValueType = valueInfo;
+            ALittleGuessMap info = new ALittleGuessMap(keyInfo, valueInfo);
+            info.UpdateValue();
             return info;
         }
 
-        if (guess.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-            ALittleGuess info = new ALittleGuess();
-            info.type = guess.type;
-            info.element = guess.element;
-            info.classTemplateList = new ArrayList<>();
-            info.classTemplateList.addAll(guess.classTemplateList);
-            info.classTemplateMap = new HashMap<>();
-            if (guess.classTemplateMap != null) {
-                for (Map.Entry<String, ALittleGuess> entry : guess.classTemplateMap.entrySet()) {
-                    info.classTemplateMap.put(entry.getKey(), replaceTemplate(entry.getValue()));
-                }
+        if (guess instanceof ALittleGuessClass) {
+            ALittleGuessClass guessClass = (ALittleGuessClass)guess;
+            ALittleGuessClass info = new ALittleGuessClass(guessClass.GetNamespaceName(),
+                    guessClass.GetClassName(), guessClass.element);
+            info.templateList.addAll(guessClass.templateList);
+            for (Map.Entry<String, ALittleGuess> entry : guessClass.templateMap.entrySet()) {
+                info.templateMap.put(entry.getKey(), replaceTemplate(entry.getValue()));
             }
 
-            ALittleClassDec srcClassDec = (ALittleClassDec) guess.element;
+            ALittleClassDec srcClassDec = guessClass.element;
             ALittleClassNameDec srcClassNameDec = srcClassDec.getClassNameDec();
             if (srcClassNameDec == null)
                 throw new ALittleGuessException(myElement, "类模板没有定义类名");
             info.value = PsiHelper.getNamespaceName(srcClassDec) + "." + srcClassNameDec.getIdContent().getText();
-
-            List<String> nameList = new ArrayList<>();
-            for (ALittleGuess tem : guess.classTemplateList) {
-                ALittleGuess impl = info.classTemplateMap.get(tem.value);
-                if (impl == null) {
-                    throw new ALittleGuessException(myElement, info.value + "没有模板实现" + tem.value);
-                }
-                nameList.add(impl.value);
-            }
-            info.value += "<" + String.join(",", nameList) + ">";
+            info.UpdateValue();
             return info;
         }
 
@@ -149,7 +117,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
         mGetterList = null;
         mSetterList = null;
-        mClassGuessInfo = null;
+        mClassGuess = null;
 
         ResolveResult[] resultList = multiResolve(false);
         for (ResolveResult result : resultList) {
@@ -159,11 +127,11 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             if (element instanceof ALittleClassVarDec) {
                 guess = ((ALittleClassVarDec) element).guessType();
 
-                if (mClassGuessInfo != null && guess.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE && mClassGuessInfo.classTemplateMap != null) {
-                    if (!mClassGuessInfo.classTemplateMap.containsKey(guess.value)) {
-                        throw new ALittleGuessException(myElement, mClassGuessInfo.value + "没有定义模板" + guess.value);
+                if (mClassGuess != null && guess instanceof ALittleGuessClassTemplate) {
+                    if (!mClassGuess.templateMap.containsKey(guess.value)) {
+                        throw new ALittleGuessException(myElement, mClassGuess.value + "没有定义模板" + guess.value);
                     }
-                    guess = mClassGuessInfo.classTemplateMap.get(guess.value);
+                    guess = mClassGuess.templateMap.get(guess.value);
                 }
 
             } else if (element instanceof ALittleStructVarDec) {
@@ -173,36 +141,44 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             } else if (element instanceof ALittleMethodNameDec) {
                 guess = ((ALittleMethodNameDec)element).guessType();
                 if (element.getParent() instanceof ALittleClassGetterDec) {
-                    if (mGetterList != null && mGetterList.indexOf(element) >= 0) {
-                        guess = guess.functorReturnList.get(0);
+                    if (mGetterList != null && mGetterList.indexOf(element) >= 0 && guess instanceof ALittleGuessFunctor) {
+                        guess = ((ALittleGuessFunctor)guess).functorReturnList.get(0);
                     }
                 } else if (element.getParent() instanceof ALittleClassSetterDec) {
-                    if (mSetterList != null && mSetterList.indexOf(element) >= 0) {
-                        guess = guess.functorParamList.get(1);
+                    if (mSetterList != null && mSetterList.indexOf(element) >= 0 && guess instanceof ALittleGuessFunctor) {
+                        guess = ((ALittleGuessFunctor)guess).functorParamList.get(1);
                     }
                 }
                 guess = replaceTemplate(guess);
             } else if (element instanceof ALittleVarAssignNameDec) {
                 guess = ((ALittleVarAssignNameDec) element).guessType();
             } else if (element instanceof ALittleEnumNameDec) {
-                guess = new ALittleGuess();
-                guess.type = ALittleReferenceUtil.GuessType.GT_ENUM_NAME;
-                guess.value = ((ALittleEnumNameDec) element).guessType().value;
-                guess.element = element;
+                ALittleGuess enumGuess = ((ALittleEnumNameDec) element).guessType();
+                if (!(enumGuess instanceof ALittleGuessEnum))
+                    throw new ALittleGuessException(myElement, "ALittleEnumNameDec.guessType的结果不是ALittleGuessEnum");
+                ALittleGuessEnum enumGuessEnum = (ALittleGuessEnum)enumGuess;
+                ALittleGuessEnumName info = new ALittleGuessEnumName(enumGuessEnum.GetNamespaceName(), enumGuessEnum.GetEnumName(), (ALittleEnumNameDec)element);
+                info.UpdateValue();
+                guess = info;
             } else if (element instanceof ALittleStructNameDec) {
-                guess = new ALittleGuess();
-                guess.type = ALittleReferenceUtil.GuessType.GT_STRUCT_NAME;
-                guess.value = ((ALittleStructNameDec) element).guessType().value;
-                guess.element = element;
+                ALittleGuess structGuess = ((ALittleStructNameDec) element).guessType();
+                if (!(structGuess instanceof ALittleGuessStruct))
+                    throw new ALittleGuessException(myElement, "ALittleStructNameDec.guessType的结果不是ALittleGuessStruct");
+                ALittleGuessStruct structGuessStruct = (ALittleGuessStruct)structGuess;
+                ALittleGuessStructName info = new ALittleGuessStructName(structGuessStruct.GetNamespaceName(), structGuessStruct.GetStructName(), (ALittleStructNameDec)element);
+                info.UpdateValue();
+                guess = info;
             } else if (element instanceof ALittleClassNameDec) {
-                ALittleGuess classGuessInfo = ((ALittleClassNameDec) element).guessType();
-                if (classGuessInfo.classTemplateList != null && !classGuessInfo.classTemplateList.isEmpty()) {
-                    throw new ALittleGuessException(myElement, "模板类" + classGuessInfo.value + "不能直接使用");
+                ALittleGuess classGuess = ((ALittleClassNameDec) element).guessType();
+                if (!(classGuess instanceof ALittleGuessClass))
+                    throw new ALittleGuessException(myElement, "ALittleClassNameDec.guessType的结果不是ALittleGuessClass");
+                ALittleGuessClass classGuessClass = (ALittleGuessClass)classGuess;
+                if (!classGuessClass.templateList.isEmpty()) {
+                    throw new ALittleGuessException(myElement, "模板类" + classGuessClass.value + "不能直接使用");
                 }
-                guess = new ALittleGuess();
-                guess.type = ALittleReferenceUtil.GuessType.GT_CLASS_NAME;
-                guess.element = element;
-                guess.value = classGuessInfo.value;
+                ALittleGuessClassName info = new ALittleGuessClassName(classGuessClass.GetNamespaceName(), classGuessClass.GetClassName(), (ALittleClassNameDec)element);
+                info.UpdateValue();
+                guess = info;
             }
 
             if (guess != null) guessList.add(guess);
@@ -210,7 +186,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
         mGetterList = null;
         mSetterList = null;
-        mClassGuessInfo = null;
+        mClassGuess = null;
 
         return guessList;
     }
@@ -283,16 +259,16 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 nextSuffix = suffixList.get(index + 1);
             }
 
-            if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
-                preType = preType.classTemplateExtends;
+            if (preType instanceof ALittleGuessClassTemplate) {
+                preType = ((ALittleGuessClassTemplate)preType).templateExtends;
             }
 
             if (preType == null) return new ResolveResult[0];
 
             // 处理类的实例对象
-            if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-                mClassGuessInfo = preType;
-                ALittleClassDec classDec = (ALittleClassDec)preType.element;
+            if (preType instanceof ALittleGuessClass) {
+                mClassGuess = (ALittleGuessClass)preType;
+                ALittleClassDec classDec = mClassGuess.element;
 
                 // 计算当前元素所在的类
                 int accessLevel =  PsiHelper.sAccessOnlyPublic;
@@ -328,8 +304,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     results.add(new PsiElementResolveResult(classMethodNameDec));
                 }
                 // 处理结构体的实例对象
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
-                ALittleStructDec structDec = (ALittleStructDec)preType.element;
+            } else if (preType instanceof ALittleGuessStruct) {
+                ALittleStructDec structDec = ((ALittleGuessStruct)preType).element;
                 List<ALittleStructVarDec> structVarDecList = new ArrayList<>();
                 // 所有成员变量
                 PsiHelper.findStructVarDecList(structDec, mKey, structVarDecList, 100);
@@ -337,8 +313,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     results.add(new PsiElementResolveResult(structVarDec));
                 }
                 // 比如 ALittleName.XXX
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME) {
-                ALittleNamespaceNameDec namespaceNameDec = (ALittleNamespaceNameDec)preType.element;
+            } else if (preType instanceof ALittleGuessNamespaceName) {
+                ALittleNamespaceNameDec namespaceNameDec = ((ALittleGuessNamespaceName)preType).element;
                 String namespaceName = namespaceNameDec.getText();
                 // 所有枚举名
                 List<PsiElement> enumNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
@@ -371,8 +347,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     results.add(new PsiElementResolveResult(instanceNameDec));
                 }
                 // 比如 AClassName.XXX
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS_NAME) {
-                ALittleClassNameDec classNameDec = (ALittleClassNameDec)preType.element;
+            } else if (preType instanceof ALittleGuessClassName) {
+                ALittleClassNameDec classNameDec = ((ALittleGuessClassName)preType).element;
                 ALittleClassDec classDec = (ALittleClassDec) classNameDec.getParent();
 
                 // 计算当前元素所在的类
@@ -408,9 +384,9 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     results.add(new PsiElementResolveResult(classMethodNameDec));
                 }
                 // 比如 AEnumName.XXX
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_ENUM_NAME) {
+            } else if (preType instanceof ALittleGuessEnumName) {
                 // 所有枚举字段
-                ALittleEnumNameDec enumNameDec = (ALittleEnumNameDec) preType.element;
+                ALittleEnumNameDec enumNameDec = ((ALittleGuessEnumName)preType).element;
                 ALittleEnumDec enumDec = (ALittleEnumDec) enumNameDec.getParent();
                 List<ALittleEnumVarDec> varDecList = new ArrayList<>();
                 PsiHelper.findEnumVarDecList(enumDec, mKey, varDecList);
@@ -450,15 +426,15 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 preType = suffixList.get(index - 1).guessType();
             }
 
-            if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
-                preType = preType.classTemplateExtends;
+            if (preType instanceof ALittleGuessClassTemplate) {
+                preType = ((ALittleGuessClassTemplate)preType).templateExtends;
             }
 
             if (preType == null) return variants.toArray();
 
             // 处理类的实例对象
-            if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-                ALittleClassDec classDec = (ALittleClassDec) preType.element;
+            if (preType instanceof ALittleGuessClass) {
+                ALittleClassDec classDec = ((ALittleGuessClass)preType).element;
 
                 // 计算当前元素所在的类
                 int accessLevel =  PsiHelper.sAccessOnlyPublic;
@@ -509,8 +485,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     );
                 }
                 // 处理结构体的实例对象
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
-                ALittleStructDec structDec = (ALittleStructDec) preType.element;
+            } else if (preType instanceof ALittleGuessStruct) {
+                ALittleStructDec structDec = ((ALittleGuessStruct)preType).element;
                 List<ALittleStructVarDec> structVarDecList = new ArrayList<>();
                 // 所有成员变量
                 PsiHelper.findStructVarDecList(structDec, "", structVarDecList, 100);
@@ -524,8 +500,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     }
                 }
                 // 比如 ALittleName.XXX
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME) {
-                ALittleNamespaceNameDec namespaceNameDec = (ALittleNamespaceNameDec) preType.element;
+            } else if (preType instanceof ALittleGuessNamespaceName) {
+                ALittleNamespaceNameDec namespaceNameDec = ((ALittleGuessNamespaceName)preType).element;
                 String namespaceName = namespaceNameDec.getText();
                 // 所有枚举名
                 List<PsiElement> enumNameDecList = ALittleTreeChangeListener.findALittleNameDecList(project,
@@ -573,8 +549,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     );
                 }
                 // 比如 AClassName.XXX
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_CLASS_NAME) {
-                ALittleClassNameDec classNameDec = (ALittleClassNameDec) preType.element;
+            } else if (preType instanceof ALittleGuessClassName) {
+                ALittleClassNameDec classNameDec = ((ALittleGuessClassName)preType).element;
                 ALittleClassDec classDec = (ALittleClassDec) classNameDec.getParent();
 
                 // 计算当前元素所在的类
@@ -623,9 +599,9 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     );
                 }
                 // 比如 AEnum.XXX
-            } else if (preType.type == ALittleReferenceUtil.GuessType.GT_ENUM_NAME) {
+            } else if (preType instanceof ALittleGuessEnumName) {
                 // 所有枚举字段
-                ALittleEnumNameDec enumNameDec = (ALittleEnumNameDec) preType.element;
+                ALittleEnumNameDec enumNameDec = ((ALittleGuessEnumName)preType).element;
                 ALittleEnumDec enumDec = (ALittleEnumDec) enumNameDec.getParent();
                 List<ALittleEnumVarDec> varDecList = new ArrayList<>();
                 PsiHelper.findEnumVarDecList(enumDec, "", varDecList);

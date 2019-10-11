@@ -2,6 +2,8 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -54,20 +56,20 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
             throw new ALittleGuessException(myElement, "没有赋值符号");
         String opString = opAssign.getText();
 
-        ALittleGuess pairGuessType = propertyValueList.get(0).guessType();
-        ALittleGuess valueGuessType = valueStat.guessType();
+        ALittleGuess pairGuess = propertyValueList.get(0).guessType();
+        ALittleGuess valueGuess = valueStat.guessType();
 
         if (opString.equals("=")) {
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(propertyValueList.get(0), pairGuessType, valueStat, valueGuessType);
+                ALittleReferenceOpUtil.guessTypeEqual(propertyValueList.get(0), pairGuess, valueStat, valueGuess);
             } catch (ALittleGuessException e) {
                 throw new ALittleGuessException(e.getElement(), "等号左边的变量和表达式的类型不同:" + e.getError());
             }
         } else {
-            if (!pairGuessType.value.equals("int") && !pairGuessType.value.equals("double") && !pairGuessType.value.equals("I64"))
+            if (!pairGuess.value.equals("int") && !pairGuess.value.equals("double") && !pairGuess.value.equals("I64"))
                 throw new ALittleGuessException(propertyValueList.get(0), opString + "左边必须是int, double, I64");
 
-            if (!valueGuessType.value.equals("int") && !valueGuessType.value.equals("double") && !valueGuessType.value.equals("I64"))
+            if (!valueGuess.value.equals("int") && !valueGuess.value.equals("double") && !valueGuess.value.equals("I64"))
                 throw new ALittleGuessException(valueStat, opString + "右边必须是int, double, I64");
         }
     }

@@ -2,6 +2,7 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.*;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -34,21 +35,20 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
 
         if (myElement.getCustomType() != null) {
             ALittleCustomType customType = myElement.getCustomType();
-            ALittleGuess guessType = customType.guessType();
-            if (guessType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
+            ALittleGuess guess = customType.guessType();
+            if (guess instanceof ALittleGuessStruct) {
                 if (valueStatList.size() > 0) {
                     throw new ALittleGuessException(myElement, "new的结构体不能有参数");
                 }
                 return;
             }
 
-            if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE
-                && guessType.classTemplateExtends != null) {
-                guessType = guessType.classTemplateExtends;
+            if (guess instanceof ALittleGuessClassTemplate && ((ALittleGuessClassTemplate)guess).templateExtends != null) {
+                guess = ((ALittleGuessClassTemplate)guess).templateExtends;
             }
 
-            if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-                ALittleClassDec classDec = (ALittleClassDec) guessType.element;
+            if (guess instanceof ALittleGuessClass) {
+                ALittleClassDec classDec = ((ALittleGuessClass)guess).element;
                 List<ALittleClassCtorDec> ctorDecList = classDec.getClassCtorDecList();
                 if (ctorDecList.size() > 1) {
                     throw new ALittleGuessException(myElement, "new的类的构造函数个数不能超过1个");

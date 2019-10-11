@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
+import plugin.guess.*;
 import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
@@ -63,30 +64,48 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
             if (element instanceof ALittleNamespaceNameDec) {
                 if (!hasNamespace) {
                     hasNamespace = true;
-                    guess = new ALittleGuess();
-                    guess.type = ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME;
-                    guess.value = ((ALittleNamespaceNameDec) element).guessType().value;
-                    guess.element = element;
+                    ALittleGuessNamespaceName guessNamespaceName = new ALittleGuessNamespaceName(
+                            ((ALittleNamespaceNameDec) element).guessType().value,
+                            (ALittleNamespaceNameDec) element
+                    );
+                    guessNamespaceName.UpdateValue();
+                    guess = guessNamespaceName;
                 }
             } else if (element instanceof ALittleClassNameDec) {
-                ALittleGuess classGuessInfo = ((ALittleClassNameDec) element).guessType();
-                if (classGuessInfo.classTemplateList != null && !classGuessInfo.classTemplateList.isEmpty()) {
-                    throw new ALittleGuessException(myElement, "模板类" + classGuessInfo.value + "不能直接使用");
+                ALittleGuess classGuess = ((ALittleClassNameDec) element).guessType();
+                if (!(classGuess instanceof ALittleGuessClass)) {
+                    throw new ALittleGuessException(myElement, "ALittleClassNameDec.guessType()的结果不是ALittleGuessClass");
                 }
-                guess = new ALittleGuess();
-                guess.type = ALittleReferenceUtil.GuessType.GT_CLASS_NAME;
-                guess.value = classGuessInfo.value;
-                guess.element = element;
+                ALittleGuessClass classGuessClass = (ALittleGuessClass)classGuess;
+                if (!classGuessClass.templateList.isEmpty()) {
+                    throw new ALittleGuessException(myElement, "模板类" + classGuessClass.value + "不能直接使用");
+                }
+                ALittleGuessClassName guessClassName = new ALittleGuessClassName(classGuessClass.GetNamespaceName(),
+                        classGuessClass.GetClassName(), (ALittleClassNameDec) element);
+                guessClassName.UpdateValue();
+                guess = guessClassName;
             } else if (element instanceof ALittleStructNameDec) {
-                guess = new ALittleGuess();
-                guess.type = ALittleReferenceUtil.GuessType.GT_STRUCT_NAME;
-                guess.value = ((ALittleStructNameDec) element).guessType().value;
-                guess.element = element;
+                ALittleGuess structGuess = ((ALittleStructNameDec) element).guessType();
+                if (!(structGuess instanceof ALittleGuessStruct)) {
+                    throw new ALittleGuessException(myElement, "ALittleStructNameDec.guessType()的结果不是ALittleGuessStruct");
+                }
+                ALittleGuessStruct structGuessStruct = (ALittleGuessStruct)structGuess;
+
+                ALittleGuessStructName guessStructName = new ALittleGuessStructName(structGuessStruct.GetNamespaceName(),
+                        structGuessStruct.GetStructName(), (ALittleStructNameDec) element);
+                guessStructName.UpdateValue();
+                guess = guessStructName;
             } else if (element instanceof ALittleEnumNameDec) {
-                guess = new ALittleGuess();
-                guess.type = ALittleReferenceUtil.GuessType.GT_ENUM_NAME;
-                guess.value = ((ALittleEnumNameDec) element).guessType().value;
-                guess.element = element;
+                ALittleGuess enumGuess = ((ALittleEnumNameDec) element).guessType();
+                if (!(enumGuess instanceof ALittleGuessEnum)) {
+                    throw new ALittleGuessException(myElement, "ALittleEnumNameDec.guessType()的结果不是ALittleGuessEnum");
+                }
+                ALittleGuessEnum enumGuessEnum = (ALittleGuessEnum)enumGuess;
+
+                ALittleGuessEnumName guessEnumName = new ALittleGuessEnumName(enumGuessEnum.GetNamespaceName(),
+                        enumGuessEnum.GetEnumName(), (ALittleEnumNameDec) element);
+                guessEnumName.UpdateValue();
+                guess = guessEnumName;
             } else if (element instanceof ALittleMethodParamNameDec) {
                 guess = ((ALittleMethodParamNameDec) element).guessType();
             } else if (element instanceof ALittleVarAssignNameDec) {
@@ -103,12 +122,14 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         try {
-            List<ALittleGuess> guessTypeList = guessTypes();
-            if (guessTypeList.isEmpty()) return;
+            List<ALittleGuess> guessList = guessTypes();
+            if (guessList.isEmpty()) return;
 
-            ALittleGuess guessType = guessTypeList.get(0);
-            if (guessType.element instanceof ALittleClassStaticDec
-                || guessType.element instanceof ALittleGlobalMethodDec) {
+            ALittleGuess guess = guessList.get(0);
+            if (!(guess instanceof ALittleGuessFunctor)) return;
+            ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
+            if (guessFunctor.element instanceof ALittleClassStaticDec
+                || guessFunctor.element instanceof ALittleGlobalMethodDec) {
                 Annotation anno = holder.createInfoAnnotation(myElement.getIdContent(), null);
                 anno.setTextAttributes(DefaultLanguageHighlighterColors.STATIC_METHOD);
             }

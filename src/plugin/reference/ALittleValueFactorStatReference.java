@@ -2,6 +2,8 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.ALittleValueFactorStat;
 
 import java.util.ArrayList;
@@ -13,7 +15,7 @@ public class ALittleValueFactorStatReference extends ALittleReference<ALittleVal
     }
 
     @NotNull
-    public List<ALittleGuess> guessTypes() throws ALittleReferenceUtil.ALittleGuessException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getPropertyValue() != null) {
             return myElement.getPropertyValue().guessTypes();
         } else if (myElement.getReflectValue() != null) {

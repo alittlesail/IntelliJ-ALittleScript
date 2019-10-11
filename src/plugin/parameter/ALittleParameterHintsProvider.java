@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.guess.ALittleGuessException;
 import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
 

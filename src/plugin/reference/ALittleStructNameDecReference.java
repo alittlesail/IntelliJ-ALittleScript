@@ -8,6 +8,8 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;

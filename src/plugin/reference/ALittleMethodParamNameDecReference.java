@@ -6,6 +6,8 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 
 import java.util.ArrayList;

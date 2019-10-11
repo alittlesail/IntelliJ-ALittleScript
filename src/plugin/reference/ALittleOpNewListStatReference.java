@@ -2,6 +2,9 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessList;
 import plugin.psi.ALittleOpNewListStat;
 import plugin.psi.ALittleValueStat;
 
@@ -19,13 +22,9 @@ public class ALittleOpNewListStatReference extends ALittleReference<ALittleOpNew
         if (valueStatList.isEmpty()) {
             throw new ALittleGuessException(myElement, "List列表不能为空");
         }
-        ALittleGuess GuessInfo = valueStatList.get(0).guessType();
 
-        ALittleGuess info = new ALittleGuess();
-        info.type = ALittleReferenceUtil.GuessType.GT_LIST;
-        info.value = "List<" + GuessInfo.value + ">";
-        info.element = myElement;
-        info.listSubType = GuessInfo;
+        ALittleGuessList info = new ALittleGuessList(valueStatList.get(0).guessType());
+        info.UpdateValue();
 
         List<ALittleGuess> guessList = new ArrayList<>();
         guessList.add(info);

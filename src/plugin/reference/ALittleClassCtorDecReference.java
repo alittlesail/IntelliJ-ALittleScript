@@ -25,8 +25,10 @@ public class ALittleClassCtorDecReference extends ALittleReference<ALittleClassC
 
     public void checkError() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
+
         if (!(parent instanceof ALittleClassDec)) return;
         ALittleClassDec classDec = (ALittleClassDec)parent;
+
         PsiHelper.ClassExtendsData classExtendsData = PsiHelper.findClassExtends(classDec);
         if (classExtendsData == null) return;
 
@@ -38,12 +40,12 @@ public class ALittleClassCtorDecReference extends ALittleReference<ALittleClassC
         ALittleMethodParamDec myMethodParamDec = myElement.getMethodParamDec();
         if (extendsMethodParamDec == null && myMethodParamDec == null) return;
         if (extendsMethodParamDec == null || myMethodParamDec == null) {
-            throw new ALittleGuessException(myElement, "该函数是从父类继承下来，但是定义不一致");
+            throw new ALittleGuessException(myElement, "该函数是从父类继承下来，但是参数数量不一致");
         }
         List<ALittleMethodParamOneDec> extendsParamOneDecList = extendsMethodParamDec.getMethodParamOneDecList();
         List<ALittleMethodParamOneDec> myParamOneDecList = myMethodParamDec.getMethodParamOneDecList();
         if (extendsParamOneDecList.size() > myParamOneDecList.size()) {
-            throw new ALittleGuessException(myMethodParamDec, "该函数是从父类继承下来，但是定义不一致");
+            throw new ALittleGuessException(myMethodParamDec, "该函数是从父类继承下来，但是子类的参数数量少于父类的构造函数");
         }
         for (int i = 0; i < extendsParamOneDecList.size(); ++i) {
             ALittleMethodParamOneDec extendsOneDec = extendsParamOneDecList.get(i);
@@ -52,10 +54,9 @@ public class ALittleClassCtorDecReference extends ALittleReference<ALittleClassC
             ALittleMethodParamOneDec myOneDec = myParamOneDecList.get(i);
             ALittleMethodParamNameDec myNameDec = myOneDec.getMethodParamNameDec();
             if (myNameDec == null) throw new ALittleGuessException(myMethodParamDec, "该函数是从父类继承下来，但是定义不一致");
-            try {
-                ALittleReferenceOpUtil.guessTypeEqual(extendsNameDec, extendsNameDec.guessType(), myNameDec, myNameDec.guessType());
-            } catch (ALittleGuessException ignored) {
-                throw new ALittleGuessException(myMethodParamDec, "该函数是从父类继承下来，但是定义不一致");
+
+            if (!extendsNameDec.guessType().value.equals(myNameDec.guessType().value)) {
+                throw new ALittleGuessException(myMethodParamDec, "该函数是从父类继承下来，但是子类参数和父类参数类型不一致");
             }
         }
     }

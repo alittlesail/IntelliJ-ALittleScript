@@ -5,6 +5,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
+import plugin.guess.*;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -24,26 +25,27 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
 
         // 第一个参数必须是函数
         ALittleValueStat valueStat = valueStatList.get(0);
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+        ALittleGuess guess = valueStat.guessType();
+        if (!(guess instanceof ALittleGuessFunctor)) {
             throw new ALittleGuessException(valueStat, "ncall表达式第一个参数必须是一个全局函数");
         }
+        ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
 
         // 必须是一个全局函数
-        if (!(guessInfo.element instanceof ALittleGlobalMethodDec)) {
+        if (!(guessFunctor.element instanceof ALittleGlobalMethodDec)) {
             throw new ALittleGuessException(valueStat, "ncall表达式第一个参数必须是一个全局函数");
         }
 
         // 检查注解
-        ALittleGlobalMethodDec globalMethodDec = (ALittleGlobalMethodDec)guessInfo.element;
+        ALittleGlobalMethodDec globalMethodDec = (ALittleGlobalMethodDec)guessFunctor.element;
         ALittleProtoModifier protoModifier = globalMethodDec.getProtoModifier();
         if (protoModifier == null) {
             throw new ALittleGuessException(valueStat, "ncall表达式第一个参数必须是一个带@注解的全局函数");
         }
 
         List<ALittleGuess> guessList = new ArrayList<>();
-        guessList.add(ALittleReferenceUtil.sStringGuessTypeInfo);
-        guessList.addAll(guessInfo.functorReturnList);
+        guessList.add(ALittleGuessPrimitive.sStringGuess);
+        guessList.addAll(guessFunctor.functorReturnList);
 
         return guessList;
     }
@@ -56,17 +58,18 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
 
         ALittleValueStat valueStat = valueStatList.get(0);
         // 第一个参数必须是函数
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+        ALittleGuess guess = valueStat.guessType();
+        if (!(guess instanceof ALittleGuessFunctor)) {
             throw new ALittleGuessException(valueStat, "ncall表达式第一个参数必须是一个全局函数");
         }
+        ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
 
-        if (!(guessInfo.element instanceof ALittleGlobalMethodDec)) {
+        if (!(guessFunctor.element instanceof ALittleGlobalMethodDec)) {
             throw new ALittleGuessException(valueStat, "ncall表达式第一个参数必须是一个全局函数");
         }
 
         // 检查注解
-        ALittleGlobalMethodDec globalMethodDec = (ALittleGlobalMethodDec)guessInfo.element;
+        ALittleGlobalMethodDec globalMethodDec = (ALittleGlobalMethodDec)guessFunctor.element;
         ALittleProtoModifier protoModifier = globalMethodDec.getProtoModifier();
         if (protoModifier == null) {
             throw new ALittleGuessException(valueStat, "ncall表达式第一个参数必须是一个带@注解的全局函数");
@@ -75,40 +78,40 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
         String text = protoModifier.getText();
 
         // 后面跟的参数数量不能超过这个函数的参数个数
-        if (valueStatList.size() - 1 > guessInfo.functorParamList.size()) {
-            if (guessInfo.functorParamTail == null) {
-                throw new ALittleGuessException(myElement, "ncall表达式参数太多了");
-            } else {
-                throw new ALittleGuessException(myElement, "ncall表达式参数太多了，即使被ncall的函数定义了参数占位符(...)也不行!");
-            }
+        if (valueStatList.size() - 1 > guessFunctor.functorParamList.size()) {
+            throw new ALittleGuessException(myElement, "ncall表达式参数太多了");
         }
 
         // 遍历所有的表达式，看下是否符合
         for (int i = 1; i < valueStatList.size(); ++i) {
-            ALittleValueStat paramValueStat = valueStatList.get(i);
-            ALittleGuess valueGuessInfo = paramValueStat.guessType();
+            valueStat = valueStatList.get(i);
+            ALittleGuess valueGuess = valueStat.guessType();
 
             // 第二个参数要特殊处理，根据不同的注解进行调整
             if (i == 1) {
-                if (text.equals("@Http") && !ALittleReferenceUtil.IsClassSuper(valueGuessInfo.element, "ALittle.IHttpSender")) {
+                if (!(valueGuess instanceof ALittleGuessClass))
+                    throw new ALittleGuessException(myElement, "ncall调用带" + text + "注解的函数时，第二个参数必须是ALittle.IHttpSender的派生类");
+                ALittleGuessClass valueGuessClass = (ALittleGuessClass)valueGuess;
+
+                if (text.equals("@Http") && !ALittleReferenceUtil.IsClassSuper(valueGuessClass.element, "ALittle.IHttpSender")) {
                     throw new ALittleGuessException(myElement, "ncall调用带" + text + "注解的函数时，第二个参数必须是ALittle.IHttpSender的派生类");
                 }
 
-                if ((text.equals("@HttpUpload") || text.equals("@HttpDownload")) && !ALittleReferenceUtil.IsClassSuper(valueGuessInfo.element, "ALittle.IHttpFileSender")) {
+                if ((text.equals("@HttpUpload") || text.equals("@HttpDownload")) && !ALittleReferenceUtil.IsClassSuper(valueGuessClass.element, "ALittle.IHttpFileSender")) {
                     throw new ALittleGuessException(myElement, "ncall调用带" + text + "注解的函数时，第二个参数必须是ALittle.IHttpFileSender的派生类");
                 }
 
-                if (text.equals("@Msg") && !ALittleReferenceUtil.IsClassSuper(valueGuessInfo.element, "ALittle.IMsgCommon")) {
+                if (text.equals("@Msg") && !ALittleReferenceUtil.IsClassSuper(valueGuessClass.element, "ALittle.IMsgCommon")) {
                     throw new ALittleGuessException(myElement, "ncall调用带" + text + "注解的函数时，第二个参数必须是ALittle.IMsgCommon的派生类");
                 }
                 continue;
             }
 
-            ALittleGuess paramGuessInfo = guessInfo.functorParamList.get(i - 1);
+            ALittleGuess paramGuessInfo = guessFunctor.functorParamList.get(i - 1);
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(myElement, paramGuessInfo, paramValueStat, valueGuessInfo);
+                ALittleReferenceOpUtil.guessTypeEqual(myElement, paramGuessInfo, valueStat, valueGuess);
             } catch (ALittleGuessException e) {
-                throw new ALittleGuessException(paramValueStat, "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
+                throw new ALittleGuessException(valueStat, "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
             }
         }
 
@@ -153,15 +156,16 @@ public class ALittleNcallStatReference extends ALittleReference<ALittleNcallStat
 
         ALittleValueStat valueStat = valueStatList.get(0);
         // 第一个参数必须是函数
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+        ALittleGuess guess = valueStat.guessType();
+        if (!(guess instanceof ALittleGuessFunctor)) {
             throw new ALittleGuessException(valueStat, "ncall表达式第一个参数必须是一个函数");
         }
+        ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
 
         // 构建对象
         for (int i = 0; i < valueStatList.size() - 1; ++i) {
-            if (i >= guessInfo.functorParamNameList.size()) break;
-            String name = guessInfo.functorParamNameList.get(i);
+            if (i >= guessFunctor.functorParamNameList.size()) break;
+            String name = guessFunctor.functorParamNameList.get(i);
             valueStat = valueStatList.get(i + 1);
             result.add(new InlayInfo(name, valueStat.getNode().getStartOffset()));
         }

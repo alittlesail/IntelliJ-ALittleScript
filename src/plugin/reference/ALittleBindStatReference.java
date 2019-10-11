@@ -73,19 +73,19 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         if (valueStatList.size() - 1 > guessFunctor.functorParamList.size()) {
             if (guessFunctor.functorParamTail == null) {
                 throw new ALittleGuessException(myElement, "bind表达式参数太多了");
-            } else {
-                throw new ALittleGuessException(myElement, "bind表达式参数太多了，即使被bind的函数定义的参数占位符(...)也不行!");
             }
         }
 
         // 遍历所有的表达式，看下是否符合
         for (int i = 1; i < valueStatList.size(); ++i) {
+            if (i - 1 >= guessFunctor.functorParamList.size()) break;
+
             ALittleGuess paramGuess = guessFunctor.functorParamList.get(i - 1);
-            ALittleValueStat paramValueStat = valueStatList.get(i);
+            valueStat = valueStatList.get(i);
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(myElement, paramGuess, paramValueStat, paramValueStat.guessType());
+                ALittleReferenceOpUtil.guessTypeEqual(myElement, paramGuess, valueStat, valueStat.guessType());
             } catch (ALittleGuessException e) {
-                throw new ALittleGuessException(paramValueStat, "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
+                throw new ALittleGuessException(valueStat, "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
             }
         }
     }
