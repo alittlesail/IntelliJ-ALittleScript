@@ -54,7 +54,7 @@
       HTTP_DOWNLOAD        =  '@HttpDownload'
       HTTP_UPLOAD          =  '@HttpUpload'
       MSG                  =  '@Msg'
-      PARAM_TAIL           =  '...'
+      TYPE_TAIL           =  '...'
 
       WHITE_SPACE          = 'regexp:\s+'
       COMMENT              = 'regexp://.*'
@@ -126,7 +126,7 @@ enumVarDec::= ID_CONTENT (ASSIGN (DIGIT_CONTENT | STRING_CONTENT))? {pin=1}
 // 函数参数部分
 methodParamOneDec ::= allType methodParamNameDec {pin=1}
 methodParamNameDec ::= ID_CONTENT
-methodParamTailDec ::= PARAM_TAIL
+methodParamTailDec ::= TYPE_TAIL
 methodParamDec ::= LPAREN ((methodParamOneDec methodParamPairDec* methodParamTailPairDec?) | methodParamTailDec)? RPAREN {pin=1}
 private methodParamPairDec ::= COMMA methodParamOneDec
 private methodParamTailPairDec ::= COMMA methodParamTailDec

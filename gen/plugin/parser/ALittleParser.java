@@ -1663,13 +1663,13 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // PARAM_TAIL
+  // TYPE_TAIL
   public static boolean methodParamTailDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "methodParamTailDec")) return false;
-    if (!nextTokenIs(b, PARAM_TAIL)) return false;
+    if (!nextTokenIs(b, TYPE_TAIL)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, PARAM_TAIL);
+    r = consumeToken(b, TYPE_TAIL);
     exit_section_(b, m, METHOD_PARAM_TAIL_DEC, r);
     return r;
   }

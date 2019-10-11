@@ -201,7 +201,6 @@ public interface ALittleTypes {
   IElementType NOT_EQ = new ALittleTokenType("!=");
   IElementType NSEND = new ALittleTokenType("nsend");
   IElementType NULL = new ALittleTokenType("null");
-  IElementType PARAM_TAIL = new ALittleTokenType("...");
   IElementType PLUS = new ALittleTokenType("+");
   IElementType PLUS_ASSIGN = new ALittleTokenType("+=");
   IElementType PLUS_PLUS = new ALittleTokenType("++");
@@ -229,6 +228,7 @@ public interface ALittleTypes {
   IElementType THIS = new ALittleTokenType("this");
   IElementType THROW = new ALittleTokenType("throw");
   IElementType TRUE = new ALittleTokenType("true");
+  IElementType TYPE_TAIL = new ALittleTokenType("...");
   IElementType USING = new ALittleTokenType("using");
   IElementType WHILE = new ALittleTokenType("while");
   IElementType YIELD = new ALittleTokenType("yield");

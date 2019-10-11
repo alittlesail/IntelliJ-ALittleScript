@@ -926,7 +926,7 @@ public class _ALittleLexer implements FlexLexer {
             // fall through
           case 141: break;
           case 46: 
-            { return PARAM_TAIL;
+            { return TYPE_TAIL;
             } 
             // fall through
           case 142: break;
