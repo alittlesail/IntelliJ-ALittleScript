@@ -5,16 +5,16 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
-import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 
 public interface ALittlePrimitiveType extends PsiElement {
 
   @NotNull
-  GuessTypeInfo guessType() throws ALittleReferenceException;
+  ALittleGuess guessType() throws ALittleGuessException;
 
   @NotNull
-  List<GuessTypeInfo> guessTypes() throws ALittleReferenceException;
+  List<ALittleGuess> guessTypes() throws ALittleGuessException;
 
   PsiReference getReference();
 

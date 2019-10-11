@@ -16,7 +16,7 @@ public class ALittleUsingNameDecReference extends ALittleReference<ALittleUsingN
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleUsingDec) {
             return ((ALittleUsingDec)parent).guessTypes();

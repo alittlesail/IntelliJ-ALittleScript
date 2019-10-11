@@ -50,8 +50,8 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
         // 标记是否已经包含了命名域，命名域的guess不要重复
         boolean hasNamespace = false;
 
@@ -59,31 +59,31 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
         for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
 
-            ALittleReferenceUtil.GuessTypeInfo guess = null;
+            ALittleGuess guess = null;
             if (element instanceof ALittleNamespaceNameDec) {
                 if (!hasNamespace) {
                     hasNamespace = true;
-                    guess = new ALittleReferenceUtil.GuessTypeInfo();
+                    guess = new ALittleGuess();
                     guess.type = ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME;
                     guess.value = ((ALittleNamespaceNameDec) element).guessType().value;
                     guess.element = element;
                 }
             } else if (element instanceof ALittleClassNameDec) {
-                ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassNameDec) element).guessType();
+                ALittleGuess classGuessInfo = ((ALittleClassNameDec) element).guessType();
                 if (classGuessInfo.classTemplateList != null && !classGuessInfo.classTemplateList.isEmpty()) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "模板类" + classGuessInfo.value + "不能直接使用");
+                    throw new ALittleGuessException(myElement, "模板类" + classGuessInfo.value + "不能直接使用");
                 }
-                guess = new ALittleReferenceUtil.GuessTypeInfo();
+                guess = new ALittleGuess();
                 guess.type = ALittleReferenceUtil.GuessType.GT_CLASS_NAME;
                 guess.value = classGuessInfo.value;
                 guess.element = element;
             } else if (element instanceof ALittleStructNameDec) {
-                guess = new ALittleReferenceUtil.GuessTypeInfo();
+                guess = new ALittleGuess();
                 guess.type = ALittleReferenceUtil.GuessType.GT_STRUCT_NAME;
                 guess.value = ((ALittleStructNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleEnumNameDec) {
-                guess = new ALittleReferenceUtil.GuessTypeInfo();
+                guess = new ALittleGuess();
                 guess.type = ALittleReferenceUtil.GuessType.GT_ENUM_NAME;
                 guess.value = ((ALittleEnumNameDec) element).guessType().value;
                 guess.element = element;
@@ -103,26 +103,26 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         try {
-            List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = guessTypes();
+            List<ALittleGuess> guessTypeList = guessTypes();
             if (guessTypeList.isEmpty()) return;
 
-            ALittleReferenceUtil.GuessTypeInfo guessType = guessTypeList.get(0);
+            ALittleGuess guessType = guessTypeList.get(0);
             if (guessType.element instanceof ALittleClassStaticDec
                 || guessType.element instanceof ALittleGlobalMethodDec) {
                 Annotation anno = holder.createInfoAnnotation(myElement.getIdContent(), null);
                 anno.setTextAttributes(DefaultLanguageHighlighterColors.STATIC_METHOD);
             }
-        } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+        } catch (ALittleGuessException ignored) {
 
         }
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
+    public void checkError() throws ALittleGuessException {
+        List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+            throw new ALittleGuessException(myElement, "未知类型");
         } else if (guessList.size() != 1) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+            throw new ALittleGuessException(myElement, "重复定义");
         }
     }
 

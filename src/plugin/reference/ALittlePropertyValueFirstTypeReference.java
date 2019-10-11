@@ -13,7 +13,7 @@ public class ALittlePropertyValueFirstTypeReference extends ALittleReference<ALi
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getPropertyValueCastType() != null) {
             return myElement.getPropertyValueCastType().guessTypes();
         } else if (myElement.getPropertyValueCustomType() != null) {

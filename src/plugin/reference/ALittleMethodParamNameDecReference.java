@@ -17,7 +17,7 @@ public class ALittleMethodParamNameDecReference extends ALittleReference<ALittle
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleMethodParamOneDec) {
             return ((ALittleMethodParamOneDec) parent).getAllType().guessTypes();
@@ -30,12 +30,12 @@ public class ALittleMethodParamNameDecReference extends ALittleReference<ALittle
         anno.setTextAttributes(CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
+    public void checkError() throws ALittleGuessException {
+        List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+            throw new ALittleGuessException(myElement, "未知类型");
         } else if (guessList.size() != 1) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+            throw new ALittleGuessException(myElement, "重复定义");
         }
     }
 }

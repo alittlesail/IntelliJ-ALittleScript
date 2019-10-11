@@ -4,6 +4,7 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.*;
 import plugin.psi.*;
 import plugin.psi.impl.ALittleClassMethodDecImpl;
 
@@ -15,7 +16,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         super(element, textRange);
     }
 
-    public ALittleReferenceUtil.GuessTypeInfo guessPreType() throws ALittleReferenceUtil.ALittleReferenceException {
+    public ALittleGuess guessPreType() throws ALittleGuessException {
         // 获取父节点
         ALittlePropertyValueSuffix propertyValueSuffix = (ALittlePropertyValueSuffix)myElement.getParent();
         ALittlePropertyValue propertyValue = (ALittlePropertyValue)propertyValueSuffix.getParent();
@@ -27,8 +28,8 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         if (index == -1) return null;
 
         // 获取前一个类型
-        ALittleReferenceUtil.GuessTypeInfo preType;
-        ALittleReferenceUtil.GuessTypeInfo prePreType = null;
+        ALittleGuess preType;
+        ALittleGuess prePreType = null;
         if (index == 0) {
             preType = propertyValueFirstType.guessType();
         } else if (index == 1) {
@@ -40,49 +41,31 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         }
 
         // 如果是Functor
-        if (preType.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-            if (prePreType != null && prePreType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
-                prePreType = prePreType.classTemplateExtends;
+        if (preType instanceof ALittleGuessFunctor) {
+            ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
+            if (prePreType instanceof ALittleGuessClassTemplate) {
+                prePreType = ((ALittleGuessClassTemplate)prePreType).templateExtends;
             }
             // 如果再往前一个是一个Class实例对象，那么就要去掉第一个参数
-            if (prePreType != null && prePreType.type == ALittleReferenceUtil.GuessType.GT_CLASS && !preType.functorParamList.isEmpty()
-                    && (preType.element instanceof ALittleClassMethodDec || preType.element instanceof ALittleClassGetterDec || preType.element instanceof ALittleClassSetterDec)) {
-                ALittleReferenceUtil.GuessTypeInfo newPreType = new ALittleReferenceUtil.GuessTypeInfo();
-                newPreType.type = preType.type;
-                newPreType.element = preType.element;
-                newPreType.functorAwait = preType.functorAwait;
-                newPreType.functorParamList = new ArrayList<>();
-                newPreType.functorParamList.addAll(preType.functorParamList);
-                newPreType.functorParamNameList = new ArrayList<>();
-                newPreType.functorParamNameList.addAll(preType.functorParamNameList);
-                newPreType.functorReturnList = new ArrayList<>();
-                newPreType.functorReturnList.addAll(preType.functorReturnList);
-                newPreType.functorParamTail = preType.functorParamTail;
-                preType = newPreType;
+            if (prePreType instanceof ALittleGuessClass && !preTypeFunctor.functorParamList.isEmpty()
+                    && (preTypeFunctor.element instanceof ALittleClassMethodDec
+                        || preTypeFunctor.element instanceof ALittleClassGetterDec
+                        || preTypeFunctor.element instanceof ALittleClassSetterDec)) {
+                ALittleGuessFunctor newPreTypeFunctor = new ALittleGuessFunctor(preTypeFunctor.element);
+                preType = newPreTypeFunctor;
 
-                preType.functorParamList.remove(0);
-                preType.functorParamNameList.remove(0);
-                preType.value = "Functor<(";
-                if (preType.functorAwait) {
-                    preType.value = "Functor<await(";
-                }
-                List<String> paramList = new ArrayList<>();
-                for (ALittleReferenceUtil.GuessTypeInfo guessTypeInfo : preType.functorParamList) {
-                    paramList.add(guessTypeInfo.value);
-                }
-                if (preType.functorParamTail != null) {
-                    paramList.add(preType.functorParamTail.value);
-                }
-                preType.value += String.join(",", paramList);
-                preType.value += ")";
-                List<String> returnList = new ArrayList<>();
-                for (ALittleReferenceUtil.GuessTypeInfo guessTypeInfo : preType.functorReturnList) {
-                    returnList.add(guessTypeInfo.value);
-                }
-                String returnString = String.join(",", returnList);
-                if (!returnString.isEmpty()) preType.value += ":";
-                preType.value += returnString;
-                preType.value += ">";
+                newPreTypeFunctor.functorAwait = preTypeFunctor.functorAwait;
+                newPreTypeFunctor.functorParamList.addAll(preTypeFunctor.functorParamList);
+                newPreTypeFunctor.functorParamNameList.addAll(preTypeFunctor.functorParamNameList);
+                newPreTypeFunctor.functorParamTail = preTypeFunctor.functorParamTail;
+                newPreTypeFunctor.functorReturnList.addAll(preTypeFunctor.functorReturnList);
+                newPreTypeFunctor.functorReturnTail = preTypeFunctor.functorReturnTail;
+
+                // 移除掉第一个参数
+                newPreTypeFunctor.functorParamList.remove(0);
+                newPreTypeFunctor.functorParamNameList.remove(0);
+
+                newPreTypeFunctor.UpdateValue();
             }
         }
 
@@ -90,71 +73,73 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
 
-        ALittleReferenceUtil.GuessTypeInfo preType = guessPreType();
+        ALittleGuess preType = guessPreType();
         if (preType == null) {
             return guessList;
         }
 
-        if (preType.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-            guessList.addAll(preType.functorReturnList);
+        if (preType instanceof ALittleGuessFunctor) {
+            guessList.addAll(((ALittleGuessFunctor)preType).functorReturnList);
         }
 
         return guessList;
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
-        ALittleReferenceUtil.GuessTypeInfo preType = guessPreType();
+    public void checkError() throws ALittleGuessException {
+        ALittleGuess preType = guessPreType();
         if (preType == null) {
             return;
         }
 
         // 如果需要处理
-        if (preType.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+        if (preType instanceof ALittleGuessFunctor) {
+            ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
+
             List<ALittleValueStat> valueStatList = myElement.getValueStatList();
-            if (preType.functorParamList.size() < valueStatList.size() && preType.functorParamTail == null) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "函数调用最多需要" + preType.functorParamList.size() + "个参数,不能是:" + valueStatList.size() + "个");
+            if (preTypeFunctor.functorParamList.size() < valueStatList.size() && preTypeFunctor.functorParamTail == null) {
+                throw new ALittleGuessException(myElement, "函数调用最多需要" + preTypeFunctor.functorParamList.size() + "个参数,不能是:" + valueStatList.size() + "个");
             }
 
             for (int i = 0; i < valueStatList.size(); ++i) {
                 ALittleValueStat valueStat = valueStatList.get(i);
-                ALittleReferenceUtil.GuessTypeInfo guessTypeInfo = valueStat.guessType();
-                if (i >= preType.functorParamList.size()) break;
+                ALittleGuess guessTypeInfo = valueStat.guessType();
+                if (i >= preTypeFunctor.functorParamList.size()) break;
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(myElement, preType.functorParamList.get(i), valueStat, guessTypeInfo);
-                } catch (ALittleReferenceUtil.ALittleReferenceException e) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "第" + (i + 1) + "个参数类型和函数定义的参数类型不同:" + e.getError());
+                    ALittleReferenceOpUtil.guessTypeEqual(myElement, preTypeFunctor.functorParamList.get(i), valueStat, guessTypeInfo);
+                } catch (ALittleGuessException e) {
+                    throw new ALittleGuessException(valueStat, "第" + (i + 1) + "个参数类型和函数定义的参数类型不同:" + e.getError());
                 }
             }
 
             // 检查这个函数是不是await
-            if (preType.functorAwait) {
+            if (preTypeFunctor.functorAwait) {
                 // 检查这次所在的函数必须要有await或者async修饰
                 PsiElement parent = myElement;
                 while (parent != null) {
                     if (parent instanceof ALittleNamespaceDec) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "全局表达式不能调用带有await的函数");
+                        throw new ALittleGuessException(myElement, "全局表达式不能调用带有await的函数");
                     } else if (parent instanceof ALittleClassCtorDec) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "构造函数内不能调用带有await的函数");
+                        throw new ALittleGuessException(myElement, "构造函数内不能调用带有await的函数");
                     } else if (parent instanceof ALittleClassGetterDec) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "getter函数内不能调用带有await的函数");
+                        throw new ALittleGuessException(myElement, "getter函数内不能调用带有await的函数");
                     } else if (parent instanceof ALittleClassSetterDec) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "setter函数内不能调用带有await的函数");
+                        throw new ALittleGuessException(myElement, "setter函数内不能调用带有await的函数");
                     } else if (parent instanceof ALittleClassMethodDec) {
                         if (((ALittleClassMethodDec)parent).getCoModifier() == null) {
-                            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
+                            throw new ALittleGuessException(myElement, "所在函数没有async或者await修饰");
                         }
                         break;
                     } else if (parent instanceof ALittleClassStaticDec) {
                         if (((ALittleClassStaticDec)parent).getCoModifier() == null) {
-                            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
+                            throw new ALittleGuessException(myElement, "所在函数没有async或者await修饰");
                         }
                         break;
                     } else if (parent instanceof ALittleGlobalMethodDec) {
                         if (((ALittleGlobalMethodDec)parent).getCoModifier() == null) {
-                            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "所在函数没有async或者await修饰");
+                            throw new ALittleGuessException(myElement, "所在函数没有async或者await修饰");
                         }
                         break;
                     }
@@ -165,17 +150,18 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
     }
 
     @NotNull
-    public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         List<InlayInfo> result = new ArrayList<>();
         // 获取函数对象
-        ALittleReferenceUtil.GuessTypeInfo preType = guessPreType();
-        if (preType.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) return result;
+        ALittleGuess preType = guessPreType();
+        if (!(preType instanceof ALittleGuessFunctor)) return result;
+        ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
 
         // 构建对象
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         for (int i = 0; i < valueStatList.size(); ++i) {
-            if (i >= preType.functorParamNameList.size()) break;
-            String name = preType.functorParamNameList.get(i);
+            if (i >= preTypeFunctor.functorParamNameList.size()) break;
+            String name = preTypeFunctor.functorParamNameList.get(i);
             ALittleValueStat valueStat = valueStatList.get(i);
             result.add(new InlayInfo(name, valueStat.getNode().getStartOffset()));
         }

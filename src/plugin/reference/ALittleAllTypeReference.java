@@ -2,6 +2,8 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.ALittleAllType;
 
 import java.util.List;
@@ -12,7 +14,7 @@ public class ALittleAllTypeReference extends ALittleReference<ALittleAllType> {
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getCustomType() != null) {
             return myElement.getCustomType().guessTypes();
         } else if (myElement.getGenericType() != null) {
@@ -20,6 +22,6 @@ public class ALittleAllTypeReference extends ALittleReference<ALittleAllType> {
         } else if (myElement.getPrimitiveType() != null) {
             return myElement.getPrimitiveType().guessTypes();
         }
-        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleAllType出现未知的子节点");
+        throw new ALittleGuessException(myElement, "ALittleAllType出现未知的子节点");
     }
 }

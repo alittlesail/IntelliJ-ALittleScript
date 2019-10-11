@@ -14,17 +14,17 @@ public class ALittleMethodParamTailDecReference extends ALittleReference<ALittle
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        ALittleGuess info = new ALittleGuess();
         info.type = ALittleReferenceUtil.GuessType.GT_PARAM_TAIL;
         info.value = myElement.getText();
         info.element = myElement;
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        List<ALittleGuess> guessList = new ArrayList<>();
         guessList.add(info);
         return guessList;
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleMethodParamDec) {
             return;
@@ -32,7 +32,7 @@ public class ALittleMethodParamTailDecReference extends ALittleReference<ALittle
 
         while (parent != null) {
             if (parent instanceof ALittleNamespaceDec) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "参数占位符未定义");
+                throw new ALittleGuessException(myElement, "参数占位符未定义");
             }
 
             ALittleMethodParamDec paramDec = null;
@@ -48,7 +48,7 @@ public class ALittleMethodParamTailDecReference extends ALittleReference<ALittle
 
             if (paramDec != null) {
                 if (paramDec.getMethodParamTailDec() == null) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "参数占位符未定义");
+                    throw new ALittleGuessException(myElement, "参数占位符未定义");
                 }
                 break;
             }

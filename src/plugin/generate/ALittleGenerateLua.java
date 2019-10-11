@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
 import plugin.alittle.FileHelper;
+import plugin.guess.*;
 import plugin.psi.*;
 import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
@@ -48,10 +49,10 @@ public class ALittleGenerateLua {
         }
     }
 
-    private void checkErrorElement(PsiElement element, boolean fullCheck) throws ALittleReferenceUtil.ALittleReferenceException {
+    private void checkErrorElement(PsiElement element, boolean fullCheck) throws ALittleGuessException {
         for(PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof PsiErrorElement) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(child, ((PsiErrorElement) child).getErrorDescription());
+                throw new ALittleGuessException(child, ((PsiErrorElement) child).getErrorDescription());
             }
 
             if (fullCheck) {
@@ -70,7 +71,7 @@ public class ALittleGenerateLua {
         // 获取语法错误
         try {
             checkErrorElement(alittleFile, fullCheck);
-        } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+        } catch (ALittleGuessException e) {
             throw new Exception(e.getElement().getContainingFile().getName() + "有语法错误:" + e.getError());
         }
 
@@ -139,11 +140,16 @@ public class ALittleGenerateLua {
     private String GenerateNcallStat(ALittleNcallStat ncallStat) throws Exception {
         List<ALittleValueStat> valueStatList = ncallStat.getValueStatList();
         if (valueStatList.isEmpty()) throw new Exception("ncall第一个参数必须是带注解的全局函数");
-        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStatList.get(0).guessType();
-        if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR || !(guessInfo.element instanceof ALittleGlobalMethodDec)) {
+
+        ALittleGuess guess = valueStatList.get(0).guessType();
+        if (!(guess instanceof ALittleGuessFunctor)) throw new Exception("ncall第一个参数必须是带注解的全局函数");
+
+        ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
+        if (!(guessFunctor.element instanceof ALittleGlobalMethodDec)) {
             throw new Exception("ncall第一个参数必须是带注解的全局函数");
         }
-        ALittleGlobalMethodDec methodDec = (ALittleGlobalMethodDec)guessInfo.element;
+        ALittleGlobalMethodDec methodDec = (ALittleGlobalMethodDec)guessFunctor.element;
+
         ALittleProtoModifier protoModifier = methodDec.getProtoModifier();
         if (protoModifier == null) {
             throw new Exception("ncall第一个参数必须是带注解的全局函数");
@@ -153,11 +159,12 @@ public class ALittleGenerateLua {
             throw new Exception("ncall必须是三个参数");
         }
 
-        ALittleReferenceUtil.GuessTypeInfo structInfo = valueStatList.get(2).guessType();
-        if (structInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+        guess = valueStatList.get(2).guessType();
+        if (!(guess instanceof ALittleGuessStruct)) {
             throw new Exception("ncall的第三个参数必须是struct");
         }
-        int msg_id = PsiHelper.JSHash(structInfo.value);
+        ALittleGuessStruct guessStruct = (ALittleGuessStruct)guess;
+        int msg_id = PsiHelper.JSHash(guessStruct.value);
 
         String text = protoModifier.getText();
 
@@ -174,16 +181,17 @@ public class ALittleGenerateLua {
         } else if (text.equals("@Msg")) {
             ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
             replaceTest = "IMsgCommon.InvokeRPC";
-            GenerateReflectStructInfo(structInfo);
+            GenerateReflectStructInfo(guessStruct);
 
             if (returnDec != null) {
                 List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
                 if (!allTypeList.isEmpty()) {
-                    ALittleReferenceUtil.GuessTypeInfo returnInfo = allTypeList.get(0).guessType();
-                    if (returnInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
-                        throw new Exception(returnInfo.value + "的返回值必须是struct");
+                    guess = allTypeList.get(0).guessType();
+                    if (!(guess instanceof ALittleGuessStruct)) {
+                        throw new Exception(guess.value + "的返回值必须是struct");
                     }
-                    GenerateReflectStructInfo(returnInfo);
+                    ALittleGuessStruct guessReturn = (ALittleGuessStruct)guess;
+                    GenerateReflectStructInfo(guessReturn);
                 }
             }
         } else {
@@ -195,7 +203,7 @@ public class ALittleGenerateLua {
         if (text.equals("@Msg")) {
             paramList.add("" + msg_id);
         } else {
-            paramList.add("\"" + structInfo.value + "\"");
+            paramList.add("\"" + guessStruct.value + "\"");
         }
         for (int i = 1; i < valueStatList.size(); ++i) {
             paramList.add(GenerateValueStat(valueStatList.get(i)));
@@ -241,8 +249,8 @@ public class ALittleGenerateLua {
         // 自定义类型
         ALittleCustomType customType = opNewStat.getCustomType();
         if (customType != null) {
-            ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
-            if (guessType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
+            ALittleGuess guess = customType.guessType();
+            if (guess instanceof ALittleGuessStruct) {
                 return "{}";
             } else {
                 String content = GenerateCustomType(customType);
@@ -264,12 +272,12 @@ public class ALittleGenerateLua {
 
     @NotNull
     private String GenerateCustomType(ALittleCustomType customType) throws Exception {
-        ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
+        ALittleGuess guess = customType.guessType();
         // 如果是结构体名，那么就当表来处理
-        if (guessType.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
+        if (guess instanceof ALittleGuessStruct) {
             return "{}";
             // 如果是类名
-        } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+        } else if (guess instanceof ALittleGuessClass) {
             // 如果是类名
             String className = customType.getIdContent().getText();
             ALittleCustomTypeDotId dotId = customType.getCustomTypeDotId();
@@ -288,13 +296,13 @@ public class ALittleGenerateLua {
             List<String> templateParamList = new ArrayList<>();
             List<ALittleAllType> allTypeList = customType.getAllTypeList();
             for (ALittleAllType allType : allTypeList) {
-                ALittleReferenceUtil.GuessTypeInfo guessInfo = allType.guessType();
-                if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-                    String[] split = guessInfo.value.split("\\.");
+                ALittleGuess guessTemplateValue = allType.guessType();
+                if (guessTemplateValue instanceof ALittleGuessClass) {
+                    String[] split = guess.value.split("\\.");
                     if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
                         templateParamList.add(split[1]);
                     } else {
-                        templateParamList.add(guessInfo.value);
+                        templateParamList.add(guess.value);
                     }
                 } else {
                     templateParamList.add("nil");
@@ -307,7 +315,7 @@ public class ALittleGenerateLua {
                 if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
                 content = namespacePre + "Template(" + className;
-                content += ", \"" + guessType.value + "\"";
+                content += ", \"" + guess.value + "\"";
                 if (!templateParamList.isEmpty()) {
                     content += ", " + String.join(", ", templateParamList);
                 }
@@ -318,9 +326,10 @@ public class ALittleGenerateLua {
 
             return content;
             // 如果是模板
-        } else if (guessType.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
+        } else if (guess instanceof ALittleGuessClassTemplate) {
+            ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
             // 检查下标
-            ALittleTemplatePairDec templatePairDec = (ALittleTemplatePairDec)guessType.element;
+            ALittleTemplatePairDec templatePairDec = guessClassTemplate.element;
             ALittleTemplateDec templateDec = (ALittleTemplateDec)templatePairDec.getParent();
             int index = templateDec.getTemplatePairDecList().indexOf(templatePairDec);
 
@@ -855,51 +864,53 @@ public class ALittleGenerateLua {
         ALittleCustomType customType = reflectValue.getCustomType();
         if (customType == null) throw new Exception("reflect表达式没有设置反射对象");
 
-        ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
-        if (guessType.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+        ALittleGuess guess = customType.guessType();
+        if (!(guess instanceof ALittleGuessStruct)) {
             throw new Exception("reflect表达式的反射对象必须是struct");
         }
+        ALittleGuessStruct guessStruct = (ALittleGuessStruct)guess;
 
         String namespacePre = "ALittle.";
         if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
-        String content = namespacePre + "FindReflectByName(\"" + guessType.value + "\")";
-        GenerateReflectStructInfo(guessType);
+        String content = namespacePre + "FindReflectByName(\"" + guessStruct.value + "\")";
+        GenerateReflectStructInfo(guessStruct);
         return content;
     }
 
-    private void GenerateReflectStructInfo(@NotNull ALittleReferenceUtil.GuessTypeInfo guessInfo) throws Exception {
-        if (mReflectMap.containsKey(guessInfo.value)) return;
-        ALittleStructDec structDec = (ALittleStructDec)guessInfo.element;
+    private void GenerateReflectStructInfo(@NotNull ALittleGuessStruct guessStruct) throws Exception {
+        if (mReflectMap.containsKey(guessStruct.value)) return;
+
+        ALittleStructDec structDec = guessStruct.element;
 
         List<String> nameList = new ArrayList<>();
         List<String> typeList = new ArrayList<>();
-        List<ALittleReferenceUtil.GuessTypeInfo> nextList = new ArrayList<>();
+        List<ALittleGuessStruct> nextList = new ArrayList<>();
         List<ALittleStructVarDec> varDecList = structDec.getStructVarDecList();
         for (ALittleStructVarDec varDec : varDecList) {
-            ALittleReferenceUtil.GuessTypeInfo varGuessInfo = varDec.guessType();
+            ALittleGuess varGuess = varDec.guessType();
             PsiElement nameDec = varDec.getIdContent();
-            if (nameDec == null) throw new Exception(guessInfo.value + "没有定义变量名");
+            if (nameDec == null) throw new Exception(guessStruct.value + "没有定义变量名");
             nameList.add("\"" + nameDec.getText() + "\"");
-            typeList.add("\"" + varGuessInfo.value + "\"");
-            if (varGuessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
-                nextList.add(varGuessInfo);
+            typeList.add("\"" + varGuess.value + "\"");
+            if (varGuess instanceof  ALittleGuessStruct) {
+                nextList.add((ALittleGuessStruct)varGuess);
             }
         }
 
-        String[] split_list = guessInfo.value.split("\\.");
+        String[] split_list = guessStruct.value.split("\\.");
         if (split_list.length != 2) return;
 
         String content = "{";
-        content += "name = \"" + guessInfo.value + "\",\n";
+        content += "name = \"" + guessStruct.value + "\",\n";
         content += "ns_name = \"" + split_list[0] + "\",\n";
         content += "rl_name = \"" + split_list[1] + "\",\n";
         content += "name_list = {" + String.join(",", nameList) +"},\n";
         content += "type_list = {" + String.join(",", typeList) + "}\n";
         content += "}";
-        mReflectMap.put(guessInfo.value, content);
+        mReflectMap.put(guessStruct.value, content);
 
-        for (ALittleReferenceUtil.GuessTypeInfo varGuessInfo : nextList) {
+        for (ALittleGuessStruct varGuessInfo : nextList) {
             GenerateReflectStructInfo(varGuessInfo);
         }
     }
@@ -918,9 +929,9 @@ public class ALittleGenerateLua {
             ALittlePropertyValueThisType thisType = firstType.getPropertyValueThisType();
             ALittlePropertyValueCastType castType = firstType.getPropertyValueCastType();
 
-            ALittleReferenceUtil.GuessTypeInfo customGuessType = firstType.guessType();
+            ALittleGuess customGuess = firstType.guessType();
             if (customType != null) {
-                if (customGuessType.type == ALittleReferenceUtil.GuessType.GT_NAMESPACE_NAME && customGuessType.value.equals("lua"))
+                if (customGuess instanceof ALittleGuessNamespaceName && customGuess.value.equals("lua"))
                     isLuaNamespace = true;
 
                 // 如果是lua命名域，那么就忽略
@@ -954,39 +965,40 @@ public class ALittleGenerateLua {
                     ALittlePropertyValueDotIdName dotIdName = dotId.getPropertyValueDotIdName();
                     if (dotIdName == null) throw new Exception("点后面没有定义属性对象");
                     // 获取类型
-                    ALittleReferenceUtil.GuessTypeInfo guess = dotIdName.guessType();
+                    ALittleGuess guess = dotIdName.guessType();
 
                     if (!isLuaNamespace) {
                         String split = ".";
                         // 如果是函数名
-                        if (guess.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+                        if (guess instanceof ALittleGuessFunctor) {
+                            ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
                             // 1. 是成员函数
                             // 2. 使用的是调用
                             // 3. 前一个后缀是类实例对象
                             // 那么就要改成使用语法糖
-                            if (guess.element instanceof ALittleClassMethodDec) {
+                            if (guessFunctor.element instanceof ALittleClassMethodDec) {
                                 if (nextSuffix != null && nextSuffix.getPropertyValueMethodCall() != null) {
                                     // 获取前一个后缀的类型
-                                    ALittleReferenceUtil.GuessTypeInfo preGuess = customGuessType;
+                                    ALittleGuess preGuess = customGuess;
                                     if (preSuffix != null) {
                                         preGuess = preSuffix.guessType();
                                     }
 
                                     // 只要不是类名，那么肯定就是类实例对象，就是用语法糖
-                                    if (preGuess.type != ALittleReferenceUtil.GuessType.GT_CLASS_NAME)
+                                    if (!(preGuess instanceof ALittleGuessClassName))
                                         split = ":";
                                 }
                                 // setter和getter需要特殊处理
-                            } else if (guess.element instanceof ALittleClassSetterDec
-                                    || guess.element instanceof ALittleClassGetterDec) {
+                            } else if (guessFunctor.element instanceof ALittleClassSetterDec
+                                    || guessFunctor.element instanceof ALittleClassGetterDec) {
                                 if (nextSuffix != null && nextSuffix.getPropertyValueMethodCall() != null) {
-                                    ALittleReferenceUtil.GuessTypeInfo preGuess = customGuessType;
+                                    ALittleGuess preGuess = customGuess;
                                     if (preSuffix != null) {
                                         preGuess = preSuffix.guessType();
                                     }
 
                                     // 如果前一个后缀是类名，那么那么就需要获取setter或者getter来获取
-                                    if (preGuess.type == ALittleReferenceUtil.GuessType.GT_CLASS_NAME) {
+                                    if (preGuess instanceof ALittleGuessClassName) {
                                         // 如果是getter，那么一定是一个参数，比如ClassName.disabled(self)
                                         // 如果是setter，那么一定是两个参数，比如ClassName.width(self, 100)
                                         if (nextSuffix.getPropertyValueMethodCall().getValueStatList().size() == 1)
@@ -1040,7 +1052,7 @@ public class ALittleGenerateLua {
             }
 
             return content.toString();
-        } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+        } catch (ALittleGuessException e) {
             throw new Exception(e.getError());
         }
     }
@@ -1063,8 +1075,8 @@ public class ALittleGenerateLua {
             return "";
         }
 
-        ALittleReferenceUtil.GuessTypeInfo info = customType.guessType();
-        if (info.type != ALittleReferenceUtil.GuessType.GT_CLASS) {
+        ALittleGuess guess = customType.guessType();
+        if (!(guess instanceof ALittleGuessClass)) {
             return "";
         }
 
@@ -1083,25 +1095,30 @@ public class ALittleGenerateLua {
     private String GenerateNsendExpr(ALittleNsendExpr nsendExpr, String preTab) throws Exception {
         List<ALittleValueStat> valueStatList = nsendExpr.getValueStatList();
         if (valueStatList.isEmpty()) throw new Exception("nsend第一个参数必须是ALittle.IMsgCommon的派生类");
-        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStatList.get(0).guessType();
-        if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgCommon")) {
+
+        ALittleGuess guess = valueStatList.get(0).guessType();
+        if (!(guess instanceof ALittleGuessClass)) throw new Exception("nsend第一个参数必须是ALittle.IMsgCommon的派生类");
+        ALittleGuessClass guessClass = (ALittleGuessClass)guess;
+
+        if (!ALittleReferenceUtil.IsClassSuper(guessClass.element, "ALittle.IMsgCommon")) {
             throw new Exception("nsend第一个参数必须是ALittle.IMsgCommon的派生类");
         }
         if (valueStatList.size() != 2) {
             throw new Exception("nsend必须是两个参数");
         }
 
-        ALittleReferenceUtil.GuessTypeInfo structInfo = valueStatList.get(1).guessType();
-        if (structInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
+        guess = valueStatList.get(1).guessType();
+        if (!(guess instanceof ALittleGuessStruct)) {
             throw new Exception("nsend的第二个参数必须是struct");
         }
-        int msg_id = PsiHelper.JSHash(structInfo.value);
+        ALittleGuessStruct guessStruct = (ALittleGuessStruct)guess;
+        int msg_id = PsiHelper.JSHash(guessStruct.value);
 
         String namespacePre = "ALittle.";
         if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
         String replaceTest = "IMsgCommon.Invoke";
-        GenerateReflectStructInfo(structInfo);
+        GenerateReflectStructInfo(guessStruct);
 
         String content = preTab + namespacePre + replaceTest + "(";
         List<String> paramList = new ArrayList<>();
@@ -1119,7 +1136,8 @@ public class ALittleGenerateLua {
     private String GenerateThrowExpr(ALittleThrowExpr throwExpr, String preTab) throws Exception {
         List<ALittleValueStat> valueStatList = throwExpr.getValueStatList();
         if (valueStatList.isEmpty()) throw new Exception("throw第一个参数必须是string类型");
-        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStatList.get(0).guessType();
+
+        ALittleGuess guessInfo = valueStatList.get(0).guessType();
         if (!guessInfo.value.equals("string")) {
             throw new Exception("throw第一个参数必须是string类型");
         }
@@ -1146,7 +1164,7 @@ public class ALittleGenerateLua {
         List<ALittleValueStat> valueStatList = assertExpr.getValueStatList();
         if (valueStatList.size() != 2) throw new Exception("assert有且仅有两个参数，第一个是任意类型，第二个是string类型");
 
-        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStatList.get(1).guessType();
+        ALittleGuess guessInfo = valueStatList.get(1).guessType();
         if (!guessInfo.value.equals("string")) {
             throw new Exception("assert第二个参数必须是string类型");
         }
@@ -1236,10 +1254,11 @@ public class ALittleGenerateLua {
                         ALittlePropertyValueDotId dotId = suffix.getPropertyValueDotId();
                         if (dotId != null && dotId.getPropertyValueDotIdName() != null) {
                             String attrName = dotId.getPropertyValueDotIdName().getText();
-                            ALittleReferenceUtil.GuessTypeInfo thisGuessType = thisType.guessType();
-                            if (thisGuessType.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+                            ALittleGuess thisGuess = thisType.guessType();
+                            if (thisGuess instanceof ALittleGuessClass) {
+                                ALittleGuessClass thisGuessClass = (ALittleGuessClass)thisGuess;
                                 List<PsiElement> varNameList = new ArrayList<>();
-                                PsiHelper.findClassAttrList((ALittleClassDec) thisGuessType.element
+                                PsiHelper.findClassAttrList(thisGuessClass.element
                                         , PsiHelper.sAccessPrivateAndProtectedAndPublic
                                         , PsiHelper.ClassAttrType.VAR
                                         , attrName
@@ -1984,16 +2003,18 @@ public class ALittleGenerateLua {
             if (paramDec == null) throw new Exception("带" + text + "的全局函数，必须有两个参数");
             List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
             if (oneDecList.size() != 2) throw new Exception("带" + text + "的全局函数，必须有两个参数");
-            ALittleReferenceUtil.GuessTypeInfo guess_param = oneDecList.get(1).getAllType().guessType();
+            ALittleGuess guessParam = oneDecList.get(1).getAllType().guessType();
+            if (!(guessParam instanceof ALittleGuessStruct)) throw new Exception("带" + text + "的全局函数，第二个参数必须是struct");
+            ALittleGuessStruct guessParamStruct = (ALittleGuessStruct)guessParam;
 
             List<ALittleAllType> returnList = new ArrayList<>();
             ALittleMethodReturnDec returnDec = root.getMethodReturnDec();
             if (returnDec != null) {
                 returnList = returnDec.getAllTypeList();
             }
-            ALittleReferenceUtil.GuessTypeInfo guess_return = null;
+            ALittleGuess guessReturn = null;
             if (returnList.size() == 1) {
-                guess_return = returnList.get(0).guessType();
+                guessReturn = returnList.get(0).guessType();
             }
 
             if (text.equals("@Http")) {
@@ -2001,7 +2022,7 @@ public class ALittleGenerateLua {
                 content.append(preTab)
                         .append(namespacePre)
                         .append("RegHttpCallback(\"")
-                        .append(guess_param.value)
+                        .append(guessParamStruct.value)
                         .append("\", ")
                         .append(methodName)
                         .append(")\n");
@@ -2010,7 +2031,7 @@ public class ALittleGenerateLua {
                 content.append(preTab)
                         .append(namespacePre)
                         .append("RegHttpDownloadCallback(\"")
-                        .append(guess_param.value)
+                        .append(guessParamStruct.value)
                         .append("\", ")
                         .append(methodName)
                         .append(")\n");
@@ -2019,33 +2040,36 @@ public class ALittleGenerateLua {
                 content.append(preTab)
                         .append(namespacePre)
                         .append("RegHttpFileCallback(\"")
-                        .append(guess_param.value)
+                        .append(guessParamStruct.value)
                         .append("\", ")
                         .append(methodName)
                         .append(")\n");
             } else if (text.equals("@Msg")) {
                 if (returnList.size() > 1) throw new Exception("带" + text + "的全局函数，最多只有一个返回值");
-                GenerateReflectStructInfo(guess_param);
-                if (guess_return == null) {
+                GenerateReflectStructInfo(guessParamStruct);
+                if (guessReturn == null) {
                     content.append(preTab)
                             .append(namespacePre)
                             .append("RegMsgCallback(")
-                            .append(PsiHelper.JSHash(guess_param.value))
+                            .append(PsiHelper.JSHash(guessParamStruct.value))
                             .append(", ")
                             .append(methodName)
                             .append(")\n");
                 } else {
+                    if (!(guessReturn instanceof ALittleGuessStruct)) throw new Exception("带" + text + "的全局函数，返回值必须是struct");
+                    ALittleGuessStruct guessReturnStruct = (ALittleGuessStruct)guessReturn;
+
                     content.append(preTab)
                             .append(namespacePre)
                             .append("RegMsgRpcCallback(")
-                            .append(PsiHelper.JSHash(guess_param.value))
+                            .append(PsiHelper.JSHash(guessParamStruct.value))
                             .append(", ")
                             .append(methodName)
                             .append(", ")
-                            .append(PsiHelper.JSHash(guess_return.value))
+                            .append(PsiHelper.JSHash(guessReturnStruct.value))
                             .append(")\n");
 
-                    GenerateReflectStructInfo(guess_return);
+                    GenerateReflectStructInfo(guessReturnStruct);
                 }
             }
         }

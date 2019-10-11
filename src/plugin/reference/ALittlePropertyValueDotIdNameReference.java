@@ -28,25 +28,25 @@ import java.util.Map;
 public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALittlePropertyValueDotIdName> {
     private List<PsiElement> mGetterList;
     private List<PsiElement> mSetterList;
-    private ALittleReferenceUtil.GuessTypeInfo mClassGuessInfo;
+    private ALittleGuess mClassGuessInfo;
 
     public ALittlePropertyValueDotIdNameReference(@NotNull ALittlePropertyValueDotIdName element, TextRange textRange) {
         super(element, textRange);
     }
 
     @NotNull
-    private ALittleReferenceUtil.GuessTypeInfo replaceTemplate(@NotNull ALittleReferenceUtil.GuessTypeInfo guess) throws ALittleReferenceUtil.ALittleReferenceException {
+    private ALittleGuess replaceTemplate(@NotNull ALittleGuess guess) throws ALittleGuessException {
         if (mClassGuessInfo == null || mClassGuessInfo.classTemplateMap == null) return guess;
 
         if (guess.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE) {
             if (!mClassGuessInfo.classTemplateMap.containsKey(guess.value)) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, mClassGuessInfo.value + "没有定义模板" + guess.value);
+                throw new ALittleGuessException(myElement, mClassGuessInfo.value + "没有定义模板" + guess.value);
             }
             return mClassGuessInfo.classTemplateMap.get(guess.value);
         }
 
         if (guess.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            ALittleGuess info = new ALittleGuess();
             info.type = guess.type;
             info.element = guess.element;
             info.functorAwait = guess.functorAwait;
@@ -68,7 +68,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 start_index = 1;
             }
             for (int i = start_index; i < guess.functorParamList.size(); ++i) {
-                ALittleReferenceUtil.GuessTypeInfo guessInfo = replaceTemplate(guess.functorParamList.get(i));
+                ALittleGuess guessInfo = replaceTemplate(guess.functorParamList.get(i));
                 info.functorParamList.add(guessInfo);
                 typeList.add(guessInfo.value);
             }
@@ -76,7 +76,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             info.functorReturnList = new ArrayList<>();
             typeList = new ArrayList<>();
             for (int i = 0; i < guess.functorReturnList.size(); ++i) {
-                ALittleReferenceUtil.GuessTypeInfo guessInfo = replaceTemplate(guess.functorReturnList.get(i));
+                ALittleGuess guessInfo = replaceTemplate(guess.functorReturnList.get(i));
                 info.functorReturnList.add(guessInfo);
                 typeList.add(guessInfo.value);
             }
@@ -87,8 +87,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
         }
 
         if (guess.type == ALittleReferenceUtil.GuessType.GT_LIST) {
-            ALittleReferenceUtil.GuessTypeInfo subInfo = replaceTemplate(guess.listSubType);
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            ALittleGuess subInfo = replaceTemplate(guess.listSubType);
+            ALittleGuess info = new ALittleGuess();
             info.type = guess.type;
             info.value = "List<" + subInfo.value + ">";
             info.element = guess.element;
@@ -97,10 +97,10 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
         }
 
         if (guess.type == ALittleReferenceUtil.GuessType.GT_MAP) {
-            ALittleReferenceUtil.GuessTypeInfo keyInfo = replaceTemplate(guess.mapKeyType);
-            ALittleReferenceUtil.GuessTypeInfo valueInfo = replaceTemplate(guess.mapValueType);
+            ALittleGuess keyInfo = replaceTemplate(guess.mapKeyType);
+            ALittleGuess valueInfo = replaceTemplate(guess.mapValueType);
 
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            ALittleGuess info = new ALittleGuess();
             info.type = guess.type;
             info.value = "Map<" + keyInfo.value + "," + valueInfo.value + ">";
             info.element = guess.element;
@@ -110,14 +110,14 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
         }
 
         if (guess.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            ALittleGuess info = new ALittleGuess();
             info.type = guess.type;
             info.element = guess.element;
             info.classTemplateList = new ArrayList<>();
             info.classTemplateList.addAll(guess.classTemplateList);
             info.classTemplateMap = new HashMap<>();
             if (guess.classTemplateMap != null) {
-                for (Map.Entry<String, ALittleReferenceUtil.GuessTypeInfo> entry : guess.classTemplateMap.entrySet()) {
+                for (Map.Entry<String, ALittleGuess> entry : guess.classTemplateMap.entrySet()) {
                     info.classTemplateMap.put(entry.getKey(), replaceTemplate(entry.getValue()));
                 }
             }
@@ -125,14 +125,14 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             ALittleClassDec srcClassDec = (ALittleClassDec) guess.element;
             ALittleClassNameDec srcClassNameDec = srcClassDec.getClassNameDec();
             if (srcClassNameDec == null)
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "类模板没有定义类名");
+                throw new ALittleGuessException(myElement, "类模板没有定义类名");
             info.value = PsiHelper.getNamespaceName(srcClassDec) + "." + srcClassNameDec.getIdContent().getText();
 
             List<String> nameList = new ArrayList<>();
-            for (ALittleReferenceUtil.GuessTypeInfo tem : guess.classTemplateList) {
-                ALittleReferenceUtil.GuessTypeInfo impl = info.classTemplateMap.get(tem.value);
+            for (ALittleGuess tem : guess.classTemplateList) {
+                ALittleGuess impl = info.classTemplateMap.get(tem.value);
                 if (impl == null) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, info.value + "没有模板实现" + tem.value);
+                    throw new ALittleGuessException(myElement, info.value + "没有模板实现" + tem.value);
                 }
                 nameList.add(impl.value);
             }
@@ -144,8 +144,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
 
         mGetterList = null;
         mSetterList = null;
@@ -155,13 +155,13 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
         for (ResolveResult result : resultList) {
             PsiElement element = result.getElement();
 
-            ALittleReferenceUtil.GuessTypeInfo guess = null;
+            ALittleGuess guess = null;
             if (element instanceof ALittleClassVarDec) {
                 guess = ((ALittleClassVarDec) element).guessType();
 
                 if (mClassGuessInfo != null && guess.type == ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE && mClassGuessInfo.classTemplateMap != null) {
                     if (!mClassGuessInfo.classTemplateMap.containsKey(guess.value)) {
-                        throw new ALittleReferenceUtil.ALittleReferenceException(myElement, mClassGuessInfo.value + "没有定义模板" + guess.value);
+                        throw new ALittleGuessException(myElement, mClassGuessInfo.value + "没有定义模板" + guess.value);
                     }
                     guess = mClassGuessInfo.classTemplateMap.get(guess.value);
                 }
@@ -185,21 +185,21 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             } else if (element instanceof ALittleVarAssignNameDec) {
                 guess = ((ALittleVarAssignNameDec) element).guessType();
             } else if (element instanceof ALittleEnumNameDec) {
-                guess = new ALittleReferenceUtil.GuessTypeInfo();
+                guess = new ALittleGuess();
                 guess.type = ALittleReferenceUtil.GuessType.GT_ENUM_NAME;
                 guess.value = ((ALittleEnumNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleStructNameDec) {
-                guess = new ALittleReferenceUtil.GuessTypeInfo();
+                guess = new ALittleGuess();
                 guess.type = ALittleReferenceUtil.GuessType.GT_STRUCT_NAME;
                 guess.value = ((ALittleStructNameDec) element).guessType().value;
                 guess.element = element;
             } else if (element instanceof ALittleClassNameDec) {
-                ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassNameDec) element).guessType();
+                ALittleGuess classGuessInfo = ((ALittleClassNameDec) element).guessType();
                 if (classGuessInfo.classTemplateList != null && !classGuessInfo.classTemplateList.isEmpty()) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "模板类" + classGuessInfo.value + "不能直接使用");
+                    throw new ALittleGuessException(myElement, "模板类" + classGuessInfo.value + "不能直接使用");
                 }
-                guess = new ALittleReferenceUtil.GuessTypeInfo();
+                guess = new ALittleGuess();
                 guess.type = ALittleReferenceUtil.GuessType.GT_CLASS_NAME;
                 guess.element = element;
                 guess.value = classGuessInfo.value;
@@ -242,12 +242,12 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
         }
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
+    public void checkError() throws ALittleGuessException {
+        List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+            throw new ALittleGuessException(myElement, "未知类型");
         } else if (guessList.size() != 1) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+            throw new ALittleGuessException(myElement, "重复定义");
         }
     }
 
@@ -270,7 +270,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             if (index == -1) return new ResolveResult[0];
 
             // 获取前一个类型
-            ALittleReferenceUtil.GuessTypeInfo preType;
+            ALittleGuess preType;
             if (index == 0) {
                 preType = propertyValueFirstType.guessType();
             } else {
@@ -418,7 +418,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     results.add(new PsiElementResolveResult(varNameDec));
                 }
             }
-        } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+        } catch (ALittleGuessException ignored) {
 
         }
         return results.toArray(new ResolveResult[results.size()]);
@@ -443,7 +443,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             if (index == -1) return variants.toArray();
 
             // 获取前一个类型
-            ALittleReferenceUtil.GuessTypeInfo preType;
+            ALittleGuess preType;
             if (index == 0) {
                 preType = propertyValueFirstType.guessType();
             } else {
@@ -636,7 +636,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                     );
                 }
             }
-        } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+        } catch (ALittleGuessException ignored) {
 
         }
 

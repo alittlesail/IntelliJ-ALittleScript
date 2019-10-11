@@ -30,8 +30,8 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
         PsiElement parent = myElement.getParent();
 
         // 如果直接就是定义，那么直接获取
@@ -76,16 +76,16 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
         return variants.toArray();
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         if (myElement.getText().startsWith("___")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "结构体名不能以3个下划线开头");
+            throw new ALittleGuessException(myElement, "结构体名不能以3个下划线开头");
         }
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
+        List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+            throw new ALittleGuessException(myElement, "未知类型");
         } else if (guessList.size() != 1) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+            throw new ALittleGuessException(myElement, "重复定义");
         }
     }
 }

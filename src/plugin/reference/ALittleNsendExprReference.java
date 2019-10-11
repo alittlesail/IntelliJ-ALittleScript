@@ -14,62 +14,62 @@ public class ALittleNsendExprReference extends ALittleReference<ALittleNsendExpr
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "nend表达式不能没有参数");
+            throw new ALittleGuessException(myElement, "nend表达式不能没有参数");
         }
 
         if (valueStatList.size() != 2)
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "nsend只有两个参数，第一个是ALittle.IMsgCommon或派生类，第二个是struct");
+            throw new ALittleGuessException(myElement, "nsend只有两个参数，第一个是ALittle.IMsgCommon或派生类，第二个是struct");
 
         // 第一个参数必须是ALittle.IMsgCommon的派生类
         ALittleValueStat valueStat = valueStatList.get(0);
-        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
+        ALittleGuess guessInfo = valueStat.guessType();
         if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgCommon")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "nsend表达式第一个参数必须是ALittle.IMsgCommon的派生类");
+            throw new ALittleGuessException(valueStat, "nsend表达式第一个参数必须是ALittle.IMsgCommon的派生类");
         }
 
         // 第二个参数必须是struct
         valueStat = valueStatList.get(1);
         guessInfo = valueStat.guessType();
         if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "nsend表达式第二个参数必须是struct");
+            throw new ALittleGuessException(valueStat, "nsend表达式第二个参数必须是struct");
         }
 
         return new ArrayList<>();
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ncall表达式不能没有参数");
+            throw new ALittleGuessException(myElement, "ncall表达式不能没有参数");
         }
 
         if (valueStatList.size() != 2)
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "nsend只有两个参数，第一个是ALittle.IMsgCommon的派生类，第二个是struct");
+            throw new ALittleGuessException(myElement, "nsend只有两个参数，第一个是ALittle.IMsgCommon的派生类，第二个是struct");
 
         // 第一个参数必须是ALittle.IMsgCommon的派生类
         ALittleValueStat valueStat = valueStatList.get(0);
-        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
+        ALittleGuess guessInfo = valueStat.guessType();
         if (!ALittleReferenceUtil.IsClassSuper(guessInfo.element, "ALittle.IMsgCommon")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "nsend表达式第一个参数必须是ALittle.IMsgCommon的派生类");
+            throw new ALittleGuessException(valueStat, "nsend表达式第一个参数必须是ALittle.IMsgCommon的派生类");
         }
 
         // 第二个参数必须是struct
         valueStat = valueStatList.get(1);
         guessInfo = valueStat.guessType();
         if (guessInfo.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "nsend表达式第二个参数必须是struct");
+            throw new ALittleGuessException(valueStat, "nsend表达式第二个参数必须是struct");
         }
     }
 
     @NotNull
-    public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         List<InlayInfo> result = new ArrayList<>();
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ncall表达式不能没有参数");
+            throw new ALittleGuessException(myElement, "ncall表达式不能没有参数");
         }
 
         // 构建对象

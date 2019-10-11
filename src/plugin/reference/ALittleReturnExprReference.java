@@ -14,11 +14,11 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         return new ArrayList<>();
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         if (myElement.getReturnYield() != null) {
             // 对于ReturnYield就不需要做返回值检查
             // 对所在函数进行检查，必须要有async和await表示
@@ -55,7 +55,7 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
             }
 
             if (element != null) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(element, "函数内部使用了return yield表达式，所以必须使用async或await修饰");
+                throw new ALittleGuessException(element, "函数内部使用了return yield表达式，所以必须使用async或await修饰");
             }
             return;
         }
@@ -94,17 +94,17 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
         }
 
         // 参数的类型
-        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = null;
+        List<ALittleGuess> guessTypeList = null;
         // 如果返回值只有一个函数调用
         if (valueStatList.size() == 1 && returnTypeList.size() > 1) {
             ALittleValueStat valueStat = valueStatList.get(0);
             guessTypeList = valueStat.guessTypes();
             if (guessTypeList.size() != returnTypeList.size()) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "return的函数调用的返回值数量和函数定义的返回值数量不相等");
+                throw new ALittleGuessException(myElement, "return的函数调用的返回值数量和函数定义的返回值数量不相等");
             }
         } else {
             if (returnTypeList.size() != valueStatList.size()) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "return的返回值数量和函数定义的返回值数量不相等");
+                throw new ALittleGuessException(myElement, "return的返回值数量和函数定义的返回值数量不相等");
             }
             guessTypeList = new ArrayList<>();
             for (ALittleValueStat valueStat : valueStatList) {
@@ -122,8 +122,8 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
             }
             try {
                 ALittleReferenceOpUtil.guessTypeEqual(returnTypeList.get(i), returnTypeList.get(i).guessType(), targetValueStat, guessTypeList.get(i));
-            } catch (ALittleReferenceUtil.ALittleReferenceException e) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(targetValueStat, "return的第" + (i + 1) + "个返回值数量和函数定义的返回值类型不同:" + e.getError());
+            } catch (ALittleGuessException e) {
+                throw new ALittleGuessException(targetValueStat, "return的第" + (i + 1) + "个返回值数量和函数定义的返回值类型不同:" + e.getError());
             }
         }
     }

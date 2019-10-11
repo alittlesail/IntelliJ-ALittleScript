@@ -18,31 +18,31 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleStructNameDec structNameDec = myElement.getStructNameDec();
         if (structNameDec == null) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "没有定义结构体名");
+            throw new ALittleGuessException(myElement, "没有定义结构体名");
         }
 
-        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+        ALittleGuess info = new ALittleGuess();
         info.type = ALittleReferenceUtil.GuessType.GT_STRUCT;
         info.value = mNamespace + "." + structNameDec.getIdContent().getText();
         info.element = myElement;
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = new ArrayList<>();
+        List<ALittleGuess> guessTypeList = new ArrayList<>();
         guessTypeList.add(info);
         return guessTypeList;
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         List<ALittleStructVarDec> varDecList = myElement.getStructVarDecList();
         Set<String> nameSet = new HashSet<>();
         for (ALittleStructVarDec varDec : varDecList) {
             PsiElement varNameDec = varDec.getIdContent();
-            if (varNameDec == null) throw new ALittleReferenceUtil.ALittleReferenceException(varDec, "没有定义成员变量名");
+            if (varNameDec == null) throw new ALittleGuessException(varDec, "没有定义成员变量名");
 
             if (nameSet.contains(varNameDec.getText())) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(varNameDec, "结构体字段名重复");
+                throw new ALittleGuessException(varNameDec, "结构体字段名重复");
             }
             nameSet.add(varNameDec.getText());
         }

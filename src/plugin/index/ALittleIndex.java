@@ -10,6 +10,7 @@ import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
+import plugin.guess.ALittleGuess;
 import plugin.psi.*;
 import plugin.reference.ALittleReferenceUtil;
 
@@ -21,7 +22,7 @@ public class ALittleIndex {
     Project mProject;
 
     // 保存关键的元素对象，用于快速语法树解析
-    protected Map<PsiFile, Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>>> mGuessTypeMap;
+    protected Map<PsiFile, Map<PsiElement, List<ALittleGuess>>> mGuessTypeMap;
     protected Map<PsiFile, Map<String, ALittleClassData>> mClassDataMap;
     protected Map<PsiFile, Map<String, ALittleStructData>> mStructDataMap;
     protected Map<PsiFile, Map<String, ALittleEnumData>> mEnumDataMap;

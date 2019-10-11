@@ -17,7 +17,7 @@ public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVa
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleVarAssignDec) {
             return ((ALittleVarAssignDec) parent).guessTypes();
@@ -27,16 +27,16 @@ public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVa
         return new ArrayList<>();
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         if (myElement.getText().startsWith("___")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "局部变量名不能以3个下划线开头");
+            throw new ALittleGuessException(myElement, "局部变量名不能以3个下划线开头");
         }
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
+        List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+            throw new ALittleGuessException(myElement, "未知类型");
         } else if (guessList.size() != 1) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+            throw new ALittleGuessException(myElement, "重复定义");
         }
     }
 

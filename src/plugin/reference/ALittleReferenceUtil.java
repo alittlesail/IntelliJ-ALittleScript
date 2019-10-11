@@ -3,6 +3,7 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.*;
 import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
@@ -13,194 +14,55 @@ import java.util.List;
 import java.util.Map;
 
 public class ALittleReferenceUtil {
-    // 定义异常
-    public static class ALittleReferenceException extends Exception {
-        private String mError;
-        private PsiElement mElement;
-
-        public ALittleReferenceException(@NotNull PsiElement element, @NotNull String error) {
-            mElement = element;
-            mError = error;
-        }
-
-        @NotNull
-        public String getError() { return mError; }
-
-        @NotNull
-        public PsiElement getElement() { return mElement; }
-    }
-
-    // 基本变量类型
-    public static GuessTypeInfo sIntGuessTypeInfo;
-    public static GuessTypeInfo sDoubleGuessTypeInfo;
-    public static GuessTypeInfo sStringGuessTypeInfo;
-    public static GuessTypeInfo sBoolGuessTypeInfo;
-    public static GuessTypeInfo sI64GuessTypeInfo;
-    public static GuessTypeInfo sAnyGuessTypeInfo;
-    public static Map<String, List<GuessTypeInfo>> sPrimitiveGuessTypeMap;
-    public static List<GuessTypeInfo> sConstNullGuessType;
-    static {
-        sPrimitiveGuessTypeMap = new HashMap<>();
-        List<GuessTypeInfo> tmp;
-        tmp = new ArrayList<>(); sIntGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "int"); tmp.add(sIntGuessTypeInfo); sPrimitiveGuessTypeMap.put("int", tmp);
-        tmp = new ArrayList<>(); sDoubleGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "double"); tmp.add(sDoubleGuessTypeInfo); sPrimitiveGuessTypeMap.put("double", tmp);
-        tmp = new ArrayList<>(); sStringGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "string"); tmp.add(sStringGuessTypeInfo); sPrimitiveGuessTypeMap.put("string", tmp);
-        tmp = new ArrayList<>(); sBoolGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "bool"); tmp.add(sBoolGuessTypeInfo); sPrimitiveGuessTypeMap.put("bool", tmp);
-        tmp = new ArrayList<>(); sI64GuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "I64"); tmp.add(sI64GuessTypeInfo); sPrimitiveGuessTypeMap.put("I64", tmp);
-        tmp = new ArrayList<>(); sAnyGuessTypeInfo = new GuessTypeInfo(GuessType.GT_PRIMITIVE, "any"); tmp.add(sAnyGuessTypeInfo); sPrimitiveGuessTypeMap.put("any", tmp);
-        sConstNullGuessType = new ArrayList<>(); sConstNullGuessType.add(new GuessTypeInfo(GuessType.GT_CONST, "null"));
-    }
-
-    // 定义类型
-    public enum GuessType
-    {
-        GT_CONST,
-        GT_PRIMITIVE,
-        GT_MAP,
-        GT_LIST,
-        GT_FUNCTOR,
-        GT_NAMESPACE,
-        GT_NAMESPACE_NAME,
-        GT_CLASS,
-        GT_CLASS_NAME,
-        GT_STRUCT,
-        GT_STRUCT_NAME,
-        GT_ENUM,
-        GT_ENUM_NAME,
-        GT_PARAM_TAIL,
-        GT_CLASS_TEMPLATE,            // 声明的模板
-    }
-
-    // 类型信息
-    public static class GuessTypeInfo
-    {
-        public GuessTypeInfo() {}
-        public GuessTypeInfo(GuessType t, String v) { type = t; value = v; }
-
-        public boolean isChanged() {
-            if (listSubType != null && listSubType.isChanged()) {
-                return true;
-            }
-
-            if (mapKeyType != null && mapKeyType.isChanged()) {
-                return true;
-            }
-
-            if (mapValueType != null && mapValueType.isChanged()) {
-                return true;
-            }
-
-            if (functorParamList != null) {
-                for (ALittleReferenceUtil.GuessTypeInfo paramInfo : functorParamList) {
-                    if (paramInfo.isChanged()) return true;
-                }
-            }
-            if (functorReturnList != null) {
-                for (ALittleReferenceUtil.GuessTypeInfo returnInfo : functorReturnList) {
-                    if (returnInfo.isChanged()) return true;
-                }
-            }
-
-            if (classTemplateExtends != null && classTemplateExtends.isChanged()) {
-                return true;
-            }
-
-            if (classTemplateList != null) {
-                for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateList) {
-                    if (classTemplateInfo.isChanged()) return true;
-                }
-            }
-            if (classTemplateMap != null) {
-                for (ALittleReferenceUtil.GuessTypeInfo classTemplateInfo : classTemplateMap.values()) {
-                    if (classTemplateInfo.isChanged()) return true;
-                }
-            }
-
-            if (element != null && ALittleTreeChangeListener.getGuessTypeList(element) != null) {
-                return false;
-            }
-
-            return true;
-        }
-
-        public GuessType type;
-        public String value;                              // 完整类型的字符串
-        public PsiElement element;                        // 指向的元素
-        public GuessTypeInfo classTemplateExtends;        // type="GT_CLASS_TEMPLATE"时，类模板标识符继承的类
-        public List<GuessTypeInfo> classTemplateList;     // type="GT_CLASS"时，定义的模板列表
-        public Map<String, GuessTypeInfo> classTemplateMap; // type="GT_CLASS"时，属于实例化模板时的类型映射, KEY是模板定义名，Value是实例对象
-        public GuessTypeInfo listSubType;                 // type="List"时，表示List的子类型
-        public GuessTypeInfo mapKeyType;                  // type="Map"时, 表示Map的Key
-        public GuessTypeInfo mapValueType;                // type="Map"时, 表示Map的Value
-        public List<GuessTypeInfo> functorParamList;      // type="Functor"时, 表示参数列表
-        public List<String> functorParamNameList;         // type="Functor"时, 表示参数名列表
-        public GuessTypeInfo functorParamTail;            // type="Functor"时, 表示参数占位符
-        public List<GuessTypeInfo> functorReturnList;     // type="Functor"时, 表示返回值列表
-        public boolean functorAwait;                      // type="Functor"时, 表示是否是await
+    // 检查迭代函数
+    public static boolean IsPairsFunction(@NotNull List<ALittleGuess> guessList) {
+        if (guessList.size() != 3) return false;
+        if (!(guessList.get(0) instanceof ALittleGuessFunctor)) return false;
+        ALittleGuessFunctor guess = (ALittleGuessFunctor)guessList.get(0);
+        if (guess.functorAwait) return false;
+        if (guess.functorParamList.size() != 2) return false;
+        if (guess.functorReturnList.size() != 0) return false;
+        if (!guess.functorParamList.get(0).value.equals(guessList.get(1).value)) return false;
+        if (!guess.value.equals(guessList.get(2).value)) return false;
+        return true;
     }
 
     // 计算表达式需要使用什么样的变量方式
     @NotNull
-    public static String CalcPairsType(ALittleValueStat valueStat) throws ALittleReferenceException {
-        List<GuessTypeInfo> guessTypeList = valueStat.guessTypes();
+    public static String CalcPairsType(ALittleValueStat valueStat) throws ALittleGuessException {
+        List<ALittleGuess> guessList = valueStat.guessTypes();
         // 必须是模板容器
-        if (guessTypeList.size() == 1 && guessTypeList.get(0).type == GuessType.GT_LIST) {
+        if (guessList.size() == 1 && guessList.get(0) instanceof ALittleGuessList) {
             return "___ipairs";
-        } else if (guessTypeList.size() == 1 && guessTypeList.get(0).type == GuessType.GT_MAP) {
+        } else if (guessList.size() == 1 && guessList.get(0) instanceof ALittleGuessMap) {
             return "___pairs";
         }
 
         // 检查迭代函数
-        do {
-            if (guessTypeList.size() != 3) break;
-            if (guessTypeList.get(0).type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) break;
-            if (guessTypeList.get(0).functorAwait) break;
-            if (guessTypeList.get(0).functorParamList.size() != 2) break;
-            if (guessTypeList.get(0).functorReturnList.size() != 0) break;
-            if (!guessTypeList.get(0).functorParamList.get(0).value.equals(guessTypeList.get(1).value)) break;
-            if (!guessTypeList.get(0).functorParamList.get(1).value.equals(guessTypeList.get(2).value)) break;
-            return "";
-        } while (false);
+        if (IsPairsFunction(guessList)) return "";
 
-        throw new ALittleReferenceException(valueStat, "该表达式不能遍历");
-    }
-
-    // 判断 parent是否是child的父类
-    public static boolean IsClassSuper(PsiElement child, PsiElement parent) throws ALittleReferenceException {
-        if (!(child instanceof ALittleClassDec)) return false;
-        ALittleClassDec childClass = (ALittleClassDec)child;
-
-        ALittleClassExtendsDec extendsDec = childClass.getClassExtendsDec();
-        if (extendsDec == null) return false;
-
-        ALittleClassNameDec nameDec = extendsDec.getClassNameDec();
-        if (nameDec == null) return false;
-
-        GuessTypeInfo guessType = nameDec.guessType();
-        if (guessType.element.equals(parent)) return true;
-
-        return IsClassSuper(guessType.element, parent);
+        throw new ALittleGuessException(valueStat, "该表达式不能遍历");
     }
 
     // 判断
-    public static boolean IsClassSuper(PsiElement child, @NotNull String parent) throws ALittleReferenceException {
-        if (!(child instanceof ALittleClassDec)) return false;
-        ALittleClassDec childClass = (ALittleClassDec)child;
-
-        ALittleClassExtendsDec extendsDec = childClass.getClassExtendsDec();
+    public static boolean IsClassSuper(ALittleClassDec child, @NotNull String parent) throws ALittleGuessException {
+        ALittleClassExtendsDec extendsDec = child.getClassExtendsDec();
         if (extendsDec == null) return false;
 
         ALittleClassNameDec nameDec = extendsDec.getClassNameDec();
         if (nameDec == null) return false;
 
-        GuessTypeInfo guessType = nameDec.guessType();
-        if (guessType.value.equals(parent)) return true;
+        ALittleGuess guess = nameDec.guessType();
+        if (guess.value.equals(parent)) return true;
 
-        return IsClassSuper(guessType.element, parent);
+        if (!(guess instanceof ALittleGuessClass)) return false;
+        ALittleGuessClass guessClass = (ALittleGuessClass)guess;
+
+        return IsClassSuper(guessClass.element, parent);
     }
 
     // 判断 parent是否是child的父类
-    public static boolean IsStructSuper(PsiElement child, PsiElement parent) throws ALittleReferenceException {
+    public static boolean IsStructSuper(PsiElement child, @NotNull String parent) throws ALittleGuessException {
         if (!(child instanceof ALittleStructDec)) return false;
         ALittleStructDec childStruct = (ALittleStructDec)child;
 
@@ -210,10 +72,13 @@ public class ALittleReferenceUtil {
         ALittleStructNameDec nameDec = extendsDec.getStructNameDec();
         if (nameDec == null) return false;
 
-        GuessTypeInfo guessType = nameDec.guessType();
-        if (guessType.element.equals(parent)) return true;
+        ALittleGuess guess = nameDec.guessType();
+        if (guess.value.equals(parent)) return true;
 
-        return IsStructSuper(guessType.element, parent);
+        if (!(guess instanceof ALittleGuessStruct)) return false;
+        ALittleGuessStruct guessStruct = (ALittleGuessStruct)guess;
+
+        return IsStructSuper(guessStruct.element, parent);
     }
 
     // 创建引用对象

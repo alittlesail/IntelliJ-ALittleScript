@@ -11,8 +11,8 @@ import static plugin.psi.ALittleTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import plugin.psi.*;
 import com.intellij.psi.PsiReference;
-import plugin.reference.ALittleReferenceUtil.GuessTypeInfo;
-import plugin.reference.ALittleReferenceUtil.ALittleReferenceException;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 
 public class ALittleConstValueImpl extends ASTWrapperPsiElement implements ALittleConstValue {
 
@@ -43,13 +43,13 @@ public class ALittleConstValueImpl extends ASTWrapperPsiElement implements ALitt
 
   @Override
   @NotNull
-  public GuessTypeInfo guessType() throws ALittleReferenceException {
+  public ALittleGuess guessType() throws ALittleGuessException {
     return ALittlePsiImplUtil.guessType(this);
   }
 
   @Override
   @NotNull
-  public List<GuessTypeInfo> guessTypes() throws ALittleReferenceException {
+  public List<ALittleGuess> guessTypes() throws ALittleGuessException {
     return ALittlePsiImplUtil.guessTypes(this);
   }
 

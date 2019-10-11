@@ -13,7 +13,7 @@ public class ALittleVarAssignDecReference extends ALittleReference<ALittleVarAss
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getAllType() != null) {
             return myElement.getAllType().guessTypes();
         } else if (myElement.getAutoType() != null) {

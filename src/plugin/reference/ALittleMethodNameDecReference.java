@@ -22,14 +22,14 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
         PsiElement parent = myElement.getParent();
         // 处理getter
         if (parent instanceof ALittleClassGetterDec) {
             ALittleClassGetterDec classGetterDec = (ALittleClassGetterDec) parent;
 
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            ALittleGuess info = new ALittleGuess();
             info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
             info.value = "Functor<(";
             info.element = classGetterDec;
@@ -39,7 +39,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             info.functorReturnList = new ArrayList<>();
 
             // 第一个参数是类
-            ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classGetterDec.getParent()).guessType();
+            ALittleGuess classGuessInfo = ((ALittleClassDec)classGetterDec.getParent()).guessType();
             info.functorParamList.add(classGuessInfo);
             info.functorParamNameList.add(classGuessInfo.value);
             info.value += classGuessInfo.value + ")";
@@ -47,8 +47,8 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             List<String> typeList = new ArrayList<>();
             // 添加返回值列表
             ALittleAllType allType = classGetterDec.getAllType();
-            if (allType == null) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "指向的getter函数没有定义返回值");
-            ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+            if (allType == null) throw new ALittleGuessException(myElement, "指向的getter函数没有定义返回值");
+            ALittleGuess GuessInfo = allType.guessType();
             typeList.add(GuessInfo.value);
             info.functorReturnList.add(GuessInfo);
 
@@ -58,7 +58,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         } else if (parent instanceof ALittleClassSetterDec) {
             ALittleClassSetterDec classSetterDec = (ALittleClassSetterDec) parent;
 
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            ALittleGuess info = new ALittleGuess();
             info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
             info.value = "Functor<(";
             info.element = classSetterDec;
@@ -69,7 +69,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
             List<String> typeList = new ArrayList<>();
             // 第一个参数是类
-            ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec) classSetterDec.getParent()).guessType();
+            ALittleGuess classGuessInfo = ((ALittleClassDec) classSetterDec.getParent()).guessType();
             typeList.add(classGuessInfo.value);
             info.functorParamList.add(classGuessInfo);
             info.functorParamNameList.add(classGuessInfo.value);
@@ -77,9 +77,9 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             // 添加参数列表
             ALittleMethodParamOneDec oneDec = classSetterDec.getMethodParamOneDec();
             if (oneDec == null)
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "指向的setter函数没有定义参数");
+                throw new ALittleGuessException(myElement, "指向的setter函数没有定义参数");
 
-            ALittleReferenceUtil.GuessTypeInfo guessInfo = oneDec.getAllType().guessType();
+            ALittleGuess guessInfo = oneDec.getAllType().guessType();
             typeList.add(guessInfo.value);
             info.functorParamList.add(guessInfo);
             if (oneDec.getMethodParamNameDec() != null) {
@@ -94,7 +94,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         } else if (parent instanceof ALittleClassMethodDec) {
             ALittleClassMethodDec classMethodDec = (ALittleClassMethodDec) parent;
 
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            ALittleGuess info = new ALittleGuess();
             info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
             info.value = "Functor<(";
             info.element = classMethodDec;
@@ -108,7 +108,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
             List<String> typeList = new ArrayList<>();
             // 第一个参数是类
-            ALittleReferenceUtil.GuessTypeInfo classGuessInfo = ((ALittleClassDec)classMethodDec.getParent()).guessType();
+            ALittleGuess classGuessInfo = ((ALittleClassDec)classMethodDec.getParent()).guessType();
             typeList.add(classGuessInfo.value);
             info.functorParamList.add(classGuessInfo);
             info.functorParamNameList.add(classGuessInfo.value);
@@ -119,7 +119,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
                 for (ALittleMethodParamOneDec oneDec : oneDecList) {
                     ALittleAllType allType = oneDec.getAllType();
-                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                    ALittleGuess GuessInfo = allType.guessType();
                     typeList.add(GuessInfo.value);
                     info.functorParamList.add(GuessInfo);
                     if (oneDec.getMethodParamNameDec() != null) {
@@ -141,7 +141,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             if (returnDec != null) {
                 List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
                 for (ALittleAllType allType : allTypeList) {
-                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                    ALittleGuess GuessInfo = allType.guessType();
                     typeList.add(GuessInfo.value);
                     info.functorReturnList.add(GuessInfo);
                 }
@@ -152,7 +152,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         } else if (parent instanceof ALittleClassStaticDec) {
             ALittleClassStaticDec classStaticDec = (ALittleClassStaticDec) parent;
 
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            ALittleGuess info = new ALittleGuess();
             info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
             info.value = "Functor<(";
             info.element = classStaticDec;
@@ -170,7 +170,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
                 for (ALittleMethodParamOneDec oneDec : oneDecList) {
                     ALittleAllType allType = oneDec.getAllType();
-                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                    ALittleGuess GuessInfo = allType.guessType();
                     typeList.add(GuessInfo.value);
                     info.functorParamList.add(GuessInfo);
                     if (oneDec.getMethodParamNameDec() != null) {
@@ -191,7 +191,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             if (returnDec != null) {
                 List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
                 for (ALittleAllType allType : allTypeList) {
-                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                    ALittleGuess GuessInfo = allType.guessType();
                     typeList.add(GuessInfo.value);
                     info.functorReturnList.add(GuessInfo);
                 }
@@ -202,7 +202,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         } else if (parent instanceof ALittleGlobalMethodDec) {
             ALittleGlobalMethodDec globalMethodDec = (ALittleGlobalMethodDec) parent;
 
-            ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+            ALittleGuess info = new ALittleGuess();
             info.type = ALittleReferenceUtil.GuessType.GT_FUNCTOR;
             info.value = "Functor<(";
             info.element = globalMethodDec;
@@ -220,7 +220,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
                 for (ALittleMethodParamOneDec oneDec : oneDecList) {
                     ALittleAllType allType = oneDec.getAllType();
-                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                    ALittleGuess GuessInfo = allType.guessType();
                     typeList.add(GuessInfo.value);
                     info.functorParamList.add(GuessInfo);
                     if (oneDec.getMethodParamNameDec() != null) {
@@ -241,7 +241,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             if (returnDec != null) {
                 List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
                 for (ALittleAllType allType : allTypeList) {
-                    ALittleReferenceUtil.GuessTypeInfo GuessInfo = allType.guessType();
+                    ALittleGuess GuessInfo = allType.guessType();
                     typeList.add(GuessInfo.value);
                     info.functorReturnList.add(GuessInfo);
                 }
@@ -254,7 +254,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         return guessList;
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         if (!(parent.getParent() instanceof ALittleClassDec)) return;
         ALittleClassDec classDec = (ALittleClassDec)parent.getParent();
@@ -279,13 +279,13 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         if (!(result instanceof ALittleMethodNameDec)) return;
         ALittleMethodNameDec methodNameDec = (ALittleMethodNameDec)result;
 
-        ALittleReferenceUtil.GuessTypeInfo myGuessTypeInfo = guessTypes().get(0);
+        ALittleGuess myGuessTypeInfo = guessTypes().get(0);
         if (myGuessTypeInfo == null) return;
-        ALittleReferenceUtil.GuessTypeInfo extendsGuessTypeInfo = methodNameDec.guessType();
+        ALittleGuess extendsGuessTypeInfo = methodNameDec.guessType();
         try {
             ALittleReferenceOpUtil.guessTypeEqual(methodNameDec, extendsGuessTypeInfo, myElement, myGuessTypeInfo);
-        } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "该函数是从父类继承下来，但是定义不一致");
+        } catch (ALittleGuessException ignored) {
+            throw new ALittleGuessException(myElement, "该函数是从父类继承下来，但是定义不一致");
         }
     }
 

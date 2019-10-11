@@ -14,9 +14,9 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
-        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
+        ALittleGuess info = new ALittleGuess();
         info.type = ALittleReferenceUtil.GuessType.GT_CLASS_TEMPLATE;
         info.value = myElement.getIdContent().getText();
         info.element = myElement;
@@ -24,7 +24,7 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
         if (allType != null) {
             info.classTemplateExtends = allType.guessType();
             if (info.classTemplateExtends.type != ALittleReferenceUtil.GuessType.GT_CLASS) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(allType, "继承的对象必须是一个类");
+                throw new ALittleGuessException(allType, "继承的对象必须是一个类");
             }
         }
 
@@ -32,16 +32,16 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
         return guessList;
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         if (myElement.getIdContent().getText().startsWith("___")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "局部变量名不能以3个下划线开头");
+            throw new ALittleGuessException(myElement, "局部变量名不能以3个下划线开头");
         }
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
+        List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+            throw new ALittleGuessException(myElement, "未知类型");
         } else if (guessList.size() != 1) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+            throw new ALittleGuessException(myElement, "重复定义");
         }
     }
 }

@@ -16,50 +16,50 @@ public class ALittleThrowExprReference extends ALittleReference<ALittleThrowExpr
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "throw表达式不能没有参数");
+            throw new ALittleGuessException(myElement, "throw表达式不能没有参数");
         }
 
         if (valueStatList.size() != 1)
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "throw只有string一个参数");
+            throw new ALittleGuessException(myElement, "throw只有string一个参数");
 
         ALittleValueStat valueStat = valueStatList.get(0);
-        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
+        ALittleGuess guessInfo = valueStat.guessType();
         if (!guessInfo.value.equals("string")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "throw表达式第一个参数必须是string类型");
+            throw new ALittleGuessException(valueStat, "throw表达式第一个参数必须是string类型");
         }
 
         return new ArrayList<>();
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "throw表达式不能没有参数");
+            throw new ALittleGuessException(myElement, "throw表达式不能没有参数");
         }
 
         if (valueStatList.size() != 1)
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "throw只有string一个参数");
+            throw new ALittleGuessException(myElement, "throw只有string一个参数");
 
         ALittleValueStat valueStat = valueStatList.get(0);
-        ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
+        ALittleGuess guessInfo = valueStat.guessType();
         if (!guessInfo.value.equals("string")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(valueStat, "throw表达式第一个参数必须是string类型");
+            throw new ALittleGuessException(valueStat, "throw表达式第一个参数必须是string类型");
         }
     }
 
     @NotNull
-    public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         List<InlayInfo> result = new ArrayList<>();
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "throw表达式不能没有参数");
+            throw new ALittleGuessException(myElement, "throw表达式不能没有参数");
         }
 
         if (valueStatList.size() != 1)
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "throw只有string一个参数");
+            throw new ALittleGuessException(myElement, "throw只有string一个参数");
 
         // 构建对象
         for (int i = 0; i < valueStatList.size(); ++i) {

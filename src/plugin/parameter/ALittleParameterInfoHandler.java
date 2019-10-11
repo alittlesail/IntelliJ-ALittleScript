@@ -7,6 +7,9 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessFunctor;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
 import plugin.reference.ALittleReferenceUtil;
@@ -38,14 +41,15 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
         ALittlePropertyValueMethodCallReference reference = (ALittlePropertyValueMethodCallReference)ref;
 
         try {
-            ALittleReferenceUtil.GuessTypeInfo preType = reference.guessPreType();
-            if (preType.type != ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
+            ALittleGuess preType = reference.guessPreType();
+            if (!(preType instanceof ALittleGuessFunctor)) {
                 return null;
             }
+            ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
             List<String> list = new ArrayList<>();
-            list.add(String.join(", ", preType.functorParamNameList));
+            list.add(String.join(", ", preTypeFunctor.functorParamNameList));
             context.setItemsToShow(list.toArray());
-        } catch (ALittleReferenceUtil.ALittleReferenceException e) {
+        } catch (ALittleGuessException e) {
             return null;
         }
 

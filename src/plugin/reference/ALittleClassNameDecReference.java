@@ -11,6 +11,9 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessClass;
+import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleClassDec;
@@ -36,8 +39,8 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
         PsiElement parent = myElement.getParent();
 
         // 如果直接就是定义，那么直接获取
@@ -47,16 +50,20 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
         } else if (parent instanceof ALittleClassExtendsDec) {
             List<PsiElement> classNameDecList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
                     PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
-            if (classNameDecList.isEmpty()) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "找不到类, namespace:" + mNamespace + ", key:" + mKey);
+            if (classNameDecList.isEmpty()) throw new ALittleGuessException(myElement, "找不到类, namespace:" + mNamespace + ", key:" + mKey);
             for (PsiElement classNameDec : classNameDecList) {
-                ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleClassNameDec)classNameDec).guessType();
-                if (guessInfo.classTemplateList != null && !guessInfo.classTemplateList.isEmpty()) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "不能继承于一个模板类, namespace:" + mNamespace + ", key:" + mKey);
+                ALittleGuess guess = ((ALittleClassNameDec)classNameDec).guessType();
+                if (!(guess instanceof ALittleGuessClass)) {
+                    throw new ALittleGuessException(myElement, "不能继承于一个模板类, namespace:" + mNamespace + ", key:" + mKey);
                 }
-                guessList.add(guessInfo);
+                ALittleGuessClass guessClass = (ALittleGuessClass)guess;
+                if (!guessClass.templateList.isEmpty()) {
+                    throw new ALittleGuessException(myElement, "不能继承于一个模板类, namespace:" + mNamespace + ", key:" + mKey);
+                }
+                guessList.add(guess);
             }
         } else {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleClassNameDec出现未知的父节点");
+            throw new ALittleGuessException(myElement, "ALittleClassNameDec出现未知的父节点");
         }
 
         return guessList;
@@ -90,16 +97,16 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
         return variants.toArray();
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         if (myElement.getText().startsWith("___")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "类名不能以3个下划线开头");
+            throw new ALittleGuessException(myElement, "类名不能以3个下划线开头");
         }
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
+        List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+            throw new ALittleGuessException(myElement, "未知类型");
         } else if (guessList.size() != 1) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "重复定义");
+            throw new ALittleGuessException(myElement, "重复定义");
         }
     }
 

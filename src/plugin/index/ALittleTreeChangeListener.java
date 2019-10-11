@@ -5,6 +5,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
+import plugin.guess.ALittleGuess;
 import plugin.psi.*;
 import plugin.reference.ALittleReferenceUtil;
 
@@ -31,24 +32,24 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         return listener;
     }
 
-    public static List<ALittleReferenceUtil.GuessTypeInfo> getGuessTypeList(@NotNull PsiElement element) {
+    public static List<ALittleGuess> getGuessTypeList(@NotNull PsiElement element) {
         ALittleTreeChangeListener listener = getListener(element.getProject());
         if (listener == null) return null;
 
         PsiFile psiFile = element.getContainingFile();
         if (psiFile == null) return null;
         psiFile = psiFile.getOriginalFile();
-        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(psiFile);
+        Map<PsiElement, List<ALittleGuess>> map = listener.mGuessTypeMap.get(psiFile);
         if (map == null) return null;
 
         return map.get(element);
     }
 
-    public static void putGuessTypeList(@NotNull PsiElement element, @NotNull List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList) {
+    public static void putGuessTypeList(@NotNull PsiElement element, @NotNull List<ALittleGuess> guessTypeList) {
         ALittleTreeChangeListener listener = getListener(element.getProject());
         if (listener == null) return;
 
-        Map<PsiElement, List<ALittleReferenceUtil.GuessTypeInfo>> map = listener.mGuessTypeMap.get(element.getContainingFile().getOriginalFile());
+        Map<PsiElement, List<ALittleGuess>> map = listener.mGuessTypeMap.get(element.getContainingFile().getOriginalFile());
         if (map == null) {
             map = new HashMap<>();
             listener.mGuessTypeMap.put(element.getContainingFile().getOriginalFile(), map);

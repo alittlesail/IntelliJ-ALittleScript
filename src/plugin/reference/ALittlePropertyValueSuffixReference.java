@@ -14,7 +14,7 @@ public class ALittlePropertyValueSuffixReference extends ALittleReference<ALittl
 
     // 获取返回值类型
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getPropertyValueMethodCall() != null) {
             return myElement.getPropertyValueMethodCall().guessTypes();
         } else if (myElement.getPropertyValueDotId() != null) {

@@ -8,6 +8,8 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.alittle.PsiHelper;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -23,28 +25,28 @@ public abstract class ALittleReference<T extends PsiElement> extends PsiReferenc
         mNamespace = PsiHelper.getNamespaceName(element);
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
     }
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
     }
 
     @NotNull
-    public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         return new ArrayList<>();
     }
 
     @NotNull
-    public ALittleReferenceUtil.GuessTypeInfo guessType() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = guessTypes();
+    public ALittleGuess guessType() throws ALittleGuessException {
+        List<ALittleGuess> guessList = guessTypes();
         if (guessList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "无法计算出该元素属于什么类型");
+            throw new ALittleGuessException(myElement, "无法计算出该元素属于什么类型");
         }
         return guessList.get(0);
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         return new ArrayList<>();
     }
 

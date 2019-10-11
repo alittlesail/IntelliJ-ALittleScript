@@ -13,7 +13,7 @@ public class ALittlePropertyValueReference extends ALittleReference<ALittlePrope
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittlePropertyValueSuffix> suffixList = myElement.getPropertyValueSuffixList();
         if (suffixList.isEmpty()) {
             return myElement.getPropertyValueFirstType().guessTypes();

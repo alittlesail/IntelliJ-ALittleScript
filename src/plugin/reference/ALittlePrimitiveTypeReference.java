@@ -13,8 +13,8 @@ public class ALittlePrimitiveTypeReference extends ALittleReference<ALittlePrimi
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get(myElement.getText());
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get(myElement.getText());
         if (guessTypeList == null) guessTypeList = new ArrayList<>();
         return guessTypeList;
     }

@@ -24,7 +24,7 @@ public class ALittleParameterHintsProvider implements InlayParameterHintsProvide
             if (ref instanceof ALittleReferenceInterface) {
                 return ((ALittleReferenceInterface) ref).getParameterHints();
             }
-        } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+        } catch (ALittleGuessException ignored) {
         }
         return new ArrayList<>();
     }

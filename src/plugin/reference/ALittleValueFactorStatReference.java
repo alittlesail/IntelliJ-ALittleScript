@@ -13,7 +13,7 @@ public class ALittleValueFactorStatReference extends ALittleReference<ALittleVal
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleReferenceUtil.ALittleGuessException {
         if (myElement.getPropertyValue() != null) {
             return myElement.getPropertyValue().guessTypes();
         } else if (myElement.getReflectValue() != null) {

@@ -14,8 +14,8 @@ public class ALittleTemplateDecReference extends ALittleReference<ALittleTemplat
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
 
         List<ALittleTemplatePairDec> pairDecList = myElement.getTemplatePairDecList();
         for (ALittleTemplatePairDec pairDec : pairDecList) {

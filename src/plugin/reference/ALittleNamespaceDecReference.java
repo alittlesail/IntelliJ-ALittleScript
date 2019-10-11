@@ -14,18 +14,18 @@ public class ALittleNamespaceDecReference extends ALittleReference<ALittleNamesp
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleNamespaceNameDec namespaceNameDec = myElement.getNamespaceNameDec();
         if (namespaceNameDec == null) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "没有定义命名域");
+            throw new ALittleGuessException(myElement, "没有定义命名域");
         }
 
-        ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
+        ALittleGuess info = new ALittleGuess();
         info.type = ALittleReferenceUtil.GuessType.GT_NAMESPACE;
         info.value = namespaceNameDec.getIdContent().getText();
         info.element = myElement;
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        List<ALittleGuess> guessList = new ArrayList<>();
         guessList.add(info);
         return guessList;
     }

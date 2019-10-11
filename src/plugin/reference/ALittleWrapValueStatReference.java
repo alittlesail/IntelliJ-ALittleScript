@@ -12,7 +12,7 @@ public class ALittleWrapValueStatReference extends ALittleReference<ALittleWrapV
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         return myElement.getValueStat().guessTypes();
     }
 }

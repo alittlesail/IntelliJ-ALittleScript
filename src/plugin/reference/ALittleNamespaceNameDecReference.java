@@ -21,8 +21,8 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
 
         List<ALittleNamespaceNameDec> nameDecList = ALittleTreeChangeListener.findNamespaceNameDecList(myElement.getProject(), mKey);
         for (ALittleNamespaceNameDec nameDec : nameDecList) {
@@ -32,14 +32,14 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
         return guessList;
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         if (myElement.getText().startsWith("___")) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "命名域不能以3个下划线开头");
+            throw new ALittleGuessException(myElement, "命名域不能以3个下划线开头");
         }
 
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = myElement.guessTypes();
+        List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知类型");
+            throw new ALittleGuessException(myElement, "未知类型");
         }
     }
 

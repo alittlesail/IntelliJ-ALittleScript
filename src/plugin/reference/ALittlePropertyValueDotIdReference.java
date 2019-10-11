@@ -13,7 +13,7 @@ public class ALittlePropertyValueDotIdReference extends ALittleReference<ALittle
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getPropertyValueDotIdName() != null) {
             return myElement.getPropertyValueDotIdName().guessTypes();
         }

@@ -7,6 +7,10 @@ import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessConst;
+import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessPrimitive;
 import plugin.psi.ALittleConstValue;
 
 import java.util.ArrayList;
@@ -18,21 +22,21 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessTypeList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessTypeList = new ArrayList<>();
         if (myElement.getDigitContent() != null) {
             if (PsiHelper.isInt(myElement.getDigitContent().getText()))
-                guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("int");
+                guessTypeList = ALittleGuessPrimitive.sPrimitiveGuessMap.get("int");
             else
-                guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("double");
+                guessTypeList = ALittleGuessPrimitive.sPrimitiveGuessMap.get("double");
         } else if (myElement.getStringContent() != null) {
-            guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("string");
+            guessTypeList = ALittleGuessPrimitive.sPrimitiveGuessMap.get("string");
         } else if (myElement.getText().equals("true") || myElement.getText().equals("false")) {
-            guessTypeList = ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("bool");
+            guessTypeList = ALittleGuessPrimitive.sPrimitiveGuessMap.get("bool");
         } else if (myElement.getText().equals("null")) {
-            guessTypeList = ALittleReferenceUtil.sConstNullGuessType;
+            guessTypeList = ALittleGuessConst.sConstNullGuess;
         } else {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "未知的常量类型:" + myElement.getText());
+            throw new ALittleGuessException(myElement, "未知的常量类型:" + myElement.getText());
         }
         return guessTypeList;
     }

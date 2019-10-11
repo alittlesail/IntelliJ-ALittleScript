@@ -4,6 +4,7 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.*;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -15,8 +16,8 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
+        List<ALittleGuess> guessList = new ArrayList<>();
 
         PsiElement parent = myElement.getParent();
         // 处理定义并且赋值
@@ -27,16 +28,16 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
             // 获取等号右边的表达式
             ALittleValueStat valueStat = varAssignExpr.getValueStat();
             if (valueStat == null) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "auto 没有赋值对象，无法推导类型");
+                throw new ALittleGuessException(myElement, "auto 没有赋值对象，无法推导类型");
             }
             // 获取等号坐标的变量定义列表
             List<ALittleVarAssignDec> pairDecList = varAssignExpr.getVarAssignDecList();
             // 计算当前是第几个参数
             int index = pairDecList.indexOf(varAssignDec);
             // 获取函数对应的那个返回值类型
-            List<ALittleReferenceUtil.GuessTypeInfo> methodCallGuessList = valueStat.guessTypes();
+            List<ALittleGuess> methodCallGuessList = valueStat.guessTypes();
             if (index >= methodCallGuessList.size()) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "auto 没有赋值对象，无法推导类型");
+                throw new ALittleGuessException(myElement, "auto 没有赋值对象，无法推导类型");
             }
 
             guessList.add(methodCallGuessList.get(index));
@@ -50,52 +51,52 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
                 // 取出遍历的对象
                 ALittleValueStat valueStat = inExpr.getValueStat();
                 if (valueStat == null) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "For没有遍历对象，auto 无法推导类型");
+                    throw new ALittleGuessException(myElement, "For没有遍历对象，auto 无法推导类型");
                 }
 
                 // 获取定义列表
                 List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
                 int index = pairDecList.indexOf(forPairDec);
                 // 获取循环对象的类型
-                ALittleReferenceUtil.GuessTypeInfo guessInfo = valueStat.guessType();
+                ALittleGuess guess = valueStat.guessType();
                 // 处理List
-                if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_LIST) {
+                if (guess instanceof ALittleGuessList) {
                     // 对于List的key使用auto，那么就默认是int类型
                     if (index == 0) {
-                        return ALittleReferenceUtil.sPrimitiveGuessTypeMap.get("int");
+                        return ALittleGuessPrimitive.sPrimitiveGuessMap.get("int");
                     } else if (index == 1) {
-                        guessList.add(guessInfo.listSubType);
+                        guessList.add(((ALittleGuessList)guess).subType);
                     }
                     // 处理Map
-                } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_MAP) {
+                } else if (guess instanceof ALittleGuessMap) {
                     // 如果是key，那么就取key的类型
                     if (index == 0) {
-                        guessList.add(guessInfo.mapKeyType);
+                        guessList.add(((ALittleGuessMap)guess).keyType);
                         // 如果是value，那么就取value的类型
                     } else if (index == 1) {
-                        guessList.add(guessInfo.mapValueType);
+                        guessList.add(((ALittleGuessMap)guess).valueType);
                     }
                 }
             } else if (parent instanceof ALittleForStartStat) {
                 ALittleForStartStat startStat = (ALittleForStartStat)parent;
                 ALittleValueStat valueStat = startStat.getValueStat();
                 if (valueStat == null) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "auto没有赋值对象，无法推导类型");
+                    throw new ALittleGuessException(myElement, "auto没有赋值对象，无法推导类型");
                 }
                 return valueStat.guessTypes();
             }
         } else {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "ALittleAutoType出现未知的父节点");
+            throw new ALittleGuessException(myElement, "ALittleAutoType出现未知的父节点");
         }
 
         return guessList;
     }
 
     @NotNull
-    public List<InlayInfo> getParameterHints() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         List<InlayInfo> result = new ArrayList<>();
         // 获取类型
-        ALittleReferenceUtil.GuessTypeInfo guessType = myElement.guessType();
+        ALittleGuess guessType = myElement.guessType();
 
         // 如果是定义并赋值
         if (myElement.getParent() instanceof ALittleVarAssignDec) {

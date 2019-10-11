@@ -16,7 +16,7 @@ public class ALittleReflectValueReference extends ALittleReference<ALittleReflec
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement element = ALittleTreeChangeListener.findALittleNameDec(myElement.getProject(),
                 PsiHelper.PsiElementType.STRUCT_NAME, null, "ALittle", "ReflectInfo", true);
         if (element instanceof ALittleStructNameDec) {
@@ -25,34 +25,34 @@ public class ALittleReflectValueReference extends ALittleReference<ALittleReflec
         return new ArrayList<>();
     }
 
-    public void checkError() throws ALittleReferenceUtil.ALittleReferenceException {
+    public void checkError() throws ALittleGuessException {
         ALittleCustomType customType = myElement.getCustomType();
         if (customType == null) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "没有指定反射对象");
+            throw new ALittleGuessException(myElement, "没有指定反射对象");
         }
 
-        ALittleReferenceUtil.GuessTypeInfo guessType = customType.guessType();
+        ALittleGuess guessType = customType.guessType();
         if (guessType.type != ALittleReferenceUtil.GuessType.GT_STRUCT) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "反射对象必须是一个struct");
+            throw new ALittleGuessException(myElement, "反射对象必须是一个struct");
         }
 
         checkStructExtends((ALittleStructDec)guessType.element);
     }
 
-    private void checkStructExtends(@NotNull ALittleStructDec dec) throws ALittleReferenceUtil.ALittleReferenceException {
+    private void checkStructExtends(@NotNull ALittleStructDec dec) throws ALittleGuessException {
         if (dec.getStructExtendsDec() != null) {
-            throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "反射对象不能使用具有继承的struct");
+            throw new ALittleGuessException(myElement, "反射对象不能使用具有继承的struct");
         }
 
         List<ALittleStructVarDec> varDecList = dec.getStructVarDecList();
         for (ALittleStructVarDec varDec : varDecList) {
-            ALittleReferenceUtil.GuessTypeInfo guessInfo = varDec.guessType();
+            ALittleGuess guessInfo = varDec.guessType();
             if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
                 checkStructExtends((ALittleStructDec)guessInfo.element);
             } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "反射对象内部不能使用类");
+                throw new ALittleGuessException(myElement, "反射对象内部不能使用类");
             } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_FUNCTOR) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "反射对象内部不能使用函数");
+                throw new ALittleGuessException(myElement, "反射对象内部不能使用函数");
             }
         }
     }

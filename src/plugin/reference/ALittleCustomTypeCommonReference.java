@@ -11,6 +11,10 @@ import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessClass;
+import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessStruct;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
@@ -34,20 +38,20 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
     }
 
     @NotNull
-    public List<ALittleReferenceUtil.GuessTypeInfo> guessTypes() throws ALittleReferenceUtil.ALittleReferenceException {
+    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         Project project = myElement.getProject();
         PsiFile psiFile = myElement.getContainingFile().getOriginalFile();
-        List<ALittleReferenceUtil.GuessTypeInfo> guessList = new ArrayList<>();
+        List<ALittleGuess> guessList = new ArrayList<>();
 
         {
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
                     PsiHelper.PsiElementType.USING_NAME, psiFile, mNamespace, mKey, true);
             for (PsiElement dec : decList) {
-                ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleUsingNameDec)dec).guessType();
+                ALittleGuess guessInfo = ((ALittleUsingNameDec)dec).guessType();
                 guessList.add(guessInfo);
             }
             if (!decList.isEmpty() && !mCustomType.getAllTypeList().isEmpty()) {
-                throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "使用using定义的类不能再使用模板参数, namespace:" + mNamespace + ", key:" + mKey);
+                throw new ALittleGuessException(myElement, "使用using定义的类不能再使用模板参数, namespace:" + mNamespace + ", key:" + mKey);
             }
         }
         {
@@ -56,7 +60,7 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
 
             // 获取填充的内容，并计算类型
             List<ALittleAllType> templateList = mCustomType.getAllTypeList();
-            List<ALittleReferenceUtil.GuessTypeInfo> srcGuessList = new ArrayList<>();
+            List<ALittleGuess> srcGuessList = new ArrayList<>();
             for (ALittleAllType allType : templateList) {
                 srcGuessList.add(allType.guessType());
             }
@@ -64,38 +68,33 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
             // 遍历
             for (PsiElement dec : decList) {
                 // 获取模板参数，并把有类继承的拿出来比对，是否符合条件
-                ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleClassNameDec)dec).guessType();
-                List<ALittleReferenceUtil.GuessTypeInfo> templateGuessList = guessInfo.classTemplateList;
-                if (templateList.size() != templateGuessList.size()) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "模板参数数量和类定义的不一致, namespace:" + mNamespace + ", key:" + mKey);
+                ALittleGuess guess = ((ALittleClassNameDec)dec).guessType();
+                if (!(guess instanceof ALittleGuessClass))
+                    throw new ALittleGuessException(myElement, "模板参数数量和类定义的不一致, namespace:" + mNamespace + ", key:" + mKey);
+                ALittleGuessClass guessClass = (ALittleGuessClass)guess;
+                if (templateList.size() != guessClass.templateList.size()) {
+                    throw new ALittleGuessException(myElement, "模板参数数量和类定义的不一致, namespace:" + mNamespace + ", key:" + mKey);
                 }
                 for (int i = 0; i < templateList.size(); ++i) {
-                    ALittleReferenceOpUtil.guessTypeEqual(myElement, templateGuessList.get(i), myElement, srcGuessList.get(i));
+                    ALittleReferenceOpUtil.guessTypeEqual(myElement, guessClass.templateList.get(i), myElement, srcGuessList.get(i));
                 }
 
-                if (!templateGuessList.isEmpty()) {
-                    ALittleClassDec srcClassDec = (ALittleClassDec) guessInfo.element;
+                if (!guessClass.templateList.isEmpty()) {
+                    ALittleClassDec srcClassDec = guessClass.element;
                     ALittleClassNameDec srcClassNameDec = srcClassDec.getClassNameDec();
                     if (srcClassNameDec == null)
-                        throw new ALittleReferenceUtil.ALittleReferenceException(mCustomType, "类模板没有定义类名");
+                        throw new ALittleGuessException(mCustomType, "类模板没有定义类名");
 
-                    ALittleReferenceUtil.GuessTypeInfo info = new ALittleReferenceUtil.GuessTypeInfo();
-                    info.type = guessInfo.type;
-                    info.element = guessInfo.element;
-                    info.value = PsiHelper.getNamespaceName(srcClassDec) + "." + srcClassNameDec.getIdContent().getText();
-                    info.classTemplateList = new ArrayList<>();
-                    info.classTemplateList.addAll(guessInfo.classTemplateList);
-                    info.classTemplateMap = new HashMap<>();
-                    List<String> nameList = new ArrayList<>();
-                    for (int i = 0; i < templateGuessList.size(); ++i) {
-                        nameList.add(srcGuessList.get(i).value);
-                        info.classTemplateMap.put(templateGuessList.get(i).value, srcGuessList.get(i));
+                    ALittleGuessClass info = new ALittleGuessClass(guessClass.element);
+                    info.templateList.addAll(guessClass.templateList);
+                    for (int i = 0; i < guessClass.templateList.size(); ++i) {
+                        info.templateMap.put(guessClass.templateList.get(i).value, srcGuessList.get(i));
                     }
-                    info.value += "<" + String.join(",", nameList) + ">";
-                    guessInfo = info;
+                    info.UpdateValue(PsiHelper.getNamespaceName(srcClassDec), srcClassNameDec.getIdContent().getText());
+                    guess = info;
                 }
 
-                guessList.add(guessInfo);
+                guessList.add(guess);
             }
         }
         {
@@ -105,7 +104,7 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                 ALittleTreeChangeListener.findClassAttrList(classDec, PsiHelper.sAccessPrivateAndProtectedAndPublic, PsiHelper.ClassAttrType.TEMPLATE, mKey, decList);
                 // 不能再静态函数中使用模板定义
                 if (!decList.isEmpty() && PsiHelper.isInClassStaticMethod(myElement)) {
-                    throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "类静态函数不能使用模板符号");
+                    throw new ALittleGuessException(myElement, "类静态函数不能使用模板符号");
                 }
                 for (PsiElement dec : decList) {
                     guessList.add(((ALittleTemplatePairDec)dec).guessType());
@@ -127,7 +126,7 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
             }
         }
 
-        if (guessList.isEmpty()) throw new ALittleReferenceUtil.ALittleReferenceException(myElement, "找不到指定类型, namespace:" + mNamespace + ", key:" + mKey);
+        if (guessList.isEmpty()) throw new ALittleGuessException(myElement, "找不到指定类型, namespace:" + mNamespace + ", key:" + mKey);
 
         return guessList;
     }
@@ -194,13 +193,13 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                     PsiHelper.PsiElementType.USING_NAME, psiFile, mNamespace, "", true);
             for (PsiElement dec : decList) {
                 try {
-                    ALittleReferenceUtil.GuessTypeInfo guessInfo = ((ALittleUsingNameDec)dec).guessType();
-                    if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_CLASS) {
+                    ALittleGuess guess = ((ALittleUsingNameDec)dec).guessType();
+                    if (guess instanceof ALittleGuessClass) {
                         variants.add(LookupElementBuilder.create(dec.getText()).
                                 withIcon(ALittleIcons.CLASS).
                                 withTypeText(dec.getContainingFile().getName())
                         );
-                    } else if (guessInfo.type == ALittleReferenceUtil.GuessType.GT_STRUCT) {
+                    } else if (guess instanceof ALittleGuessStruct) {
                         variants.add(LookupElementBuilder.create(dec.getText()).
                                 withIcon(ALittleIcons.STRUCT).
                                 withTypeText(dec.getContainingFile().getName())
@@ -211,7 +210,7 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                                 withTypeText(dec.getContainingFile().getName())
                         );
                     }
-                } catch (ALittleReferenceUtil.ALittleReferenceException ignored) {
+                } catch (ALittleGuessException ignored) {
                     variants.add(LookupElementBuilder.create(dec.getText()).
                             withIcon(ALittleIcons.CLASS).
                             withTypeText(dec.getContainingFile().getName())
