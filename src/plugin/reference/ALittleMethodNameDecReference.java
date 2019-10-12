@@ -8,9 +8,7 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
-import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessException;
-import plugin.guess.ALittleGuessFunctor;
+import plugin.guess.*;
 import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
@@ -151,33 +149,118 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
             ALittleGuessFunctor info = new ALittleGuessFunctor(globalMethodDec);
             info.functorAwait = globalMethodDec.getCoModifier() != null && globalMethodDec.getCoModifier().getText().equals("await");
+            if (globalMethodDec.getProtoModifier() != null) {
+                PsiElement error = globalMethodDec.getMethodNameDec();
+                if (error == null) {
+                    error = globalMethodDec;
+                }
 
-            ALittleMethodParamDec paramDec = globalMethodDec.getMethodParamDec();
-            if (paramDec != null) {
+                // 如果是带协议注解，那么一定是一个await
+                info.functorAwait = true;
+                info.functorProto = globalMethodDec.getProtoModifier().getText();
+
+                ALittleMethodParamDec paramDec = globalMethodDec.getMethodParamDec();
+                if (paramDec == null) throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数必须是两个参数");
                 List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
-                for (ALittleMethodParamOneDec oneDec : oneDecList) {
-                    ALittleAllType allType = oneDec.getAllType();
-                    info.functorParamList.add(allType.guessType());
-                    if (oneDec.getMethodParamNameDec() != null) {
-                        info.functorParamNameList.add(oneDec.getMethodParamNameDec().getIdContent().getText());
-                    } else {
-                        info.functorParamNameList.add("");
+                if (oneDecList.size() != 2) throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数必须是两个参数");
+                ALittleGuess guess = oneDecList.get(1).getAllType().guessType();
+                if (!(guess instanceof ALittleGuessStruct)) throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数第二个参数必须是struct");
+
+                if (info.functorProto.equals("@Http")) {
+                    PsiElement element = ALittleTreeChangeListener.findALittleNameDec(myElement.getProject(), PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), "ALittle", "IHttpSender", true);
+                    if (!(element instanceof ALittleClassNameDec)) throw new ALittleGuessException(error, "语言框架中找不到ALittle.IHttpSender");
+                    ALittleClassNameDec classNameDec = (ALittleClassNameDec)element;
+                    info.functorParamList.add(classNameDec.guessType());
+                    info.functorParamNameList.add("sender");
+                    info.functorParamList.add(guess);
+                    info.functorParamNameList.add("param");
+
+                    ALittleMethodReturnDec returnDec = globalMethodDec.getMethodReturnDec();
+                    if (returnDec == null) throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数返回值必须是struct");
+                    List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
+                    if (allTypeList.size() != 1) throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数返回值有且仅有一个struct");
+                    ALittleGuess returnGuess = allTypeList.get(0).guessType();
+                    if (!(returnGuess instanceof ALittleGuessStruct)) throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数返回值必须是struct");
+                    info.functorReturnList.add(ALittleGuessPrimitive.sStringGuess);
+                    info.functorReturnList.add(returnGuess);
+                } else if (info.functorProto.equals("@HttpDownload")) {
+                    PsiElement element = ALittleTreeChangeListener.findALittleNameDec(myElement.getProject(), PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), "ALittle", "IHttpFileSender", true);
+                    if (!(element instanceof ALittleClassNameDec)) throw new ALittleGuessException(error, "语言框架中找不到ALittle.IHttpFileSender");
+                    ALittleClassNameDec classNameDec = (ALittleClassNameDec)element;
+                    info.functorParamList.add(classNameDec.guessType());
+                    info.functorParamNameList.add("sender");
+                    info.functorParamList.add(guess);
+                    info.functorParamNameList.add("param");
+
+                    info.functorReturnList.add(ALittleGuessPrimitive.sStringGuess);
+                } else if (info.functorProto.equals("@HttpUpload")) {
+                    PsiElement element = ALittleTreeChangeListener.findALittleNameDec(myElement.getProject(), PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), "ALittle", "IHttpFileSender", true);
+                    if (!(element instanceof ALittleClassNameDec)) throw new ALittleGuessException(error, "语言框架中找不到ALittle.IHttpFileSender");
+                    ALittleClassNameDec classNameDec = (ALittleClassNameDec)element;
+                    info.functorParamList.add(classNameDec.guessType());
+                    info.functorParamNameList.add("sender");
+                    info.functorParamList.add(guess);
+                    info.functorParamNameList.add("param");
+
+                    ALittleMethodReturnDec returnDec = globalMethodDec.getMethodReturnDec();
+                    if (returnDec == null) throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数返回值必须是struct");
+                    List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
+                    if (allTypeList.size() != 1) throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数返回值有且仅有一个struct");
+                    ALittleGuess returnGuess = allTypeList.get(0).guessType();
+                    if (!(returnGuess instanceof ALittleGuessStruct)) throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数返回值必须是struct");
+                    info.functorReturnList.add(ALittleGuessPrimitive.sStringGuess);
+                    info.functorReturnList.add(returnGuess);
+                } else if (info.functorProto.equals("@Msg")) {
+                    PsiElement element = ALittleTreeChangeListener.findALittleNameDec(myElement.getProject(), PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), "ALittle", "IMsgCommon", true);
+                    if (!(element instanceof ALittleClassNameDec)) throw new ALittleGuessException(error, "语言框架中找不到ALittle.IMsgCommon");
+                    ALittleClassNameDec classNameDec = (ALittleClassNameDec)element;
+                    info.functorParamList.add(classNameDec.guessType());
+                    info.functorParamNameList.add("sender");
+                    info.functorParamList.add(guess);
+                    info.functorParamNameList.add("param");
+
+                    ALittleMethodReturnDec returnDec = globalMethodDec.getMethodReturnDec();
+                    if (returnDec != null) {
+                        List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
+                        if (allTypeList.size() > 0) {
+                            ALittleGuess returnGuess = allTypeList.get(0).guessType();
+                            if (!(returnGuess instanceof ALittleGuessStruct))
+                                throw new ALittleGuessException(error, "带" + info.functorProto + "注解的函数返回值必须是struct");
+                            info.functorReturnList.add(ALittleGuessPrimitive.sStringGuess);
+                            info.functorReturnList.add(returnGuess);
+                        }
+                    }
+                } else {
+                    throw new ALittleGuessException(error, "未知的注解类型:" + info.functorProto);
+                }
+            } else {
+                ALittleMethodParamDec paramDec = globalMethodDec.getMethodParamDec();
+                if (paramDec != null) {
+                    List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
+                    for (ALittleMethodParamOneDec oneDec : oneDecList) {
+                        ALittleAllType allType = oneDec.getAllType();
+                        info.functorParamList.add(allType.guessType());
+                        if (oneDec.getMethodParamNameDec() != null) {
+                            info.functorParamNameList.add(oneDec.getMethodParamNameDec().getIdContent().getText());
+                        } else {
+                            info.functorParamNameList.add("");
+                        }
+                    }
+                    ALittleMethodParamTailDec tailDec = paramDec.getMethodParamTailDec();
+                    if (tailDec != null) {
+                        info.functorParamTail = tailDec.guessType();
                     }
                 }
-                ALittleMethodParamTailDec tailDec = paramDec.getMethodParamTailDec();
-                if (tailDec != null) {
-                    info.functorParamTail = tailDec.guessType();
-                }
-            }
-            ALittleMethodReturnDec returnDec = globalMethodDec.getMethodReturnDec();
-            if (returnDec != null) {
-                List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
-                for (ALittleAllType allType : allTypeList) {
-                    info.functorReturnList.add(allType.guessType());
-                }
-                ALittleMethodReturnTailDec tailDec = returnDec.getMethodReturnTailDec();
-                if (tailDec != null) {
-                    info.functorReturnTail = tailDec.guessType();
+                ALittleMethodReturnDec returnDec = globalMethodDec.getMethodReturnDec();
+                if (returnDec != null) {
+                    List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
+                    for (ALittleAllType allType : allTypeList) {
+                        info.functorReturnList.add(allType.guessType());
+                    }
+                    ALittleMethodReturnTailDec tailDec = returnDec.getMethodReturnTailDec();
+                    if (tailDec != null) {
+                        info.functorReturnTail = tailDec.guessType();
+                    }
                 }
             }
             info.UpdateValue();

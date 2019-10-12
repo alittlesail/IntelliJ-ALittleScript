@@ -17,6 +17,7 @@ public class ALittleGuessFunctor extends ALittleGuess {
     public ALittleGuess functorParamTail;                                   // 参数占位符
     public @NotNull List<ALittleGuess> functorReturnList = new ArrayList<>();     // 返回值列表
     public ALittleGuess functorReturnTail;                                  // 返回值占位符
+    public String functorProto;                                 // 协议注解
     public boolean functorAwait = false;                      // 表示是否是await
 
     public @NotNull PsiElement element; // 产生当前Functor的节点对象
@@ -27,9 +28,15 @@ public class ALittleGuessFunctor extends ALittleGuess {
     @Override
     public void UpdateValue() {
         value = "Functor<";
-        if (functorAwait) {
-            value += "await";
+        List<String> preList = new ArrayList<>();
+        if (functorProto != null) {
+            preList.add(functorProto);
         }
+        if (functorAwait) {
+            preList.add("await");
+        }
+        value += String.join(",", preList);
+
         List<String> paramList = new ArrayList<>();
         for (ALittleGuess guess : functorParamList) {
             paramList.add(guess.value);

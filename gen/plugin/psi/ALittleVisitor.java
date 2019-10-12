@@ -223,10 +223,6 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitNcallStat(@NotNull ALittleNcallStat o) {
-    visitPsiElement(o);
-  }
-
   public void visitNsendExpr(@NotNull ALittleNsendExpr o) {
     visitPsiElement(o);
   }

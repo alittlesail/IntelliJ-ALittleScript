@@ -275,7 +275,7 @@ autoType ::= auto
 
 //复合值///////////////////////////////////////////////////////////////////
 // 复合值
-valueStat ::= opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | tcallStat | ncallStat | methodParamTailDec
+valueStat ::= opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | tcallStat | methodParamTailDec
 valueFactorStat ::= wrapValueStat | constValue | propertyValue | reflectValue
 
 // new
@@ -286,8 +286,6 @@ opNewListStat ::= LBRACK (valueStat (COMMA valueStat)*)? RBRACK {pin=1}
 bindStat ::= bind LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
 // tcall
 tcallStat ::= tcall LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
-// ncall
-ncallStat ::= ncall LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
 // 值
 wrapValueStat ::= LPAREN valueStat RPAREN
 // 常量值

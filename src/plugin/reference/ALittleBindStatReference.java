@@ -34,6 +34,7 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         // 开始构建类型
         ALittleGuessFunctor info = new ALittleGuessFunctor(myElement);
         info.functorAwait = guessFunctor.functorAwait;
+        info.functorProto = guessFunctor.functorProto;
         info.functorParamList.addAll(guessFunctor.functorParamList);
         info.functorParamNameList.addAll(guessFunctor.functorParamNameList);
         info.functorParamTail = guessFunctor.functorParamTail;

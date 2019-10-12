@@ -13,6 +13,8 @@ import plugin.component.StdLibraryProvider;
 import plugin.alittle.FileHelper;
 import plugin.guess.*;
 import plugin.psi.*;
+import plugin.reference.ALittlePropertyValueMethodCallReference;
+import plugin.reference.ALittleReference;
 import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
 
@@ -137,83 +139,6 @@ public class ALittleGenerateLua {
     }
 
     @NotNull
-    private String GenerateNcallStat(ALittleNcallStat ncallStat) throws Exception {
-        List<ALittleValueStat> valueStatList = ncallStat.getValueStatList();
-        if (valueStatList.isEmpty()) throw new Exception("ncall第一个参数必须是带注解的全局函数");
-
-        ALittleGuess guess = valueStatList.get(0).guessType();
-        if (!(guess instanceof ALittleGuessFunctor)) throw new Exception("ncall第一个参数必须是带注解的全局函数");
-
-        ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
-        if (!(guessFunctor.element instanceof ALittleGlobalMethodDec)) {
-            throw new Exception("ncall第一个参数必须是带注解的全局函数");
-        }
-        ALittleGlobalMethodDec methodDec = (ALittleGlobalMethodDec)guessFunctor.element;
-
-        ALittleProtoModifier protoModifier = methodDec.getProtoModifier();
-        if (protoModifier == null) {
-            throw new Exception("ncall第一个参数必须是带注解的全局函数");
-        }
-
-        if (valueStatList.size() != 3) {
-            throw new Exception("ncall必须是三个参数");
-        }
-
-        guess = valueStatList.get(2).guessType();
-        if (!(guess instanceof ALittleGuessStruct)) {
-            throw new Exception("ncall的第三个参数必须是struct");
-        }
-        ALittleGuessStruct guessStruct = (ALittleGuessStruct)guess;
-        int msg_id = PsiHelper.JSHash(guessStruct.value);
-
-        String text = protoModifier.getText();
-
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-        String replaceTest = "";
-        if (text.equals("@Http")) {
-            replaceTest = "IHttpSender.Invoke";
-        } else if (text.equals("@HttpUpload")) {
-            replaceTest = "IHttpFileSender.InvokeUpload";
-        } else if (text.equals("@HttpDownload")) {
-            replaceTest = "IHttpFileSender.InvokeDownload";
-        } else if (text.equals("@Msg")) {
-            ALittleMethodReturnDec returnDec = methodDec.getMethodReturnDec();
-            replaceTest = "IMsgCommon.InvokeRPC";
-            GenerateReflectStructInfo(guessStruct);
-
-            if (returnDec != null) {
-                List<ALittleAllType> allTypeList = returnDec.getAllTypeList();
-                if (!allTypeList.isEmpty()) {
-                    guess = allTypeList.get(0).guessType();
-                    if (!(guess instanceof ALittleGuessStruct)) {
-                        throw new Exception(guess.value + "的返回值必须是struct");
-                    }
-                    ALittleGuessStruct guessReturn = (ALittleGuessStruct)guess;
-                    GenerateReflectStructInfo(guessReturn);
-                }
-            }
-        } else {
-            throw new Exception("未知的注解类型:" + text);
-        }
-
-        String content = namespacePre + replaceTest + "(";
-        List<String> paramList = new ArrayList<>();
-        if (text.equals("@Msg")) {
-            paramList.add("" + msg_id);
-        } else {
-            paramList.add("\"" + guessStruct.value + "\"");
-        }
-        for (int i = 1; i < valueStatList.size(); ++i) {
-            paramList.add(GenerateValueStat(valueStatList.get(i)));
-        }
-        content += String.join(", ", paramList);
-        content += ")";
-        return content;
-    }
-
-    @NotNull
     private String GenerateOpNewListStat(ALittleOpNewListStat opNewList) throws Exception {
         List<ALittleValueStat> valueStatList = opNewList.getValueStatList();
 
@@ -298,11 +223,11 @@ public class ALittleGenerateLua {
             for (ALittleAllType allType : allTypeList) {
                 ALittleGuess guessTemplateValue = allType.guessType();
                 if (guessTemplateValue instanceof ALittleGuessClass) {
-                    String[] split = guess.value.split("\\.");
+                    String[] split = guessTemplateValue.value.split("\\.");
                     if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
                         templateParamList.add(split[1]);
                     } else {
-                        templateParamList.add(guess.value);
+                        templateParamList.add(guessTemplateValue.value);
                     }
                 } else {
                     templateParamList.add("nil");
@@ -813,9 +738,6 @@ public class ALittleGenerateLua {
         ALittleTcallStat tcallStat = rootStat.getTcallStat();
         if (tcallStat != null) return GenerateTcallStat(tcallStat);
 
-        ALittleNcallStat ncallStat = rootStat.getNcallStat();
-        if (ncallStat != null) return GenerateNcallStat(ncallStat);
-
         ALittleMethodParamTailDec tailDec = rootStat.getMethodParamTailDec();
         if (tailDec != null) return tailDec.getText();
 
@@ -893,7 +815,7 @@ public class ALittleGenerateLua {
             if (nameDec == null) throw new Exception(guessStruct.value + "没有定义变量名");
             nameList.add("\"" + nameDec.getText() + "\"");
             typeList.add("\"" + varGuess.value + "\"");
-            if (varGuess instanceof  ALittleGuessStruct) {
+            if (varGuess instanceof ALittleGuessStruct) {
                 nextList.add((ALittleGuessStruct)varGuess);
             }
         }
@@ -1039,10 +961,71 @@ public class ALittleGenerateLua {
 
                 ALittlePropertyValueMethodCall methodCall = suffix.getPropertyValueMethodCall();
                 if (methodCall != null) {
-                    List<ALittleValueStat> valueStatList = methodCall.getValueStatList();
-                    List<String> paramList = new ArrayList<>();
-                    for (ALittleValueStat valueStat : valueStatList) {
-                        paramList.add(GenerateValueStat(valueStat));
+                    List<String> paramList = null;
+
+                    // 是否是调用了带注解函数，要进行特殊处理
+                    PsiReference ref = methodCall.getReference();
+                    if (ref instanceof ALittlePropertyValueMethodCallReference) {
+                        ALittlePropertyValueMethodCallReference reference = (ALittlePropertyValueMethodCallReference)ref;
+                        ALittleGuess preType = reference.guessPreType();
+                        if (preType instanceof ALittleGuessFunctor) {
+                            ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
+                            if (preTypeFunctor.functorProto != null) {
+                                String namespaceName = "";
+                                if (!mNamespaceName.equals("ALittle")) {
+                                    namespaceName = "ALittle.";
+                                }
+
+                                if (preTypeFunctor.functorProto.equals("@Http")) {
+                                    content = new StringBuilder(namespaceName + "IHttpSender.Invoke");
+                                } else if (preTypeFunctor.functorProto.equals("@HttpDownload")) {
+                                    content = new StringBuilder(namespaceName + "IHttpFileSender.InvokeDownload");
+                                } else if (preTypeFunctor.functorProto.equals("@HttpUpload")) {
+                                    content = new StringBuilder(namespaceName + "IHttpFileSender.InvokeUpload");
+                                } else if (preTypeFunctor.functorProto.equals("@Msg")) {
+                                    if (preTypeFunctor.functorReturnList.isEmpty()) {
+                                        content = new StringBuilder(namespaceName + "IMsgCommon.Invoke");
+                                    } else {
+                                        content = new StringBuilder(namespaceName + "IMsgCommon.InvokeRPC");
+                                    }
+                                }
+
+                                if (preTypeFunctor.functorParamList.size() != 2)
+                                    throw new Exception("GeneratePropertyValue:处理到MethodCall时发现带注解的函数参数数量不是2");
+                                if (!(preTypeFunctor.functorParamList.get(1) instanceof ALittleGuessStruct))
+                                    throw new Exception("GeneratePropertyValue:处理到MethodCall时发现带注解的函数第二个参数不是struct");
+                                ALittleGuessStruct paramStruct = (ALittleGuessStruct)preTypeFunctor.functorParamList.get(1);
+                                int msg_id = PsiHelper.JSHash(paramStruct.value);
+
+                                paramList = new ArrayList<>();
+                                if (preTypeFunctor.functorProto.equals("@Msg")) {
+                                    paramList.add("" + msg_id);
+                                    // 注册协议
+                                    GenerateReflectStructInfo(paramStruct);
+                                    // 如果有返回值，那么也要注册返回值
+                                    if (preTypeFunctor.functorReturnList.size() == 2) {
+                                        if (!(preTypeFunctor.functorReturnList.get(1) instanceof ALittleGuessStruct)) {
+                                            throw new Exception("GeneratePropertyValue:处理到MethodCall时发现带注解的函数返回值不是struct");
+                                        }
+                                        GenerateReflectStructInfo((ALittleGuessStruct)preTypeFunctor.functorReturnList.get(1));
+                                    }
+                                } else {
+                                    paramList.add("\"" + paramStruct.value + "\"");
+                                }
+                                List<ALittleValueStat> valueStatList = methodCall.getValueStatList();
+                                for (ALittleValueStat valueStat : valueStatList) {
+                                    paramList.add(GenerateValueStat(valueStat));
+                                }
+                            }
+                        }
+                    }
+
+                    if (paramList == null) {
+                        paramList = new ArrayList<>();
+                        List<ALittleValueStat> valueStatList = methodCall.getValueStatList();
+                        for (ALittleValueStat valueStat : valueStatList) {
+                            paramList.add(GenerateValueStat(valueStat));
+                        }
                     }
                     content.append("(").append(String.join(", ", paramList)).append(")");
                     continue;

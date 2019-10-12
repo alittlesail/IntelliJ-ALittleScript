@@ -693,6 +693,9 @@ public class ALittleReferenceOpUtil {
             if (leftGuessFunctor.functorParamList.size() != rightGuessFunctor.functorParamList.size()
                 || leftGuessFunctor.functorReturnList.size() != rightGuessFunctor.functorReturnList.size()
                 || leftGuessFunctor.functorAwait != rightGuessFunctor.functorAwait
+                || leftGuessFunctor.functorProto == null && rightGuessFunctor.functorProto != null
+                || leftGuessFunctor.functorProto != null && rightGuessFunctor.functorProto == null
+                || (leftGuessFunctor.functorProto != null && !leftGuessFunctor.functorProto.equals(rightGuessFunctor.functorProto))
                 || leftGuessFunctor.functorParamTail == null && rightGuessFunctor.functorParamTail != null
                 || leftGuessFunctor.functorParamTail != null && rightGuessFunctor.functorParamTail == null
                 || leftGuessFunctor.functorReturnTail == null && rightGuessFunctor.functorReturnTail != null

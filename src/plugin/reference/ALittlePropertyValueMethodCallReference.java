@@ -55,6 +55,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                 preType = newPreTypeFunctor;
 
                 newPreTypeFunctor.functorAwait = preTypeFunctor.functorAwait;
+                newPreTypeFunctor.functorProto = preTypeFunctor.functorProto;
                 newPreTypeFunctor.functorParamList.addAll(preTypeFunctor.functorParamList);
                 newPreTypeFunctor.functorParamNameList.addAll(preTypeFunctor.functorParamNameList);
                 newPreTypeFunctor.functorParamTail = preTypeFunctor.functorParamTail;

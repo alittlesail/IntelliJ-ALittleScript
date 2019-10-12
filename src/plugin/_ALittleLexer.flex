@@ -118,7 +118,6 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "new"                 { return NEW; }
   "bind"                { return BIND; }
   "tcall"               { return TCALL; }
-  "ncall"               { return NCALL; }
   "true"                { return TRUE; }
   "false"               { return FALSE; }
   "null"                { return NULL; }

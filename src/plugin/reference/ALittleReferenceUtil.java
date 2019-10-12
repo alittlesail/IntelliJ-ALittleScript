@@ -20,6 +20,7 @@ public class ALittleReferenceUtil {
         if (!(guessList.get(0) instanceof ALittleGuessFunctor)) return false;
         ALittleGuessFunctor guess = (ALittleGuessFunctor)guessList.get(0);
         if (guess.functorAwait) return false;
+        if (guess.functorProto != null) return false;
         if (guess.functorParamList.size() != 2) return false;
         if (guess.functorParamTail != null) return false;
         if (guess.functorReturnList.size() != 0) return false;
@@ -152,7 +153,6 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleVarAssignNameDec) return new ALittleVarAssignNameDecReference((ALittleVarAssignNameDec)element, range);
         if (element instanceof ALittleWrapValueStat) return new ALittleWrapValueStatReference((ALittleWrapValueStat)element, range);
 
-        if (element instanceof ALittleNcallStat) return new ALittleNcallStatReference((ALittleNcallStat)element, range);
         if (element instanceof ALittleNsendExpr) return new ALittleNsendExprReference((ALittleNsendExpr)element, range);
         if (element instanceof ALittleThrowExpr) return new ALittleThrowExprReference((ALittleThrowExpr)element, range);
 
