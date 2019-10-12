@@ -10,9 +10,9 @@ public struct Event
 public class EventDispatcher
 {
     // 侦听对象，保存所有侦听这个控件的逻辑对象，以及它们的回调函数
-    protected Map<string, Map<any, Map<Functor<(any, Event)>, bool> > > _listeners;
+    private Map<string, Map<any, Map<Functor<(any, Event)>, bool> > > _listeners;
     // 是否禁用，如果_abs_disable为true，那么它调用DispatchEvent时什么都不做
-    protected bool _abs_disabled;
+    private bool _abs_disabled;
 
     public Ctor()
     {

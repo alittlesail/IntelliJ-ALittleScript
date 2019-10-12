@@ -85,18 +85,6 @@ public class PsiHelper {
     public static int sAccessProtectedAndPublic = 2;         // 可以访问public protected的属性和方法
     public static int sAccessPrivateAndProtectedAndPublic = 3;           // 可以public protected private的属性和方法
 
-    // 计算访问权限等级
-    public static int calcAccessLevel(int accessLevel, ClassAccessType accessType) {
-        if (accessLevel > sAccessOnlyPublic) {
-            if (accessType == ClassAccessType.PRIVATE) {
-                accessLevel = sAccessOnlyPublic;
-            } else if (accessType == ClassAccessType.PROTECTED) {
-                --accessLevel;
-            }
-        }
-        return accessLevel;
-    }
-
     // 获取某个元素的命名域对象
     public static ALittleNamespaceNameDec getNamespaceNameDec(@NotNull PsiFile psiFile) {
         for(PsiElement child = psiFile.getFirstChild(); child != null; child = child.getNextSibling()) {
@@ -282,7 +270,6 @@ public class PsiHelper {
 
     public static class ClassExtendsData
     {
-        public PsiHelper.ClassAccessType accessType;
         public ALittleClassDec dec;
     }
     // 计算class的父类
@@ -306,7 +293,6 @@ public class PsiHelper {
                 , namespaceName, classNameDec.getText(), true);
         if (result instanceof ALittleClassNameDec) {
             ClassExtendsData data = new ClassExtendsData();
-            data.accessType = PsiHelper.calcAccessType(classExtendsDec.getAccessModifier());
             data.dec = (ALittleClassDec)result.getParent();
             return data;
         }
@@ -321,9 +307,28 @@ public class PsiHelper {
             return accessLevel;
         }
         ClassExtendsData classExtendsData = findClassExtends(dec);
-        if (classExtendsData == null) return PsiHelper.sAccessOnlyPublic;
-        accessLevel = calcAccessLevel(accessLevel, classExtendsData.accessType);
+        if (classExtendsData == null) {
+            if (getNamespaceName(dec).equals(getNamespaceName(targetDec))) {
+                return PsiHelper.sAccessProtectedAndPublic;
+            }
+            return PsiHelper.sAccessOnlyPublic;
+        }
         return calcAccessLevelByTargetClassDec(accessLevel, classExtendsData.dec, targetDec);
+    }
+
+    public static int calcAccessLevelByTargetClassDecForElement(@NotNull PsiElement element, @NotNull ALittleClassDec targetDec) {
+        // 计算当前元素所在的类
+        int accessLevel =  PsiHelper.sAccessOnlyPublic;
+        ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(element);
+        if (myClassDec != null) {
+            accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, targetDec);
+        } else {
+            String namespaceName = PsiHelper.getNamespaceName(element);
+            if (namespaceName.equals("lua") || namespaceName.equals(PsiHelper.getNamespaceName(targetDec))) {
+                accessLevel = PsiHelper.sAccessProtectedAndPublic;
+            }
+        }
+        return accessLevel;
     }
 
     // 获取函数列表
@@ -349,7 +354,6 @@ public class PsiHelper {
         // 处理继承
         ClassExtendsData classExtendsData = findClassExtends(classDec);
         if (classExtendsData != null) {
-            accessLevel = PsiHelper.calcAccessLevel(accessLevel, classExtendsData.accessType);
             findClassMethodNameDecList(classExtendsData.dec, accessLevel, name, result, deep - 1);
         }
     }
@@ -370,7 +374,6 @@ public class PsiHelper {
         // 处理继承
         ClassExtendsData classExtendsData = findClassExtends(classDec);
         if (classExtendsData != null) {
-            accessLevel = PsiHelper.calcAccessLevel(accessLevel, classExtendsData.accessType);
             findClassAttrList(classExtendsData.dec, accessLevel, attrType, name, result, deep - 1);
         }
     }

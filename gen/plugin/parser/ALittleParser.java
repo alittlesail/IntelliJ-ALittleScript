@@ -330,7 +330,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // COLON accessModifier? (namespaceNameDec DOT)? classNameDec
+  // COLON (namespaceNameDec DOT)? classNameDec
   public static boolean classExtendsDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "classExtendsDec")) return false;
     if (!nextTokenIs(b, COLON)) return false;
@@ -339,29 +339,21 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, COLON);
     p = r; // pin = 1
     r = r && report_error_(b, classExtendsDec_1(b, l + 1));
-    r = p && report_error_(b, classExtendsDec_2(b, l + 1)) && r;
     r = p && classNameDec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
-  // accessModifier?
+  // (namespaceNameDec DOT)?
   private static boolean classExtendsDec_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "classExtendsDec_1")) return false;
-    accessModifier(b, l + 1);
-    return true;
-  }
-
-  // (namespaceNameDec DOT)?
-  private static boolean classExtendsDec_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "classExtendsDec_2")) return false;
-    classExtendsDec_2_0(b, l + 1);
+    classExtendsDec_1_0(b, l + 1);
     return true;
   }
 
   // namespaceNameDec DOT
-  private static boolean classExtendsDec_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "classExtendsDec_2_0")) return false;
+  private static boolean classExtendsDec_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classExtendsDec_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = namespaceNameDec(b, l + 1);

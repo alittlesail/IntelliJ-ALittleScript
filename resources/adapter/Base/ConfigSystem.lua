@@ -79,4 +79,4 @@ function ConfigSystem:SaveConfig()
 	end
 end
 
-NormalConfigSystem = Template(ConfigSystem, "ALittle.ConfigSystem<ALittle.NormalFileLoader,ALittle.NormalFileSaver>", NormalFileLoader, NormalFileSaver);
+NormalConfigSystem = Template(ConfigSystem, "ALittle.ConfigSystem<ALittle.NormalFileLoader,ALittle.NormalFileSaver>", ALittle.ConfigSystem<ALittle.NormalFileLoader,ALittle.NormalFileSaver>, ALittle.ConfigSystem<ALittle.NormalFileLoader,ALittle.NormalFileSaver>);

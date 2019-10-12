@@ -1,7 +1,7 @@
 
 namespace ALittle;
 
-public class LoopList : public LoopObject
+public class LoopList : LoopObject
 {
     private int _count;              // updater个数
     private int _cur_index;          // 当前执行的updater下标
@@ -112,7 +112,7 @@ public class LoopList : public LoopObject
     }
 
     // 更新
-    public fun Update(int frame_time)
+    protected fun Update(int frame_time)
     {
         if (this._cur_index > this._count)
             return;

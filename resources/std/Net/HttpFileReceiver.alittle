@@ -35,7 +35,7 @@ public static FindHttpFileReceiverCallback(string method) : Functor<await(IHttpF
     return __all_callback[method];
 }
 
-public class HttpFileReceiverTemplate<NATIVE : IHttpFileReceiverNative> : public IHttpFileReceiver
+public class HttpFileReceiverTemplate<NATIVE : IHttpFileReceiverNative> : IHttpFileReceiver
 {
     private int _http_id;
     private lua.thread _co;
@@ -60,15 +60,15 @@ public class HttpFileReceiverTemplate<NATIVE : IHttpFileReceiverNative> : public
         return yield;
     }
 
-    public fun HandleReceiveResult(string reason)
+    protected fun HandleReceiveResult(string reason)
     {
-        auto result, auto reason = lua.coroutine.resume(this._co, reason);
+        auto result, string reason = lua.coroutine.resume(this._co, reason);
         if (!result) Error(reason);
     }
 
     public get invoked() : bool { return this._invoked; }
 
-    public fun SendString(string content)
+    protected fun SendString(string content)
     {
         this._interface.SendString(this._http_id, content);
     }

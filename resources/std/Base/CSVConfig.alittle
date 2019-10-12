@@ -134,7 +134,7 @@ class KeyValueConfig
     }
 }
 
-class SingleKeyTableConfig<T> : public CSVConfig
+class SingleKeyTableConfig<T> : CSVConfig
 {
     private Map<any, int> _key_map;
     private Map<any, any> _cache_map;
@@ -258,7 +258,7 @@ class SingleKeyTableIndexConfig<T>
     }
 }
 
-class DoubleKeyTableConfig<T> : public CSVConfig
+class DoubleKeyTableConfig<T> : CSVConfig
 {
     private Map<any, Map<any, int>> _key_map;
     private Map<any, Map<any, any>> _cache_map;

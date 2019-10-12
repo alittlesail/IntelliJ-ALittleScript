@@ -38,7 +38,7 @@ public class ALittleVarAssignExprReference extends ALittleReference<ALittleVarAs
             }
             boolean hasTail = methodCallGuessList.get(methodCallGuessList.size() - 1) instanceof ALittleGuessReturnTail;
             if (hasTail) {
-                methodCallGuessList.remove(methodCallGuessList.size() - 1);
+                // 不需要检查
             } else {
                 if (methodCallGuessList.size() < pairDecList.size()) {
                     throw new ALittleGuessException(valueStat, "调用的函数返回值数量少于定义的变量数量");
@@ -48,6 +48,7 @@ public class ALittleVarAssignExprReference extends ALittleReference<ALittleVarAs
             for (int i = 0; i < pairDecList.size(); ++i) {
                 ALittleVarAssignDec pairDec = pairDecList.get(i);
                 if (i >= methodCallGuessList.size()) break;
+                if (methodCallGuessList.get(i) instanceof ALittleGuessReturnTail) break;
                 try {
                     ALittleReferenceOpUtil.guessTypeEqual(pairDec, pairDec.guessType(), valueStat, methodCallGuessList.get(i));
                 } catch (ALittleGuessException e) {

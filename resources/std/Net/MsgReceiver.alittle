@@ -1,7 +1,7 @@
 
 namespace ALittle;
 
-public class MsgReceiverTemplate<NATIVE : IMsgCommonNative> : public IMsgCommon
+public class MsgReceiverTemplate<NATIVE : IMsgCommonNative> : IMsgCommon
 {
     private int _client_id;
     private string _remote_ip;
@@ -41,12 +41,12 @@ public class MsgReceiverTemplate<NATIVE : IMsgCommonNative> : public IMsgCommon
         return this._is_connected;
     }
 
-    public fun HandleConnected()
+    protected fun HandleConnected()
     {
         this._is_connected = true;
     }
 
-    public fun HandleDisconnected()
+    protected fun HandleDisconnected()
     {
         this._is_connected = false;
         this.ClearRPC("连接断开了");

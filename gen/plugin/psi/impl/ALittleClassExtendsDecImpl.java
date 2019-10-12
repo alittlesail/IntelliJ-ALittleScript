@@ -31,12 +31,6 @@ public class ALittleClassExtendsDecImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ALittleAccessModifier getAccessModifier() {
-    return findChildByClass(ALittleAccessModifier.class);
-  }
-
-  @Override
-  @Nullable
   public ALittleClassNameDec getClassNameDec() {
     return findChildByClass(ALittleClassNameDec.class);
   }

@@ -89,7 +89,7 @@ private templateExtendsDec ::= COLON allType {pin=1}
 // 类定义
 classDec ::= accessModifier? class classNameDec templateDec? classExtendsDec? classBodyDec {pin=2}
 classNameDec ::= ID_CONTENT
-classExtendsDec ::= COLON accessModifier? (namespaceNameDec DOT)? classNameDec {pin=1}
+classExtendsDec ::= COLON (namespaceNameDec DOT)? classNameDec {pin=1}
 private classBodyDec ::= LBRACE (classVarDec | classCtorDec | classGetterDec | classSetterDec | classStaticDec | classMethodDec)* RBRACE {pin=1}
 
 // 结构体定义

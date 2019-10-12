@@ -1,7 +1,7 @@
 
 namespace ALittle;
 
-public class LoopTimer : public LoopObject
+public class LoopTimer : LoopObject
 {
     private Functor<()> _func;              // 函数
     private int _total_delay_time;          // 动画的延时时间，就是延时多久才开始动画
@@ -97,7 +97,7 @@ public class LoopTimer : public LoopObject
     }
 
     // 更新
-    public fun Update(int frame_time)
+    protected fun Update(int frame_time)
     {
         // 扣除延时时间
         if (this._accumulate_delay_time < this._total_delay_time)

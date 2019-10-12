@@ -39,7 +39,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
     private ALittleGuess replaceTemplate(@NotNull ALittleGuess guess) throws ALittleGuessException {
         if (mClassGuess == null) return guess;
 
-        if (guess instanceof ALittleGuessClassTemplate) {
+        if (guess instanceof ALittleGuessClassTemplate && !mClassGuess.templateMap.isEmpty()) {
             if (!mClassGuess.templateMap.containsKey(guess.value)) {
                 throw new ALittleGuessException(myElement, mClassGuess.value + "没有定义模板" + guess.value);
             }
@@ -127,7 +127,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             if (element instanceof ALittleClassVarDec) {
                 guess = ((ALittleClassVarDec) element).guessType();
 
-                if (mClassGuess != null && guess instanceof ALittleGuessClassTemplate) {
+                if (mClassGuess != null && guess instanceof ALittleGuessClassTemplate && !mClassGuess.templateMap.isEmpty()) {
                     if (!mClassGuess.templateMap.containsKey(guess.value)) {
                         throw new ALittleGuessException(myElement, mClassGuess.value + "没有定义模板" + guess.value);
                     }
@@ -270,12 +270,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 mClassGuess = (ALittleGuessClass)preType;
                 ALittleClassDec classDec = mClassGuess.element;
 
-                // 计算当前元素所在的类
-                int accessLevel =  PsiHelper.sAccessOnlyPublic;
-                ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(myElement);
-                if (myClassDec != null) {
-                    accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, classDec);
-                }
+                // 计算当前元素对这个类的访问权限
+                int accessLevel =  PsiHelper.calcAccessLevelByTargetClassDecForElement(myElement, classDec);
 
                 // 所有成员变量
                 List<PsiElement> classVarDecList = new ArrayList<>();
@@ -351,12 +347,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleClassNameDec classNameDec = ((ALittleGuessClassName)preType).element;
                 ALittleClassDec classDec = (ALittleClassDec) classNameDec.getParent();
 
-                // 计算当前元素所在的类
-                int accessLevel =  PsiHelper.sAccessOnlyPublic;
-                ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(myElement);
-                if (myClassDec != null) {
-                    accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, classDec);
-                }
+                // 计算当前元素对这个类的访问权限
+                int accessLevel =  PsiHelper.calcAccessLevelByTargetClassDecForElement(myElement, classDec);
 
                 // 所有静态函数
                 List<PsiElement> classMethodNameDecList = new ArrayList<>();
@@ -436,12 +428,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             if (preType instanceof ALittleGuessClass) {
                 ALittleClassDec classDec = ((ALittleGuessClass)preType).element;
 
-                // 计算当前元素所在的类
-                int accessLevel =  PsiHelper.sAccessOnlyPublic;
-                ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(myElement);
-                if (myClassDec != null) {
-                    accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, classDec);
-                }
+                // 计算当前元素对这个类的访问权限
+                int accessLevel =  PsiHelper.calcAccessLevelByTargetClassDecForElement(myElement, classDec);
 
                 List<PsiElement> classVarDecList = new ArrayList<>();
                 // 所有成员变量
@@ -553,12 +541,8 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 ALittleClassNameDec classNameDec = ((ALittleGuessClassName)preType).element;
                 ALittleClassDec classDec = (ALittleClassDec) classNameDec.getParent();
 
-                // 计算当前元素所在的类
-                int accessLevel =  PsiHelper.sAccessOnlyPublic;
-                ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(myElement);
-                if (myClassDec != null) {
-                    accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, classDec);
-                }
+                // 计算当前元素对这个类的访问权限
+                int accessLevel =  PsiHelper.calcAccessLevelByTargetClassDecForElement(myElement, classDec);
 
                 // 所有静态函数
                 List<PsiElement> classMethodNameDecList = new ArrayList<>();

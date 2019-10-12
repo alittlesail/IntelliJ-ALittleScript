@@ -115,11 +115,10 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
             guessTypeList = valueStat.guessTypes();
             boolean hasValueTail = !guessTypeList.isEmpty()
                     && guessTypeList.get(guessTypeList.size() - 1) instanceof ALittleGuessReturnTail;
-            if (hasValueTail) guessTypeList.remove(guessTypeList.size() - 1);
 
             if (returnTailDec == null) {
                 if (hasValueTail) {
-                    if (guessTypeList.size() < returnTypeList.size()) {
+                    if (guessTypeList.size() < returnTypeList.size() - 1) {
                         throw new ALittleGuessException(myElement, "return的函数调用的返回值数量超过函数定义的返回值数量");
                     }
                 } else {

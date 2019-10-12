@@ -5,7 +5,7 @@ public class LoopObject
 {
     public fun IsCompleted() : bool {}
     public fun Completed() {}
-    public fun Update(int frame_time) {}
+    protected fun Update(int frame_time) {}
     public fun Reset() {}
     public fun SetTime(int time) : int, bool {}
     public fun SetCompleted() {}

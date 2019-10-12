@@ -47,7 +47,9 @@ public class ALittleGuessClass extends ALittleGuess {
                 nameList.add(impl.value);
             }
         }
-        value += "<" + String.join(",", nameList) + ">";
+        if (!nameList.isEmpty()) {
+            value += "<" + String.join(",", nameList) + ">";
+        }
     }
 
     @Override

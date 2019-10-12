@@ -21,16 +21,17 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guessList = new ArrayList<>();
         ALittleAllType allType = myElement.getAllType();
+        ALittleGuess templateExtends = null;
         if (allType != null) {
             ALittleGuess guess = allType.guessType();
             if (!(guess instanceof ALittleGuessClass)) {
                 throw new ALittleGuessException(allType, "继承的对象必须是一个类");
             }
-            ALittleGuessClassTemplate info = new ALittleGuessClassTemplate(myElement, guess);
-            info.UpdateValue();
-            guessList.add(info);
+            templateExtends = guess;
         }
-
+        ALittleGuessClassTemplate info = new ALittleGuessClassTemplate(myElement, templateExtends);
+        info.UpdateValue();
+        guessList.add(info);
         return guessList;
     }
 

@@ -6,7 +6,7 @@ private Map<int, IMsgCommon> __MsgSenderMap = new Map<int, IMsgCommon>();
 public static FindMsgSender(int id) : IMsgCommon { return __MsgSenderMap[id]; }
 
 // 用于长连接
-public class MsgSenderTemplate<MI : IMsgCommonNative> : public IMsgCommon
+public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
 {
     private int _heartbeat;                 // 心跳间隔时间
     private LoopFunction _heartbeat_loop;   //
@@ -58,7 +58,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : public IMsgCommon
     }
 
     // 客户端连接服务端，成功
-    public fun HandleConnectSucceed()
+    protected fun HandleConnectSucceed()
     {
         // 初始化标记时间
         this._last_recv_time = 0;
@@ -68,12 +68,12 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : public IMsgCommon
         this.StartHeartbeat();
 
         // 返回协程
-        auto result, auto reason = lua.coroutine.resume(this._co, null);
+        auto result, string reason = lua.coroutine.resume(this._co, null);
         if (result != true) Error(reason);
     }
 
     // 断开连接
-    public fun HandleDisconnect()
+    protected fun HandleDisconnect()
     {
         this.StopHeartbeat();
         __MsgSenderMap[this._interface.GetID()] = null;
@@ -84,12 +84,12 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : public IMsgCommon
     }
 
     // 客户端链接服务端，失败
-    public fun HandleConnectFailed(string error)
+    protected fun HandleConnectFailed(string error)
     {
         // 返回协程
         __MsgSenderMap[this._interface.GetID()] = null;
         if (error == null) error = this._ip..":"..this._port.."连接失败";
-        auto result, auto reason = lua.coroutine.resume(this._co, error);
+        auto result, string reason = lua.coroutine.resume(this._co, error);
         if (result != true) Error(reason);
     }
 
@@ -110,7 +110,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : public IMsgCommon
 
     // 发送心跳包
     // max_ms 可以接受的最大延迟毫秒数，默认是10000毫秒
-    public fun SendHeartbeat(int max_ms)
+    private fun SendHeartbeat(int max_ms)
     {
         // 如果没有连接成功，那么直接返回
         if (this._interface.IsConnected() == false)
@@ -142,7 +142,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : public IMsgCommon
     }
 
     // 心跳包检测
-    public fun CheckHeartbeat(int send_time, int cmp_time, int delta_time)
+    private fun CheckHeartbeat(int send_time, int cmp_time, int delta_time)
     {
         // 由得时候，以为APP被挂起，所有线程无条件挂起，导致LoopSystem时间跳跃。会立即执行当前的回调函数
         // 所以确认当前时间和发送时间是否在delta_time范围内，否则必须重新创建一个LoopFunction
@@ -176,7 +176,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : public IMsgCommon
     }
 
     // 开始发送心跳包
-    public fun StartHeartbeat()
+    private fun StartHeartbeat()
     {
         if (this._heartbeat == null)
             return;
@@ -188,7 +188,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : public IMsgCommon
         this._heartbeat_loop.Start();
     }
     // 停止发送心跳包
-    public fun StopHeartbeat()
+    private fun StopHeartbeat()
     {
         if (this._heartbeat_loop == null)
             return;

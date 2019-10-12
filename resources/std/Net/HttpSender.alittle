@@ -24,7 +24,7 @@ public class IHttpSender
 private Map<int, IHttpSender> __HttpSenderMap = new Map<int, IHttpSender>();
 public static FindHttpSender(int id) : IHttpSender { return __HttpSenderMap[id]; }
 
-public class HttpSenderTemplate<NATIVE : IHttpSenderNative> : public IHttpSender
+public class HttpSenderTemplate<NATIVE : IHttpSenderNative> : IHttpSender
 {
     private NATIVE _interface;          // 实际Http的接口对象
     private lua.thread _co;         // 协程对象
@@ -63,30 +63,30 @@ public class HttpSenderTemplate<NATIVE : IHttpSenderNative> : public IHttpSender
         this._interface.Stop();
     }
 
-    public fun HandleSucceed()
+    protected fun HandleSucceed()
     {
         __HttpSenderMap[this._interface.GetID()] = null;
         auto error, Map<string, any> param = tcall(lua.json.decode, this._interface.GetResponse());
         if (error != null)
         {
-            auto result, auto reason = lua.coroutine.resume(this._co, error, null);
+            auto result, string reason = lua.coroutine.resume(this._co, error, null);
             if (result != true) Error(reason);
             return;
         }
         if (param["error"] != null)
         {
-            auto result, auto reason = lua.coroutine.resume(this._co, param["error"], null);
+            auto result, string reason = lua.coroutine.resume(this._co, param["error"], null);
             if (result != true) Error(reason);
             return;
         }
-        auto result, auto reason = lua.coroutine.resume(this._co, null, param);
+        auto result, string reason = lua.coroutine.resume(this._co, null, param);
         if (result != true) Error(reason);
     }
 
-    public fun HandleFailed(string reason)
+    protected fun HandleFailed(string reason)
     {
         __HttpSenderMap[this._interface.GetID()] = null;
-        auto result, auto reason = lua.coroutine.resume(this._co, reason, null);
+        auto result, string reason = lua.coroutine.resume(this._co, reason, null);
         if (result != true) Error(reason);
     }
 }

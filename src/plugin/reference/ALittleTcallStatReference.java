@@ -31,10 +31,14 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
         if (!(guess instanceof ALittleGuessFunctor)) {
             throw new ALittleGuessException(valueStat, "pcall表达式第一个参数必须是一个函数");
         }
+        ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
 
         List<ALittleGuess> guessList = new ArrayList<>();
         guessList.add(ALittleGuessPrimitive.sStringGuess);
-        guessList.addAll(((ALittleGuessFunctor)guess).functorReturnList);
+        guessList.addAll(guessFunctor.functorReturnList);
+        if (guessFunctor.functorReturnTail != null) {
+            guessList.add(guessFunctor.functorReturnTail);
+        }
 
         return guessList;
     }

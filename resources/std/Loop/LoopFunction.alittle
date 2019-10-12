@@ -1,7 +1,7 @@
 
 namespace ALittle;
 
-public class LoopFunction : public LoopObject
+public class LoopFunction : LoopObject
 {
     private Functor<()> _func;
     private int _total_count;
@@ -127,7 +127,7 @@ public class LoopFunction : public LoopObject
     }
 
     // 更新
-    public fun Update(int frame_time)
+    protected fun Update(int frame_time)
     {
         // 扣除延时时间
         if (this._accumulate_delay_time < this._total_delay_time)

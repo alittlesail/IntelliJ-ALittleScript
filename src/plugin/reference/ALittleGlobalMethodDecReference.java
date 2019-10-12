@@ -62,7 +62,7 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
         if (paramGuessList.size() != 2) throw new ALittleGuessException(paramDec, "带" + text + "的全局函数，必须有两个参数");
 
         // 第二个参数
-        if (paramGuessList.get(1) instanceof ALittleGuessStruct)
+        if (!(paramGuessList.get(1) instanceof ALittleGuessStruct))
             throw new ALittleGuessException(myElement, "带" + text + "的全局函数，第二个参数必须是struct");
         checkStructExtends(oneDecList.get(1), ((ALittleGuessStruct)paramGuessList.get(1)).element);
 
@@ -76,7 +76,7 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
                 throw new ALittleGuessException(oneDecList.get(0), "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpReceiver");
 
             // 返回值
-            if (returnGuessList.get(0) instanceof ALittleGuessStruct)
+            if (!(returnGuessList.get(0) instanceof ALittleGuessStruct))
                 throw new ALittleGuessException(myElement, "带" + text + "的全局函数，返回值必须是struct");
             checkStructExtends(returnList.get(0), ((ALittleGuessStruct)returnGuessList.get(0)).element);
         } else if (text.equals("@HttpDownload")) {
@@ -99,7 +99,7 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
                 throw new ALittleGuessException(oneDecList.get(0), "带" + text + "的全局函数，第一个参数必须是ALittle.IHttpFileReceiver");
 
             // 返回值
-            if (returnGuessList.get(0) instanceof ALittleGuessStruct)
+            if (!(returnGuessList.get(0) instanceof ALittleGuessStruct))
                 throw new ALittleGuessException(myElement, "带" + text + "的全局函数，返回值必须是struct");
             checkStructExtends(returnList.get(0), ((ALittleGuessStruct)returnGuessList.get(0)).element);
         } else if (text.equals("@Msg")) {
@@ -115,8 +115,9 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
 
             // 返回值
             if (!returnGuessList.isEmpty()) {
-                if (returnGuessList.get(0) instanceof ALittleGuessStruct)
+                if (!(returnGuessList.get(0) instanceof ALittleGuessStruct)) {
                     throw new ALittleGuessException(myElement, "带" + text + "的全局函数，返回值必须是struct");
+                }
                 checkStructExtends(returnList.get(0), ((ALittleGuessStruct)returnGuessList.get(0)).element);
             }
         }

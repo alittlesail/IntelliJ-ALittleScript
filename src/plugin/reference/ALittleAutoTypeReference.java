@@ -38,8 +38,7 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
             List<ALittleGuess> methodCallGuessList = valueStat.guessTypes();
             boolean hasTail = !methodCallGuessList.isEmpty() && methodCallGuessList.get(methodCallGuessList.size() - 1) instanceof ALittleGuessReturnTail;
             if (hasTail) {
-                methodCallGuessList.remove(methodCallGuessList.size() - 1);
-                if (index >= methodCallGuessList.size()) {
+                if (index >= methodCallGuessList.size() - 1) {
                     guessList.add(ALittleGuessPrimitive.sAnyGuess);
                 } else {
                     guessList.add(methodCallGuessList.get(index));

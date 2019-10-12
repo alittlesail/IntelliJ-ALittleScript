@@ -11,9 +11,6 @@ import plugin.guess.ALittleGuessException;
 public interface ALittleClassExtendsDec extends PsiElement {
 
   @Nullable
-  ALittleAccessModifier getAccessModifier();
-
-  @Nullable
   ALittleClassNameDec getClassNameDec();
 
   @Nullable

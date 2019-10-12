@@ -108,7 +108,7 @@ public class IMsgCommon
     }
 
     // 序列化
-    public fun MessageWrite(int msg_id, any msg_body)
+    private fun MessageWrite(int msg_id, any msg_body)
     {
         auto info = this._invoke_map[msg_id];
         if (info == null)
@@ -128,7 +128,7 @@ public class IMsgCommon
     }
 
     // 收到服务端发来的数据包
-    public fun HandleMessage(int id, int rpc_id, lua.MessageReadFactory factory)
+    protected fun HandleMessage(int id, int rpc_id, lua.MessageReadFactory factory)
     {
         // 消息id为0，心跳包返回
         if (id == 0)
@@ -181,7 +181,7 @@ public class IMsgCommon
         // 如果是RPC异常包
         if (id == 1)
         {
-            auto result, auto reason = lua.coroutine.resume(info.co, factory.ReadString());
+            auto result, string reason = lua.coroutine.resume(info.co, factory.ReadString());
             if (result != true) Error(reason);
             return;
         }
@@ -189,17 +189,17 @@ public class IMsgCommon
         any msg = this.MessageRead(factory, id);
         if (msg == null)
         {
-            auto result, auto reason = lua.coroutine.resume(info.co, "MsgSystem.HandleMessage MessageRead failed by id:"..id);
+            auto result, string reason = lua.coroutine.resume(info.co, "MsgSystem.HandleMessage MessageRead failed by id:"..id);
             if (result != true) Error(reason);
             Log("MsgSystem.HandleMessage MessageRead failed by id:"..id);
             return;
         }
-        auto result, auto reason = lua.coroutine.resume(info.co, null, msg);
+        auto result, string reason = lua.coroutine.resume(info.co, null, msg);
         if (result != true) Error(reason);
     }
 
     // 发送数据包
-    public fun Send(int msg_id, any msg_body, int rpc_id)
+    protected fun Send(int msg_id, any msg_body, int rpc_id)
     {
         if (!this.IsConnected()) return;
 
@@ -209,7 +209,7 @@ public class IMsgCommon
     }
 
     // 发送RPC异常包
-    public fun SendRpcError(int rpc_id, string reason)
+    protected fun SendRpcError(int rpc_id, string reason)
     {
         // 如果没有连接成功，那么直接返回
         if (!this.IsConnected()) return;
@@ -224,7 +224,7 @@ public class IMsgCommon
     }
 
     // 发送RPC包
-    public await fun SendRPC(int msg_id, any msg_body) : string, any
+    protected await fun SendRPC(int msg_id, any msg_body) : string, any
     {
         auto co = lua.coroutine.running();
         if (co == null)
@@ -284,7 +284,7 @@ public class IMsgCommon
     }
 
     // 清理RPC
-    public fun ClearRPC(string reason)
+    private fun ClearRPC(string reason)
     {
         // 先复制，再清理
         auto tmp = new Map<int, MsgRPCInfo>();
@@ -297,7 +297,7 @@ public class IMsgCommon
         // 逐个调用表示失败
         for (auto rpc_id, auto info in tmp)
         {
-            auto result, auto reason = lua.coroutine.resume(info.co, reason, null);
+            auto result, string reason = lua.coroutine.resume(info.co, reason, null);
             if (result != true) Error(reason);
         }
     }

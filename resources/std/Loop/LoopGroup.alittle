@@ -1,7 +1,7 @@
 
 namespace ALittle;
 
-public class LoopGroup : public LoopObject
+public class LoopGroup : LoopObject
 {
     private int _total_count;         // updater总数
     private int _complete_count;      // updater完成数量
@@ -138,7 +138,7 @@ public class LoopGroup : public LoopObject
     }
 
     // 更新
-    public fun Update(int frame_time)
+    protected fun Update(int frame_time)
     {
         if (this._complete_count >= this._total_count) return;
 

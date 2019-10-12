@@ -7,13 +7,13 @@ private auto tostring = lua.tostring;
 private auto setmetatable = lua.setmetatable;
 private auto coroutine = lua.coroutine;
 
-struct FunctorMetatable
+private struct FunctorMetatable
 {
     any __call;
     Functor<(FunctorObject):string> __tostring;
 }
 
-struct FunctorObject
+private struct FunctorObject
 {
     List<any> _arg;
     int _arg_count;
@@ -51,6 +51,7 @@ private static __functor_mt__tostring(FunctorObject caller) : string
 }
 __functor_mt.__tostring = __functor_mt__tostring;
 
+// 提供语言生成代码使用
 protected static Bind(any func, ...) : any
 {
     // 如果没有携带参数，那么就直接返回func

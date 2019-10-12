@@ -21,9 +21,11 @@ public class ALittleReferenceUtil {
         ALittleGuessFunctor guess = (ALittleGuessFunctor)guessList.get(0);
         if (guess.functorAwait) return false;
         if (guess.functorParamList.size() != 2) return false;
+        if (guess.functorParamTail != null) return false;
         if (guess.functorReturnList.size() != 0) return false;
+        if (guess.functorReturnTail != null) return false;
         if (!guess.functorParamList.get(0).value.equals(guessList.get(1).value)) return false;
-        if (!guess.value.equals(guessList.get(2).value)) return false;
+        if (!guess.functorParamList.get(1).value.equals(guessList.get(2).value)) return false;
         return true;
     }
 

@@ -22,7 +22,7 @@ public class IFileLoader
 }
 
 // 最普通的文件加载器
-public class NormalFileLoader : public IFileLoader
+public class NormalFileLoader : IFileLoader
 {
     public fun Load(string file_path) : string
     {
@@ -41,7 +41,7 @@ public class IFileSaver
 }
 
 // 最普通的文件保存期
-public class NormalFileSaver : public IFileSaver
+public class NormalFileSaver : IFileSaver
 {
     public fun Save(string file_path, string content) : bool
     {
