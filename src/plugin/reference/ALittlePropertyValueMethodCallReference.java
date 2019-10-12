@@ -169,6 +169,8 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         for (int i = 0; i < valueStatList.size(); ++i) {
             if (i >= preTypeFunctor.functorParamNameList.size()) break;
             String name = preTypeFunctor.functorParamNameList.get(i);
+            // 参数占位符直接跳过
+            if (name.equals("...")) continue;
             ALittleValueStat valueStat = valueStatList.get(i);
             result.add(new InlayInfo(name, valueStat.getNode().getStartOffset()));
         }

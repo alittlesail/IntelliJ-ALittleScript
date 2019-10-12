@@ -106,19 +106,23 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
         // 获取类型
         ALittleGuess guessType = myElement.guessType();
 
+        ALittleVarAssignNameDec nameDec = null;
         // 如果是定义并赋值
         if (myElement.getParent() instanceof ALittleVarAssignDec) {
             ALittleVarAssignDec dec = (ALittleVarAssignDec) myElement.getParent();
-            ALittleVarAssignNameDec nameDec = dec.getVarAssignNameDec();
-            if (nameDec == null) return result;
-
-            result.add(new InlayInfo(guessType.value, nameDec.getNode().getStartOffset()));
+            nameDec = dec.getVarAssignNameDec();
         // 如果是for
         } else if (myElement.getParent() instanceof  ALittleForPairDec) {
             ALittleForPairDec dec = (ALittleForPairDec) myElement.getParent();
-            ALittleVarAssignNameDec nameDec = dec.getVarAssignNameDec();
-            if (nameDec == null) return result;
+            nameDec = dec.getVarAssignNameDec();
+        }
 
+        // 优化显示
+        if (nameDec == null) return result;
+        String[] nameList = guessType.value.split("\\.");
+        if (nameList.length >= 2) {
+            result.add(new InlayInfo(nameList[1], nameDec.getNode().getStartOffset()));
+        } else {
             result.add(new InlayInfo(guessType.value, nameDec.getNode().getStartOffset()));
         }
 
