@@ -3293,7 +3293,19 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // COLON allType
+  // class
+  public static boolean templateExtendsClassDec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "templateExtendsClassDec")) return false;
+    if (!nextTokenIs(b, CLASS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, CLASS);
+    exit_section_(b, m, TEMPLATE_EXTENDS_CLASS_DEC, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // COLON (allType | templateExtendsClassDec | templateExtendsStructDec)
   static boolean templateExtendsDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "templateExtendsDec")) return false;
     if (!nextTokenIs(b, COLON)) return false;
@@ -3301,9 +3313,31 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, COLON);
     p = r; // pin = 1
-    r = r && allType(b, l + 1);
+    r = r && templateExtendsDec_1(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // allType | templateExtendsClassDec | templateExtendsStructDec
+  private static boolean templateExtendsDec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "templateExtendsDec_1")) return false;
+    boolean r;
+    r = allType(b, l + 1);
+    if (!r) r = templateExtendsClassDec(b, l + 1);
+    if (!r) r = templateExtendsStructDec(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // struct
+  public static boolean templateExtendsStructDec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "templateExtendsStructDec")) return false;
+    if (!nextTokenIs(b, STRUCT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, STRUCT);
+    exit_section_(b, m, TEMPLATE_EXTENDS_STRUCT_DEC, r);
+    return r;
   }
 
   /* ********************************************************** */

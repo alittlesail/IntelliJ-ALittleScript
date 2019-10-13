@@ -7,11 +7,15 @@ import plugin.psi.ALittleTemplatePairDec;
 
 public class ALittleGuessClassTemplate extends ALittleGuess {
     public ALittleGuess templateExtends;
+    public boolean isClass;
+    public boolean isStruct;
     public @NotNull ALittleTemplatePairDec element;
 
-    public ALittleGuessClassTemplate(@NotNull ALittleTemplatePairDec e, ALittleGuess t) {
+    public ALittleGuessClassTemplate(@NotNull ALittleTemplatePairDec e, ALittleGuess t, boolean ic, boolean is) {
         element = e;
         templateExtends = t;
+        isClass = ic;
+        isStruct = is;
     }
 
     @Override

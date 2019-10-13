@@ -84,7 +84,9 @@ namespaceNameDec ::= ID_CONTENT
 // 模板定义
 templateDec ::= LESS templatePairDec (COMMA templatePairDec)? GREATER {pin=1}
 templatePairDec ::= ID_CONTENT templateExtendsDec? {pin=1}
-private templateExtendsDec ::= COLON allType {pin=1}
+private templateExtendsDec ::= COLON (allType | templateExtendsClassDec | templateExtendsStructDec) {pin=1}
+templateExtendsClassDec ::= class
+templateExtendsStructDec ::= struct
 
 // 类定义
 classDec ::= accessModifier? class classNameDec templateDec? classExtendsDec? classBodyDec {pin=2}

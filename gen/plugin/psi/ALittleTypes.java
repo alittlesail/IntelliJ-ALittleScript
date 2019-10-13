@@ -125,6 +125,8 @@ public interface ALittleTypes {
   IElementType STRUCT_VAR_DEC = new ALittleElementType("STRUCT_VAR_DEC");
   IElementType TCALL_STAT = new ALittleElementType("TCALL_STAT");
   IElementType TEMPLATE_DEC = new ALittleElementType("TEMPLATE_DEC");
+  IElementType TEMPLATE_EXTENDS_CLASS_DEC = new ALittleElementType("TEMPLATE_EXTENDS_CLASS_DEC");
+  IElementType TEMPLATE_EXTENDS_STRUCT_DEC = new ALittleElementType("TEMPLATE_EXTENDS_STRUCT_DEC");
   IElementType TEMPLATE_PAIR_DEC = new ALittleElementType("TEMPLATE_PAIR_DEC");
   IElementType THROW_EXPR = new ALittleElementType("THROW_EXPR");
   IElementType USING_DEC = new ALittleElementType("USING_DEC");
@@ -585,6 +587,12 @@ public interface ALittleTypes {
       }
       else if (type == TEMPLATE_DEC) {
         return new ALittleTemplateDecImpl(node);
+      }
+      else if (type == TEMPLATE_EXTENDS_CLASS_DEC) {
+        return new ALittleTemplateExtendsClassDecImpl(node);
+      }
+      else if (type == TEMPLATE_EXTENDS_STRUCT_DEC) {
+        return new ALittleTemplateExtendsStructDecImpl(node);
       }
       else if (type == TEMPLATE_PAIR_DEC) {
         return new ALittleTemplatePairDecImpl(node);

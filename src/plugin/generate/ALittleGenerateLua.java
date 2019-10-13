@@ -223,11 +223,15 @@ public class ALittleGenerateLua {
             for (ALittleAllType allType : allTypeList) {
                 ALittleGuess guessTemplateValue = allType.guessType();
                 if (guessTemplateValue instanceof ALittleGuessClass) {
-                    String[] split = guessTemplateValue.value.split("\\.");
+                    ALittleGuessClass guessClass = (ALittleGuessClass)guessTemplateValue;
+                    String name = guessClass.value;
+                    if (guessClass.usingName != null) name = guessClass.usingName;
+
+                    String[] split = name.split("\\.");
                     if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
                         templateParamList.add(split[1]);
                     } else {
-                        templateParamList.add(guessTemplateValue.value);
+                        templateParamList.add(name);
                     }
                 } else {
                     templateParamList.add("nil");

@@ -18,11 +18,21 @@ public class ALittleGuessClass extends ALittleGuess {
     public @NotNull List<ALittleGuess> templateList = new ArrayList<>();            // 类本身定义的模板列表
     public @NotNull Map<String, ALittleGuess> templateMap = new HashMap<>();        // 填充后的模板实例
 
+    public String usingName;        // 如果是using定义出来的，那么就有这个值
     public @NotNull ALittleClassDec element;
-    public ALittleGuessClass(@NotNull String namespaceName, @NotNull String className, @NotNull ALittleClassDec e) {
+    public ALittleGuessClass(@NotNull String namespaceName, @NotNull String className,
+                             @NotNull ALittleClassDec e, String un) {
         mNamespaceName = namespaceName;
         mClassName = className;
         element = e;
+        usingName = un;
+    }
+
+    @NotNull
+    public ALittleGuessClass Clone() {
+        ALittleGuessClass guess = new ALittleGuessClass(mNamespaceName, mClassName, element, usingName);
+        guess.UpdateValue();
+        return guess;
     }
 
     @NotNull

@@ -14,43 +14,19 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public class ALittleTemplatePairDecImpl extends ASTWrapperPsiElement implements ALittleTemplatePairDec {
+public class ALittleTemplateExtendsStructDecImpl extends ASTWrapperPsiElement implements ALittleTemplateExtendsStructDec {
 
-  public ALittleTemplatePairDecImpl(@NotNull ASTNode node) {
+  public ALittleTemplateExtendsStructDecImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitTemplatePairDec(this);
+    visitor.visitTemplateExtendsStructDec(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ALittleVisitor) accept((ALittleVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public ALittleAllType getAllType() {
-    return findChildByClass(ALittleAllType.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleTemplateExtendsClassDec getTemplateExtendsClassDec() {
-    return findChildByClass(ALittleTemplateExtendsClassDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleTemplateExtendsStructDec getTemplateExtendsStructDec() {
-    return findChildByClass(ALittleTemplateExtendsStructDec.class);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getIdContent() {
-    return findNotNullChildByType(ID_CONTENT);
   }
 
   @Override

@@ -475,6 +475,14 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitTemplateExtendsClassDec(@NotNull ALittleTemplateExtendsClassDec o) {
+    visitPsiElement(o);
+  }
+
+  public void visitTemplateExtendsStructDec(@NotNull ALittleTemplateExtendsStructDec o) {
+    visitPsiElement(o);
+  }
+
   public void visitTemplatePairDec(@NotNull ALittleTemplatePairDec o) {
     visitPsiElement(o);
   }

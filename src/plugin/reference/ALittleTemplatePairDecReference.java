@@ -7,6 +7,8 @@ import plugin.guess.ALittleGuessClass;
 import plugin.guess.ALittleGuessClassTemplate;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.ALittleAllType;
+import plugin.psi.ALittleTemplateExtendsClassDec;
+import plugin.psi.ALittleTemplateExtendsStructDec;
 import plugin.psi.ALittleTemplatePairDec;
 
 import java.util.ArrayList;
@@ -20,16 +22,26 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guessList = new ArrayList<>();
+
         ALittleAllType allType = myElement.getAllType();
+        ALittleTemplateExtendsClassDec extendsClassDec = myElement.getTemplateExtendsClassDec();
+        ALittleTemplateExtendsStructDec extendsStructDec = myElement.getTemplateExtendsStructDec();
+
         ALittleGuess templateExtends = null;
+        boolean isClass = false;
+        boolean isStruct = false;
         if (allType != null) {
             ALittleGuess guess = allType.guessType();
             if (!(guess instanceof ALittleGuessClass)) {
                 throw new ALittleGuessException(allType, "继承的对象必须是一个类");
             }
             templateExtends = guess;
+        } else if (extendsClassDec != null) {
+            isClass = true;
+        } else if (extendsStructDec != null) {
+            isStruct = true;
         }
-        ALittleGuessClassTemplate info = new ALittleGuessClassTemplate(myElement, templateExtends);
+        ALittleGuessClassTemplate info = new ALittleGuessClassTemplate(myElement, templateExtends, isClass, isStruct);
         info.UpdateValue();
         guessList.add(info);
         return guessList;

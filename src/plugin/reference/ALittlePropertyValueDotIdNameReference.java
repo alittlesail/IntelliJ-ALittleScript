@@ -94,7 +94,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
         if (guess instanceof ALittleGuessClass) {
             ALittleGuessClass guessClass = (ALittleGuessClass)guess;
             ALittleGuessClass info = new ALittleGuessClass(guessClass.GetNamespaceName(),
-                    guessClass.GetClassName(), guessClass.element);
+                    guessClass.GetClassName(), guessClass.element, guessClass.usingName);
             info.templateList.addAll(guessClass.templateList);
             for (Map.Entry<String, ALittleGuess> entry : guessClass.templateMap.entrySet()) {
                 info.templateMap.put(entry.getKey(), replaceTemplate(entry.getValue()));

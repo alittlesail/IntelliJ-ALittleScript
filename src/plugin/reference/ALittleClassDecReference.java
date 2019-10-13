@@ -27,7 +27,7 @@ public class ALittleClassDecReference extends ALittleReference<ALittleClassDec> 
             throw new ALittleGuessException(myElement, "没有定义类名");
         }
 
-        ALittleGuessClass info = new ALittleGuessClass(mNamespace, classNameDec.getIdContent().getText(), myElement);
+        ALittleGuessClass info = new ALittleGuessClass(mNamespace, classNameDec.getIdContent().getText(), myElement, null);
         ALittleTemplateDec templateDec = myElement.getTemplateDec();
         if (templateDec != null) {
             info.templateList = templateDec.guessTypes();

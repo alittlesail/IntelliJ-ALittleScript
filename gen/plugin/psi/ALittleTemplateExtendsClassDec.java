@@ -8,19 +8,7 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public interface ALittleTemplatePairDec extends PsiElement {
-
-  @Nullable
-  ALittleAllType getAllType();
-
-  @Nullable
-  ALittleTemplateExtendsClassDec getTemplateExtendsClassDec();
-
-  @Nullable
-  ALittleTemplateExtendsStructDec getTemplateExtendsStructDec();
-
-  @NotNull
-  PsiElement getIdContent();
+public interface ALittleTemplateExtendsClassDec extends PsiElement {
 
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;
