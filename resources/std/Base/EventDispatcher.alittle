@@ -10,13 +10,13 @@ public struct Event
 public class EventDispatcher
 {
     // 侦听对象，保存所有侦听这个控件的逻辑对象，以及它们的回调函数
-    private Map<string, Map<any, Map<Functor<(any, Event)>, bool> > > _listeners;
+    private Map<string, Map<any, Map<Functor<(any, Event)>, bool>>> _listeners;
     // 是否禁用，如果_abs_disable为true，那么它调用DispatchEvent时什么都不做
     private bool _abs_disabled;
 
     public Ctor()
     {
-        this._listeners = new Map<string, Map<any, Map<Functor<(any, Event)>, bool> > >();
+        this._listeners = new Map<string, Map<any, Map<Functor<(any, Event)>, bool>>>();
         this._abs_disabled = false;
     }
 
@@ -29,11 +29,11 @@ public class EventDispatcher
         if (object == null) return false;
         if (callback == null) return false;
 
-        Map<any, Map<Functor<(any, Event)>, bool> > callback_table = this._listeners[event_type];
+        Map<any, Map<Functor<(any, Event)>, bool>> callback_table = this._listeners[event_type];
         if (callback_table == null)
         {
             // 创建回调映射表
-            callback_table = new Map<any, Map<Functor<(any, Event)>, bool> >();
+            callback_table = new Map<any, Map<Functor<(any, Event)>, bool>>();
             // 设置为弱引用表
             Setweak(callback_table, true, false);
             // 保存表
@@ -56,7 +56,7 @@ public class EventDispatcher
     // 移除侦听对象：侦听事件类型，侦听对象
     public fun RemoveEventListener(string event_type, any object, Functor<(any, Event)> callback)
     {
-        Map<any, Map<Functor<(any, Event)>, bool> > callback_table = this._listeners[event_type];
+        Map<any, Map<Functor<(any, Event)>, bool>> callback_table = this._listeners[event_type];
         if (callback_table == null) return;
 
         // 将要删除的侦听对象置为nil
@@ -73,7 +73,7 @@ public class EventDispatcher
     // 清理所有侦听
     public fun ClearEventListener()
     {
-        this._listeners = new Map<string, Map<any, Map<Functor<(any, Event)>, bool> > >();
+        this._listeners = new Map<string, Map<any, Map<Functor<(any, Event)>, bool>>>();
     }
 
     public fun DispatchEventType(string type)
@@ -88,7 +88,7 @@ public class EventDispatcher
     public fun DispatchEvent(Event event)
     {
         // 根据事件类型，获得所有侦听者
-        Map<any, Map<Functor<(any, Event)>, bool> > callback_table = this._listeners[event.type];
+        Map<any, Map<Functor<(any, Event)>, bool>> callback_table = this._listeners[event.type];
         // 检查event的type属性，如果没有则什么都不做。所以每个event必须要有一个type属性
         if (callback_table == null) return;
         // 遍历所有侦听者

@@ -4,7 +4,7 @@ namespace ALittle;
 protected class CSVConfig
 {
     protected ICSVFile _csv_file;
-    protected ReflectInfo _reflect_info;
+    protected StructInfo _reflect_info;
     protected CSVInvokeInfo _csv_info;
 
     public fun Init(ICSVFile loader)
@@ -134,14 +134,14 @@ class KeyValueConfig
     }
 }
 
-class SingleKeyTableConfig<T> : CSVConfig
+class SingleKeyTableConfig<T : struct> : CSVConfig
 {
     private Map<any, int> _key_map;
     private Map<any, any> _cache_map;
 
-    public Ctor(ReflectInfo reflect_info)
+    public Ctor()
     {
-        this._reflect_info = reflect_info;
+        this._reflect_info = reflect<T>;
         this._key_map = new Map<any, int>();
         this._cache_map = new Map<any, any>();
         Setweak(this._cache_map, false, true);
@@ -200,7 +200,7 @@ class SingleKeyTableConfig<T> : CSVConfig
     }
 }
 
-class SingleKeyTableIndexConfig<T>
+class SingleKeyTableIndexConfig<T : struct>
 {
     private SingleKeyTableConfig<T> _parent;
     private Map<any, Map<any, bool>> _value_map;
@@ -258,14 +258,14 @@ class SingleKeyTableIndexConfig<T>
     }
 }
 
-class DoubleKeyTableConfig<T> : CSVConfig
+class DoubleKeyTableConfig<T : struct> : CSVConfig
 {
     private Map<any, Map<any, int>> _key_map;
     private Map<any, Map<any, any>> _cache_map;
 
-    public Ctor(ReflectInfo reflect_info)
+    public Ctor()
     {
-        this._reflect_info = reflect_info;
+        this._reflect_info = reflect<T>;
         this._key_map = new Map<any, Map<any, int>>();
         this._cache_map = new Map<any, Map<any, any>>();
         Setweak(this._cache_map, false, true);

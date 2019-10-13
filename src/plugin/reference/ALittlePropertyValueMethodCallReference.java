@@ -172,6 +172,8 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             // 参数占位符直接跳过
             if (name.equals("...")) continue;
             ALittleValueStat valueStat = valueStatList.get(i);
+            String valueName = valueStat.getText();
+            if (name.equals(valueName)) continue;
             result.add(new InlayInfo(name, valueStat.getNode().getStartOffset()));
         }
         return result;

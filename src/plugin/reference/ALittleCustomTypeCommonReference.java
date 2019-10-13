@@ -77,15 +77,28 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                 for (int i = 0; i < templateList.size(); ++i) {
                     if (!(guessClass.templateList.get(i) instanceof ALittleGuessClassTemplate))
                         throw new ALittleGuessException(myElement, "guessClass.templateList不是ALittleGuessClassTemplate");
+
+                    ALittleGuess srcGuess = srcGuessList.get(i);
+                    boolean srcIsClass = false;
+                    boolean srcIsStruct = false;
+                    if (srcGuess instanceof ALittleGuessClassTemplate) {
+                        ALittleGuessClassTemplate srcGuessClassTemplate = (ALittleGuessClassTemplate)srcGuess;
+                        srcGuess = srcGuessClassTemplate.templateExtends;
+                        srcIsClass = srcGuessClassTemplate.isClass;
+                        srcIsStruct = srcGuessClassTemplate.isStruct;
+                    }
+
                     ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guessClass.templateList.get(i);
                     if (guessClassTemplate.templateExtends != null) {
-                        ALittleReferenceOpUtil.guessTypeEqual(myElement, guessClassTemplate.templateExtends, myElement, srcGuessList.get(i));
+                        if (srcGuess == null)
+                            throw new ALittleGuessException(myElement, "填充的类型和模板不一致");
+                        ALittleReferenceOpUtil.guessTypeEqual(myElement, guessClassTemplate.templateExtends, myElement, srcGuess);
                     } else if (guessClassTemplate.isClass) {
-                        if (!(srcGuessList.get(i) instanceof ALittleGuessClass)) {
+                        if (!srcIsClass && !(srcGuess instanceof ALittleGuessClass)) {
                             throw new ALittleGuessException(templateList.get(i), "模板要求的是class，不能是:" + srcGuessList.get(i).value);
                         }
                     } else if (guessClassTemplate.isStruct) {
-                        if (!(srcGuessList.get(i) instanceof ALittleGuessStruct)) {
+                        if (!srcIsStruct && !(srcGuessList.get(i) instanceof ALittleGuessStruct)) {
                             throw new ALittleGuessException(templateList.get(i), "模板要求的是struct，不能是:" + srcGuessList.get(i).value);
                         }
                     }

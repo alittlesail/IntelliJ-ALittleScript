@@ -43,8 +43,18 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
                 return;
             }
 
-            if (guess instanceof ALittleGuessClassTemplate && ((ALittleGuessClassTemplate)guess).templateExtends != null) {
-                guess = ((ALittleGuessClassTemplate)guess).templateExtends;
+            if (guess instanceof ALittleGuessClassTemplate) {
+                ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+                if (guessClassTemplate.templateExtends != null) {
+                    guess = guessClassTemplate.templateExtends;
+                } else if (guessClassTemplate.isStruct) {
+                    if (valueStatList.size() > 0) {
+                        throw new ALittleGuessException(myElement, "new的结构体不能有参数");
+                    }
+                    return;
+                } else if (guessClassTemplate.isClass) {
+                    throw new ALittleGuessException(myElement, "如果要new改模板类型，请不要使用class，无法确定它的构造函数参数");
+                }
             }
 
             if (guess instanceof ALittleGuessClass) {

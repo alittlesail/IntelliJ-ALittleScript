@@ -149,7 +149,7 @@ protected static CreateCSVInfoImpl(string var_type, int split_index) : CSVInvoke
     return invoke_info;
 }
 
-protected static CreateCSVInfo(ReflectInfo reflect_info) : CSVInvokeInfo
+protected static CreateCSVInfo(StructInfo reflect_info) : CSVInvokeInfo
 {
     int split_index = maxn(__split_list);
     assert(split_index > 0, "分隔符数量不足");

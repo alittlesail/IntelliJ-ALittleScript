@@ -150,6 +150,12 @@
           <line>43</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <condition expression="guess.value.equals(&quot;lua.coroutine&quot;)" language="JAVA" />
+          <url>file://$PROJECT_DIR$/src/plugin/reference/ALittleAutoTypeReference.java</url>
+          <line>110</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>

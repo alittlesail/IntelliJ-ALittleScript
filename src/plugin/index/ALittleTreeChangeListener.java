@@ -6,6 +6,7 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 import plugin.reference.ALittleReferenceUtil;
 
@@ -125,6 +126,29 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         List<PsiElement> result = findALittleNameDecList(project, type, psiFile, namespaceName, name, findInGlobal);
         if (result.isEmpty()) return null;
         return result.get(0);
+    }
+
+    public static List<ALittleGuess> findALittleStructGuessList(Project project,
+                                                                String namespaceName,
+                                                                String name) throws ALittleGuessException {
+        PsiElement element = ALittleTreeChangeListener.findALittleNameDec(project,
+                PsiHelper.PsiElementType.STRUCT_NAME, null, namespaceName, name, true);
+        if (element instanceof ALittleStructNameDec) {
+            return ((ALittleStructNameDec) element).guessTypes();
+        }
+        return new ArrayList<>();
+    }
+
+
+    public static List<ALittleGuess> findALittleClassGuessList(Project project,
+                                                                String namespaceName,
+                                                                String name) throws ALittleGuessException {
+        PsiElement element = ALittleTreeChangeListener.findALittleNameDec(project,
+                PsiHelper.PsiElementType.CLASS_NAME, null, namespaceName, name, true);
+        if (element instanceof ALittleClassNameDec) {
+            return ((ALittleClassNameDec) element).guessTypes();
+        }
+        return new ArrayList<>();
     }
 
     public static void findClassAttrList(@NotNull ALittleClassDec classDec,

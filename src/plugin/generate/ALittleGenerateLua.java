@@ -177,22 +177,100 @@ public class ALittleGenerateLua {
             ALittleGuess guess = customType.guessType();
             if (guess instanceof ALittleGuessStruct) {
                 return "{}";
-            } else {
-                String content = GenerateCustomType(customType);
-                content += "(";
-                List<String> paramList = new ArrayList<>();
-                List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
-                for (ALittleValueStat valueStat : valueStatList) {
-                    paramList.add(GenerateValueStat(valueStat));
+            } else if (guess instanceof ALittleGuessClassTemplate) {
+                ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+                if (guessClassTemplate.templateExtends != null) {
+                    // 不处理
+                } else if (guessClassTemplate.isStruct) {
+                    return "{}";
+                } else if (guessClassTemplate.isClass) {
+                    throw new Exception("该模板只是class，不能确定它的构造参数参数");
                 }
-                content += String.join(", ", paramList);
-
-                content += ")";
-                return content;
             }
+
+            String content = GenerateCustomType(customType);
+            content += "(";
+            List<String> paramList = new ArrayList<>();
+            List<ALittleValueStat> valueStatList = opNewStat.getValueStatList();
+            for (ALittleValueStat valueStat : valueStatList) {
+                paramList.add(GenerateValueStat(valueStat));
+            }
+            content += String.join(", ", paramList);
+
+            content += ")";
+            return content;
         }
 
         throw new Exception("new 未知类型");
+    }
+
+    @NotNull
+    private void GenerateCustomTypeTemplateList(List<ALittleGuess> guessList,
+                                       @NotNull List<String> templateParamList,
+                                       @NotNull List<String> templateParamNameList) throws Exception {
+        for (int index = 0; index < guessList.size(); ++index) {
+            ALittleGuess guess = guessList.get(index);
+            if (guess instanceof ALittleGuessClass) {
+                ALittleGuessClass guessClass = (ALittleGuessClass)guess;
+                if (guessClass.templateList.isEmpty()) {
+                    String name = guessClass.value;
+                    if (guessClass.usingName != null) name = guessClass.usingName;
+
+                    String[] split = name.split("\\.");
+                    if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
+                        templateParamList.add(split[1]);
+                    } else {
+                        templateParamList.add(name);
+                    }
+                    templateParamNameList.add(name);
+                } else {
+                    String templateName = guessClass.GetNamespaceName() + "." + guessClass.GetClassName();
+                    String className = templateName;
+                    List<String> subTemplateParamList = new ArrayList<>();
+                    List<String> subTemplateParamNameList = new ArrayList<>();
+                    List<ALittleGuess> subGuessList = new ArrayList<>();
+                    for (ALittleGuess subGuess : guessClass.templateList) {
+                        ALittleGuess valueGuess = guessClass.templateMap.get(subGuess.value);
+                        if (valueGuess == null) throw new Exception("参数模板没有填充完毕");
+                        subGuessList.add(valueGuess);
+                    }
+                    GenerateCustomTypeTemplateList(subGuessList, subTemplateParamList, subTemplateParamNameList);
+
+                    templateName += "<" + String.join(", ", subTemplateParamNameList) + ">";
+                    String namespacePre = "ALittle.";
+                    if (mNamespaceName.equals("ALittle")) namespacePre = "";
+
+                    if (guessClass.GetNamespaceName().equals(mNamespaceName) || guessClass.GetNamespaceName().equals("lua")) {
+                        className = guessClass.GetClassName();
+                    }
+
+                    String content = namespacePre + "Template(" + className;
+                    content += ", \"" + templateName + "\"";
+                    if (!subTemplateParamList.isEmpty()) {
+                        content += ", " + String.join(", ", subTemplateParamList);
+                    }
+                    content += ")";
+                    templateParamNameList.add(templateName);
+                    templateParamList.add(content);
+                }
+            } else if (guess instanceof ALittleGuessClassTemplate) {
+                templateParamList.add("self.__class.__element[" + (index + 1) + "]");
+                if (((ALittleGuessClassTemplate)guess).isStruct) {
+                    templateParamNameList.add("\"..self.__class.__element[" + (index + 1) + "].name..\"");
+                } else {
+                    templateParamNameList.add("\"..self.__class.__element[" + (index + 1) + "].__name..\"");
+                }
+            } else if (guess instanceof ALittleGuessStruct) {
+                templateParamNameList.add(guess.value);
+                String namespacePre = "ALittle.";
+                if (mNamespaceName.equals("ALittle")) namespacePre = "";
+                templateParamList.add(namespacePre + "FindStructByName(\"" + guess.value + "\")");
+                GenerateReflectStructInfo((ALittleGuessStruct)guess);
+            } else {
+                templateParamNameList.add(guess.value);
+                templateParamList.add("nil");
+            }
+        }
     }
 
     @NotNull
@@ -216,44 +294,36 @@ public class ALittleGenerateLua {
                     }
                 }
             }
+            ALittleGuessClass guessClass = (ALittleGuessClass)guess;
 
-            // 如果有模板，那么就
-            List<String> templateParamList = new ArrayList<>();
             List<ALittleAllType> allTypeList = customType.getAllTypeList();
-            for (ALittleAllType allType : allTypeList) {
-                ALittleGuess guessTemplateValue = allType.guessType();
-                if (guessTemplateValue instanceof ALittleGuessClass) {
-                    ALittleGuessClass guessClass = (ALittleGuessClass)guessTemplateValue;
-                    String name = guessClass.value;
-                    if (guessClass.usingName != null) name = guessClass.usingName;
-
-                    String[] split = name.split("\\.");
-                    if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
-                        templateParamList.add(split[1]);
-                    } else {
-                        templateParamList.add(name);
-                    }
-                } else {
-                    templateParamList.add("nil");
-                }
-            }
-
-            String content = "";
+            // 如果有填充模板参数，那么就模板模板
             if (!allTypeList.isEmpty()) {
+                List<String> templateParamList = new ArrayList<>();
+                List<String> templateParamNameList = new ArrayList<>();
+                List<ALittleGuess> guessList = new ArrayList<>();
+                for (ALittleAllType allType : allTypeList) {
+                    guessList.add(allType.guessType());
+                }
+                GenerateCustomTypeTemplateList(guessList, templateParamList, templateParamNameList);
+
+                String templateName = guessClass.GetNamespaceName() + "." + guessClass.GetClassName();
+
+                templateName += "<" + String.join(", ", templateParamNameList) + ">";
                 String namespacePre = "ALittle.";
                 if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
-                content = namespacePre + "Template(" + className;
-                content += ", \"" + guess.value + "\"";
+                String content = namespacePre + "Template(" + className;
+                content += ", \"" + templateName + "\"";
                 if (!templateParamList.isEmpty()) {
                     content += ", " + String.join(", ", templateParamList);
                 }
                 content += ")";
-            } else {
-                content = className;
-            }
 
-            return content;
+                return content;
+            } else {
+                return className;
+            }
             // 如果是模板
         } else if (guess instanceof ALittleGuessClassTemplate) {
             ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
@@ -791,17 +861,38 @@ public class ALittleGenerateLua {
         if (customType == null) throw new Exception("reflect表达式没有设置反射对象");
 
         ALittleGuess guess = customType.guessType();
-        if (!(guess instanceof ALittleGuessStruct)) {
-            throw new Exception("reflect表达式的反射对象必须是struct");
+        if (guess instanceof ALittleGuessStruct) {
+            ALittleGuessStruct guessStruct = (ALittleGuessStruct)guess;
+
+            String namespacePre = "ALittle.";
+            if (mNamespaceName.equals("ALittle")) namespacePre = "";
+
+            String content = namespacePre + "FindStructByName(\"" + guessStruct.value + "\")";
+            GenerateReflectStructInfo(guessStruct);
+            return content;
+        } else if (guess instanceof ALittleGuessClass) {
+            ALittleGuessClass guessClass = (ALittleGuessClass)guess;
+            String name = guessClass.value;
+            if (guessClass.usingName != null) name = guessClass.usingName;
+            String split[] = name.split("\\.");
+            if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
+                return split[1];
+            } else {
+                return name;
+            }
+        } else if (guess instanceof ALittleGuessClassTemplate) {
+            ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+            if (guessClassTemplate.templateExtends != null
+                    || guessClassTemplate.isClass || guessClassTemplate.isStruct) {
+                // 检查下标
+                ALittleTemplatePairDec templatePairDec = guessClassTemplate.element;
+                ALittleTemplateDec templateDec = (ALittleTemplateDec)templatePairDec.getParent();
+                int index = templateDec.getTemplatePairDecList().indexOf(templatePairDec);
+                return "self.__class.__element[" + (index + 1) + "]";
+            }
         }
-        ALittleGuessStruct guessStruct = (ALittleGuessStruct)guess;
 
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-        String content = namespacePre + "FindReflectByName(\"" + guessStruct.value + "\")";
-        GenerateReflectStructInfo(guessStruct);
-        return content;
+        throw new Exception("reflect只能反射class或者struct");
     }
 
     private void GenerateReflectStructInfo(@NotNull ALittleGuessStruct guessStruct) throws Exception {
@@ -831,6 +922,7 @@ public class ALittleGenerateLua {
         content += "name = \"" + guessStruct.value + "\",\n";
         content += "ns_name = \"" + split_list[0] + "\",\n";
         content += "rl_name = \"" + split_list[1] + "\",\n";
+        content += "hash_code = " + PsiHelper.JSHash(guessStruct.value) + ",\n";
         content += "name_list = {" + String.join(",", nameList) +"},\n";
         content += "type_list = {" + String.join(",", typeList) + "}\n";
         content += "}";
@@ -2121,7 +2213,7 @@ public class ALittleGenerateLua {
 
         for (Map.Entry<String, String> entry : mReflectMap.entrySet()) {
             content.append(namespacePre)
-                    .append("RegReflect(")
+                    .append("RegStruct(")
                     .append(PsiHelper.JSHash(entry.getKey()))
                     .append(", \"")
                     .append(entry.getKey())

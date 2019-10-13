@@ -2,10 +2,7 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
-import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessClass;
-import plugin.guess.ALittleGuessClassTemplate;
-import plugin.guess.ALittleGuessException;
+import plugin.guess.*;
 import plugin.psi.ALittleAllType;
 import plugin.psi.ALittleTemplateExtendsClassDec;
 import plugin.psi.ALittleTemplateExtendsStructDec;
@@ -32,8 +29,8 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
         boolean isStruct = false;
         if (allType != null) {
             ALittleGuess guess = allType.guessType();
-            if (!(guess instanceof ALittleGuessClass)) {
-                throw new ALittleGuessException(allType, "继承的对象必须是一个类");
+            if (!(guess instanceof ALittleGuessClass) && !(guess instanceof ALittleGuessStruct)) {
+                throw new ALittleGuessException(allType, "继承的对象必须是一个类或者结构体");
             }
             templateExtends = guess;
         } else if (extendsClassDec != null) {

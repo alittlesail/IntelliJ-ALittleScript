@@ -375,7 +375,7 @@ protected static CreateMessageInfo(string var_type) : ProtocolInvokeInfo
     return CreateMessageInfoImpl(reflect_info);
 }
 
-protected static CreateMessageInfoImpl(ReflectInfo reflect_info) : ProtocolInvokeInfo
+protected static CreateMessageInfoImpl(StructInfo reflect_info) : ProtocolInvokeInfo
 {
     auto invoke_info = new ProtocolInvokeInfo();
     invoke_info.wfunc = PS_WriteMessage;

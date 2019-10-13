@@ -139,8 +139,8 @@ end
 assert(CSVConfig, " extends class:CSVConfig is nil")
 SingleKeyTableConfig = Class(CSVConfig, "ALittle.SingleKeyTableConfig")
 
-function SingleKeyTableConfig:Ctor(reflect_info)
-	___rawset(self, "_reflect_info", reflect_info)
+function SingleKeyTableConfig:Ctor()
+	___rawset(self, "_reflect_info", self.__class.__element[1])
 	___rawset(self, "_key_map", {})
 	___rawset(self, "_cache_map", {})
 	Setweak(self._cache_map, false, true)
@@ -201,7 +201,7 @@ function SingleKeyTableConfig:CreateIndex(field)
 	if col_index == 0 then
 		return nil
 	end
-	return Template(SingleKeyTableIndexConfig, "ALittle.SingleKeyTableIndexConfig<T>", nil)(self, col_index, is_number)
+	return Template(SingleKeyTableIndexConfig, "ALittle.SingleKeyTableIndexConfig<"..self.__class.__element[1].name..">", self.__class.__element[1])(self, col_index, is_number)
 end
 
 SingleKeyTableIndexConfig = Class(nil, "ALittle.SingleKeyTableIndexConfig")
@@ -257,8 +257,8 @@ end
 assert(CSVConfig, " extends class:CSVConfig is nil")
 DoubleKeyTableConfig = Class(CSVConfig, "ALittle.DoubleKeyTableConfig")
 
-function DoubleKeyTableConfig:Ctor(reflect_info)
-	___rawset(self, "_reflect_info", reflect_info)
+function DoubleKeyTableConfig:Ctor()
+	___rawset(self, "_reflect_info", self.__class.__element[1])
 	___rawset(self, "_key_map", {})
 	___rawset(self, "_cache_map", {})
 	Setweak(self._cache_map, false, true)

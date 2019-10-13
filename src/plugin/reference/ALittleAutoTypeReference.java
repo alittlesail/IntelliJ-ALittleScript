@@ -104,7 +104,7 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
     public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         List<InlayInfo> result = new ArrayList<>();
         // 获取类型
-        ALittleGuess guessType = myElement.guessType();
+        ALittleGuess guess = myElement.guessType();
 
         ALittleVarAssignNameDec nameDec = null;
         // 如果是定义并赋值
@@ -119,13 +119,16 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
 
         // 优化显示
         if (nameDec == null) return result;
-        String[] nameList = guessType.value.split("\\.");
-        if (nameList.length >= 2) {
-            result.add(new InlayInfo(nameList[1], nameDec.getNode().getStartOffset()));
-        } else {
-            result.add(new InlayInfo(guessType.value, nameDec.getNode().getStartOffset()));
+        if (guess instanceof ALittleGuessClass || guess instanceof ALittleGuessClassName
+                || guess instanceof ALittleGuessStruct || guess instanceof ALittleGuessStructName) {
+            int indexDot = guess.value.indexOf(".");
+            int indexTail = guess.value.indexOf("...");
+            if (indexDot != -1 && indexDot != indexTail) {
+                result.add(new InlayInfo(guess.value.substring(indexDot + 1), nameDec.getNode().getStartOffset()));
+                return result;
+            }
         }
-
+        result.add(new InlayInfo(guess.value, nameDec.getNode().getStartOffset()));
         return result;
     }
 }
