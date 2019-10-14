@@ -3332,7 +3332,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LESS templatePairDec (COMMA templatePairDec)? GREATER
+  // LESS templatePairDec (COMMA templatePairDec)* GREATER
   public static boolean templateDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "templateDec")) return false;
     if (!nextTokenIs(b, LESS)) return false;
@@ -3347,10 +3347,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // (COMMA templatePairDec)?
+  // (COMMA templatePairDec)*
   private static boolean templateDec_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "templateDec_2")) return false;
-    templateDec_2_0(b, l + 1);
+    while (true) {
+      int c = current_position_(b);
+      if (!templateDec_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "templateDec_2", c)) break;
+    }
     return true;
   }
 

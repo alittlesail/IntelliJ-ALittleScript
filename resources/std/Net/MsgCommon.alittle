@@ -199,6 +199,13 @@ public class IMsgCommon
     }
 
     // 发送数据包
+    public fun SendMsg<T:struct>(T msg)
+    {
+        auto info = reflect<T>;
+        this.Send(info.hash_code, msg, 0);
+    }
+
+    // 发送数据包
     protected fun Send(int msg_id, any msg_body, int rpc_id)
     {
         if (!this.IsConnected()) return;

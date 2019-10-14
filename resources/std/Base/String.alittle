@@ -25,7 +25,7 @@ public static String_CopyTable<T>(T info) : T
         else
             new_info[key] = String_CopyTable(value);
     }
-    return new_info;
+    return cast<T>(new_info);
 }
 
 // 去掉前后空格

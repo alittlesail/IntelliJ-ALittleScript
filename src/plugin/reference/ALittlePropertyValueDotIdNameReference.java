@@ -41,7 +41,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
         if (guess instanceof ALittleGuessClassTemplate && !mClassGuess.templateMap.isEmpty()) {
             if (!mClassGuess.templateMap.containsKey(guess.value)) {
-                throw new ALittleGuessException(myElement, mClassGuess.value + "没有定义模板" + guess.value);
+                return guess;
             }
             return mClassGuess.templateMap.get(guess.value);
         }
@@ -130,12 +130,10 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
                 guess = ((ALittleClassVarDec) element).guessType();
 
                 if (mClassGuess != null && guess instanceof ALittleGuessClassTemplate && !mClassGuess.templateMap.isEmpty()) {
-                    if (!mClassGuess.templateMap.containsKey(guess.value)) {
-                        throw new ALittleGuessException(myElement, mClassGuess.value + "没有定义模板" + guess.value);
+                    if (mClassGuess.templateMap.containsKey(guess.value)) {
+                        guess = mClassGuess.templateMap.get(guess.value);
                     }
-                    guess = mClassGuess.templateMap.get(guess.value);
                 }
-
             } else if (element instanceof ALittleStructVarDec) {
                 guess = ((ALittleStructVarDec) element).guessType();
             } else if (element instanceof ALittleEnumVarDec) {

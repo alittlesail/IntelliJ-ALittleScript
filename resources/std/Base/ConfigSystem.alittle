@@ -31,7 +31,7 @@ public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
     public fun GetConfig<T>(string key, T default) : T
     {
         // 获取值
-        any value = this._config_map[key];
+        T value = cast<T>(this._config_map[key]);
         // 如果为空则返回默认值
         if (value == null) return default;
         return value;

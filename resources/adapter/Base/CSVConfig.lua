@@ -140,7 +140,7 @@ assert(CSVConfig, " extends class:CSVConfig is nil")
 SingleKeyTableConfig = Class(CSVConfig, "ALittle.SingleKeyTableConfig")
 
 function SingleKeyTableConfig:Ctor()
-	___rawset(self, "_reflect_info", self.__class.__element[1])
+	___rawset(self, "_reflect_info", self.__class.__element[2])
 	___rawset(self, "_key_map", {})
 	___rawset(self, "_cache_map", {})
 	Setweak(self._cache_map, false, true)
@@ -201,7 +201,7 @@ function SingleKeyTableConfig:CreateIndex(field)
 	if col_index == 0 then
 		return nil
 	end
-	return Template(SingleKeyTableIndexConfig, "ALittle.SingleKeyTableIndexConfig<"..self.__class.__element[1].name..">", self.__class.__element[1])(self, col_index, is_number)
+	return Template(SingleKeyTableIndexConfig, "ALittle.SingleKeyTableIndexConfig<"..self.__class.__element[1].__name..", "..self.__class.__element[2].__name..", "..self.__class.__element[3].name..">", self.__class.__element[1], self.__class.__element[2], self.__class.__element[3])(self, col_index, is_number)
 end
 
 SingleKeyTableIndexConfig = Class(nil, "ALittle.SingleKeyTableIndexConfig")
@@ -225,12 +225,12 @@ function SingleKeyTableIndexConfig:Ctor(parent, col_index, is_number)
 	end
 end
 
-function SingleKeyTableIndexConfig:GetKeySet(key)
-	return self._value_map[key]
+function SingleKeyTableIndexConfig:GetKeySet(index)
+	return self._value_map[index]
 end
 
-function SingleKeyTableIndexConfig:GetOne(key)
-	local keys = self._value_map[key]
+function SingleKeyTableIndexConfig:GetOne(index)
+	local keys = self._value_map[index]
 	if keys == nil then
 		return nil
 	end
@@ -240,9 +240,9 @@ function SingleKeyTableIndexConfig:GetOne(key)
 	return nil
 end
 
-function SingleKeyTableIndexConfig:GetList(key)
+function SingleKeyTableIndexConfig:GetList(index)
 	local list = {}
-	local keys = self._value_map[key]
+	local keys = self._value_map[index]
 	if keys == nil then
 		return list
 	end
@@ -258,7 +258,7 @@ assert(CSVConfig, " extends class:CSVConfig is nil")
 DoubleKeyTableConfig = Class(CSVConfig, "ALittle.DoubleKeyTableConfig")
 
 function DoubleKeyTableConfig:Ctor()
-	___rawset(self, "_reflect_info", self.__class.__element[1])
+	___rawset(self, "_reflect_info", self.__class.__element[3])
 	___rawset(self, "_key_map", {})
 	___rawset(self, "_cache_map", {})
 	Setweak(self._cache_map, false, true)
@@ -310,9 +310,9 @@ function DoubleKeyTableConfig:GetData(first_key, second_key)
 	if self._csv_file == nil then
 		return nil
 	end
-	local value = self._cache_map[first_key]
-	if value ~= nil then
-		value = value[second_key]
+	local value_map = self._cache_map[first_key]
+	if value_map ~= nil then
+		local value = value_map[second_key]
 		if value ~= nil then
 			return value
 		end
@@ -325,7 +325,7 @@ function DoubleKeyTableConfig:GetData(first_key, second_key)
 	if row == nil then
 		return nil
 	end
-	value = self:LoadCell(row)
+	local value = self:LoadCell(row)
 	if value == nil then
 		return nil
 	end

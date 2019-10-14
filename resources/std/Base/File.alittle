@@ -78,7 +78,7 @@ public static File_GetFileAttrByDir(string path, Map<string, lua.fileattr> file_
     if (file_map == null)
         file_map = new Map<string, lua.fileattr>();
     // 遍历路径
-    for (string file in dir(path))
+    for (auto file in dir(path))
     {
         // 跳过当前目录，父级目录
         if (file != "." && file != "..")

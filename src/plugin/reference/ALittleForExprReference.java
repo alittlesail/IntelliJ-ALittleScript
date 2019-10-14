@@ -64,7 +64,6 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
             if (valueStat == null) return;
             List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
 
-            // 如果for的对象是any，那么就放过，不检查了
             List<ALittleGuess> guessList = valueStat.guessTypes();
 
             // 检查List

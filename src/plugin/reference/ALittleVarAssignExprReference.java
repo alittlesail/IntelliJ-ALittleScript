@@ -64,9 +64,8 @@ public class ALittleVarAssignExprReference extends ALittleReference<ALittleVarAs
         ALittleGuess valueGuess = valueStat.guessType();
 
         if (pairGuess instanceof ALittleGuessClassTemplate) {
-            ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)pairGuess;
-            if (guessClassTemplate.templateExtends == null && !guessClassTemplate.isStruct && !guessClassTemplate.isClass) {
-                throw new ALittleGuessException(valueStat, "对于没有约束的模板不能进行赋值");
+            if (!pairGuess.value.equals(valueGuess.value) && !valueGuess.value.equals("null")) {
+                throw new ALittleGuessException(valueStat, "等号左边的变量和表达式的类型不同");
             }
         }
 

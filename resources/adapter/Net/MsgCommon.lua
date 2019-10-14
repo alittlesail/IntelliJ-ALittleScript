@@ -156,6 +156,11 @@ function IMsgCommon:HandleMessage(id, rpc_id, factory)
 	end
 end
 
+function IMsgCommon:SendMsg(T, msg)
+	local info = T
+	self:Send(info.hash_code, msg, 0)
+end
+
 function IMsgCommon:Send(msg_id, msg_body, rpc_id)
 	if not self:IsConnected() then
 		return

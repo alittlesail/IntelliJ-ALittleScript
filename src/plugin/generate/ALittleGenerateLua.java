@@ -1137,6 +1137,11 @@ public class ALittleGenerateLua {
                                 }
                             } else if (guess instanceof ALittleGuessStruct) {
                                 paramList.add(namespaceName + "FindStructByName(\"" + guess.value + "\"");
+                            } else if (guess instanceof ALittleGuessClassTemplate) {
+                                ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+                                ALittleTemplateDec templateDec = (ALittleTemplateDec)guessClassTemplate.element.getParent();
+                                int templateIndex = templateDec.getTemplatePairDecList().indexOf(guessClassTemplate.element);
+                                paramList.add("self.__class.__element[" + (templateIndex + 1) + "]");
                             } else {
                                 throw new Exception("ALittlePropertyValueMethodCallReference.generateTemplateParamList()的返回列表中出现其他类型的ALittleGuess:" + guess.value);
                             }

@@ -4,6 +4,7 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.guess.*;
 import plugin.psi.*;
 
@@ -66,24 +67,26 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
                 List<ALittleForPairDec> pairDecList = inExpr.getForPairDecList();
                 int index = pairDecList.indexOf(forPairDec);
                 // 获取循环对象的类型
-                ALittleGuess guess = valueStat.guessType();
+                List<ALittleGuess> valueGuessList = valueStat.guessTypes();
                 // 处理List
-                if (guess instanceof ALittleGuessList) {
+                if (valueGuessList.size() == 1 && valueGuessList.get(0) instanceof ALittleGuessList) {
                     // 对于List的key使用auto，那么就默认是int类型
                     if (index == 0) {
                         return ALittleGuessPrimitive.sPrimitiveGuessMap.get("int");
                     } else if (index == 1) {
-                        guessList.add(((ALittleGuessList)guess).subType);
+                        guessList.add(((ALittleGuessList)valueGuessList.get(0)).subType);
                     }
                     // 处理Map
-                } else if (guess instanceof ALittleGuessMap) {
+                } else if (valueGuessList.size() == 1 && valueGuessList.get(0)  instanceof ALittleGuessMap) {
                     // 如果是key，那么就取key的类型
                     if (index == 0) {
-                        guessList.add(((ALittleGuessMap)guess).keyType);
+                        guessList.add(((ALittleGuessMap)valueGuessList.get(0)).keyType);
                         // 如果是value，那么就取value的类型
                     } else if (index == 1) {
-                        guessList.add(((ALittleGuessMap)guess).valueType);
+                        guessList.add(((ALittleGuessMap)valueGuessList.get(0)).valueType);
                     }
+                } else if (ALittleReferenceUtil.IsPairsFunction(valueGuessList)) {
+                    guessList.add(valueGuessList.get(2));
                 }
             } else if (parent instanceof ALittleForStartStat) {
                 ALittleForStartStat startStat = (ALittleForStartStat)parent;

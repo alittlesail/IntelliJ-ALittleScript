@@ -3,10 +3,7 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessException;
-import plugin.guess.ALittleGuessParamTail;
-import plugin.guess.ALittleGuessReturnTail;
+import plugin.guess.*;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -167,6 +164,13 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
             if (i >= returnTypeList.size()) break;
             ALittleGuess returnTypeGuess = returnTypeList.get(i).guessType();
             if (returnTypeGuess instanceof ALittleGuessReturnTail) break;
+
+            if (returnTypeGuess instanceof ALittleGuessClassTemplate) {
+                if (!returnTypeGuess.value.equals(guessTypeList.get(i).value) && !guessTypeList.get(i).value.equals("null")) {
+                    throw new ALittleGuessException(targetValueStat, "return的第" + (i + 1) + "个返回值函数定义的返回值类型不同");
+                }
+            }
+
             try {
                 ALittleReferenceOpUtil.guessTypeEqual(returnTypeGuess, targetValueStat, guessTypeList.get(i));
             } catch (ALittleGuessException e) {

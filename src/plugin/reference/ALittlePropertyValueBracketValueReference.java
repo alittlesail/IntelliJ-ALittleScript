@@ -2,10 +2,7 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
-import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessException;
-import plugin.guess.ALittleGuessList;
-import plugin.guess.ALittleGuessMap;
+import plugin.guess.*;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -77,6 +74,12 @@ public class ALittlePropertyValueBracketValueReference extends ALittleReference<
                 throw new ALittleGuessException(valueStat, "索引值的类型必须是int或者是I64，不能是:" + keyGuessType.value);
             }
         } else if (preType instanceof ALittleGuessMap) {
+            ALittleGuessMap preTypeMap = (ALittleGuessMap)preType;
+            if (preTypeMap.keyType instanceof ALittleGuessClassTemplate) {
+                if (!preTypeMap.keyType.value.equals(keyGuessType.value)) {
+                    throw new ALittleGuessException(valueStat, "索引值的类型必须是" + preTypeMap.keyType.value + "，不能是:" + keyGuessType.value);
+                }
+            }
             try {
                 ALittleReferenceOpUtil.guessTypeEqual(((ALittleGuessMap)preType).keyType, valueStat, keyGuessType);
             } catch (ALittleGuessException e) {
