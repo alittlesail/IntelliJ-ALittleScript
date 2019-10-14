@@ -7,6 +7,8 @@ private auto tostring = lua.tostring;
 private auto setmetatable = lua.setmetatable;
 private auto coroutine = lua.coroutine;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 private struct FunctorMetatable
 {
     any __call;
@@ -70,25 +72,38 @@ protected static Bind(any func, ...) : any
     return object;
 }
 
-private FunctorMetatable __co_functor_mt = new FunctorMetatable();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+private struct CoFunctorMetatable
+{
+    any __call;
+    Functor<(CoFunctorObject):string> __tostring;
+}
+
+private struct CoFunctorObject
+{
+    Functor<(any):any> _func;
+}
+
+private CoFunctorMetatable __co_functor_mt = new CoFunctorMetatable();
 // 设置call函数。这样创建类实例对象时，可以使用A()这样的书写方式。
-private static __co_functor_mt__call(FunctorObject caller, ...) : any
+private static __co_functor_mt__call(CoFunctorObject caller, ...) : any
 {
     return cast<Functor<(any):any>>(coroutine.wrap(caller._func))(...);
 }
 __co_functor_mt.__call = __co_functor_mt__call;
 
 // 设置tostring函数
-private static __co_functor_mt__tostring(FunctorObject caller) : string
+private static __co_functor_mt__tostring(CoFunctorObject caller) : string
 {
     return "[ALittle CoWrap:" .. tostring(caller) .. "]";
 }
 __co_functor_mt.__tostring = __co_functor_mt__tostring;
 
-protected static CoWrap(any func) : FunctorObject
+protected static CoWrap(any func) : CoFunctorObject
 {
     // 委托对象
-    FunctorObject object = new FunctorObject();
+    CoFunctorObject object = new CoFunctorObject();
     // 保存func
     object._func = func;
     // 委托对象的metatable
