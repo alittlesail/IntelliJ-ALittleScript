@@ -70,7 +70,7 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
             ALittleGuess paramGuessInfo = guessFunctor.functorParamList.get(i - 1);
             ALittleValueStat paramValueStat = valueStatList.get(i);
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(myElement, paramGuessInfo, paramValueStat, paramValueStat.guessType());
+                ALittleReferenceOpUtil.guessTypeEqual(paramGuessInfo, paramValueStat, paramValueStat.guessType());
             } catch (ALittleGuessException e) {
                 throw new ALittleGuessException(paramValueStat, "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
             }

@@ -129,7 +129,7 @@ protected static CreateCSVInfoImpl(string var_type, int split_index) : CSVInvoke
 {
     assert(split_index > 0, "分隔符数量不足");
 
-    auto reflect_info = FindReflectByName(var_type);
+    auto reflect_info = FindStructByName(var_type);
     assert(reflect_info != null, "FindReflectByName调用失败! 未知类型:" .. var_type);
 
     auto invoke_info = new CSVInvokeInfo();

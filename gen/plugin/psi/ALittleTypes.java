@@ -112,6 +112,7 @@ public interface ALittleTypes {
   IElementType PROPERTY_VALUE_EXPR = new ALittleElementType("PROPERTY_VALUE_EXPR");
   IElementType PROPERTY_VALUE_FIRST_TYPE = new ALittleElementType("PROPERTY_VALUE_FIRST_TYPE");
   IElementType PROPERTY_VALUE_METHOD_CALL = new ALittleElementType("PROPERTY_VALUE_METHOD_CALL");
+  IElementType PROPERTY_VALUE_METHOD_TEMPLATE = new ALittleElementType("PROPERTY_VALUE_METHOD_TEMPLATE");
   IElementType PROPERTY_VALUE_SUFFIX = new ALittleElementType("PROPERTY_VALUE_SUFFIX");
   IElementType PROPERTY_VALUE_THIS_TYPE = new ALittleElementType("PROPERTY_VALUE_THIS_TYPE");
   IElementType PROTO_MODIFIER = new ALittleElementType("PROTO_MODIFIER");
@@ -548,6 +549,9 @@ public interface ALittleTypes {
       }
       else if (type == PROPERTY_VALUE_METHOD_CALL) {
         return new ALittlePropertyValueMethodCallImpl(node);
+      }
+      else if (type == PROPERTY_VALUE_METHOD_TEMPLATE) {
+        return new ALittlePropertyValueMethodTemplateImpl(node);
       }
       else if (type == PROPERTY_VALUE_SUFFIX) {
         return new ALittlePropertyValueSuffixImpl(node);

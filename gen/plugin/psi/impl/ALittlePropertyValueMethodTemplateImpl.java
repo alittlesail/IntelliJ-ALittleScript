@@ -14,14 +14,14 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public class ALittleClassMethodDecImpl extends ASTWrapperPsiElement implements ALittleClassMethodDec {
+public class ALittlePropertyValueMethodTemplateImpl extends ASTWrapperPsiElement implements ALittlePropertyValueMethodTemplate {
 
-  public ALittleClassMethodDecImpl(@NotNull ASTNode node) {
+  public ALittlePropertyValueMethodTemplateImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitClassMethodDec(this);
+    visitor.visitPropertyValueMethodTemplate(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -30,45 +30,9 @@ public class ALittleClassMethodDecImpl extends ASTWrapperPsiElement implements A
   }
 
   @Override
-  @Nullable
-  public ALittleAccessModifier getAccessModifier() {
-    return findChildByClass(ALittleAccessModifier.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleCoModifier getCoModifier() {
-    return findChildByClass(ALittleCoModifier.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleMethodBodyDec getMethodBodyDec() {
-    return findChildByClass(ALittleMethodBodyDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleMethodNameDec getMethodNameDec() {
-    return findChildByClass(ALittleMethodNameDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleMethodParamDec getMethodParamDec() {
-    return findChildByClass(ALittleMethodParamDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleMethodReturnDec getMethodReturnDec() {
-    return findChildByClass(ALittleMethodReturnDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleTemplateDec getTemplateDec() {
-    return findChildByClass(ALittleTemplateDec.class);
+  @NotNull
+  public List<ALittleAllType> getAllTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleAllType.class);
   }
 
   @Override

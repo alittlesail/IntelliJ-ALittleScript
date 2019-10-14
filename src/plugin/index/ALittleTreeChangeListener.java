@@ -139,6 +139,14 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         return new ArrayList<>();
     }
 
+    public static ALittleGuess findALittleStructGuess(Project project, String namespaceName, String name) throws ALittleGuessException {
+        PsiElement element = ALittleTreeChangeListener.findALittleNameDec(project,
+                PsiHelper.PsiElementType.STRUCT_NAME, null, namespaceName, name, true);
+        if (element instanceof ALittleStructNameDec) {
+            return ((ALittleStructNameDec) element).guessType();
+        }
+        return null;
+    }
 
     public static List<ALittleGuess> findALittleClassGuessList(Project project,
                                                                 String namespaceName,

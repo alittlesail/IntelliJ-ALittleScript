@@ -24,9 +24,9 @@ public static Setweak(any table, bool key, bool value)
     lua.setmetatable(table, mt);
 }
 
-public static Push(List<any> list, any object)
+public static Push<T>(List<T> list, T object)
 {
-    lua.table.insert(list, object);
+    lua.table.insert(list, cast<int>(object));
 }
 
 public static DateInfo(int time) : lua.dateinfo

@@ -92,7 +92,7 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
                 for (int i = 0; i < valueStatList.size(); ++i) {
                     ALittleValueStat valueStat = valueStatList.get(i);
                     try {
-                        ALittleReferenceOpUtil.guessTypeEqual(param_oneDecList.get(i), param_type_list.get(i), valueStat, valueStat.guessType());
+                        ALittleReferenceOpUtil.guessTypeEqual(param_type_list.get(i), valueStat, valueStat.guessType());
                     } catch (ALittleGuessException e) {
                         throw new ALittleGuessException(valueStat, "第" + (i + 1) + "个参数类型和函数定义的参数类型不同:" + e.getError());
                     }

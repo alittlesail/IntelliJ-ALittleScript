@@ -42,7 +42,7 @@ public class ALittleUsingDecReference extends ALittleReference<ALittleUsingDec> 
                     if (guessClass.templateList.isEmpty()) {
                         newGuessList.add(guess);
                     } else {
-                        guessClass = guessClass.Clone();
+                        guessClass = (ALittleGuessClass)guessClass.Clone();
                         guessClass.usingName = mNamespace + "." + nameDec.getText();
                         newGuessList.add(guessClass);
                     }

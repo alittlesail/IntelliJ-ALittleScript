@@ -85,7 +85,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                 // 第二个参数必须和List元素相等
                 ALittleGuess valueGuessType = pairDecList.get(1).guessType();
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guess.subType, pairDecList.get(1), valueGuessType);
+                    ALittleReferenceOpUtil.guessTypeEqual(guess.subType, pairDecList.get(1), valueGuessType);
                 } catch (ALittleGuessException e) {
                     throw new ALittleGuessException(e.getElement(), "变量格式错误，不能是:" + valueGuessType.value + " :" + e.getError());
                 }
@@ -105,7 +105,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                 // 第一个参数必须和Map的key元素相等
                 ALittleGuess keyGuessType = pairDecList.get(0).guessType();
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessMap.keyType, pairDecList.get(0), keyGuessType);
+                    ALittleReferenceOpUtil.guessTypeEqual(guessMap.keyType, pairDecList.get(0), keyGuessType);
                 } catch (ALittleGuessException e) {
                     throw new ALittleGuessException(e.getElement(), "key变量格式错误，不能是:" + keyGuessType.value + " :" + e.getError());
                 }
@@ -113,7 +113,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                 // 第二个参数必须和Map的key元素相等
                 ALittleGuess valueGuessType = pairDecList.get(1).guessType();
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(valueStat, guessMap.valueType, pairDecList.get(1), valueGuessType);
+                    ALittleReferenceOpUtil.guessTypeEqual(guessMap.valueType, pairDecList.get(1), valueGuessType);
                 } catch (ALittleGuessException e) {
                     throw new ALittleGuessException(e.getElement(), "value变量格式错误，不能是:" + valueGuessType.value + " :" + e.getError());
                 }

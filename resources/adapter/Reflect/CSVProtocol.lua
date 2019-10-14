@@ -116,7 +116,7 @@ end
 
 function CreateCSVInfoImpl(var_type, split_index)
 	Assert(split_index > 0, "分隔符数量不足")
-	local reflect_info = FindReflectByName(var_type)
+	local reflect_info = FindStructByName(var_type)
 	Assert(reflect_info ~= nil, "FindReflectByName调用失败! 未知类型:" .. var_type)
 	local invoke_info = {}
 	invoke_info.split = __split_list[split_index]

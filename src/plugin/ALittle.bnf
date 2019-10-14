@@ -148,11 +148,11 @@ classGetterDec ::= accessModifier? get methodNameDec LPAREN RPAREN COLON allType
 // 类setter函数
 classSetterDec ::= accessModifier? set methodNameDec LPAREN methodParamOneDec RPAREN methodBodyDec {pin=2}
 // 类成员函数定义
-classMethodDec ::= accessModifier? coModifier? fun methodNameDec methodParamDec methodReturnDec? methodBodyDec {pin=3}
+classMethodDec ::= accessModifier? coModifier? fun methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec {pin=3}
 // 类静态函数定义
-classStaticDec ::= accessModifier? coModifier? static methodNameDec methodParamDec methodReturnDec? methodBodyDec {pin=3}
+classStaticDec ::= accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec {pin=3}
 // 全局函数
-globalMethodDec ::= protoModifier? accessModifier? coModifier? static methodNameDec methodParamDec methodReturnDec? methodBodyDec {pin=4}
+globalMethodDec ::= protoModifier? accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec {pin=4}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -306,7 +306,9 @@ propertyValueSuffix ::= propertyValueDotId | propertyValueBracketValue | propert
 propertyValueDotId ::= DOT propertyValueDotIdName {pin=1}
 propertyValueDotIdName ::= ID_CONTENT
 propertyValueBracketValue ::= LBRACK valueStat RBRACK {pin=1}
-propertyValueMethodCall ::= LPAREN (valueStat (COMMA valueStat)*)? RPAREN {pin=1}
+propertyValueMethodCall ::= propertyValueMethodTemplate? LPAREN (valueStat (COMMA valueStat)*)? RPAREN {pin=2}
+propertyValueMethodTemplate ::= LESS allType propertyValueMethodTemplatePair* GREATER {pin=1}
+private propertyValueMethodTemplatePair ::= COMMA allType {pin=1}
 
 // op 类型的运算，编号越大，优先级越低///////////////////////////////////////////////////
 

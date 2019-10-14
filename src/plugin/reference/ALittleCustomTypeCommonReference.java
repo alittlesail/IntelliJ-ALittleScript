@@ -21,6 +21,7 @@ import java.util.List;
 
 public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALittleReference<T> {
     private ALittleClassDec mClassDec;
+    private ALittleTemplateDec mTemplateParamDec;
     private ALittleCustomType mCustomType;
 
     public ALittleCustomTypeCommonReference(@NotNull ALittleCustomType customType, @NotNull T element, TextRange textRange) {
@@ -32,6 +33,12 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
         if (mClassDec != null) return mClassDec;
         mClassDec = PsiHelper.findClassDecFromParent(myElement);
         return mClassDec;
+    }
+
+    public ALittleTemplateDec getTemplateDec() {
+        if (mTemplateParamDec != null) return mTemplateParamDec;
+        mTemplateParamDec = PsiHelper.findTemplateDecFromParent(myElement);
+        return mTemplateParamDec;
     }
 
     @NotNull
@@ -75,33 +82,7 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                 }
                 // 对比两种
                 for (int i = 0; i < templateList.size(); ++i) {
-                    if (!(guessClass.templateList.get(i) instanceof ALittleGuessClassTemplate))
-                        throw new ALittleGuessException(myElement, "guessClass.templateList不是ALittleGuessClassTemplate");
-
-                    ALittleGuess srcGuess = srcGuessList.get(i);
-                    boolean srcIsClass = false;
-                    boolean srcIsStruct = false;
-                    if (srcGuess instanceof ALittleGuessClassTemplate) {
-                        ALittleGuessClassTemplate srcGuessClassTemplate = (ALittleGuessClassTemplate)srcGuess;
-                        srcGuess = srcGuessClassTemplate.templateExtends;
-                        srcIsClass = srcGuessClassTemplate.isClass;
-                        srcIsStruct = srcGuessClassTemplate.isStruct;
-                    }
-
-                    ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guessClass.templateList.get(i);
-                    if (guessClassTemplate.templateExtends != null) {
-                        if (srcGuess == null)
-                            throw new ALittleGuessException(myElement, "填充的类型和模板不一致");
-                        ALittleReferenceOpUtil.guessTypeEqual(myElement, guessClassTemplate.templateExtends, myElement, srcGuess);
-                    } else if (guessClassTemplate.isClass) {
-                        if (!srcIsClass && !(srcGuess instanceof ALittleGuessClass)) {
-                            throw new ALittleGuessException(templateList.get(i), "模板要求的是class，不能是:" + srcGuessList.get(i).value);
-                        }
-                    } else if (guessClassTemplate.isStruct) {
-                        if (!srcIsStruct && !(srcGuessList.get(i) instanceof ALittleGuessStruct)) {
-                            throw new ALittleGuessException(templateList.get(i), "模板要求的是struct，不能是:" + srcGuessList.get(i).value);
-                        }
-                    }
+                    ALittleReferenceOpUtil.guessTypeEqual(guessClass.templateList.get(i), templateList.get(i), srcGuessList.get(i));
                 }
 
                 if (!guessClass.templateList.isEmpty()) {
@@ -135,6 +116,17 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                 }
                 for (PsiElement dec : decList) {
                     guessList.add(((ALittleTemplatePairDec)dec).guessType());
+                }
+            }
+        }
+        {
+            ALittleTemplateDec templateDec = getTemplateDec();
+            if (templateDec != null) {
+                List<ALittleTemplatePairDec> pairDecList = templateDec.getTemplatePairDecList();
+                for (ALittleTemplatePairDec dec : pairDecList) {
+                    if (dec.getIdContent().getText().equals(mKey)) {
+                        guessList.add(dec.guessType());
+                    }
                 }
             }
         }
@@ -187,6 +179,17 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                 ALittleTreeChangeListener.findClassAttrList(classDec, PsiHelper.sAccessPrivateAndProtectedAndPublic, PsiHelper.ClassAttrType.TEMPLATE, mKey, decList);
                 for (PsiElement dec : decList) {
                     results.add(new PsiElementResolveResult(dec));
+                }
+            }
+        }
+        {
+            ALittleTemplateDec templateDec = getTemplateDec();
+            if (templateDec != null) {
+                List<ALittleTemplatePairDec> pairDecList = templateDec.getTemplatePairDecList();
+                for (ALittleTemplatePairDec pairDec : pairDecList) {
+                    if (pairDec.getIdContent().getText().equals(mKey)) {
+                        results.add(new PsiElementResolveResult(pairDec.getIdContent()));
+                    }
                 }
             }
         }
@@ -257,7 +260,7 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                 );
             }
         }
-        // 查找模板
+        // 查找类模板
         {
             ALittleClassDec classDec = getClassDec();
             if (classDec != null) {
@@ -268,6 +271,19 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
                     variants.add(LookupElementBuilder.create(pairDec.getIdContent().getText()).
                             withIcon(ALittleIcons.TEMPLATE).
                             withTypeText(dec.getContainingFile().getName())
+                    );
+                }
+            }
+        }
+        // 查找函数模板
+        {
+            ALittleTemplateDec templateDec = getTemplateDec();
+            if (templateDec != null) {
+                List<ALittleTemplatePairDec> pairDecList = templateDec.getTemplatePairDecList();
+                for (ALittleTemplatePairDec pairDec : pairDecList) {
+                    variants.add(LookupElementBuilder.create(pairDec.getIdContent().getText()).
+                            withIcon(ALittleIcons.TEMPLATE).
+                            withTypeText(pairDec.getContainingFile().getName())
                     );
                 }
             }

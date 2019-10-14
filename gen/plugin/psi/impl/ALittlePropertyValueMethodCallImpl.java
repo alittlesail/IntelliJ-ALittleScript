@@ -30,6 +30,12 @@ public class ALittlePropertyValueMethodCallImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
+  @Nullable
+  public ALittlePropertyValueMethodTemplate getPropertyValueMethodTemplate() {
+    return findChildByClass(ALittlePropertyValueMethodTemplate.class);
+  }
+
+  @Override
   @NotNull
   public List<ALittleValueStat> getValueStatList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleValueStat.class);

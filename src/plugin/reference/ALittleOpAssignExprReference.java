@@ -3,6 +3,7 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessClassTemplate;
 import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessReturnTail;
 import plugin.psi.*;
@@ -50,7 +51,7 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
                 if (i >= methodCallGuessList.size()) break;
                 if (methodCallGuessList.get(i) instanceof ALittleGuessReturnTail) break;
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(pairDec, pairDec.guessType(), valueStat, methodCallGuessList.get(i));
+                    ALittleReferenceOpUtil.guessTypeEqual(pairDec.guessType(), valueStat, methodCallGuessList.get(i));
                 } catch (ALittleGuessException e) {
                     throw new ALittleGuessException(valueStat, "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等:" + e.getError());
                 }
@@ -67,9 +68,16 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
         ALittleGuess pairGuess = propertyValueList.get(0).guessType();
         ALittleGuess valueGuess = valueStat.guessType();
 
+        if (pairGuess instanceof ALittleGuessClassTemplate) {
+            ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)pairGuess;
+            if (guessClassTemplate.templateExtends == null && !guessClassTemplate.isStruct && !guessClassTemplate.isClass) {
+                throw new ALittleGuessException(valueStat, "对于没有约束的模板不能进行赋值");
+            }
+        }
+
         if (opString.equals("=")) {
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(propertyValueList.get(0), pairGuess, valueStat, valueGuess);
+                ALittleReferenceOpUtil.guessTypeEqual(pairGuess, valueStat, valueGuess);
             } catch (ALittleGuessException e) {
                 throw new ALittleGuessException(e.getElement(), "等号左边的变量和表达式的类型不同:" + e.getError());
             }

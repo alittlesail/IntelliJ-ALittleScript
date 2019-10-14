@@ -370,7 +370,7 @@ protected static CreateMapInfo(string var_type) : ProtocolInvokeInfo
 
 protected static CreateMessageInfo(string var_type) : ProtocolInvokeInfo
 {
-    auto reflect_info = FindReflectByName(var_type);
+    auto reflect_info = FindStructByName(var_type);
     assert(reflect_info != null, "FindReflect调用失败! 未知类型:" .. var_type);
     return CreateMessageInfoImpl(reflect_info);
 }
@@ -395,7 +395,7 @@ protected static CreateMessageInfoImpl(StructInfo reflect_info) : ProtocolInvoke
 
 protected static CreateProtocolInvokeInfo(int msg_id) : ProtocolInvokeInfo
 {
-    auto reflect_info = FindReflectById(msg_id);
+    auto reflect_info = FindStructById(msg_id);
     assert(reflect_info != null, "FindReflect调用失败! 未知ID:" .. msg_id);
     return CreateMessageInfoImpl(reflect_info);
 }

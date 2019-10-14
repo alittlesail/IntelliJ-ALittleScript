@@ -76,6 +76,18 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             info.functorParamList.add(classGuess);
             info.functorParamNameList.add(classGuess.value);
 
+            // 添加模板参数列表
+            ALittleTemplateDec templateDec = classMethodDec.getTemplateDec();
+            if (templateDec != null) {
+                List<ALittleGuess> templateGuessList = templateDec.guessTypes();
+                for (ALittleGuess guess : templateGuessList) {
+                    if (!(guess instanceof ALittleGuessClassTemplate)) {
+                        throw new ALittleGuessException(myElement, "templateDec.guessTypes()取到的不是ALittleGuessClassTemplate");
+                    }
+                    info.functorTemplateParamList.add((ALittleGuessClassTemplate)guess);
+                }
+            }
+
             // 添加参数列表
             ALittleMethodParamDec paramDec = classMethodDec.getMethodParamDec();
             if (paramDec != null) {
@@ -113,6 +125,18 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
             ALittleGuessFunctor info = new ALittleGuessFunctor(classStaticDec);
             info.functorAwait = classStaticDec.getCoModifier() != null && classStaticDec.getCoModifier().getText().equals("await");
+
+            // 添加模板参数列表
+            ALittleTemplateDec templateDec = classStaticDec.getTemplateDec();
+            if (templateDec != null) {
+                List<ALittleGuess> templateGuessList = templateDec.guessTypes();
+                for (ALittleGuess guess : templateGuessList) {
+                    if (!(guess instanceof ALittleGuessClassTemplate)) {
+                        throw new ALittleGuessException(myElement, "templateDec.guessTypes()取到的不是ALittleGuessClassTemplate");
+                    }
+                    info.functorTemplateParamList.add((ALittleGuessClassTemplate)guess);
+                }
+            }
 
             ALittleMethodParamDec paramDec = classStaticDec.getMethodParamDec();
             if (paramDec != null) {
@@ -154,6 +178,9 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 if (error == null) {
                     error = globalMethodDec;
                 }
+
+                if (globalMethodDec.getTemplateDec() != null)
+                    throw new ALittleGuessException(error, "带" + info.functorProto + "不能定义函数模板");
 
                 // 如果是带协议注解，那么一定是一个await
                 info.functorAwait = true;
@@ -234,6 +261,18 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                     throw new ALittleGuessException(error, "未知的注解类型:" + info.functorProto);
                 }
             } else {
+                // 添加模板参数列表
+                ALittleTemplateDec templateDec = globalMethodDec.getTemplateDec();
+                if (templateDec != null) {
+                    List<ALittleGuess> templateGuessList = templateDec.guessTypes();
+                    for (ALittleGuess guess : templateGuessList) {
+                        if (!(guess instanceof ALittleGuessClassTemplate)) {
+                            throw new ALittleGuessException(myElement, "templateDec.guessTypes()取到的不是ALittleGuessClassTemplate");
+                        }
+                        info.functorTemplateParamList.add((ALittleGuessClassTemplate)guess);
+                    }
+                }
+
                 ALittleMethodParamDec paramDec = globalMethodDec.getMethodParamDec();
                 if (paramDec != null) {
                     List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
@@ -299,7 +338,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         if (myGuessTypeInfo == null) return;
         ALittleGuess extendsGuessTypeInfo = methodNameDec.guessType();
         try {
-            ALittleReferenceOpUtil.guessTypeEqual(methodNameDec, extendsGuessTypeInfo, myElement, myGuessTypeInfo);
+            ALittleReferenceOpUtil.guessTypeEqual(extendsGuessTypeInfo, myElement, myGuessTypeInfo);
         } catch (ALittleGuessException ignored) {
             throw new ALittleGuessException(myElement, "该函数是从父类继承下来，但是定义不一致");
         }

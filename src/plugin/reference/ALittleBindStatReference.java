@@ -35,6 +35,7 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         ALittleGuessFunctor info = new ALittleGuessFunctor(myElement);
         info.functorAwait = guessFunctor.functorAwait;
         info.functorProto = guessFunctor.functorProto;
+        info.functorTemplateParamList.addAll(guessFunctor.functorTemplateParamList);
         info.functorParamList.addAll(guessFunctor.functorParamList);
         info.functorParamNameList.addAll(guessFunctor.functorParamNameList);
         info.functorParamTail = guessFunctor.functorParamTail;
@@ -84,7 +85,7 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
             ALittleGuess paramGuess = guessFunctor.functorParamList.get(i - 1);
             valueStat = valueStatList.get(i);
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(myElement, paramGuess, valueStat, valueStat.guessType());
+                ALittleReferenceOpUtil.guessTypeEqual(paramGuess, valueStat, valueStat.guessType());
             } catch (ALittleGuessException e) {
                 throw new ALittleGuessException(valueStat, "第" + i + "个参数类型和函数定义的参数类型不同:" + e.getError());
             }

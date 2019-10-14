@@ -15,7 +15,7 @@ private auto maxn = lua.table.maxn;
 private auto random = lua.math.random;
 
 // 深度复制表
-public static String_CopyTable(any info) : any
+public static String_CopyTable<T>(T info) : T
 {
     Map<any, any> new_info = new Map<any, any>();
     for (any key, any value in cast<Map<any, any> >(info))
@@ -108,7 +108,7 @@ public static String_SplitSepList(string target, List<string> sep_list) : List<s
 }
 
 // 把列表以分隔符合并成字符串
-public static String_Join(List<any> list, string sep) : string
+public static String_Join<T>(List<T> list, string sep) : string
 {
     return concat(list, sep);
 }

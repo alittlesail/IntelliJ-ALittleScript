@@ -72,6 +72,12 @@ public class ALittleGlobalMethodDecImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
+  @Nullable
+  public ALittleTemplateDec getTemplateDec() {
+    return findChildByClass(ALittleTemplateDec.class);
+  }
+
+  @Override
   @NotNull
   public ALittleGuess guessType() throws ALittleGuessException {
     return ALittlePsiImplUtil.guessType(this);

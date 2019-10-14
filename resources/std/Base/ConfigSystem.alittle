@@ -28,7 +28,7 @@ public class ConfigSystem<FL : IFileLoader, FS : IFileSaver>
         this._config_map = json_content;
     }
 
-    public fun GetConfig(string key, any default) : any
+    public fun GetConfig<T>(string key, T default) : T
     {
         // 获取值
         any value = this._config_map[key];

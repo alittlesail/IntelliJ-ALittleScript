@@ -10,6 +10,9 @@ import plugin.guess.ALittleGuessException;
 
 public interface ALittlePropertyValueMethodCall extends PsiElement {
 
+  @Nullable
+  ALittlePropertyValueMethodTemplate getPropertyValueMethodTemplate();
+
   @NotNull
   List<ALittleValueStat> getValueStatList();
 

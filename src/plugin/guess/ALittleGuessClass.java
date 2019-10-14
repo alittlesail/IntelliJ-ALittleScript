@@ -28,9 +28,36 @@ public class ALittleGuessClass extends ALittleGuess {
         usingName = un;
     }
 
+    @Override
+    public boolean NeedReplace() {
+        if (templateList.isEmpty()) return false;
+        for (Map.Entry<String, ALittleGuess> entry : templateMap.entrySet()) {
+            if (entry.getValue().NeedReplace()) return true;
+        }
+        return false;
+    }
+
+    @Override
     @NotNull
-    public ALittleGuessClass Clone() {
+    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+        ALittleGuessClass newGuess = (ALittleGuessClass)Clone();
+        for (Map.Entry<String, ALittleGuess> entry : templateMap.entrySet()) {
+            ALittleGuess guess = entry.getValue().ReplaceTemplate(fillMap);
+            if (!guess.equals(entry.getValue())) {
+                newGuess.templateMap.put(entry.getKey(), entry.getValue().ReplaceTemplate(fillMap));
+            }
+        }
+        return newGuess;
+    }
+
+    @Override
+    @NotNull
+    public ALittleGuess Clone() {
         ALittleGuessClass guess = new ALittleGuessClass(mNamespaceName, mClassName, element, usingName);
+        guess.templateList.addAll(templateList);
+        for (Map.Entry<String, ALittleGuess> entry : templateMap.entrySet()) {
+            guess.templateMap.put(entry.getKey(), entry.getValue());
+        }
         guess.UpdateValue();
         return guess;
     }

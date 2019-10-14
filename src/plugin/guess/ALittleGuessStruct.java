@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleStructDec;
 
+import java.util.Map;
+
 public class ALittleGuessStruct extends ALittleGuess {
     private @NotNull String mNamespaceName;
     private @NotNull String mStructName;
@@ -33,5 +35,24 @@ public class ALittleGuessStruct extends ALittleGuess {
     @Override
     public boolean isChanged() {
         return ALittleTreeChangeListener.getGuessTypeList(element) == null;
+    }
+
+    @Override
+    @NotNull
+    public ALittleGuess Clone() {
+        ALittleGuessStruct guess = new ALittleGuessStruct(mNamespaceName, mStructName, element);
+        guess.UpdateValue();
+        return guess;
+    }
+
+    @Override
+    public boolean NeedReplace() {
+        return false;
+    }
+
+    @Override
+    @NotNull
+    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+        return this;
     }
 }

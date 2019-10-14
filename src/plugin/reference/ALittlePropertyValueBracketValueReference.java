@@ -78,7 +78,7 @@ public class ALittlePropertyValueBracketValueReference extends ALittleReference<
             }
         } else if (preType instanceof ALittleGuessMap) {
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(myElement, ((ALittleGuessMap)preType).keyType, valueStat, keyGuessType);
+                ALittleReferenceOpUtil.guessTypeEqual(((ALittleGuessMap)preType).keyType, valueStat, keyGuessType);
             } catch (ALittleGuessException e) {
                 throw new ALittleGuessException(e.getElement(), "索引值的类型不能是:" + keyGuessType.value + " :" + e.getError());
             }

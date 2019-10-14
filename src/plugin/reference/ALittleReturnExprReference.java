@@ -168,7 +168,7 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
             ALittleGuess returnTypeGuess = returnTypeList.get(i).guessType();
             if (returnTypeGuess instanceof ALittleGuessReturnTail) break;
             try {
-                ALittleReferenceOpUtil.guessTypeEqual(returnTypeList.get(i), returnTypeGuess, targetValueStat, guessTypeList.get(i));
+                ALittleReferenceOpUtil.guessTypeEqual(returnTypeGuess, targetValueStat, guessTypeList.get(i));
             } catch (ALittleGuessException e) {
                 throw new ALittleGuessException(targetValueStat, "return的第" + (i + 1) + "个返回值数量和函数定义的返回值类型不同:" + e.getError());
             }

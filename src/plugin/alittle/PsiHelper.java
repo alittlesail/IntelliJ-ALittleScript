@@ -3,6 +3,9 @@ package plugin.alittle;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessClassTemplate;
+import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleClassData;
 import plugin.index.ALittleEnumData;
 import plugin.index.ALittleStructData;
@@ -129,6 +132,29 @@ public class PsiHelper {
         while (dec != null && !(dec instanceof PsiFile)) {
             if (dec instanceof ALittleClassDec) {
                 return (ALittleClassDec)dec;
+            }
+            dec = dec.getParent();
+        }
+        return null;
+    }
+
+    // 获取这个元素所在的函数模板
+    public static ALittleTemplateDec findTemplateDecFromParent(@NotNull PsiElement dec) {
+        while (dec != null && !(dec instanceof PsiFile)) {
+            if (dec instanceof ALittleClassDec) {
+                return null;
+            } else if (dec instanceof ALittleClassCtorDec) {
+                return null;
+            } else if (dec instanceof ALittleClassGetterDec) {
+                return null;
+            } else if (dec instanceof ALittleClassSetterDec) {
+                return null;
+            } else if (dec instanceof ALittleClassStaticDec) {
+                return ((ALittleClassStaticDec) dec).getTemplateDec();
+            } else if (dec instanceof ALittleClassMethodDec) {
+                return ((ALittleClassMethodDec) dec).getTemplateDec();
+            } else if (dec instanceof ALittleGlobalMethodDec) {
+                return ((ALittleGlobalMethodDec) dec).getTemplateDec();
             }
             dec = dec.getParent();
         }

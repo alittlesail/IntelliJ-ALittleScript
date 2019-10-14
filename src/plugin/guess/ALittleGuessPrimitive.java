@@ -34,4 +34,25 @@ public class ALittleGuessPrimitive extends ALittleGuess {
     public boolean isChanged() {
         return false;
     }
+
+    @Override
+    public void UpdateValue() {}
+    @Override
+    @NotNull
+    public ALittleGuess Clone() {
+        ALittleGuessPrimitive guess = new ALittleGuessPrimitive(value);
+        guess.UpdateValue();
+        return guess;
+    }
+
+    @Override
+    public boolean NeedReplace() {
+        return false;
+    }
+
+    @Override
+    @NotNull
+    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+        return this;
+    }
 }

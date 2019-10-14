@@ -360,7 +360,7 @@ function CreateMapInfo(var_type)
 end
 
 function CreateMessageInfo(var_type)
-	local reflect_info = FindReflectByName(var_type)
+	local reflect_info = FindStructByName(var_type)
 	Assert(reflect_info ~= nil, "FindReflect调用失败! 未知类型:" .. var_type)
 	return CreateMessageInfoImpl(reflect_info)
 end
@@ -382,7 +382,7 @@ function CreateMessageInfoImpl(reflect_info)
 end
 
 function CreateProtocolInvokeInfo(msg_id)
-	local reflect_info = FindReflectById(msg_id)
+	local reflect_info = FindStructById(msg_id)
 	Assert(reflect_info ~= nil, "FindReflect调用失败! 未知ID:" .. msg_id)
 	return CreateMessageInfoImpl(reflect_info)
 end

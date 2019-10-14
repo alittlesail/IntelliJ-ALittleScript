@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleTemplatePairDec;
 
+import java.util.Map;
+
 public class ALittleGuessClassTemplate extends ALittleGuess {
     public ALittleGuess templateExtends;
     public boolean isClass;
@@ -16,6 +18,40 @@ public class ALittleGuessClassTemplate extends ALittleGuess {
         templateExtends = t;
         isClass = ic;
         isStruct = is;
+    }
+
+    @Override
+    public boolean NeedReplace() {
+        return true;
+    }
+
+    @Override
+    @NotNull
+    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+        ALittleGuess newGuess = fillMap.get(value);
+        if (newGuess != null) return newGuess;
+        return this;
+    }
+
+    @Override
+    @NotNull
+    public ALittleGuess Clone() {
+        ALittleGuessClassTemplate guess = new ALittleGuessClassTemplate(element, templateExtends, isClass, isStruct);
+        guess.UpdateValue();
+        return guess;
+    }
+
+    @NotNull
+    public String GetTotalValue() {
+        String v = element.getIdContent().getText();
+        if (templateExtends != null) {
+            return v + ":" + templateExtends.value;
+        } else if (isClass) {
+            return v + ":class";
+        } else if (isStruct) {
+            return v + ":struct";
+        }
+        return v;
     }
 
     @Override

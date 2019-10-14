@@ -10,8 +10,10 @@ import plugin.reference.ALittleReferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ALittleGuessFunctor extends ALittleGuess {
+    public @NotNull List<ALittleGuessClassTemplate> functorTemplateParamList = new ArrayList<>(); // 参数列表
     public @NotNull List<ALittleGuess> functorParamList = new ArrayList<>(); // 参数列表
     public @NotNull List<String> functorParamNameList = new ArrayList<>();   // 参数名列表
     public ALittleGuess functorParamTail;                                   // 参数占位符
@@ -26,6 +28,47 @@ public class ALittleGuessFunctor extends ALittleGuess {
     }
 
     @Override
+    @NotNull
+    public ALittleGuess Clone() {
+        ALittleGuessFunctor guess = new ALittleGuessFunctor(element);
+        guess.functorTemplateParamList.addAll(functorTemplateParamList);
+        guess.functorParamList.addAll(functorParamList);
+        guess.functorParamNameList.addAll(functorParamNameList);
+        guess.functorParamTail = functorParamTail;
+        guess.functorReturnList.addAll(functorReturnList);
+        guess.functorReturnTail = functorReturnTail;
+        guess.functorProto = functorProto;
+        guess.functorAwait = functorAwait;
+        guess.UpdateValue();
+        return guess;
+    }
+    @Override
+    public boolean NeedReplace() {
+        for (ALittleGuess guess : functorParamList) {
+            if (guess.NeedReplace()) return true;
+        }
+        for (ALittleGuess guess : functorReturnList) {
+            if (guess.NeedReplace()) return true;
+        }
+        return false;
+    }
+
+    @Override
+    @NotNull
+    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+        ALittleGuessFunctor newGuess = (ALittleGuessFunctor)Clone();
+        newGuess.functorParamList = new ArrayList<>();
+        for (ALittleGuess guess : functorParamList) {
+            newGuess.functorParamList.add(guess.ReplaceTemplate(fillMap));
+        }
+        newGuess.functorReturnList = new ArrayList<>();
+        for (ALittleGuess guess : functorReturnList) {
+            newGuess.functorReturnList.add(guess.ReplaceTemplate(fillMap));
+        }
+        return newGuess;
+    }
+
+    @Override
     public void UpdateValue() {
         value = "Functor<";
         List<String> preList = new ArrayList<>();
@@ -36,6 +79,14 @@ public class ALittleGuessFunctor extends ALittleGuess {
             preList.add("await");
         }
         value += String.join(",", preList);
+
+        if (!functorTemplateParamList.isEmpty()) {
+            List<String> templateList = new ArrayList<>();
+            for (ALittleGuessClassTemplate guess : functorTemplateParamList) {
+                templateList.add(guess.GetTotalValue());
+            }
+            value += "<" + String.join(",", templateList) + ">";
+        }
 
         List<String> paramList = new ArrayList<>();
         for (ALittleGuess guess : functorParamList) {

@@ -51,6 +51,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             ALittleGuessFunctor info = new ALittleGuessFunctor(guessFunctor.element);
             info.functorAwait = guessFunctor.functorAwait;
             info.functorProto = guessFunctor.functorProto;
+            info.functorTemplateParamList.addAll(guessFunctor.functorTemplateParamList);
             info.functorParamTail = guessFunctor.functorParamTail;
             info.functorParamNameList.addAll(guessFunctor.functorParamNameList);
             info.functorReturnTail = guessFunctor.functorReturnTail;

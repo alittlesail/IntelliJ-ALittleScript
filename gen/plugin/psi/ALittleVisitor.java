@@ -423,6 +423,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitPropertyValueMethodTemplate(@NotNull ALittlePropertyValueMethodTemplate o) {
+    visitPsiElement(o);
+  }
+
   public void visitPropertyValueSuffix(@NotNull ALittlePropertyValueSuffix o) {
     visitPsiElement(o);
   }

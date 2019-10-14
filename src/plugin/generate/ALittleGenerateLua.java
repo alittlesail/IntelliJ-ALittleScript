@@ -884,11 +884,13 @@ public class ALittleGenerateLua {
             ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
             if (guessClassTemplate.templateExtends != null
                     || guessClassTemplate.isClass || guessClassTemplate.isStruct) {
-                // 检查下标
-                ALittleTemplatePairDec templatePairDec = guessClassTemplate.element;
-                ALittleTemplateDec templateDec = (ALittleTemplateDec)templatePairDec.getParent();
-                int index = templateDec.getTemplatePairDecList().indexOf(templatePairDec);
-                return "self.__class.__element[" + (index + 1) + "]";
+                ALittleTemplateDec templateDec = (ALittleTemplateDec)guessClassTemplate.element.getParent();
+                if (templateDec.getParent() instanceof ALittleClassDec) {
+                    int index = templateDec.getTemplatePairDecList().indexOf(guessClassTemplate.element);
+                    return "self.__class.__element[" + (index + 1) + "]";
+                } else {
+                    return guessClassTemplate.value;
+                }
             }
         }
 
@@ -1057,73 +1059,95 @@ public class ALittleGenerateLua {
 
                 ALittlePropertyValueMethodCall methodCall = suffix.getPropertyValueMethodCall();
                 if (methodCall != null) {
-                    List<String> paramList = null;
-
                     // 是否是调用了带注解函数，要进行特殊处理
                     PsiReference ref = methodCall.getReference();
-                    if (ref instanceof ALittlePropertyValueMethodCallReference) {
-                        ALittlePropertyValueMethodCallReference reference = (ALittlePropertyValueMethodCallReference)ref;
-                        ALittleGuess preType = reference.guessPreType();
-                        if (preType instanceof ALittleGuessFunctor) {
-                            ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
-                            if (preTypeFunctor.functorProto != null) {
-                                String namespaceName = "";
-                                if (!mNamespaceName.equals("ALittle")) {
-                                    namespaceName = "ALittle.";
-                                }
+                    if (!(ref instanceof ALittlePropertyValueMethodCallReference)) {
+                        throw new Exception("ALittlePropertyValueMethodCall.getReference()得到的不是ALittlePropertyValueMethodCallReference");
+                    }
+                    ALittlePropertyValueMethodCallReference reference = (ALittlePropertyValueMethodCallReference)ref;
+                    ALittleGuess preType = reference.guessPreType();
+                    if (!(preType instanceof ALittleGuessFunctor)) {
+                        throw new Exception("ALittlePropertyValueMethodCallReference.guessPreType()得到的不是ALittleGuessFunctor");
+                    }
+                    ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
+                    if (preTypeFunctor.functorProto != null) {
+                        String namespaceName = "";
+                        if (!mNamespaceName.equals("ALittle")) {
+                            namespaceName = "ALittle.";
+                        }
 
-                                if (preTypeFunctor.functorProto.equals("@Http")) {
-                                    content = new StringBuilder(namespaceName + "IHttpSender.Invoke");
-                                } else if (preTypeFunctor.functorProto.equals("@HttpDownload")) {
-                                    content = new StringBuilder(namespaceName + "IHttpFileSender.InvokeDownload");
-                                } else if (preTypeFunctor.functorProto.equals("@HttpUpload")) {
-                                    content = new StringBuilder(namespaceName + "IHttpFileSender.InvokeUpload");
-                                } else if (preTypeFunctor.functorProto.equals("@Msg")) {
-                                    if (preTypeFunctor.functorReturnList.isEmpty()) {
-                                        content = new StringBuilder(namespaceName + "IMsgCommon.Invoke");
-                                    } else {
-                                        content = new StringBuilder(namespaceName + "IMsgCommon.InvokeRPC");
-                                    }
-                                }
-
-                                if (preTypeFunctor.functorParamList.size() != 2)
-                                    throw new Exception("GeneratePropertyValue:处理到MethodCall时发现带注解的函数参数数量不是2");
-                                if (!(preTypeFunctor.functorParamList.get(1) instanceof ALittleGuessStruct))
-                                    throw new Exception("GeneratePropertyValue:处理到MethodCall时发现带注解的函数第二个参数不是struct");
-                                ALittleGuessStruct paramStruct = (ALittleGuessStruct)preTypeFunctor.functorParamList.get(1);
-                                int msg_id = PsiHelper.JSHash(paramStruct.value);
-
-                                paramList = new ArrayList<>();
-                                if (preTypeFunctor.functorProto.equals("@Msg")) {
-                                    paramList.add("" + msg_id);
-                                    // 注册协议
-                                    GenerateReflectStructInfo(paramStruct);
-                                    // 如果有返回值，那么也要注册返回值
-                                    if (preTypeFunctor.functorReturnList.size() == 2) {
-                                        if (!(preTypeFunctor.functorReturnList.get(1) instanceof ALittleGuessStruct)) {
-                                            throw new Exception("GeneratePropertyValue:处理到MethodCall时发现带注解的函数返回值不是struct");
-                                        }
-                                        GenerateReflectStructInfo((ALittleGuessStruct)preTypeFunctor.functorReturnList.get(1));
-                                    }
-                                } else {
-                                    paramList.add("\"" + paramStruct.value + "\"");
-                                }
-                                List<ALittleValueStat> valueStatList = methodCall.getValueStatList();
-                                for (ALittleValueStat valueStat : valueStatList) {
-                                    paramList.add(GenerateValueStat(valueStat));
-                                }
+                        if (preTypeFunctor.functorProto.equals("@Http")) {
+                            content = new StringBuilder(namespaceName + "IHttpSender.Invoke");
+                        } else if (preTypeFunctor.functorProto.equals("@HttpDownload")) {
+                            content = new StringBuilder(namespaceName + "IHttpFileSender.InvokeDownload");
+                        } else if (preTypeFunctor.functorProto.equals("@HttpUpload")) {
+                            content = new StringBuilder(namespaceName + "IHttpFileSender.InvokeUpload");
+                        } else if (preTypeFunctor.functorProto.equals("@Msg")) {
+                            if (preTypeFunctor.functorReturnList.isEmpty()) {
+                                content = new StringBuilder(namespaceName + "IMsgCommon.Invoke");
+                            } else {
+                                content = new StringBuilder(namespaceName + "IMsgCommon.InvokeRPC");
                             }
                         }
-                    }
 
-                    if (paramList == null) {
-                        paramList = new ArrayList<>();
+                        if (preTypeFunctor.functorParamList.size() != 2)
+                            throw new Exception("GeneratePropertyValue:处理到MethodCall时发现带注解的函数参数数量不是2");
+                        if (!(preTypeFunctor.functorParamList.get(1) instanceof ALittleGuessStruct))
+                            throw new Exception("GeneratePropertyValue:处理到MethodCall时发现带注解的函数第二个参数不是struct");
+                        ALittleGuessStruct paramStruct = (ALittleGuessStruct)preTypeFunctor.functorParamList.get(1);
+                        int msg_id = PsiHelper.JSHash(paramStruct.value);
+
+                        List<String> paramList = new ArrayList<>();
+                        if (preTypeFunctor.functorProto.equals("@Msg")) {
+                            paramList.add("" + msg_id);
+                            // 注册协议
+                            GenerateReflectStructInfo(paramStruct);
+                            // 如果有返回值，那么也要注册返回值
+                            if (preTypeFunctor.functorReturnList.size() == 2) {
+                                if (!(preTypeFunctor.functorReturnList.get(1) instanceof ALittleGuessStruct)) {
+                                    throw new Exception("GeneratePropertyValue:处理到MethodCall时发现带注解的函数返回值不是struct");
+                                }
+                                GenerateReflectStructInfo((ALittleGuessStruct)preTypeFunctor.functorReturnList.get(1));
+                            }
+                        } else {
+                            paramList.add("\"" + paramStruct.value + "\"");
+                        }
                         List<ALittleValueStat> valueStatList = methodCall.getValueStatList();
                         for (ALittleValueStat valueStat : valueStatList) {
                             paramList.add(GenerateValueStat(valueStat));
                         }
+
+                        content.append("(").append(String.join(", ", paramList)).append(")");
+                    } else {
+                        List<String> paramList = new ArrayList<>();
+
+                        String namespaceName = "";
+                        if (!mNamespaceName.equals("ALittle")) {
+                            namespaceName = "ALittle.";
+                        }
+
+                        List<ALittleGuess> templateList = reference.generateTemplateParamList();
+                        for (ALittleGuess guess : templateList) {
+                            if (guess instanceof ALittleGuessClass) {
+                                ALittleGuessClass guessClass = (ALittleGuessClass)guess;
+                                if (guessClass.GetNamespaceName().equals(mNamespaceName) || guessClass.GetNamespaceName().equals("lua")) {
+                                    paramList.add(guessClass.GetClassName());
+                                } else {
+                                    paramList.add(guessClass.value);
+                                }
+                            } else if (guess instanceof ALittleGuessStruct) {
+                                paramList.add(namespaceName + "FindStructByName(\"" + guess.value + "\"");
+                            } else {
+                                throw new Exception("ALittlePropertyValueMethodCallReference.generateTemplateParamList()的返回列表中出现其他类型的ALittleGuess:" + guess.value);
+                            }
+                        }
+
+                        List<ALittleValueStat> valueStatList = methodCall.getValueStatList();
+                        for (ALittleValueStat valueStat : valueStatList) {
+                            paramList.add(GenerateValueStat(valueStat));
+                        }
+                        content.append("(").append(String.join(", ", paramList)).append(")");
                     }
-                    content.append("(").append(String.join(", ", paramList)).append(")");
                     continue;
                 }
 
@@ -1865,6 +1889,21 @@ public class ALittleGenerateLua {
             }
 
             List<String> paramNameList = new ArrayList<>();
+
+            ALittleTemplateDec templateDec = classMethodDec.getTemplateDec();
+            if (templateDec != null) {
+                List<ALittleTemplatePairDec> pairDecList = templateDec.getTemplatePairDecList();
+                for (ALittleTemplatePairDec pairDec : pairDecList) {
+                    ALittleGuess guess = pairDec.guessType();
+                    if (guess instanceof ALittleGuessClassTemplate) {
+                        ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+                        if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass || guessClassTemplate.isStruct) {
+                            paramNameList.add(guessClassTemplate.value);
+                        }
+                    }
+                }
+            }
+
             ALittleMethodParamDec paramDec = classMethodDec.getMethodParamDec();
             if (paramDec != null) {
                 List<ALittleMethodParamOneDec> paramOneDecList = paramDec.getMethodParamOneDecList();
@@ -1918,6 +1957,21 @@ public class ALittleGenerateLua {
                 throw new Exception("class " + className + " 静态函数没有函数名");
             }
             List<String> paramNameList = new ArrayList<>();
+
+            ALittleTemplateDec templateDec = classStaticDec.getTemplateDec();
+            if (templateDec != null) {
+                List<ALittleTemplatePairDec> pairDecList = templateDec.getTemplatePairDecList();
+                for (ALittleTemplatePairDec pairDec : pairDecList) {
+                    ALittleGuess guess = pairDec.guessType();
+                    if (guess instanceof ALittleGuessClassTemplate) {
+                        ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+                        if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass || guessClassTemplate.isStruct) {
+                            paramNameList.add(guessClassTemplate.value);
+                        }
+                    }
+                }
+            }
+
             ALittleMethodParamDec paramDec = classStaticDec.getMethodParamDec();
             if (paramDec != null) {
                 List<ALittleMethodParamOneDec> paramOneDecList = paramDec.getMethodParamOneDecList();
@@ -2014,6 +2068,21 @@ public class ALittleGenerateLua {
         String methodName = globalMethodNameDec.getIdContent().getText();
 
         List<String> paramNameList = new ArrayList<>();
+
+        ALittleTemplateDec templateDec = root.getTemplateDec();
+        if (templateDec != null) {
+            List<ALittleTemplatePairDec> pairDecList = templateDec.getTemplatePairDecList();
+            for (ALittleTemplatePairDec pairDec : pairDecList) {
+                ALittleGuess guess = pairDec.guessType();
+                if (guess instanceof ALittleGuessClassTemplate) {
+                    ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+                    if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass || guessClassTemplate.isStruct) {
+                        paramNameList.add(guessClassTemplate.value);
+                    }
+                }
+            }
+        }
+
         ALittleMethodParamDec paramDec = root.getMethodParamDec();
         if (paramDec != null) {
             List<ALittleMethodParamOneDec> paramOneDecList = paramDec.getMethodParamOneDecList();

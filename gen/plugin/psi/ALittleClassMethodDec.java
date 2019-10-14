@@ -28,6 +28,9 @@ public interface ALittleClassMethodDec extends PsiElement {
   @Nullable
   ALittleMethodReturnDec getMethodReturnDec();
 
+  @Nullable
+  ALittleTemplateDec getTemplateDec();
+
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;
 

@@ -387,7 +387,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // accessModifier? coModifier? fun methodNameDec methodParamDec methodReturnDec? methodBodyDec
+  // accessModifier? coModifier? fun methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec
   public static boolean classMethodDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "classMethodDec")) return false;
     boolean r, p;
@@ -397,8 +397,9 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = r && consumeToken(b, FUN);
     p = r; // pin = 3
     r = r && report_error_(b, methodNameDec(b, l + 1));
+    r = p && report_error_(b, classMethodDec_4(b, l + 1)) && r;
     r = p && report_error_(b, methodParamDec(b, l + 1)) && r;
-    r = p && report_error_(b, classMethodDec_5(b, l + 1)) && r;
+    r = p && report_error_(b, classMethodDec_6(b, l + 1)) && r;
     r = p && methodBodyDec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -418,9 +419,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // templateDec?
+  private static boolean classMethodDec_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classMethodDec_4")) return false;
+    templateDec(b, l + 1);
+    return true;
+  }
+
   // methodReturnDec?
-  private static boolean classMethodDec_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "classMethodDec_5")) return false;
+  private static boolean classMethodDec_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classMethodDec_6")) return false;
     methodReturnDec(b, l + 1);
     return true;
   }
@@ -463,7 +471,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // accessModifier? coModifier? static methodNameDec methodParamDec methodReturnDec? methodBodyDec
+  // accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec
   public static boolean classStaticDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "classStaticDec")) return false;
     boolean r, p;
@@ -473,8 +481,9 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = r && consumeToken(b, STATIC);
     p = r; // pin = 3
     r = r && report_error_(b, methodNameDec(b, l + 1));
+    r = p && report_error_(b, classStaticDec_4(b, l + 1)) && r;
     r = p && report_error_(b, methodParamDec(b, l + 1)) && r;
-    r = p && report_error_(b, classStaticDec_5(b, l + 1)) && r;
+    r = p && report_error_(b, classStaticDec_6(b, l + 1)) && r;
     r = p && methodBodyDec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -494,9 +503,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // templateDec?
+  private static boolean classStaticDec_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classStaticDec_4")) return false;
+    templateDec(b, l + 1);
+    return true;
+  }
+
   // methodReturnDec?
-  private static boolean classStaticDec_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "classStaticDec_5")) return false;
+  private static boolean classStaticDec_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "classStaticDec_6")) return false;
     methodReturnDec(b, l + 1);
     return true;
   }
@@ -1365,7 +1381,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // protoModifier? accessModifier? coModifier? static methodNameDec methodParamDec methodReturnDec? methodBodyDec
+  // protoModifier? accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec
   public static boolean globalMethodDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "globalMethodDec")) return false;
     boolean r, p;
@@ -1376,8 +1392,9 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = r && consumeToken(b, STATIC);
     p = r; // pin = 4
     r = r && report_error_(b, methodNameDec(b, l + 1));
+    r = p && report_error_(b, globalMethodDec_5(b, l + 1)) && r;
     r = p && report_error_(b, methodParamDec(b, l + 1)) && r;
-    r = p && report_error_(b, globalMethodDec_6(b, l + 1)) && r;
+    r = p && report_error_(b, globalMethodDec_7(b, l + 1)) && r;
     r = p && methodBodyDec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -1404,9 +1421,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // templateDec?
+  private static boolean globalMethodDec_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "globalMethodDec_5")) return false;
+    templateDec(b, l + 1);
+    return true;
+  }
+
   // methodReturnDec?
-  private static boolean globalMethodDec_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "globalMethodDec_6")) return false;
+  private static boolean globalMethodDec_7(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "globalMethodDec_7")) return false;
     methodReturnDec(b, l + 1);
     return true;
   }
@@ -2881,58 +2905,107 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LPAREN (valueStat (COMMA valueStat)*)? RPAREN
+  // propertyValueMethodTemplate? LPAREN (valueStat (COMMA valueStat)*)? RPAREN
   public static boolean propertyValueMethodCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "propertyValueMethodCall")) return false;
-    if (!nextTokenIs(b, LPAREN)) return false;
+    if (!nextTokenIs(b, "<property value method call>", LESS, LPAREN)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_METHOD_CALL, null);
-    r = consumeToken(b, LPAREN);
-    p = r; // pin = 1
-    r = r && report_error_(b, propertyValueMethodCall_1(b, l + 1));
+    Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_METHOD_CALL, "<property value method call>");
+    r = propertyValueMethodCall_0(b, l + 1);
+    r = r && consumeToken(b, LPAREN);
+    p = r; // pin = 2
+    r = r && report_error_(b, propertyValueMethodCall_2(b, l + 1));
     r = p && consumeToken(b, RPAREN) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
+  // propertyValueMethodTemplate?
+  private static boolean propertyValueMethodCall_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueMethodCall_0")) return false;
+    propertyValueMethodTemplate(b, l + 1);
+    return true;
+  }
+
   // (valueStat (COMMA valueStat)*)?
-  private static boolean propertyValueMethodCall_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "propertyValueMethodCall_1")) return false;
-    propertyValueMethodCall_1_0(b, l + 1);
+  private static boolean propertyValueMethodCall_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueMethodCall_2")) return false;
+    propertyValueMethodCall_2_0(b, l + 1);
     return true;
   }
 
   // valueStat (COMMA valueStat)*
-  private static boolean propertyValueMethodCall_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "propertyValueMethodCall_1_0")) return false;
+  private static boolean propertyValueMethodCall_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueMethodCall_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = valueStat(b, l + 1);
-    r = r && propertyValueMethodCall_1_0_1(b, l + 1);
+    r = r && propertyValueMethodCall_2_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // (COMMA valueStat)*
-  private static boolean propertyValueMethodCall_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "propertyValueMethodCall_1_0_1")) return false;
+  private static boolean propertyValueMethodCall_2_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueMethodCall_2_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!propertyValueMethodCall_1_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "propertyValueMethodCall_1_0_1", c)) break;
+      if (!propertyValueMethodCall_2_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "propertyValueMethodCall_2_0_1", c)) break;
     }
     return true;
   }
 
   // COMMA valueStat
-  private static boolean propertyValueMethodCall_1_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "propertyValueMethodCall_1_0_1_0")) return false;
+  private static boolean propertyValueMethodCall_2_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueMethodCall_2_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
     r = r && valueStat(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // LESS allType propertyValueMethodTemplatePair* GREATER
+  public static boolean propertyValueMethodTemplate(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueMethodTemplate")) return false;
+    if (!nextTokenIs(b, LESS)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_METHOD_TEMPLATE, null);
+    r = consumeToken(b, LESS);
+    p = r; // pin = 1
+    r = r && report_error_(b, allType(b, l + 1));
+    r = p && report_error_(b, propertyValueMethodTemplate_2(b, l + 1)) && r;
+    r = p && consumeToken(b, GREATER) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // propertyValueMethodTemplatePair*
+  private static boolean propertyValueMethodTemplate_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueMethodTemplate_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!propertyValueMethodTemplatePair(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "propertyValueMethodTemplate_2", c)) break;
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // COMMA allType
+  static boolean propertyValueMethodTemplatePair(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueMethodTemplatePair")) return false;
+    if (!nextTokenIs(b, COMMA)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, COMMA);
+    p = r; // pin = 1
+    r = r && allType(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */

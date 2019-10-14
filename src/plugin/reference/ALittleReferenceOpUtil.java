@@ -613,7 +613,7 @@ public class ALittleReferenceOpUtil {
         throw new ALittleGuessException(op2Value.getOp2(), "未知的运算符");
     }
 
-    public static void guessTypeEqual(@NotNull PsiElement leftSrc, @NotNull ALittleGuess leftGuess
+    public static void guessTypeEqual(@NotNull ALittleGuess leftGuess
             , @NotNull PsiElement rightSrc, @NotNull ALittleGuess rightGuess) throws ALittleGuessException {
         // 如果字符串直接相等，那么就直接返回成功
         if (leftGuess.value.equals(rightGuess.value)) return;
@@ -663,8 +663,8 @@ public class ALittleReferenceOpUtil {
                 throw new ALittleGuessException(rightSrc, "要求是" + leftGuess.value + ",不能是:" + rightGuess.value);
             }
             try {
-                guessTypeEqual(leftSrc, ((ALittleGuessMap)leftGuess).keyType, rightSrc, ((ALittleGuessMap)rightGuess).keyType);
-                guessTypeEqual(leftSrc, ((ALittleGuessMap)leftGuess).valueType, rightSrc, ((ALittleGuessMap)rightGuess).valueType);
+                guessTypeEqual(((ALittleGuessMap)leftGuess).keyType, rightSrc, ((ALittleGuessMap)rightGuess).keyType);
+                guessTypeEqual(((ALittleGuessMap)leftGuess).valueType, rightSrc, ((ALittleGuessMap)rightGuess).valueType);
             } catch (ALittleGuessException ignored) {
                 throw new ALittleGuessException(rightSrc, "要求是" + leftGuess.value + ",不能是:" + rightGuess.value);
             }
@@ -676,7 +676,7 @@ public class ALittleReferenceOpUtil {
                 throw new ALittleGuessException(rightSrc, "要求是" + leftGuess.value + ",不能是:" + rightGuess.value);
             }
             try {
-                guessTypeEqual(leftSrc, ((ALittleGuessList)leftGuess).subType, rightSrc, ((ALittleGuessList)rightGuess).subType);
+                guessTypeEqual(((ALittleGuessList)leftGuess).subType, rightSrc, ((ALittleGuessList)rightGuess).subType);
             } catch (ALittleGuessException ignored) {
                 throw new ALittleGuessException(rightSrc, "要求是" + leftGuess.value + ",不能是:" + rightGuess.value);
             }
@@ -692,6 +692,7 @@ public class ALittleReferenceOpUtil {
 
             if (leftGuessFunctor.functorParamList.size() != rightGuessFunctor.functorParamList.size()
                 || leftGuessFunctor.functorReturnList.size() != rightGuessFunctor.functorReturnList.size()
+                || leftGuessFunctor.functorTemplateParamList.size() != rightGuessFunctor.functorTemplateParamList.size()
                 || leftGuessFunctor.functorAwait != rightGuessFunctor.functorAwait
                 || leftGuessFunctor.functorProto == null && rightGuessFunctor.functorProto != null
                 || leftGuessFunctor.functorProto != null && rightGuessFunctor.functorProto == null
@@ -704,12 +705,16 @@ public class ALittleReferenceOpUtil {
                 throw new ALittleGuessException(rightSrc, "要求是" + leftGuess.value + ",不能是:" + rightGuess.value);
             }
 
+            for (int i = 0; i < leftGuessFunctor.functorTemplateParamList.size(); ++i) {
+                guessTypeEqual(leftGuessFunctor.functorTemplateParamList.get(i), rightSrc, rightGuessFunctor.functorTemplateParamList.get(i));
+            }
+
             for (int i = 0; i < leftGuessFunctor.functorParamList.size(); ++i) {
-                guessTypeEqual(leftSrc, leftGuessFunctor.functorParamList.get(i), rightSrc, rightGuessFunctor.functorParamList.get(i));
+                guessTypeEqual(leftGuessFunctor.functorParamList.get(i), rightSrc, rightGuessFunctor.functorParamList.get(i));
             }
 
             for (int i = 0; i < leftGuessFunctor.functorReturnList.size(); ++i) {
-                guessTypeEqual(leftSrc, leftGuessFunctor.functorReturnList.get(i), rightSrc, rightGuessFunctor.functorReturnList.get(i));
+                guessTypeEqual(leftGuessFunctor.functorReturnList.get(i), rightSrc, rightGuessFunctor.functorReturnList.get(i));
             }
             return;
         }
@@ -724,7 +729,6 @@ public class ALittleReferenceOpUtil {
 
             if (leftGuess.value.equals(rightGuess.value)) return;
 
-
             if (ALittleReferenceUtil.IsClassSuper(((ALittleGuessClass)leftGuess).element, rightGuess.value)) return;
             if (ALittleReferenceUtil.IsClassSuper(((ALittleGuessClass)rightGuess).element, leftGuess.value)) return;
 
@@ -734,8 +738,28 @@ public class ALittleReferenceOpUtil {
         if (leftGuess instanceof ALittleGuessClassTemplate) {
             ALittleGuessClassTemplate leftGuessClassTemplate = (ALittleGuessClassTemplate)leftGuess;
             if (leftGuessClassTemplate.templateExtends != null) {
-                guessTypeEqual(leftSrc, leftGuessClassTemplate.templateExtends, rightSrc, rightGuess);
+                guessTypeEqual(leftGuessClassTemplate.templateExtends, rightSrc, rightGuess);
                 return;
+            } else if (leftGuessClassTemplate.isClass) {
+                if (rightGuess instanceof ALittleGuessClass) {
+                    return;
+                } else if (rightGuess instanceof ALittleGuessClassTemplate) {
+                    ALittleGuessClassTemplate rightGuessClassTemplate = (ALittleGuessClassTemplate)rightGuess;
+                    if (rightGuessClassTemplate.templateExtends != null || rightGuessClassTemplate.isClass) {
+                        return;
+                    }
+                }
+                throw new ALittleGuessException(rightSrc, "要求是" + leftGuess.value + ",不能是:" + rightGuess.value);
+            } else if (leftGuessClassTemplate.isStruct) {
+                if (rightGuess instanceof ALittleGuessStruct) {
+                    return;
+                } else if (rightGuess instanceof ALittleGuessClassTemplate) {
+                    ALittleGuessClassTemplate rightGuessClassTemplate = (ALittleGuessClassTemplate)rightGuess;
+                    if (rightGuessClassTemplate.isStruct) {
+                        return;
+                    }
+                }
+                throw new ALittleGuessException(rightSrc, "要求是" + leftGuess.value + ",不能是:" + rightGuess.value);
             }
             return;
         }

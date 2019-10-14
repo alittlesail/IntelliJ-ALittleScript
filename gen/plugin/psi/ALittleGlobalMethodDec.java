@@ -31,6 +31,9 @@ public interface ALittleGlobalMethodDec extends PsiElement {
   @Nullable
   ALittleProtoModifier getProtoModifier();
 
+  @Nullable
+  ALittleTemplateDec getTemplateDec();
+
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;
 

@@ -8,28 +8,10 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public interface ALittleClassStaticDec extends PsiElement {
+public interface ALittlePropertyValueMethodTemplate extends PsiElement {
 
-  @Nullable
-  ALittleAccessModifier getAccessModifier();
-
-  @Nullable
-  ALittleCoModifier getCoModifier();
-
-  @Nullable
-  ALittleMethodBodyDec getMethodBodyDec();
-
-  @Nullable
-  ALittleMethodNameDec getMethodNameDec();
-
-  @Nullable
-  ALittleMethodParamDec getMethodParamDec();
-
-  @Nullable
-  ALittleMethodReturnDec getMethodReturnDec();
-
-  @Nullable
-  ALittleTemplateDec getTemplateDec();
+  @NotNull
+  List<ALittleAllType> getAllTypeList();
 
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;
