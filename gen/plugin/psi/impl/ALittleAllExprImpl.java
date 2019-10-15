@@ -67,12 +67,6 @@ public class ALittleAllExprImpl extends ASTWrapperPsiElement implements ALittleA
 
   @Override
   @Nullable
-  public ALittleNsendExpr getNsendExpr() {
-    return findChildByClass(ALittleNsendExpr.class);
-  }
-
-  @Override
-  @Nullable
   public ALittleOp1Expr getOp1Expr() {
     return findChildByClass(ALittleOp1Expr.class);
   }

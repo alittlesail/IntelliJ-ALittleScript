@@ -920,10 +920,10 @@ public class ALittleGenerateLua {
         String[] split_list = guessStruct.value.split("\\.");
         if (split_list.length != 2) return;
 
-        String content = "{";
-        content += "name = \"" + guessStruct.value + "\",\n";
-        content += "ns_name = \"" + split_list[0] + "\",\n";
-        content += "rl_name = \"" + split_list[1] + "\",\n";
+        String content = "{\n";
+        content += "name = \"" + guessStruct.value + "\",";
+        content += "ns_name = \"" + split_list[0] + "\",";
+        content += "rl_name = \"" + split_list[1] + "\",";
         content += "hash_code = " + PsiHelper.JSHash(guessStruct.value) + ",\n";
         content += "name_list = {" + String.join(",", nameList) +"},\n";
         content += "type_list = {" + String.join(",", typeList) + "}\n";
@@ -1136,7 +1136,8 @@ public class ALittleGenerateLua {
                                     paramList.add(guessClass.value);
                                 }
                             } else if (guess instanceof ALittleGuessStruct) {
-                                paramList.add(namespaceName + "FindStructByName(\"" + guess.value + "\"");
+                                paramList.add(namespaceName + "FindStructByName(\"" + guess.value + "\")");
+                                GenerateReflectStructInfo((ALittleGuessStruct)guess);
                             } else if (guess instanceof ALittleGuessClassTemplate) {
                                 ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
                                 ALittleTemplateDec templateDec = (ALittleTemplateDec)guessClassTemplate.element.getParent();
@@ -1196,47 +1197,6 @@ public class ALittleGenerateLua {
         }
 
         content += nameDec.getText() + " = " + GenerateCustomType(customType) + ";\n";
-        return content;
-    }
-
-    @NotNull
-    private String GenerateNsendExpr(ALittleNsendExpr nsendExpr, String preTab) throws Exception {
-        List<ALittleValueStat> valueStatList = nsendExpr.getValueStatList();
-        if (valueStatList.isEmpty()) throw new Exception("nsend第一个参数必须是ALittle.IMsgCommon的派生类");
-
-        ALittleGuess guess = valueStatList.get(0).guessType();
-        if (!(guess instanceof ALittleGuessClass)) throw new Exception("nsend第一个参数必须是ALittle.IMsgCommon的派生类");
-        ALittleGuessClass guessClass = (ALittleGuessClass)guess;
-
-        if (!ALittleReferenceUtil.IsClassSuper(guessClass.element, "ALittle.IMsgCommon")) {
-            throw new Exception("nsend第一个参数必须是ALittle.IMsgCommon的派生类");
-        }
-        if (valueStatList.size() != 2) {
-            throw new Exception("nsend必须是两个参数");
-        }
-
-        guess = valueStatList.get(1).guessType();
-        if (!(guess instanceof ALittleGuessStruct)) {
-            throw new Exception("nsend的第二个参数必须是struct");
-        }
-        ALittleGuessStruct guessStruct = (ALittleGuessStruct)guess;
-        int msg_id = PsiHelper.JSHash(guessStruct.value);
-
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-        String replaceTest = "IMsgCommon.Invoke";
-        GenerateReflectStructInfo(guessStruct);
-
-        String content = preTab + namespacePre + replaceTest + "(";
-        List<String> paramList = new ArrayList<>();
-        paramList.add("" + msg_id);
-
-        for (int i = 0; i < valueStatList.size(); ++i) {
-            paramList.add(GenerateValueStat(valueStatList.get(i)));
-        }
-        content += String.join(", ", paramList);
-        content += ")\n";
         return content;
     }
 
@@ -1674,8 +1634,6 @@ public class ALittleGenerateLua {
                 exprList.add(GenerateWrapExpr((ALittleWrapExpr)child, preTab));
             } else if (child instanceof ALittlePropertyValueExpr) {
                 exprList.add(GeneratePropertyValueExpr((ALittlePropertyValueExpr)child, preTab));
-            } else if (child instanceof ALittleNsendExpr) {
-                exprList.add(GenerateNsendExpr((ALittleNsendExpr)child, preTab));
             } else if (child instanceof ALittleThrowExpr) {
                 exprList.add(GenerateThrowExpr((ALittleThrowExpr)child, preTab));
             } else if (child instanceof ALittleAssertExpr) {

@@ -168,7 +168,6 @@ allExpr ::= varAssignExpr |
             flowExpr |
             wrapExpr |
             propertyValueExpr |
-            nsendExpr |
             throwExpr |
             assertExpr |
             emptyExpr
@@ -240,9 +239,6 @@ propertyValueExpr ::= propertyValue SEMI {pin=1}
 
 // 单目运算表达式
 op1Expr ::= op1 valueStat SEMI {pin=1}
-
-// nsend
-nsendExpr ::= nsend LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI {pin=1}
 
 // throw
 throwExpr ::= throw LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI {pin=1}

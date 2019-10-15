@@ -5,7 +5,6 @@ import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.ALittleNsendExpr;
 import plugin.psi.ALittleThrowExpr;
 import plugin.psi.ALittleValueStat;
 

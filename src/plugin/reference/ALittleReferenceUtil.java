@@ -154,7 +154,6 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleVarAssignNameDec) return new ALittleVarAssignNameDecReference((ALittleVarAssignNameDec)element, range);
         if (element instanceof ALittleWrapValueStat) return new ALittleWrapValueStatReference((ALittleWrapValueStat)element, range);
 
-        if (element instanceof ALittleNsendExpr) return new ALittleNsendExprReference((ALittleNsendExpr)element, range);
         if (element instanceof ALittleThrowExpr) return new ALittleThrowExprReference((ALittleThrowExpr)element, range);
 
         return null;

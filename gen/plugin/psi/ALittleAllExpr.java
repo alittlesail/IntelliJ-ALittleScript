@@ -29,9 +29,6 @@ public interface ALittleAllExpr extends PsiElement {
   ALittleIfExpr getIfExpr();
 
   @Nullable
-  ALittleNsendExpr getNsendExpr();
-
-  @Nullable
   ALittleOp1Expr getOp1Expr();
 
   @Nullable

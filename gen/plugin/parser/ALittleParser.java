@@ -68,7 +68,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   //             flowExpr |
   //             wrapExpr |
   //             propertyValueExpr |
-  //             nsendExpr |
   //             throwExpr |
   //             assertExpr |
   //             emptyExpr
@@ -87,7 +86,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     if (!r) r = flowExpr(b, l + 1);
     if (!r) r = wrapExpr(b, l + 1);
     if (!r) r = propertyValueExpr(b, l + 1);
-    if (!r) r = nsendExpr(b, l + 1);
     if (!r) r = throwExpr(b, l + 1);
     if (!r) r = assertExpr(b, l + 1);
     if (!r) r = emptyExpr(b, l + 1);
@@ -1853,61 +1851,6 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, ID_CONTENT);
     exit_section_(b, m, NAMESPACE_NAME_DEC, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // nsend LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI
-  public static boolean nsendExpr(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "nsendExpr")) return false;
-    if (!nextTokenIs(b, NSEND)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, NSEND_EXPR, null);
-    r = consumeTokens(b, 1, NSEND, LPAREN);
-    p = r; // pin = 1
-    r = r && report_error_(b, nsendExpr_2(b, l + 1));
-    r = p && report_error_(b, consumeTokens(b, -1, RPAREN, SEMI)) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  // (valueStat (COMMA valueStat)*)?
-  private static boolean nsendExpr_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "nsendExpr_2")) return false;
-    nsendExpr_2_0(b, l + 1);
-    return true;
-  }
-
-  // valueStat (COMMA valueStat)*
-  private static boolean nsendExpr_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "nsendExpr_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = valueStat(b, l + 1);
-    r = r && nsendExpr_2_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (COMMA valueStat)*
-  private static boolean nsendExpr_2_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "nsendExpr_2_0_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!nsendExpr_2_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "nsendExpr_2_0_1", c)) break;
-    }
-    return true;
-  }
-
-  // COMMA valueStat
-  private static boolean nsendExpr_2_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "nsendExpr_2_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, COMMA);
-    r = r && valueStat(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
