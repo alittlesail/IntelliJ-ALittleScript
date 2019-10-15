@@ -190,4 +190,4 @@ public static StaticFunction(int param, string value) : bool
 // public 修饰单例，那么单例将注册在全局，比如lua中的_G，全局可直接使用
 // protected 修饰单例，那么单例将注册在命名域下，本命名域下可以直接使用，其他命名域需要带上命名域前缀
 // private 修饰单例，那么单例将注册在命名域下，并且本文件蔡可以使用
-public instance TestB g_TestBInst = new TestB(10);
+public TestB g_TestBInst = new TestB(10);

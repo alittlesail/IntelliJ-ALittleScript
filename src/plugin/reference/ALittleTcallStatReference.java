@@ -22,14 +22,14 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleGuessException(myElement, "pcall表达式不能没有参数");
+            throw new ALittleGuessException(myElement, "tcall表达式不能没有参数");
         }
 
         // 第一个参数必须是函数
         ALittleValueStat valueStat = valueStatList.get(0);
         ALittleGuess guess = valueStat.guessType();
         if (!(guess instanceof ALittleGuessFunctor)) {
-            throw new ALittleGuessException(valueStat, "pcall表达式第一个参数必须是一个函数");
+            throw new ALittleGuessException(valueStat, "tcall表达式第一个参数必须是一个函数");
         }
         ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
 
@@ -46,21 +46,21 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
     public void checkError() throws ALittleGuessException {
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleGuessException(myElement, "pcall表达式不能没有参数");
+            throw new ALittleGuessException(myElement, "tcall表达式不能没有参数");
         }
 
         ALittleValueStat valueStat = valueStatList.get(0);
         // 第一个参数必须是函数
         ALittleGuess guess = valueStat.guessType();
         if (!(guess instanceof ALittleGuessFunctor)) {
-            throw new ALittleGuessException(valueStat, "pcall表达式第一个参数必须是一个函数");
+            throw new ALittleGuessException(valueStat, "tcall表达式第一个参数必须是一个函数");
         }
         ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
 
         // 后面跟的参数数量不能超过这个函数的参数个数
         if (valueStatList.size() - 1 > guessFunctor.functorParamList.size()) {
             if (guessFunctor.functorParamTail == null) {
-                throw new ALittleGuessException(myElement, "pcall表达式参数太多了");
+                throw new ALittleGuessException(myElement, "tcall表达式参数太多了");
             }
         }
 
@@ -69,6 +69,9 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
             if (i-1 >= guessFunctor.functorParamList.size()) break;
             ALittleGuess paramGuessInfo = guessFunctor.functorParamList.get(i - 1);
             ALittleValueStat paramValueStat = valueStatList.get(i);
+            if (paramGuessInfo.NeedReplace()) {
+                throw new ALittleGuessException(paramValueStat, "tcall表达式中不可填充带模板的那个参数");
+            }
             try {
                 ALittleReferenceOpUtil.guessTypeEqual(paramGuessInfo, paramValueStat, paramValueStat.guessType());
             } catch (ALittleGuessException e) {
@@ -115,14 +118,14 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
         List<InlayInfo> result = new ArrayList<>();
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();
         if (valueStatList.isEmpty()) {
-            throw new ALittleGuessException(myElement, "pcall表达式不能没有参数");
+            throw new ALittleGuessException(myElement, "tcall表达式不能没有参数");
         }
 
         ALittleValueStat valueStat = valueStatList.get(0);
         // 第一个参数必须是函数
         ALittleGuess guess = valueStat.guessType();
         if (!(guess instanceof ALittleGuessFunctor)) {
-            throw new ALittleGuessException(valueStat, "pcall表达式第一个参数必须是一个函数");
+            throw new ALittleGuessException(valueStat, "tcall表达式第一个参数必须是一个函数");
         }
         ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
 

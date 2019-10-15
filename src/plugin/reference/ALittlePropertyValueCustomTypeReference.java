@@ -112,6 +112,8 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
                 guess = ((ALittleVarAssignNameDec) element).guessType();
             } else if (element instanceof ALittleMethodNameDec) {
                 guess = ((ALittleMethodNameDec) element).guessType();
+            } else if (element instanceof ALittleUsingNameDec) {
+                guess = ((ALittleUsingNameDec) element).guessType();
             }
 
             if (guess != null) guessList.add(guess);
@@ -185,6 +187,14 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
                     PsiHelper.PsiElementType.STRUCT_NAME, file, mNamespace, mKey, true);
             if (!decList.isEmpty()) results.clear();
+            for (PsiElement dec : decList) {
+                results.add(new PsiElementResolveResult(dec));
+            }
+        }
+        // 处理using
+        {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
+                    PsiHelper.PsiElementType.USING_NAME, file, mNamespace, mKey, true);
             for (PsiElement dec : decList) {
                 results.add(new PsiElementResolveResult(dec));
             }
@@ -283,6 +293,36 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
                 );
             }
         }
+        // 处理using
+        {
+            List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project, PsiHelper.PsiElementType.USING_NAME, file, mNamespace, "", true);
+            for (PsiElement dec : decList) {
+                try {
+                    ALittleGuess guess = ((ALittleUsingNameDec)dec).guessType();
+                    if (guess instanceof ALittleGuessClass) {
+                        variants.add(LookupElementBuilder.create(dec.getText()).
+                                withIcon(ALittleIcons.CLASS).
+                                withTypeText(dec.getContainingFile().getName())
+                        );
+                    } else if (guess instanceof ALittleGuessStruct) {
+                        variants.add(LookupElementBuilder.create(dec.getText()).
+                                withIcon(ALittleIcons.STRUCT).
+                                withTypeText(dec.getContainingFile().getName())
+                        );
+                    } else {
+                        variants.add(LookupElementBuilder.create(dec.getText()).
+                                withIcon(ALittleIcons.PROPERTY).
+                                withTypeText(dec.getContainingFile().getName())
+                        );
+                    }
+                } catch (ALittleGuessException ignored) {
+                    variants.add(LookupElementBuilder.create(dec.getText()).
+                            withIcon(ALittleIcons.CLASS).
+                            withTypeText(dec.getContainingFile().getName())
+                    );
+                }
+            }
+        }
         // 处理枚举名
         {
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project, PsiHelper.PsiElementType.ENUM_NAME, file, mNamespace, "", true);
@@ -326,7 +366,6 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
                 );
             }
         }
-
         return variants.toArray();
     }
 }

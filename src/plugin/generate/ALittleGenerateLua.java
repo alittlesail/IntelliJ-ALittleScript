@@ -1149,8 +1149,17 @@ public class ALittleGenerateLua {
                         }
 
                         List<ALittleValueStat> valueStatList = methodCall.getValueStatList();
-                        for (ALittleValueStat valueStat : valueStatList) {
-                            paramList.add(GenerateValueStat(valueStat));
+                        for (int i = 0; i < valueStatList.size(); ++i) {
+                            ALittleValueStat valueStat = valueStatList.get(i);
+
+                            // 如果是成员、setter、gettter函数，第一个参数要放在最前面
+                            if (i == 0 && (preTypeFunctor.element instanceof ALittleClassMethodDec
+                                        || preTypeFunctor.element instanceof ALittleClassGetterDec
+                                    || preTypeFunctor.element instanceof ALittleClassSetterDec)) {
+                                paramList.add(0, GenerateValueStat(valueStat));
+                            } else {
+                                paramList.add(GenerateValueStat(valueStat));
+                            }
                         }
                         content.append("(").append(String.join(", ", paramList)).append(")");
                     }

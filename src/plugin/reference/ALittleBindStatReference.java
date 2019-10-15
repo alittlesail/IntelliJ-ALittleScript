@@ -84,6 +84,9 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
 
             ALittleGuess paramGuess = guessFunctor.functorParamList.get(i - 1);
             valueStat = valueStatList.get(i);
+            if (paramGuess.NeedReplace()) {
+                throw new ALittleGuessException(valueStat, "bind表达式中不可填充带模板的那个参数");
+            }
             try {
                 ALittleReferenceOpUtil.guessTypeEqual(paramGuess, valueStat, valueStat.guessType());
             } catch (ALittleGuessException e) {

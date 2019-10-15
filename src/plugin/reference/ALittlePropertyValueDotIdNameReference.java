@@ -57,8 +57,12 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
             info.functorReturnTail = guessFunctor.functorReturnTail;
 
             int start_index = 0;
-            if (guessFunctor.element instanceof ALittleClassMethodDec) {
+            if (guessFunctor.element instanceof ALittleClassMethodDec
+                || guessFunctor.element instanceof ALittleClassSetterDec
+                || guessFunctor.element instanceof ALittleClassGetterDec) {
                 info.functorParamList.add(mClassGuess);
+                if (!info.functorParamNameList.isEmpty())
+                info.functorParamNameList.set(0, mClassGuess.value);
                 start_index = 1;
             }
             for (int i = start_index; i < guessFunctor.functorParamList.size(); ++i) {
