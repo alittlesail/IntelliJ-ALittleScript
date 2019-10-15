@@ -3,6 +3,7 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessClassTemplate;
 import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessFunctor;
 import plugin.psi.ALittleBindStat;
@@ -30,6 +31,9 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
             throw new ALittleGuessException(valueStat, "bind表达式第一个参数必须是一个函数");
         }
         ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
+        if (!guessFunctor.functorTemplateParamList.isEmpty()) {
+            throw new ALittleGuessException(valueStat, "bind表达式要绑定的函数不能有模板定义");
+        }
 
         // 开始构建类型
         ALittleGuessFunctor info = new ALittleGuessFunctor(myElement);
@@ -70,6 +74,9 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
             throw new ALittleGuessException(valueStat, "bind表达式第一个参数必须是一个函数");
         }
         ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
+        if (!guessFunctor.functorTemplateParamList.isEmpty()) {
+            throw new ALittleGuessException(valueStat, "bind表达式要绑定的函数不能有模板定义");
+        }
 
         // 后面跟的参数数量不能超过这个函数的参数个数
         if (valueStatList.size() - 1 > guessFunctor.functorParamList.size()) {
@@ -84,9 +91,6 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
 
             ALittleGuess paramGuess = guessFunctor.functorParamList.get(i - 1);
             valueStat = valueStatList.get(i);
-            if (paramGuess.NeedReplace()) {
-                throw new ALittleGuessException(valueStat, "bind表达式中不可填充带模板的那个参数");
-            }
             try {
                 ALittleReferenceOpUtil.guessTypeEqual(paramGuess, valueStat, valueStat.guessType());
             } catch (ALittleGuessException e) {

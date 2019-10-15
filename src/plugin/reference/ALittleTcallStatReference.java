@@ -32,6 +32,9 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
             throw new ALittleGuessException(valueStat, "tcall表达式第一个参数必须是一个函数");
         }
         ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
+        if (!guessFunctor.functorTemplateParamList.isEmpty()) {
+            throw new ALittleGuessException(valueStat, "bind表达式要绑定的函数不能有模板定义");
+        }
 
         List<ALittleGuess> guessList = new ArrayList<>();
         guessList.add(ALittleGuessPrimitive.sStringGuess);
@@ -56,6 +59,9 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
             throw new ALittleGuessException(valueStat, "tcall表达式第一个参数必须是一个函数");
         }
         ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
+        if (!guessFunctor.functorTemplateParamList.isEmpty()) {
+            throw new ALittleGuessException(valueStat, "bind表达式要绑定的函数不能有模板定义");
+        }
 
         // 后面跟的参数数量不能超过这个函数的参数个数
         if (valueStatList.size() - 1 > guessFunctor.functorParamList.size()) {
@@ -69,9 +75,6 @@ public class ALittleTcallStatReference extends ALittleReference<ALittleTcallStat
             if (i-1 >= guessFunctor.functorParamList.size()) break;
             ALittleGuess paramGuessInfo = guessFunctor.functorParamList.get(i - 1);
             ALittleValueStat paramValueStat = valueStatList.get(i);
-            if (paramGuessInfo.NeedReplace()) {
-                throw new ALittleGuessException(paramValueStat, "tcall表达式中不可填充带模板的那个参数");
-            }
             try {
                 ALittleReferenceOpUtil.guessTypeEqual(paramGuessInfo, paramValueStat, paramValueStat.guessType());
             } catch (ALittleGuessException e) {
