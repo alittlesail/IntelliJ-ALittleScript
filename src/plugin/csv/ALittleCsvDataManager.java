@@ -137,7 +137,8 @@ public class ALittleCsvDataManager {
         ALittleCsvModifier csvModifier = structDec.getCsvModifier();
         if (csvModifier == null) return null;
         PsiElement pathElement = csvModifier.getStringContent();
-        if (pathElement == null) return null;
+        if (pathElement == null)
+            throw new ALittleGuessException(csvModifier, "Csv注解的格式错误,比如A模块的src目录下有B.csv文件，那么写成 @Csv \"A:/B.csv\"");
         String path = pathElement.getText();
         path = path.substring(1, path.length() - 1);
 
@@ -145,7 +146,7 @@ public class ALittleCsvDataManager {
         if (csvData == null) {
             String[] split = path.split(":");
             if (split.length != 2) {
-                throw new ALittleGuessException(pathElement, "Csv注解的格式为 模块名:src下的文件路径");
+                throw new ALittleGuessException(csvModifier, "Csv注解的格式错误,比如A模块的src目录下有B.csv文件，那么写成 @Csv \"A:/B.csv\"");
             }
             Module module = ModuleManager.getInstance(structDec.getProject()).findModuleByName(split[0]);
             if (module == null) {
