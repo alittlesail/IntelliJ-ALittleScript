@@ -2,13 +2,13 @@ package plugin.component;
 
 import com.intellij.AppTopics;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.BaseComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.*;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
@@ -17,12 +17,11 @@ import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.SendLogRunnable;
+import plugin.csv.ALittleCsvDataManager;
 import plugin.generate.ALittleGenerateLua;
 import plugin.guess.ALittleGuessException;
-import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleFile;
-import plugin.reference.ALittleReferenceUtil;
 
 public class ALittleInitComponent implements BaseComponent {
     private boolean USED = false;
@@ -35,6 +34,8 @@ public class ALittleInitComponent implements BaseComponent {
     }
 
     public void initComponent() {
+        ALittleCsvDataManager.Setup();
+
         MessageBus bus = ApplicationManager.getApplication().getMessageBus();
         MessageBusConnection connection = bus.connect();
         connection.subscribe(AppTopics.FILE_DOCUMENT_SYNC
@@ -54,6 +55,7 @@ public class ALittleInitComponent implements BaseComponent {
                         Project[] myProject = ProjectManager.getInstance().getOpenProjects();
                         for (Project project : myProject) {
                             PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
+
                             if (psiFile instanceof ALittleFile) {
                                 if (!USED) {
                                     SendLogRunnable.SendLog("fist use gen a single lua file");
@@ -122,7 +124,7 @@ public class ALittleInitComponent implements BaseComponent {
     }
 
     public void disposeComponent() {
-
+        ALittleCsvDataManager.Shutdown();
         SendLogRunnable.SendLog("disposeComponent");
     }
 }

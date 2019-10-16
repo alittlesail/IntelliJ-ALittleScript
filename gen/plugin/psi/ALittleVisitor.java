@@ -75,6 +75,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitCsvModifier(@NotNull ALittleCsvModifier o) {
+    visitPsiElement(o);
+  }
+
   public void visitCustomType(@NotNull ALittleCustomType o) {
     visitPsiElement(o);
   }

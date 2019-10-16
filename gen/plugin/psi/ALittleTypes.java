@@ -25,6 +25,7 @@ public interface ALittleTypes {
   IElementType CLASS_VAR_DEC = new ALittleElementType("CLASS_VAR_DEC");
   IElementType CONST_VALUE = new ALittleElementType("CONST_VALUE");
   IElementType CO_MODIFIER = new ALittleElementType("CO_MODIFIER");
+  IElementType CSV_MODIFIER = new ALittleElementType("CSV_MODIFIER");
   IElementType CUSTOM_TYPE = new ALittleElementType("CUSTOM_TYPE");
   IElementType CUSTOM_TYPE_DOT_ID = new ALittleElementType("CUSTOM_TYPE_DOT_ID");
   IElementType CUSTOM_TYPE_DOT_ID_NAME = new ALittleElementType("CUSTOM_TYPE_DOT_ID_NAME");
@@ -159,6 +160,7 @@ public interface ALittleTypes {
   IElementType CONCAT = new ALittleTokenType("..");
   IElementType COND_AND = new ALittleTokenType("&&");
   IElementType COND_OR = new ALittleTokenType("||");
+  IElementType CSV = new ALittleTokenType("@Csv");
   IElementType CTOR = new ALittleTokenType("Ctor");
   IElementType DIGIT_CONTENT = new ALittleTokenType("DIGIT_CONTENT");
   IElementType DO = new ALittleTokenType("do");
@@ -286,6 +288,9 @@ public interface ALittleTypes {
       }
       else if (type == CO_MODIFIER) {
         return new ALittleCoModifierImpl(node);
+      }
+      else if (type == CSV_MODIFIER) {
+        return new ALittleCsvModifierImpl(node);
       }
       else if (type == CUSTOM_TYPE) {
         return new ALittleCustomTypeImpl(node);

@@ -10,9 +10,10 @@ import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
+import plugin.csv.ALittleCsvDataManager;
 import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
-import plugin.reference.ALittleReferenceUtil;
 
 import java.io.File;
 import java.util.*;
@@ -28,8 +29,10 @@ public class ALittleIndex {
     protected Map<PsiFile, Map<String, ALittleEnumData>> mEnumDataMap;
 
     // 按命名域来划分
+    // String 表示命名域
     protected Map<String, Map<ALittleNamespaceNameDec, ALittleAccessData>> mAllDataMap;
     // 根据开放权限来划分
+    // String 表示命名域
     protected Map<String, ALittleAccessData> mGlobalAccessMap;
     protected Map<String, ALittleAccessData> mNamespaceAccessMap;
     protected Map<PsiFile, ALittleAccessData> mFileAccessMap;
@@ -38,6 +41,9 @@ public class ALittleIndex {
     boolean mReloading = false;         // 是否正在加载
     boolean mReloaded = false;          // 是否加载完成
     boolean mIsRefreshed = false;       // 是否刷新过
+
+    // Csv数据联动
+    protected Map<String, HashSet<ALittleStructDec>>  mCsvStructSet;                        // 收集csv路径对应的struct集合
 
     public ALittleIndex(Project project) {
         mProject = project;
@@ -50,6 +56,8 @@ public class ALittleIndex {
         mClassDataMap = new HashMap<>();
         mStructDataMap = new HashMap<>();
         mEnumDataMap = new HashMap<>();
+
+        mCsvStructSet = new HashMap<>();
     }
 
     private void loadDir(PsiManager psi_mgr, VirtualFile root) {
@@ -98,6 +106,8 @@ public class ALittleIndex {
         mClassDataMap = new HashMap<>();
         mStructDataMap = new HashMap<>();
         mEnumDataMap = new HashMap<>();
+
+        mCsvStructSet = new HashMap<>();
 
         mReloading = true;
 
@@ -210,7 +220,50 @@ public class ALittleIndex {
         return map.get(nameDec.getText());
     }
 
-    protected void addNamespaceName(@NotNull ALittleNamespaceNameDec element) {
+    public void addCsvData(@NotNull ALittleStructDec structDec) {
+        // 检查修饰符
+        ALittleCsvModifier csvModifier = structDec.getCsvModifier();
+        if (csvModifier == null) return;
+        PsiElement pathElement = csvModifier.getStringContent();
+        if (pathElement == null) return;
+        String path = pathElement.getText();
+        path = path.substring(1, path.length() - 1);
+
+        HashSet<ALittleStructDec> set = mCsvStructSet.get(path);
+        if (set == null) {
+            set = new HashSet<>();
+            mCsvStructSet.put(path, set);
+        }
+        set.add(structDec);
+
+        try {
+            ALittleCsvDataManager.checkAndChange(structDec);
+        } catch (ALittleGuessException ignored) {
+
+        }
+    }
+
+    public HashSet<ALittleStructDec> getCsvData(@NotNull String path) {
+        return mCsvStructSet.get(path);
+    }
+
+    public void removeCsvData(@NotNull ALittleStructDec structDec) {
+        // 检查修饰符
+        ALittleCsvModifier csvModifier = structDec.getCsvModifier();
+        if (csvModifier == null) return;
+        PsiElement pathElement = csvModifier.getStringContent();
+        if (pathElement == null) return;
+        String path = pathElement.getText();
+        path = path.substring(1, path.length() - 1);
+
+        HashSet<ALittleStructDec> set = mCsvStructSet.get(path);
+        if (set == null) return;
+        set.remove(structDec);
+        if (!set.isEmpty()) return;
+        mCsvStructSet.remove(path);
+    }
+
+    public void addNamespaceName(@NotNull ALittleNamespaceNameDec element) {
         // 清除标记
         mGuessTypeMap.remove(element.getContainingFile().getOriginalFile());
         mClassDataMap.remove(element.getContainingFile().getOriginalFile());
@@ -284,6 +337,7 @@ public class ALittleIndex {
                 ALittleStructNameDec nameDec = dec.getStructNameDec();
                 if (nameDec == null) continue;
 
+                addCsvData(dec);
                 addStructData(dec);
                 allAccessData.addALittleNameDec(nameDec);
                 PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
@@ -344,7 +398,7 @@ public class ALittleIndex {
         }
     }
 
-    protected void removeNamespaceName(ALittleNamespaceNameDec element) {
+    public void removeNamespaceName(ALittleNamespaceNameDec element) {
         // 清除标记
         mGuessTypeMap.remove(element.getContainingFile().getOriginalFile());
         mClassDataMap.remove(element.getContainingFile().getOriginalFile());
@@ -373,6 +427,9 @@ public class ALittleIndex {
                     if (globalAccessData != null) globalAccessData.removeALittleNameDec(nameDec);
                     if (namespaceAccessData != null) namespaceAccessData.removeALittleNameDec(nameDec);
                     if (fileAccessData != null) fileAccessData.removeALittleNameDec(nameDec);
+                    if (nameDec instanceof ALittleStructNameDec) {
+                        removeCsvData((ALittleStructDec)nameDec.getParent());
+                    }
                 }
             }
         }

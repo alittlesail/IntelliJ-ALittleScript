@@ -43,8 +43,8 @@
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553049610453" />
     <property name="jdk.selected.JAVA_MODULE" value="1.8" />
     <property name="last.edited.regexp" value="&quot;11\\\&quot;" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/plugin" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/jflex-1.7.0-2.jar!/" />
+    <property name="project.structure.last.edited" value="Global Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.33989638" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
@@ -58,8 +58,12 @@
     <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="plugin.parser" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
+      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="plugin.psi" />
@@ -74,18 +78,14 @@
       <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="plugin.csv" />
       <recent name="plugin.reference" />
       <recent name="plugin.guess" />
       <recent name="plugin.index" />
       <recent name="plugin.action" />
-      <recent name="plugin.psi.impl" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
-      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="plugin.parser" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -136,5 +136,16 @@
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.lua" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/plugin/csv/ALittleCsvDataManager.java</url>
+          <line>100</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

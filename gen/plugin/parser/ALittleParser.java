@@ -565,6 +565,19 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // CSV STRING_CONTENT
+  public static boolean csvModifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "csvModifier")) return false;
+    if (!nextTokenIs(b, CSV)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, CSV_MODIFIER, null);
+    r = consumeTokens(b, 1, CSV, STRING_CONTENT);
+    p = r; // pin = 1
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // ID_CONTENT customTypeDotId? customTypeTemplate?
   public static boolean customType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "customType")) return false;
@@ -3132,31 +3145,39 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // accessModifier? struct structNameDec structExtendsDec? structBodyDec
+  // csvModifier? accessModifier? struct structNameDec structExtendsDec? structBodyDec
   public static boolean structDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "structDec")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, STRUCT_DEC, "<struct dec>");
     r = structDec_0(b, l + 1);
+    r = r && structDec_1(b, l + 1);
     r = r && consumeToken(b, STRUCT);
-    p = r; // pin = 2
+    p = r; // pin = 3
     r = r && report_error_(b, structNameDec(b, l + 1));
-    r = p && report_error_(b, structDec_3(b, l + 1)) && r;
+    r = p && report_error_(b, structDec_4(b, l + 1)) && r;
     r = p && structBodyDec(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
-  // accessModifier?
+  // csvModifier?
   private static boolean structDec_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "structDec_0")) return false;
+    csvModifier(b, l + 1);
+    return true;
+  }
+
+  // accessModifier?
+  private static boolean structDec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structDec_1")) return false;
     accessModifier(b, l + 1);
     return true;
   }
 
   // structExtendsDec?
-  private static boolean structDec_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "structDec_3")) return false;
+  private static boolean structDec_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structDec_4")) return false;
     structExtendsDec(b, l + 1);
     return true;
   }

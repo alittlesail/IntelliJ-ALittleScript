@@ -75,6 +75,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "@HttpDownload"       { return HTTP_DOWNLOAD; }
   "@HttpUpload"         { return HTTP_UPLOAD; }
   "@Msg"                { return MSG; }
+  "@Csv"                { return CSV; }
   "..."                 { return TYPE_TAIL; }
   "register"            { return REGISTER; }
   "public"              { return PUBLIC; }

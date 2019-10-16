@@ -14,14 +14,14 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public class ALittleStructDecImpl extends ASTWrapperPsiElement implements ALittleStructDec {
+public class ALittleCsvModifierImpl extends ASTWrapperPsiElement implements ALittleCsvModifier {
 
-  public ALittleStructDecImpl(@NotNull ASTNode node) {
+  public ALittleCsvModifierImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitStructDec(this);
+    visitor.visitCsvModifier(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -31,32 +31,8 @@ public class ALittleStructDecImpl extends ASTWrapperPsiElement implements ALittl
 
   @Override
   @Nullable
-  public ALittleAccessModifier getAccessModifier() {
-    return findChildByClass(ALittleAccessModifier.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleCsvModifier getCsvModifier() {
-    return findChildByClass(ALittleCsvModifier.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleStructExtendsDec getStructExtendsDec() {
-    return findChildByClass(ALittleStructExtendsDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleStructNameDec getStructNameDec() {
-    return findChildByClass(ALittleStructNameDec.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ALittleStructVarDec> getStructVarDecList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleStructVarDec.class);
+  public PsiElement getStringContent() {
+    return findChildByType(STRING_CONTENT);
   }
 
   @Override

@@ -5,6 +5,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
+import plugin.csv.ALittleCsvDataManager;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.*;

@@ -54,7 +54,8 @@
       HTTP_DOWNLOAD        =  '@HttpDownload'
       HTTP_UPLOAD          =  '@HttpUpload'
       MSG                  =  '@Msg'
-      TYPE_TAIL           =  '...'
+      CSV                  =  '@Csv'
+      TYPE_TAIL            =  '...'
 
       WHITE_SPACE          = 'regexp:\s+'
       COMMENT              = 'regexp://.*'
@@ -75,6 +76,8 @@ accessModifier ::= public | private | protected
 coModifier ::= async | await
 // 协议修饰符
 protoModifier ::= HTTP | HTTP_DOWNLOAD | HTTP_UPLOAD |  MSG
+// CSV联动修饰符
+csvModifier ::= CSV STRING_CONTENT {pin=1}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 命名域
@@ -95,7 +98,7 @@ classExtendsDec ::= COLON (namespaceNameDec DOT)? classNameDec {pin=1}
 private classBodyDec ::= LBRACE (classVarDec | classCtorDec | classGetterDec | classSetterDec | classStaticDec | classMethodDec)* RBRACE {pin=1}
 
 // 结构体定义
-structDec ::= accessModifier? struct structNameDec structExtendsDec? structBodyDec {pin=2}
+structDec ::= csvModifier? accessModifier? struct structNameDec structExtendsDec? structBodyDec {pin=3}
 structNameDec ::= ID_CONTENT
 structExtendsDec ::= COLON (namespaceNameDec DOT)? structNameDec {pin=1}
 private structBodyDec ::= LBRACE (structVarDec)* RBRACE {pin=1}
