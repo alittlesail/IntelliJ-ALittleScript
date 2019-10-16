@@ -219,6 +219,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitMysqlModifier(@NotNull ALittleMysqlModifier o) {
+    visitPsiElement(o);
+  }
+
   public void visitNamespaceDec(@NotNull ALittleNamespaceDec o) {
     visitPsiElement(o);
   }

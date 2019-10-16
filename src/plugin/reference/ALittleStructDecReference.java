@@ -1,17 +1,13 @@
 package plugin.reference;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-import plugin.csv.ALittleCsvData;
 import plugin.csv.ALittleCsvDataManager;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessStruct;
+import plugin.mysql.ALittleMysqlDataManager;
 import plugin.psi.ALittleStructDec;
 import plugin.psi.ALittleStructNameDec;
 import plugin.psi.ALittleStructVarDec;
@@ -55,5 +51,6 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
         }
 
         ALittleCsvDataManager.checkCsv(myElement);
+        ALittleMysqlDataManager.checkMysql(myElement);
     }
 }

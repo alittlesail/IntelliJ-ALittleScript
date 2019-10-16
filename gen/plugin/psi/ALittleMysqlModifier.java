@@ -8,25 +8,10 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public interface ALittleStructDec extends PsiElement {
+public interface ALittleMysqlModifier extends PsiElement {
 
   @Nullable
-  ALittleAccessModifier getAccessModifier();
-
-  @Nullable
-  ALittleCsvModifier getCsvModifier();
-
-  @Nullable
-  ALittleMysqlModifier getMysqlModifier();
-
-  @Nullable
-  ALittleStructExtendsDec getStructExtendsDec();
-
-  @Nullable
-  ALittleStructNameDec getStructNameDec();
-
-  @NotNull
-  List<ALittleStructVarDec> getStructVarDecList();
+  PsiElement getStringContent();
 
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;

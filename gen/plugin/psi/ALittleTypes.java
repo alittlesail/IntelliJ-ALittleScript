@@ -61,6 +61,7 @@ public interface ALittleTypes {
   IElementType METHOD_PARAM_TAIL_DEC = new ALittleElementType("METHOD_PARAM_TAIL_DEC");
   IElementType METHOD_RETURN_DEC = new ALittleElementType("METHOD_RETURN_DEC");
   IElementType METHOD_RETURN_TAIL_DEC = new ALittleElementType("METHOD_RETURN_TAIL_DEC");
+  IElementType MYSQL_MODIFIER = new ALittleElementType("MYSQL_MODIFIER");
   IElementType NAMESPACE_DEC = new ALittleElementType("NAMESPACE_DEC");
   IElementType NAMESPACE_NAME_DEC = new ALittleElementType("NAMESPACE_NAME_DEC");
   IElementType OP_1 = new ALittleElementType("OP_1");
@@ -198,6 +199,7 @@ public interface ALittleTypes {
   IElementType MSG = new ALittleTokenType("@Msg");
   IElementType MUL = new ALittleTokenType("*");
   IElementType MUL_ASSIGN = new ALittleTokenType("*=");
+  IElementType MYSQL = new ALittleTokenType("@Mysql");
   IElementType NAMESPACE = new ALittleTokenType("namespace");
   IElementType NEW = new ALittleTokenType("new");
   IElementType NOT = new ALittleTokenType("!");
@@ -396,6 +398,9 @@ public interface ALittleTypes {
       }
       else if (type == METHOD_RETURN_TAIL_DEC) {
         return new ALittleMethodReturnTailDecImpl(node);
+      }
+      else if (type == MYSQL_MODIFIER) {
+        return new ALittleMysqlModifierImpl(node);
       }
       else if (type == NAMESPACE_DEC) {
         return new ALittleNamespaceDecImpl(node);

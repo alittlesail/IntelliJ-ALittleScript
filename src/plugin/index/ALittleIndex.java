@@ -13,6 +13,7 @@ import plugin.component.StdLibraryProvider;
 import plugin.csv.ALittleCsvDataManager;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
+import plugin.mysql.ALittleMysqlDataManager;
 import plugin.psi.*;
 
 import java.io.File;
@@ -44,6 +45,8 @@ public class ALittleIndex {
 
     // Csv数据联动
     protected Map<String, HashSet<ALittleStructDec>>  mCsvStructSet;                        // 收集csv路径对应的struct集合
+    // Mysql数据联动
+    protected Map<String, HashSet<ALittleStructDec>>  mMysqlStructSet;                      // 收集mysql路径对应的struct集合
 
     public ALittleIndex(Project project) {
         mProject = project;
@@ -58,6 +61,7 @@ public class ALittleIndex {
         mEnumDataMap = new HashMap<>();
 
         mCsvStructSet = new HashMap<>();
+        mMysqlStructSet = new HashMap<>();
     }
 
     private void loadDir(PsiManager psi_mgr, VirtualFile root) {
@@ -108,6 +112,7 @@ public class ALittleIndex {
         mEnumDataMap = new HashMap<>();
 
         mCsvStructSet = new HashMap<>();
+        mMysqlStructSet = new HashMap<>();
 
         mReloading = true;
 
@@ -237,7 +242,13 @@ public class ALittleIndex {
         set.add(structDec);
 
         try {
-            ALittleCsvDataManager.checkAndChange(structDec);
+            if (mReloading) {
+                ALittleCsvDataManager.checkCsv(structDec);
+                ALittleMysqlDataManager.checkMysql(structDec);
+            } else {
+                ALittleCsvDataManager.checkAndChange(structDec);
+                ALittleMysqlDataManager.checkAndChange(structDec);
+            }
         } catch (ALittleGuessException ignored) {
 
         }
@@ -261,6 +272,50 @@ public class ALittleIndex {
         set.remove(structDec);
         if (!set.isEmpty()) return;
         mCsvStructSet.remove(path);
+    }
+
+    public void addMysqlData(@NotNull ALittleStructDec structDec) {
+        // 检查修饰符
+        ALittleMysqlModifier mysqlModifier = structDec.getMysqlModifier();
+        if (mysqlModifier == null) return;
+        PsiElement pathElement = mysqlModifier.getStringContent();
+        if (pathElement == null) return;
+        String path = pathElement.getText();
+        path = path.substring(1, path.length() - 1);
+
+        HashSet<ALittleStructDec> set = mMysqlStructSet.get(path);
+        if (set == null) {
+            set = new HashSet<>();
+            mMysqlStructSet.put(path, set);
+        }
+        set.add(structDec);
+
+        try {
+            if (mIsRefreshed)
+            ALittleMysqlDataManager.checkAndChange(structDec);
+        } catch (ALittleGuessException ignored) {
+
+        }
+    }
+
+    public HashSet<ALittleStructDec> getMysqlData(@NotNull String path) {
+        return mMysqlStructSet.get(path);
+    }
+
+    public void removeMysqlData(@NotNull ALittleStructDec structDec) {
+        // 检查修饰符
+        ALittleCsvModifier csvModifier = structDec.getCsvModifier();
+        if (csvModifier == null) return;
+        PsiElement pathElement = csvModifier.getStringContent();
+        if (pathElement == null) return;
+        String path = pathElement.getText();
+        path = path.substring(1, path.length() - 1);
+
+        HashSet<ALittleStructDec> set = mMysqlStructSet.get(path);
+        if (set == null) return;
+        set.remove(structDec);
+        if (!set.isEmpty()) return;
+        mMysqlStructSet.remove(path);
     }
 
     public void addNamespaceName(@NotNull ALittleNamespaceNameDec element) {
@@ -338,6 +393,7 @@ public class ALittleIndex {
                 if (nameDec == null) continue;
 
                 addCsvData(dec);
+                addMysqlData(dec);
                 addStructData(dec);
                 allAccessData.addALittleNameDec(nameDec);
                 PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
@@ -429,6 +485,7 @@ public class ALittleIndex {
                     if (fileAccessData != null) fileAccessData.removeALittleNameDec(nameDec);
                     if (nameDec instanceof ALittleStructNameDec) {
                         removeCsvData((ALittleStructDec)nameDec.getParent());
+                        removeMysqlData((ALittleStructDec)nameDec.getParent());
                     }
                 }
             }

@@ -1806,6 +1806,19 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // MYSQL STRING_CONTENT
+  public static boolean mysqlModifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mysqlModifier")) return false;
+    if (!nextTokenIs(b, MYSQL)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, MYSQL_MODIFIER, null);
+    r = consumeTokens(b, 1, MYSQL, STRING_CONTENT);
+    p = r; // pin = 1
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // registerModifier? namespace namespaceNameDec SEMI (globalMethodDec | classDec | enumDec | structDec | instanceDec | usingDec | opAssignExpr | propertyValueExpr)*
   public static boolean namespaceDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "namespaceDec")) return false;
@@ -3145,7 +3158,18 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // csvModifier? accessModifier? struct structNameDec structExtendsDec? structBodyDec
+  // csvModifier | mysqlModifier
+  static boolean structDataModifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structDataModifier")) return false;
+    if (!nextTokenIs(b, "", CSV, MYSQL)) return false;
+    boolean r;
+    r = csvModifier(b, l + 1);
+    if (!r) r = mysqlModifier(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // structDataModifier? accessModifier? struct structNameDec structExtendsDec? structBodyDec
   public static boolean structDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "structDec")) return false;
     boolean r, p;
@@ -3161,10 +3185,10 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // csvModifier?
+  // structDataModifier?
   private static boolean structDec_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "structDec_0")) return false;
-    csvModifier(b, l + 1);
+    structDataModifier(b, l + 1);
     return true;
   }
 

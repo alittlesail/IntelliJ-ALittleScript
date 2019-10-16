@@ -55,6 +55,7 @@
       HTTP_UPLOAD          =  '@HttpUpload'
       MSG                  =  '@Msg'
       CSV                  =  '@Csv'
+      MYSQL                =  '@Mysql'
       TYPE_TAIL            =  '...'
 
       WHITE_SPACE          = 'regexp:\s+'
@@ -78,6 +79,8 @@ coModifier ::= async | await
 protoModifier ::= HTTP | HTTP_DOWNLOAD | HTTP_UPLOAD |  MSG
 // CSV联动修饰符
 csvModifier ::= CSV STRING_CONTENT {pin=1}
+// MYSQL联动修饰符
+mysqlModifier ::= MYSQL STRING_CONTENT {pin=1}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 命名域
@@ -98,10 +101,11 @@ classExtendsDec ::= COLON (namespaceNameDec DOT)? classNameDec {pin=1}
 private classBodyDec ::= LBRACE (classVarDec | classCtorDec | classGetterDec | classSetterDec | classStaticDec | classMethodDec)* RBRACE {pin=1}
 
 // 结构体定义
-structDec ::= csvModifier? accessModifier? struct structNameDec structExtendsDec? structBodyDec {pin=3}
+structDec ::= structDataModifier? accessModifier? struct structNameDec structExtendsDec? structBodyDec {pin=3}
 structNameDec ::= ID_CONTENT
 structExtendsDec ::= COLON (namespaceNameDec DOT)? structNameDec {pin=1}
 private structBodyDec ::= LBRACE (structVarDec)* RBRACE {pin=1}
+private structDataModifier ::= csvModifier | mysqlModifier
 
 // 枚举定义
 enumDec ::= accessModifier? enum enumNameDec enumBodyDec  {pin=2}

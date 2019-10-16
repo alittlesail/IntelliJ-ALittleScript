@@ -1,4 +1,4 @@
-package plugin.csv;
+package plugin.mysql;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -20,20 +20,25 @@ import plugin.psi.*;
 
 import java.util.*;
 
-public class ALittleCsvDataManager {
-    private static Map<String, ALittleCsvData> mDataMap = new HashMap<>();
-    private static Map<String, ALittleCsvData> mCheckMap = new HashMap<>();
+public class ALittleMysqlDataManager {
+    private static Map<String, ALittleMysqlData> mDataMap = new HashMap<>();
+    private static Map<String, ALittleMysqlData> mCheckMap = new HashMap<>();
     private static List<String> mRemoveList = new ArrayList<>();
     private static Timer mTimer;
 
     public static void Setup() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+        } catch (Exception ignored) {
+            return;
+        }
         mTimer = new Timer();
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                     public void run() {
-                        ALittleCsvDataManager.checkRun();
+                        ALittleMysqlDataManager.checkRun();
                     }
                 });
             }
@@ -50,7 +55,7 @@ public class ALittleCsvDataManager {
     private static void checkRun() {
         // 把检查列表拷贝一份
         if (mCheckMap.size() == 0) {
-            for (Map.Entry<String, ALittleCsvData> entry : mDataMap.entrySet()) {
+            for (Map.Entry<String, ALittleMysqlData> entry : mDataMap.entrySet()) {
                 mCheckMap.put(entry.getKey(), entry.getValue());
             }
         }
@@ -58,33 +63,33 @@ public class ALittleCsvDataManager {
         mRemoveList.clear();
 
         int count = 20;
-        for (Map.Entry<String, ALittleCsvData> entry : mCheckMap.entrySet()) {
+        for (Map.Entry<String, ALittleMysqlData> entry : mCheckMap.entrySet()) {
             if (count <= 0) break;
             -- count;
             mRemoveList.add(entry.getKey());
 
-            ALittleCsvData csvData = entry.getValue();
-            ALittleCsvData.ChangeType changeType = csvData.isChanged();
-            ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(csvData.getProject());
+            ALittleMysqlData mysqlData = entry.getValue();
+            ALittleMysqlData.ChangeType changeType = mysqlData.isChanged();
+            ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(mysqlData.getProject());
             if (listener == null) continue;
 
-            if (changeType == ALittleCsvData.ChangeType.CT_DELETED) {
-                HashSet<ALittleStructDec> set = listener.getCsvData(entry.getKey());
+            if (changeType == ALittleMysqlData.ChangeType.CT_DELETED) {
+                HashSet<ALittleStructDec> set = listener.getMysqlData(entry.getKey());
                 if (set != null) {
                     for (ALittleStructDec dec : set) {
-                        WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
-                            changeCsv(dec, new ArrayList<>());
+                        WriteCommandAction.writeCommandAction(mysqlData.getProject()).run(() -> {
+                            changeMysql(dec, new ArrayList<>());
                         });
                     }
                 }
                 mDataMap.remove(entry.getKey());
-            } else if (changeType == ALittleCsvData.ChangeType.CT_CHANGED) {
-                List<String> varList = csvData.generateVarList();
-                HashSet<ALittleStructDec> set = listener.getCsvData(entry.getKey());
+            } else if (changeType == ALittleMysqlData.ChangeType.CT_CHANGED) {
+                List<String> varList = mysqlData.generateVarList();
+                HashSet<ALittleStructDec> set = listener.getMysqlData(entry.getKey());
                 if (set != null) {
                     for (ALittleStructDec dec : set) {
-                        WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
-                            changeCsv(dec, varList);
+                        WriteCommandAction.writeCommandAction(mysqlData.getProject()).run(() -> {
+                            changeMysql(dec, varList);
                         });
                     }
                 }
@@ -98,58 +103,45 @@ public class ALittleCsvDataManager {
     }
 
     // 返回是否需要变化
-    public static ALittleCsvData checkCsv(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
-        ALittleCsvModifier csvModifier = structDec.getCsvModifier();
-        if (csvModifier == null) return null;
-        PsiElement pathElement = csvModifier.getStringContent();
+    public static ALittleMysqlData checkMysql(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
+        ALittleMysqlModifier mysqlModifier = structDec.getMysqlModifier();
+        if (mysqlModifier == null) return null;
+        PsiElement pathElement = mysqlModifier.getStringContent();
         if (pathElement == null)
-            throw new ALittleGuessException(csvModifier, "Csv注解的格式错误,比如A模块的src目录下有B.csv文件，那么写成 @Csv \"A:/B.csv\"");
+            throw new ALittleGuessException(mysqlModifier, "Mysql注解的格式错误, @Mysql \"IP:端口/数据库?user=账号名&password=密码\"");
         String path = pathElement.getText();
         path = path.substring(1, path.length() - 1);
-
-        ALittleCsvData csvData = mDataMap.get(path);
-        if (csvData == null) {
-            String[] split = path.split(":");
-            if (split.length != 2) {
-                throw new ALittleGuessException(csvModifier, "Csv注解的格式错误,比如A模块的src目录下有B.csv文件，那么写成 @Csv \"A:/B.csv\"");
-            }
-            Module module = ModuleManager.getInstance(structDec.getProject()).findModuleByName(split[0]);
-            if (module == null) {
-                throw new ALittleGuessException(pathElement, "模块名:" + split[0] + "不存在");
-            }
-
-            String error = null;
-            VirtualFile[] roots = ModuleRootManager.getInstance(module).getSourceRoots();
-            for (VirtualFile root : roots) {
-                ALittleCsvData tmp = new ALittleCsvData(structDec.getProject(), root.getPath() + split[1]);
-                error = tmp.load();
-                if (error == null) {
-                    csvData = tmp;
-                    break;
-                }
-            }
-            if (error != null) throw new ALittleGuessException(pathElement, error);
-            if (csvData == null) return null;
-
-            mDataMap.put(path, csvData);
+        boolean result = path.matches("^(localhost|\\d+\\.\\d+\\.\\d+\\.\\d+)(:\\d+)?/\\w+\\.\\w+\\?user=\\w+&password=\\w+$");
+        if (!result) {
+            throw new ALittleGuessException(pathElement, "Mysql注解的格式错误, @Mysql \"IP:端口/数据库?user=账号名&password=密码\"");
         }
-        // 检查是否和csvData一致
-        if (csvData.check(structDec.getStructVarDecList())) return csvData;
+
+        ALittleMysqlData mysqlData = mDataMap.get(path);
+        if (mysqlData == null) {
+            mysqlData = new ALittleMysqlData(structDec.getProject(), path);
+            String error = mysqlData.load();
+            if (error != null) {
+                throw new ALittleGuessException(pathElement, error);
+            }
+            mDataMap.put(path, mysqlData);
+        }
+        // 检查是否和mysqlData一致
+        if (mysqlData.check(structDec.getStructVarDecList())) return mysqlData;
         return null;
     }
 
     // 处理变化
-    public static void changeCsv(@NotNull ALittleStructDec dec, List<String> varList) {
+    public static void changeMysql(@NotNull ALittleStructDec dec, List<String> varList) {
         ALittleStructNameDec nameDec = dec.getStructNameDec();
         if (nameDec == null) return;
         String name = nameDec.getText();
-        String csv = "";
-        ALittleCsvModifier csvModifier = dec.getCsvModifier();
-        if (csvModifier != null) {
-            csv = csvModifier.getText() + "\n";
+        String mysql = "";
+        ALittleMysqlModifier mysqlModifier = dec.getMysqlModifier();
+        if (mysqlModifier != null) {
+            mysql = mysqlModifier.getText() + "\n";
         }
         // 构造节点
-        String content = "namespace ALittle;\n" + csv + "struct " + name + "\n{\n" + String.join("\n", varList) + "\n}";
+        String content = "namespace ALittle;\n" + mysql + "struct " + name + "\n{\n" + String.join("\n", varList) + "\n}";
         ALittleFile alittleFile = (ALittleFile)PsiFileFactory.getInstance(dec.getProject()).createFileFromText("dummy.alittle", ALittleFileType.INSTANCE, content);
         ALittleNamespaceDec namespaceDec = PsiHelper.getNamespaceDec(alittleFile);
         if (namespaceDec == null) return;
@@ -171,15 +163,15 @@ public class ALittleCsvDataManager {
     }
 
     public static void checkAndChange(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
-        ALittleCsvData csvData = ALittleCsvDataManager.checkCsv(structDec);
-        if (csvData == null) return;
+        ALittleMysqlData mysqlData = ALittleMysqlDataManager.checkMysql(structDec);
+        if (mysqlData == null) return;
 
-        List<String> varList = csvData.generateVarList();
+        List<String> varList = mysqlData.generateVarList();
         Project project = structDec.getProject();
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             public void run() {
                 WriteCommandAction.writeCommandAction(project).run(() -> {
-                    ALittleCsvDataManager.changeCsv(structDec, varList);
+                    ALittleMysqlDataManager.changeMysql(structDec, varList);
                 });
             }
         });

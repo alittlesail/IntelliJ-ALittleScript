@@ -21,6 +21,7 @@ import plugin.csv.ALittleCsvDataManager;
 import plugin.generate.ALittleGenerateLua;
 import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleTreeChangeListener;
+import plugin.mysql.ALittleMysqlDataManager;
 import plugin.psi.ALittleFile;
 
 public class ALittleInitComponent implements BaseComponent {
@@ -35,6 +36,7 @@ public class ALittleInitComponent implements BaseComponent {
 
     public void initComponent() {
         ALittleCsvDataManager.Setup();
+        ALittleMysqlDataManager.Setup();
 
         MessageBus bus = ApplicationManager.getApplication().getMessageBus();
         MessageBusConnection connection = bus.connect();
@@ -125,6 +127,7 @@ public class ALittleInitComponent implements BaseComponent {
 
     public void disposeComponent() {
         ALittleCsvDataManager.Shutdown();
+        ALittleMysqlDataManager.Shutdown();
         SendLogRunnable.SendLog("disposeComponent");
     }
 }

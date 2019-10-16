@@ -1,16 +1,8 @@
 package plugin.csv;
 
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
-import plugin.alittle.FileHelper;
-import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessException;
 import plugin.psi.ALittleAllType;
 import plugin.psi.ALittleStructVarDec;
 
@@ -33,6 +25,7 @@ public class ALittleCsvData {
     private long mLastModified;
     private String mFilePath;
     private List<CsvData> mVarList = new ArrayList<>();
+    private List<String> mStringList = null;
 
     public ALittleCsvData(Project project, String filePath) {
         mProject = project;
@@ -65,6 +58,7 @@ public class ALittleCsvData {
     // 读取文件并解析csv头部
     public String load() {
         mVarList = new ArrayList<>();
+        mStringList = null;
         try {
             File file = new File(mFilePath);
             InputStreamReader reader = new InputStreamReader(
@@ -123,10 +117,29 @@ public class ALittleCsvData {
     }
 
     public List<String> generateVarList() {
-        List<String> varList = new ArrayList<>();
+        if (mStringList != null) return mStringList;
+        mStringList = new ArrayList<>();
+
+        int typeMaxLen = 0;
+        int nameMaxLen = 0;
         for (CsvData csvData : mVarList) {
-            varList.add("\t\t" + csvData.type + "\t\t" + csvData.name + ";\t\t // " + csvData.comment);
+            if (csvData.type.length() > typeMaxLen) typeMaxLen = csvData.type.length();
+            if (csvData.name.length() > nameMaxLen) nameMaxLen = csvData.name.length();
         }
-        return varList;
+
+        for (CsvData csvData : mVarList) {
+            int deltaLen = typeMaxLen - csvData.type.length() + 1;
+            StringBuilder value = new StringBuilder("\t" + csvData.type);
+            for (int i = 0; i < deltaLen; ++i)
+                value.append(' ');
+            deltaLen = nameMaxLen - csvData.name.length();
+            value.append(csvData.name).append(';');
+            for (int i = 0; i < deltaLen; ++i)
+                value.append(' ');
+            value.append(" // ");
+            value.append(csvData.comment);
+            mStringList.add(value.toString());
+        }
+        return mStringList;
     }
 }
