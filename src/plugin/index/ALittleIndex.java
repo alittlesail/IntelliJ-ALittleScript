@@ -11,10 +11,10 @@ import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
-import plugin.csv.ALittleCsvDataManager;
+import plugin.link.ALittleCsvDataManager;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.mysql.ALittleMysqlDataManager;
+import plugin.link.ALittleMysqlDataManager;
 import plugin.psi.*;
 
 import java.io.File;

@@ -2,7 +2,6 @@ package plugin.component;
 
 import com.intellij.AppTopics;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.BaseComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
@@ -17,11 +16,11 @@ import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.SendLogRunnable;
-import plugin.csv.ALittleCsvDataManager;
+import plugin.link.ALittleCsvDataManager;
 import plugin.generate.ALittleGenerateLua;
 import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleTreeChangeListener;
-import plugin.mysql.ALittleMysqlDataManager;
+import plugin.link.ALittleMysqlDataManager;
 import plugin.psi.ALittleFile;
 
 public class ALittleInitComponent implements BaseComponent {

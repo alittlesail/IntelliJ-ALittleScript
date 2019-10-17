@@ -1,16 +1,10 @@
-package plugin.mysql;
+package plugin.link;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
@@ -19,6 +13,9 @@ import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 
 public class ALittleMysqlDataManager {
@@ -26,6 +23,8 @@ public class ALittleMysqlDataManager {
     private static Map<String, ALittleMysqlData> mCheckMap = new HashMap<>();
     private static List<String> mRemoveList = new ArrayList<>();
     private static Timer mTimer;
+
+    private static Map<String, Connection> mConnMap = new HashMap<>();
 
     public static void Setup() {
         try {
@@ -43,7 +42,7 @@ public class ALittleMysqlDataManager {
                     }
                 });
             }
-        }, 60*1000, 5*1000);
+        }, 60*1000, 10*1000);
     }
 
     public static void Shutdown() {
@@ -51,10 +50,34 @@ public class ALittleMysqlDataManager {
             mTimer.cancel();
             mTimer = null;
         }
+
+        for (Connection conn : mConnMap.values()) {
+            try {
+                conn.close();
+            } catch (SQLException ignored) {
+
+            }
+        }
+        mConnMap.clear();
     }
 
-    public static void CheckTable() {
+    public static Connection getConn(String url) throws SQLException {
+        Connection conn = mConnMap.get(url);
+        if (conn != null) return conn;
+        conn = DriverManager.getConnection(url);
+        if (conn == null) return null;
+        mConnMap.put(url, conn);
+        return conn;
+    }
 
+    public static void removeConn(String url) {
+        Connection conn = mConnMap.get(url);
+        if (conn == null) return;
+        mConnMap.remove(url);
+        try {
+            conn.close();
+        } catch (SQLException e) {
+        }
     }
 
     private static void checkRun() {
@@ -67,7 +90,7 @@ public class ALittleMysqlDataManager {
 
         mRemoveList.clear();
 
-        int count = 20;
+        int count = 1;
         for (Map.Entry<String, ALittleMysqlData> entry : mCheckMap.entrySet()) {
             if (count <= 0) break;
             -- count;

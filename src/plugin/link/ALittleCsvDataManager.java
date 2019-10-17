@@ -1,4 +1,4 @@
-package plugin.csv;
+package plugin.link;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.application.ApplicationManager;

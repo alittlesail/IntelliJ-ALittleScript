@@ -1,36 +1,17 @@
-package plugin.mysql;
+package plugin.link;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiComment;
-import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
-import plugin.psi.ALittleAllType;
-import plugin.psi.ALittleStructVarDec;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ALittleMysqlData {
-    public static class MysqlData {
-        public String comment;  // 注解
-        public String name;     // 字段名
-        public String type;     // 字段类型
-    }
-
+public class ALittleMysqlData extends ALittleLinkData {
     private Project mProject;
     private Timestamp mLastModified;
     private String mFilePath;
-    private List<MysqlData> mVarList = new ArrayList<>();
-    private List<String> mStringList = null;
-
+    
     public ALittleMysqlData(Project project, String filePath) {
         mProject = project;
         mLastModified = null;
@@ -69,10 +50,8 @@ public class ALittleMysqlData {
 
     // 读取文件并解析mysql头部
     public String load() {
-        mVarList = new ArrayList<>();
-        mStringList = null;
-
         long time1 = System.currentTimeMillis();
+        String url = null;
         try {
             Pattern pattern = Pattern.compile("/(\\w+)\\.(\\w+)\\?");
             Matcher matcher = pattern.matcher(mFilePath);
@@ -82,7 +61,38 @@ public class ALittleMysqlData {
 
             String newFilePath = mFilePath.replaceFirst("/(\\w+)\\.(\\w+)\\?", "/information_schema?");
 
-            Connection conn = DriverManager.getConnection("jdbc:mysql://" + newFilePath + "&serverTimezone=UTC");
+            url = "jdbc:mysql://" + newFilePath + "&serverTimezone=UTC";
+            Connection conn = ALittleMysqlDataManager.getConn(url);
+            if (conn == null) throw new Exception("连接创建失败:" + url);
+
+            {
+                Timestamp lastModified = null;
+                Statement stmt = conn.createStatement();
+                // 字段名，数据类型，注释，key类型
+                ResultSet rs = stmt.executeQuery("SELECT `update_time`,`create_time` FROM `tables` WHERE `table_schema`=\""
+                        + dbName + "\" AND `table_name`=\"" + tableName + "\";");
+                while (rs.next()) {
+                    lastModified = rs.getTimestamp(1);
+                    if (lastModified == null)
+                        lastModified = rs.getTimestamp(2);
+                }
+                rs.close();
+                stmt.close();
+
+                if (lastModified == null) {
+                    throw new Exception("表不存在:" + dbName + "." + tableName);
+                }
+
+                if (mLastModified != null && mLastModified.equals(lastModified)) {
+                    return null;
+                }
+
+                mLastModified = lastModified;
+            }
+
+            mVarList = new ArrayList<>();
+            mStringList = null;
+
             Map<String, String> indexMap = new HashMap<>();
             {
                 Statement stmt = conn.createStatement();
@@ -96,8 +106,7 @@ public class ALittleMysqlData {
                     if (indexMap.get(columnName) != null) {
                         rs.close();
                         stmt.close();
-                        conn.close();
-                        return "赞不支持联合索引";
+                        return "暂不支持联合索引";
                     }
                     if (indexName.equals("PRIMARY")) {
                         indexMap.put(columnName, "ALittle.TABLE_PRIMARY_");
@@ -116,12 +125,12 @@ public class ALittleMysqlData {
                 ResultSet rs = stmt.executeQuery("SELECT `column_name`,`data_type`,`column_comment`,`column_default` FROM `columns` WHERE `table_schema`=\""
                         + dbName + "\" AND `table_name`=\"" + tableName + "\" ORDER BY `ordinal_position` ASC;");
                 while (rs.next()) {
-                    MysqlData mysqlData = new MysqlData();
-                    mysqlData.comment = rs.getString(3);
-                    mysqlData.name = rs.getString(1);
+                    ALittleLinkInfo data = new ALittleLinkInfo();
+                    data.comment = rs.getString(3).trim();
+                    data.name = rs.getString(1);
                     String dataType = rs.getString(2).toLowerCase();
                     String columnDefault = rs.getString(4);
-                    String index = indexMap.get(mysqlData.name);
+                    String index = indexMap.get(data.name);
                     if (dataType.equals("varchar")) {
                         if (index != null) {
                             dataType = index + "STRING";
@@ -138,8 +147,7 @@ public class ALittleMysqlData {
                         if (index != null) {
                             rs.close();
                             stmt.close();
-                            conn.close();
-                            return "tinyint类型不支持作为表索引";
+                            return "tinyint类型(字段名:" + data.name + ")不支持作为表索引";
                         } else {
                             dataType = "bool";
                         }
@@ -147,8 +155,7 @@ public class ALittleMysqlData {
                         if (index != null) {
                             rs.close();
                             stmt.close();
-                            conn.close();
-                            return "double类型不支持作为表索引";
+                            return "double类型(字段名:" + data.name + ")不支持作为表索引";
                         } else {
                             dataType = "double";
                         }
@@ -162,104 +169,38 @@ public class ALittleMysqlData {
                         if (index != null) {
                             rs.close();
                             stmt.close();
-                            conn.close();
-                            return "text类型不支持作为表索引";
+                            return "text类型(字段名:" + data.name + ")不支持作为表索引";
                         } else {
-                            if (columnDefault.isEmpty()) {
+                            if (data.comment.isEmpty()) {
                                 rs.close();
                                 stmt.close();
-                                conn.close();
-                                return "text类型对应的高级类型必须填写在表字段默认值位置";
+                                return "text类型(字段名:" + data.name + ")对应的高级类型必须填写在注释字段,和注释内容用分号隔开, 格式为 类型;注释内容";
                             }
-                            dataType = columnDefault;
+                            String[] split = data.comment.split(";");
+                            data.comment = "";
+                            if (split.length > 1) {
+                                data.comment = split[1].trim();
+                            }
+                            dataType = split[0].trim();
                         }
                     } else {
                         rs.close();
                         stmt.close();
-                        conn.close();
-                        return "不支持生成的类型:" + dataType + ",请使用以下:varchar,int,bigint,text";
+                        return "不支持生成的类型:" + dataType + "(字段名:" + data.name + "),请使用以下:varchar,int,bigint,text";
                     }
-                    mysqlData.type = dataType;
-                    mVarList.add(mysqlData);
+                    data.type = dataType;
+                    mVarList.add(data);
                 }
                 rs.close();
                 stmt.close();
             }
-            {
-                mLastModified = null;
-                Statement stmt = conn.createStatement();
-                // 字段名，数据类型，注释，key类型
-                ResultSet rs = stmt.executeQuery("SELECT `update_time` FROM `tables` WHERE `table_schema`=\""
-                        + dbName + "\" AND `table_name`=\"" + tableName + "\";");
-                while (rs.next()) {
-                    mLastModified = rs.getTimestamp(1);
-                }
-                rs.close();
-                stmt.close();
-            }
-            conn.close();
         } catch (Exception e) {
+            mLastModified = null;
+            mVarList = new ArrayList<>();
+            mStringList = null;
+            ALittleMysqlDataManager.removeConn(url);
             return e.getMessage();
         }
-        long time2 = System.currentTimeMillis();
-        System.out.println(time2 - time1);
         return null;
-    }
-
-    public boolean check(@NotNull List<ALittleStructVarDec> varDecList) {
-        if (varDecList.size() != mVarList.size()) return true;
-
-        for (int i = 0; i < varDecList.size(); ++i) {
-            ALittleStructVarDec varDec = varDecList.get(i);
-            MysqlData mysqlData = mVarList.get(i);
-
-            ALittleAllType allType = varDec.getAllType();
-            if (allType == null) return true;
-            if (!mysqlData.type.equals(allType.getText())) return true;
-            PsiElement element = varDec.getIdContent();
-            if (element == null) return true;
-            if (!mysqlData.name.equals(element.getText())) return true;
-            element = varDec;
-            do {
-                element = element.getNextSibling();
-                if (element == null || element instanceof ALittleStructVarDec) {
-                    return !mysqlData.comment.isEmpty();
-                } else if (element instanceof PsiComment) {
-                    break;
-                }
-            } while (true);
-            if (!element.getText().equals("// " + mysqlData.comment)) return true;
-        }
-
-        return false;
-    }
-
-    public List<String> generateVarList() {
-        if (mStringList != null) return mStringList;
-        mStringList = new ArrayList<>();
-
-        int typeMaxLen = 0;
-        int nameMaxLen = 0;
-        for (MysqlData mysqlData : mVarList) {
-            if (mysqlData.type.length() > typeMaxLen) typeMaxLen = mysqlData.type.length();
-            if (mysqlData.name.length() > nameMaxLen) nameMaxLen = mysqlData.name.length();
-        }
-
-        for (MysqlData mysqlData : mVarList) {
-            int deltaLen = typeMaxLen - mysqlData.type.length() + 1;
-            StringBuilder value = new StringBuilder("\t" + mysqlData.type);
-            for (int i = 0; i < deltaLen; ++i)
-                value.append(' ');
-            deltaLen = nameMaxLen - mysqlData.name.length();
-            value.append(mysqlData.name).append(';');
-            for (int i = 0; i < deltaLen; ++i)
-                value.append(' ');
-            if (!mysqlData.comment.isEmpty()) {
-                value.append(" // ");
-                value.append(mysqlData.comment);
-            }
-            mStringList.add(value.toString());
-        }
-        return mStringList;
     }
 }
