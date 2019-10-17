@@ -1,11 +1,13 @@
 package plugin.link;
 
+import aapt.pb.repackage.com.google.protobuf.MapEntry;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -23,15 +25,9 @@ import java.util.*;
 
 public class ALittleCsvDataManager {
     private static Map<String, ALittleCsvData> mDataMap = new HashMap<>();
-    private static Map<WatchKey, KeyInfo> mKeyMap = new HashMap<>();
+    private static Map<WatchKey, Set<Module>> mKeyMap = new HashMap<>();
     private static WatchService mWatchService;
     private static Thread mThread;
-
-    public static class KeyInfo
-    {
-        String moduleName;
-        Project project;
-    }
 
     public enum ChangeType
     {
@@ -40,7 +36,35 @@ public class ALittleCsvDataManager {
         CT_CHANGED,
     }
 
+    public static void setWatch(Module module, String csvPath) {
+        Setup();
+
+        for (Map.Entry<WatchKey, Set<Module>> entry : mKeyMap.entrySet()) {
+            if (entry.getValue().contains(module)) {
+                entry.getValue().remove(module);
+                if (entry.getValue().isEmpty()) {
+                    entry.getKey().cancel();
+                    mKeyMap.remove(entry.getKey());
+                }
+                break;
+            }
+        }
+        if (csvPath.isEmpty()) return;
+        Path path = Paths.get(csvPath);
+        try {
+            WatchKey key = path.register(mWatchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+            Set<Module> set = mKeyMap.get(key);
+            if (set == null) {
+                set = new HashSet<>();
+                mKeyMap.put(key, set);
+            }
+            set.add(module);
+        } catch (IOException e) {
+        }
+    }
+
     public static void Setup() {
+        if (mWatchService != null) return;
         try {
             mWatchService = FileSystems.getDefault().newWatchService();
 
@@ -95,16 +119,26 @@ public class ALittleCsvDataManager {
     }
 
     private static void handleChangeForCsv(WatchKey key, String relPath, ChangeType changeType) {
-        KeyInfo keyInfo = mKeyMap.get(key);
-        if (keyInfo == null) return;
-        String path = keyInfo.moduleName + ":/" + relPath;
+        Set<Module> moduleSet = mKeyMap.get(key);
+        if (moduleSet == null || moduleSet.isEmpty()) return;
+        Project project = null;
+        Module module = null;
+        for (Module m : moduleSet) {
+            module = m;
+            project = m.getProject();
+            break;
+        }
+        String path = ALittleLinkConfig.getConfig(module).getCsvPathWithEnd() + relPath;
 
         if (changeType == ChangeType.CT_CREATED) {
-            ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(keyInfo.project);
+            ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(project);
             if (listener == null) return;
-            HashSet<ALittleStructDec> set = listener.getCsvData(path);
+            HashSet<ALittleStructDec> set = listener.getCsvData(relPath);
             if (set == null) return;
             for (ALittleStructDec dec : set) {
+                FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
+                Module m = facade.getModuleForFile(dec.getContainingFile().getVirtualFile());
+                if (!moduleSet.contains(m)) continue;
                 try {
                     checkAndChangeForStruct(dec);
                 } catch (ALittleGuessException ignored) {
@@ -121,9 +155,13 @@ public class ALittleCsvDataManager {
 
         if (changeType == ChangeType.CT_DELETED) {
             mDataMap.remove(path);
-            HashSet<ALittleStructDec> set = listener.getCsvData(path);
+            HashSet<ALittleStructDec> set = listener.getCsvData(relPath);
             if (set == null) return;
             for (ALittleStructDec dec : set) {
+                FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
+                Module m = facade.getModuleForFile(dec.getContainingFile().getVirtualFile());
+                if (!moduleSet.equals(m)) continue;
+
                 WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
                     handleChangeForStruct(dec, new ArrayList<>());
                 });
@@ -134,9 +172,13 @@ public class ALittleCsvDataManager {
         if (changeType == ChangeType.CT_CHANGED) {
             csvData.load();
             List<String> varList = csvData.generateVarList();
-            HashSet<ALittleStructDec> set = listener.getCsvData(path);
+            HashSet<ALittleStructDec> set = listener.getCsvData(relPath);
             if (set == null) return;
             for (ALittleStructDec dec : set) {
+                FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
+                Module m = facade.getModuleForFile(dec.getContainingFile().getVirtualFile());
+                if (!module.equals(m)) continue;
+
                 WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
                     handleChangeForStruct(dec, varList);
                 });
@@ -149,50 +191,28 @@ public class ALittleCsvDataManager {
     public static ALittleCsvData checkForStruct(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
         ALittleCsvModifier csvModifier = structDec.getCsvModifier();
         if (csvModifier == null) return null;
+        VirtualFile virtualFile = structDec.getContainingFile().getOriginalFile().getVirtualFile();
+        if (virtualFile == null) return null;
+        FileIndexFacade facade = FileIndexFacade.getInstance(structDec.getProject());
+        Module module = facade.getModuleForFile(virtualFile);
+        if (module == null) return null;
+        String csvPath = ALittleLinkConfig.getConfig(module).getCsvPathWithEnd();
+        if (csvPath.isEmpty()) {
+            throw new ALittleGuessException(csvModifier, "所在模块没有设置Csv目录,无法解析");
+        }
         PsiElement pathElement = csvModifier.getStringContent();
         if (pathElement == null)
-            throw new ALittleGuessException(csvModifier, "Csv注解的格式错误,比如A模块的src目录下有B.csv文件，那么写成 @Csv \"A:/B.csv\"");
+            throw new ALittleGuessException(csvModifier, "Csv注解的格式错误, 格式为 @Csv \"相对路径\"");
+
         String path = pathElement.getText();
-        path = path.substring(1, path.length() - 1);
+        path = csvPath + path.substring(1, path.length() - 1);
 
         ALittleCsvData csvData = mDataMap.get(path);
         if (csvData == null) {
-            String[] split = path.split(":");
-            if (split.length != 2) {
-                throw new ALittleGuessException(csvModifier, "Csv注解的格式错误,比如A模块的src目录下有B.csv文件，那么写成 @Csv \"A:/B.csv\"");
-            }
-            Module module = ModuleManager.getInstance(structDec.getProject()).findModuleByName(split[0]);
-            if (module == null) {
-                throw new ALittleGuessException(pathElement, "模块名:" + split[0] + "不存在");
-            }
-
-            String error = null;
-            String rootPath = null;
-            VirtualFile[] roots = ModuleRootManager.getInstance(module).getSourceRoots();
-            for (VirtualFile root : roots) {
-                ALittleCsvData tmp = new ALittleCsvData(structDec.getProject(), root.getPath() + split[1]);
-                error = tmp.load();
-                if (error == null) {
-                    csvData = tmp;
-                    rootPath = root.getPath();
-                    break;
-                }
-            }
+            csvData = new ALittleCsvData(structDec.getProject(), path);
+            String error = csvData.load();
             if (error != null) throw new ALittleGuessException(pathElement, error);
-            if (csvData == null) return null;
-
             mDataMap.put(path, csvData);
-
-            Path pathObject = Paths.get(rootPath);
-            try {
-                WatchKey key = pathObject.register(mWatchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-                KeyInfo keyInfo = new KeyInfo();
-                keyInfo.moduleName = split[0];
-                keyInfo.project = structDec.getProject();
-                mKeyMap.put(key, keyInfo);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         // 检查是否和csvData一致
         if (csvData.check(structDec.getStructVarDecList())) return csvData;
