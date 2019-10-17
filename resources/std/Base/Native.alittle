@@ -111,3 +111,16 @@ public static NewTimeAndIndex() : int, int
     }
     return __VersionTime, __VersionIndex;
 }
+
+// 表结构索引
+public using TABLE_PRIMARY_INT = int;
+public using TABLE_UNIQUE_INT = int;
+public using TABLE_INDEX_INT = int;
+
+public using TABLE_PRIMARY_I64 = I64;
+public using TABLE_UNIQUE_I64 = I64;
+public using TABLE_INDEX_I64 = I64;
+
+public using TABLE_PRIMARY_STRING = string;
+public using TABLE_UNIQUE_STRING = string;
+public using TABLE_INDEX_STRING = string;

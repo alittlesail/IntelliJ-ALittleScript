@@ -1,7 +1,9 @@
 package plugin.csv;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiWhiteSpace;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.ALittleAllType;
 import plugin.psi.ALittleStructVarDec;
@@ -22,38 +24,16 @@ public class ALittleCsvData {
     }
 
     private Project mProject;
-    private long mLastModified;
     private String mFilePath;
     private List<CsvData> mVarList = new ArrayList<>();
     private List<String> mStringList = null;
 
     public ALittleCsvData(Project project, String filePath) {
         mProject = project;
-        mLastModified = 0;
         mFilePath = filePath;
     }
 
     public Project getProject() { return mProject; }
-
-    public enum ChangeType
-    {
-        CT_NONE,
-        CT_DELETED,
-        CT_CHANGED,
-    }
-
-    // 对应的文件是否发生变化
-    public ChangeType isChanged() {
-        if (mFilePath == null) return ChangeType.CT_NONE;
-
-        File file = new File(mFilePath);
-        if (!file.exists()) return ChangeType.CT_DELETED;
-        if (mLastModified != file.lastModified()) {
-            load();
-            return ChangeType.CT_CHANGED;
-        }
-        return ChangeType.CT_NONE;
-    }
 
     // 读取文件并解析csv头部
     public String load() {
@@ -81,17 +61,19 @@ public class ALittleCsvData {
             String[] typeList = typeLine.split(",");
             if (typeList.length == 0) return "类型行是空的";
 
-            if (nameList.length != commentList.length) return "字段的列数和注释的列数不一致";
             if (typeList.length != nameList.length) return "类型的列数和字段的列数不一致";
 
-            for (int i = 0; i < commentList.length; ++i) {
+            for (int i = 0; i < nameList.length; ++i) {
                 CsvData csvData = new CsvData();
-                csvData.comment = commentList[i];
+                if (i >= commentList.length) {
+                    csvData.comment = "";
+                } else {
+                    csvData.comment = commentList[i];
+                }
                 csvData.name = nameList[i];
                 csvData.type = typeList[i];
                 mVarList.add(csvData);
             }
-            mLastModified = file.lastModified();
         } catch (Exception e) {
             return e.getMessage();
         }
@@ -111,6 +93,20 @@ public class ALittleCsvData {
             PsiElement element = varDec.getIdContent();
             if (element == null) return true;
             if (!csvData.name.equals(element.getText())) return true;
+            element = varDec;
+            do {
+                element = element.getNextSibling();
+                if (element == null || element instanceof ALittleStructVarDec) {
+                    return !csvData.comment.isEmpty();
+                } else if (element instanceof PsiComment) {
+                    break;
+                } else if (element instanceof PsiWhiteSpace) {
+                    continue;
+                } else {
+                    System.out.println("-->" + element.getText());
+                }
+            } while (true);
+            if (!element.getText().equals("// " + csvData.comment)) return true;
         }
 
         return false;
@@ -136,8 +132,10 @@ public class ALittleCsvData {
             value.append(csvData.name).append(';');
             for (int i = 0; i < deltaLen; ++i)
                 value.append(' ');
-            value.append(" // ");
-            value.append(csvData.comment);
+            if (!csvData.comment.isEmpty()) {
+                value.append(" // ");
+                value.append(csvData.comment);
+            }
             mStringList.add(value.toString());
         }
         return mStringList;

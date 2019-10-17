@@ -1,5 +1,6 @@
 package plugin.mysql;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
@@ -28,7 +29,7 @@ public class ALittleMysqlDataManager {
 
     public static void Setup() {
         try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
         } catch (Exception ignored) {
             return;
         }
@@ -50,6 +51,10 @@ public class ALittleMysqlDataManager {
             mTimer.cancel();
             mTimer = null;
         }
+    }
+
+    public static void CheckTable() {
+
     }
 
     private static void checkRun() {
@@ -134,6 +139,13 @@ public class ALittleMysqlDataManager {
     public static void changeMysql(@NotNull ALittleStructDec dec, List<String> varList) {
         ALittleStructNameDec nameDec = dec.getStructNameDec();
         if (nameDec == null) return;
+        ASTNode node = dec.getNode();
+        if (node == null) return;
+        PsiElement parent = dec.getParent();
+        if (parent == null) return;
+        ASTNode parentNode = parent.getNode();
+        if (parentNode == null) return;
+
         String name = nameDec.getText();
         String mysql = "";
         ALittleMysqlModifier mysqlModifier = dec.getMysqlModifier();
@@ -155,7 +167,7 @@ public class ALittleMysqlDataManager {
             listener.removeNamespaceName(namespaceNameDec);
         }
 
-        dec.getParent().getNode().replaceChild(dec.getNode(), structDecList.get(0).getNode());
+        parentNode.replaceChild(node, structDecList.get(0).getNode());
 
         if (listener != null) {
             listener.addNamespaceName(namespaceNameDec);

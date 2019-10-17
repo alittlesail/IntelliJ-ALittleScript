@@ -50,7 +50,7 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
             nameSet.add(varNameDec.getText());
         }
 
-        ALittleCsvDataManager.checkCsv(myElement);
+        ALittleCsvDataManager.checkForStruct(myElement);
         ALittleMysqlDataManager.checkMysql(myElement);
     }
 }

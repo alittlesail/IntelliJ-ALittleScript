@@ -1,15 +1,14 @@
 package plugin.csv;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
@@ -18,87 +17,136 @@ import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.*;
 
 public class ALittleCsvDataManager {
     private static Map<String, ALittleCsvData> mDataMap = new HashMap<>();
-    private static Map<String, ALittleCsvData> mCheckMap = new HashMap<>();
-    private static List<String> mRemoveList = new ArrayList<>();
-    private static Timer mTimer;
+    private static Map<WatchKey, KeyInfo> mKeyMap = new HashMap<>();
+    private static WatchService mWatchService;
+    private static Thread mThread;
+
+    public static class KeyInfo
+    {
+        String moduleName;
+        Project project;
+    }
+
+    public enum ChangeType
+    {
+        CT_CREATED,
+        CT_DELETED,
+        CT_CHANGED,
+    }
 
     public static void Setup() {
-        mTimer = new Timer();
-        mTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                ApplicationManager.getApplication().invokeLater(new Runnable() {
-                    public void run() {
-                        ALittleCsvDataManager.checkRun();
+        try {
+            mWatchService = FileSystems.getDefault().newWatchService();
+
+            mThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        try {
+                            WatchKey watchKey = mWatchService.take();
+                            for (WatchEvent event : watchKey.pollEvents()) {
+                                ApplicationManager.getApplication().invokeLater(new Runnable() {
+                                    public void run() {
+                                        if (event.kind().equals(StandardWatchEventKinds.ENTRY_MODIFY)) {
+                                            handleChangeForCsv(watchKey, event.context().toString(), ChangeType.CT_CHANGED);
+                                        } else if (event.kind().equals(StandardWatchEventKinds.ENTRY_DELETE)) {
+                                            handleChangeForCsv(watchKey, event.context().toString(), ChangeType.CT_DELETED);
+                                        } else if (event.kind().equals(StandardWatchEventKinds.ENTRY_CREATE)) {
+                                            handleChangeForCsv(watchKey, event.context().toString(), ChangeType.CT_CREATED);
+                                        }
+                                    }
+                                });
+                            }
+                            watchKey.reset();
+                        } catch (InterruptedException | ClosedWatchServiceException ignored) {
+                            break;
+                        }
                     }
-                });
-            }
-        }, 60*1000, 5*1000);
+                }
+            });
+            mThread.start();
+        } catch (UnsupportedOperationException | IOException ignored) {
+
+        }
     }
 
     public static void Shutdown() {
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
+        if (mWatchService != null) {
+            try {
+                mWatchService.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mWatchService = null;
+        }
+        if (mThread != null) {
+            try {
+                mThread.join();
+            } catch (InterruptedException ignored) {
+            }
+            mThread = null;
         }
     }
 
-    private static void checkRun() {
-        // 把检查列表拷贝一份
-        if (mCheckMap.size() == 0) {
-            for (Map.Entry<String, ALittleCsvData> entry : mDataMap.entrySet()) {
-                mCheckMap.put(entry.getKey(), entry.getValue());
-            }
-        }
+    private static void handleChangeForCsv(WatchKey key, String relPath, ChangeType changeType) {
+        KeyInfo keyInfo = mKeyMap.get(key);
+        if (keyInfo == null) return;
+        String path = keyInfo.moduleName + ":/" + relPath;
 
-        mRemoveList.clear();
+        if (changeType == ChangeType.CT_CREATED) {
+            ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(keyInfo.project);
+            if (listener == null) return;
+            HashSet<ALittleStructDec> set = listener.getCsvData(path);
+            if (set == null) return;
+            for (ALittleStructDec dec : set) {
+                try {
+                    checkAndChangeForStruct(dec);
+                } catch (ALittleGuessException ignored) {
 
-        int count = 20;
-        for (Map.Entry<String, ALittleCsvData> entry : mCheckMap.entrySet()) {
-            if (count <= 0) break;
-            -- count;
-            mRemoveList.add(entry.getKey());
-
-            ALittleCsvData csvData = entry.getValue();
-            ALittleCsvData.ChangeType changeType = csvData.isChanged();
-            ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(csvData.getProject());
-            if (listener == null) continue;
-
-            if (changeType == ALittleCsvData.ChangeType.CT_DELETED) {
-                HashSet<ALittleStructDec> set = listener.getCsvData(entry.getKey());
-                if (set != null) {
-                    for (ALittleStructDec dec : set) {
-                        WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
-                            changeCsv(dec, new ArrayList<>());
-                        });
-                    }
-                }
-                mDataMap.remove(entry.getKey());
-            } else if (changeType == ALittleCsvData.ChangeType.CT_CHANGED) {
-                List<String> varList = csvData.generateVarList();
-                HashSet<ALittleStructDec> set = listener.getCsvData(entry.getKey());
-                if (set != null) {
-                    for (ALittleStructDec dec : set) {
-                        WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
-                            changeCsv(dec, varList);
-                        });
-                    }
                 }
             }
+            return;
         }
 
-        for (String path : mRemoveList) {
-            mCheckMap.remove(path);
+        ALittleCsvData csvData = mDataMap.get(path);
+        if (csvData == null) return;
+        ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(csvData.getProject());
+        if (listener == null) return;
+
+        if (changeType == ChangeType.CT_DELETED) {
+            mDataMap.remove(path);
+            HashSet<ALittleStructDec> set = listener.getCsvData(path);
+            if (set == null) return;
+            for (ALittleStructDec dec : set) {
+                WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
+                    handleChangeForStruct(dec, new ArrayList<>());
+                });
+            }
+            return;
         }
-        mRemoveList.clear();
+
+        if (changeType == ChangeType.CT_CHANGED) {
+            csvData.load();
+            List<String> varList = csvData.generateVarList();
+            HashSet<ALittleStructDec> set = listener.getCsvData(path);
+            if (set == null) return;
+            for (ALittleStructDec dec : set) {
+                WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
+                    handleChangeForStruct(dec, varList);
+                });
+            }
+            return;
+        }
     }
 
-    // 返回是否需要变化
-    public static ALittleCsvData checkCsv(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
+    // 对struct只执行检查
+    public static ALittleCsvData checkForStruct(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
         ALittleCsvModifier csvModifier = structDec.getCsvModifier();
         if (csvModifier == null) return null;
         PsiElement pathElement = csvModifier.getStringContent();
@@ -119,12 +167,14 @@ public class ALittleCsvDataManager {
             }
 
             String error = null;
+            String rootPath = null;
             VirtualFile[] roots = ModuleRootManager.getInstance(module).getSourceRoots();
             for (VirtualFile root : roots) {
                 ALittleCsvData tmp = new ALittleCsvData(structDec.getProject(), root.getPath() + split[1]);
                 error = tmp.load();
                 if (error == null) {
                     csvData = tmp;
+                    rootPath = root.getPath();
                     break;
                 }
             }
@@ -132,16 +182,34 @@ public class ALittleCsvDataManager {
             if (csvData == null) return null;
 
             mDataMap.put(path, csvData);
+
+            Path pathObject = Paths.get(rootPath);
+            try {
+                WatchKey key = pathObject.register(mWatchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+                KeyInfo keyInfo = new KeyInfo();
+                keyInfo.moduleName = split[0];
+                keyInfo.project = structDec.getProject();
+                mKeyMap.put(key, keyInfo);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         // 检查是否和csvData一致
         if (csvData.check(structDec.getStructVarDecList())) return csvData;
         return null;
     }
 
-    // 处理变化
-    public static void changeCsv(@NotNull ALittleStructDec dec, List<String> varList) {
+    // 对struct执行变化
+    public static void handleChangeForStruct(@NotNull ALittleStructDec dec, List<String> varList) {
         ALittleStructNameDec nameDec = dec.getStructNameDec();
         if (nameDec == null) return;
+        ASTNode node = dec.getNode();
+        if (node == null) return;
+        PsiElement parent = dec.getParent();
+        if (parent == null) return;
+        ASTNode parentNode = parent.getNode();
+        if (parentNode == null) return;
+
         String name = nameDec.getText();
         String csv = "";
         ALittleCsvModifier csvModifier = dec.getCsvModifier();
@@ -170,18 +238,15 @@ public class ALittleCsvDataManager {
         }
     }
 
-    public static void checkAndChange(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
-        ALittleCsvData csvData = ALittleCsvDataManager.checkCsv(structDec);
+    // 对struct检查，如果有变化就直接执行变化
+    public static void checkAndChangeForStruct(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
+        ALittleCsvData csvData = ALittleCsvDataManager.checkForStruct(structDec);
         if (csvData == null) return;
 
         List<String> varList = csvData.generateVarList();
         Project project = structDec.getProject();
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            public void run() {
-                WriteCommandAction.writeCommandAction(project).run(() -> {
-                    ALittleCsvDataManager.changeCsv(structDec, varList);
-                });
-            }
+        WriteCommandAction.writeCommandAction(project).run(() -> {
+            ALittleCsvDataManager.handleChangeForStruct(structDec, varList);
         });
     }
 }

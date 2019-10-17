@@ -1,5 +1,6 @@
 package plugin.index;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -241,17 +242,17 @@ public class ALittleIndex {
         }
         set.add(structDec);
 
-        try {
-            if (mReloading) {
-                ALittleCsvDataManager.checkCsv(structDec);
-                ALittleMysqlDataManager.checkMysql(structDec);
-            } else {
-                ALittleCsvDataManager.checkAndChange(structDec);
-                ALittleMysqlDataManager.checkAndChange(structDec);
-            }
-        } catch (ALittleGuessException ignored) {
+        // 变化
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    ALittleCsvDataManager.checkAndChangeForStruct(structDec);
+                    ALittleMysqlDataManager.checkAndChange(structDec);
+                } catch (ALittleGuessException ignored) {
 
-        }
+                }
+            }
+        });
     }
 
     public HashSet<ALittleStructDec> getCsvData(@NotNull String path) {
