@@ -18,6 +18,7 @@ public class ALittleLinkConfig {
     private @NotNull String mMysqlPort = "";
     private @NotNull String mMysqlUser = "";
     private @NotNull String mMysqlPassword = "";
+    private @NotNull String mMysqlUrl = "";
 
     public ALittleLinkConfig(Module module) {
         mModule = module;
@@ -54,6 +55,10 @@ public class ALittleLinkConfig {
             br.close();
             reader.close();
 
+            if (!mMysqlIp.isEmpty() && !mMysqlPort.isEmpty() && !mMysqlUser.isEmpty() && !mMysqlPassword.isEmpty()) {
+                mMysqlUrl = "jdbc:mysql://" + mMysqlIp + ":" + mMysqlPort
+                        + "/information_schema?user=" + mMysqlUser + "&password=" + mMysqlPassword + "&serverTimezone=UTC";
+            }
             if (!mCsvPath.isEmpty()) {
                 ALittleCsvDataManager.setWatch(mModule, mCsvPath);
             }
@@ -107,8 +112,22 @@ public class ALittleLinkConfig {
     public String getMysqlPassword() {
         return mMysqlPassword;
     }
-    public void setMysql(String ip, String port, String user, String password) {
+    public void setMysql(@NotNull String ip, @NotNull String port, @NotNull String user, @NotNull String password) {
+        mMysqlIp = ip;
+        mMysqlPort = port;
+        mMysqlUser = user;
+        mMysqlPassword = password;
 
+        if (!mMysqlIp.isEmpty() && !mMysqlPort.isEmpty() && !mMysqlUser.isEmpty() && !mMysqlPassword.isEmpty()) {
+            mMysqlUrl = "jdbc:mysql://" + mMysqlIp + ":" + mMysqlPort
+                    + "/information_schema?user=" + mMysqlUser + "&password=" + mMysqlPassword + "&serverTimezone=UTC";
+        } else {
+            mMysqlUrl = "";
+        }
+    }
+    @NotNull
+    public String getMysqlUrl() {
+        return mMysqlUrl;
     }
 
     @NotNull
