@@ -29,13 +29,6 @@ public class ALittleCsvDataManager {
     private static WatchService mWatchService;
     private static Thread mThread;
 
-    public enum ChangeType
-    {
-        CT_CREATED,
-        CT_DELETED,
-        CT_CHANGED,
-    }
-
     public static void setWatch(Module module, String csvPath) {
         Setup();
 
@@ -78,11 +71,11 @@ public class ALittleCsvDataManager {
                                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                                     public void run() {
                                         if (event.kind().equals(StandardWatchEventKinds.ENTRY_MODIFY)) {
-                                            handleChangeForCsv(watchKey, event.context().toString(), ChangeType.CT_CHANGED);
+                                            handleChangeForCsv(watchKey, event.context().toString(), ALittleLinkData.ChangeType.CT_CHANGED);
                                         } else if (event.kind().equals(StandardWatchEventKinds.ENTRY_DELETE)) {
-                                            handleChangeForCsv(watchKey, event.context().toString(), ChangeType.CT_DELETED);
+                                            handleChangeForCsv(watchKey, event.context().toString(), ALittleLinkData.ChangeType.CT_DELETED);
                                         } else if (event.kind().equals(StandardWatchEventKinds.ENTRY_CREATE)) {
-                                            handleChangeForCsv(watchKey, event.context().toString(), ChangeType.CT_CREATED);
+                                            handleChangeForCsv(watchKey, event.context().toString(), ALittleLinkData.ChangeType.CT_CREATED);
                                         }
                                     }
                                 });
@@ -118,7 +111,7 @@ public class ALittleCsvDataManager {
         }
     }
 
-    private static void handleChangeForCsv(WatchKey key, String relPath, ChangeType changeType) {
+    private static void handleChangeForCsv(WatchKey key, String relPath, ALittleLinkData.ChangeType changeType) {
         Set<Module> moduleSet = mKeyMap.get(key);
         if (moduleSet == null || moduleSet.isEmpty()) return;
         Project project = null;
@@ -130,14 +123,17 @@ public class ALittleCsvDataManager {
         }
         String path = ALittleLinkConfig.getConfig(module).getCsvPathWithEnd() + relPath;
 
-        if (changeType == ChangeType.CT_CREATED) {
+        if (changeType == ALittleLinkData.ChangeType.CT_CREATED) {
             ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(project);
             if (listener == null) return;
             HashSet<ALittleStructDec> set = listener.getCsvData(relPath);
             if (set == null) return;
+            set = new HashSet<>(set);
             for (ALittleStructDec dec : set) {
                 FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
-                Module m = facade.getModuleForFile(dec.getContainingFile().getVirtualFile());
+                VirtualFile file = dec.getContainingFile().getVirtualFile();
+                if (file == null) continue;
+                Module m = facade.getModuleForFile(file);
                 if (!moduleSet.contains(m)) continue;
                 try {
                     checkAndChangeForStruct(dec);
@@ -153,13 +149,16 @@ public class ALittleCsvDataManager {
         ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(csvData.getProject());
         if (listener == null) return;
 
-        if (changeType == ChangeType.CT_DELETED) {
+        if (changeType == ALittleLinkData.ChangeType.CT_DELETED) {
             mDataMap.remove(path);
             HashSet<ALittleStructDec> set = listener.getCsvData(relPath);
             if (set == null) return;
+            set = new HashSet<>(set);
             for (ALittleStructDec dec : set) {
                 FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
-                Module m = facade.getModuleForFile(dec.getContainingFile().getVirtualFile());
+                VirtualFile file = dec.getContainingFile().getVirtualFile();
+                if (file == null) continue;
+                Module m = facade.getModuleForFile(file);
                 if (!moduleSet.equals(m)) continue;
 
                 WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
@@ -169,14 +168,17 @@ public class ALittleCsvDataManager {
             return;
         }
 
-        if (changeType == ChangeType.CT_CHANGED) {
+        if (changeType == ALittleLinkData.ChangeType.CT_CHANGED) {
             csvData.load();
             List<String> varList = csvData.generateVarList();
             HashSet<ALittleStructDec> set = listener.getCsvData(relPath);
             if (set == null) return;
+            set = new HashSet<>(set);
             for (ALittleStructDec dec : set) {
                 FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
-                Module m = facade.getModuleForFile(dec.getContainingFile().getVirtualFile());
+                VirtualFile file = dec.getContainingFile().getVirtualFile();
+                if (file == null) continue;
+                Module m = facade.getModuleForFile(file);
                 if (!module.equals(m)) continue;
 
                 WriteCommandAction.writeCommandAction(csvData.getProject()).run(() -> {
@@ -260,13 +262,12 @@ public class ALittleCsvDataManager {
 
     // 对struct检查，如果有变化就直接执行变化
     public static void checkAndChangeForStruct(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
-        ALittleCsvData csvData = ALittleCsvDataManager.checkForStruct(structDec);
-        if (csvData == null) return;
+        WriteCommandAction.writeCommandAction(structDec.getProject()).run(() -> {
+            ALittleCsvData csvData = ALittleCsvDataManager.checkForStruct(structDec);
+            if (csvData == null) return;
 
-        List<String> varList = csvData.generateVarList();
-        Project project = structDec.getProject();
-        WriteCommandAction.writeCommandAction(project).run(() -> {
-            ALittleCsvDataManager.handleChangeForStruct(structDec, varList);
+            List<String> varList = csvData.generateVarList();
+            ALittleMysqlDataManager.handleChangeForStruct(structDec, varList);
         });
     }
 }

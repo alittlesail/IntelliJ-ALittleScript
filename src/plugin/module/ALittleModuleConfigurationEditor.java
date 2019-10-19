@@ -146,10 +146,10 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
         Module module = mState.getRootModel().getModule();
         ALittleLinkConfig config = ALittleLinkConfig.getConfig(module);
         config.setCsvPath(myCsvPathTextField.getText());
-        config.setMysql(myMysqlIpTextField.getToolTipText(),
+        config.setMysql(myMysqlIpTextField.getText(),
                 myMysqlPortTextField.getText(),
                 myMysqlUserTextField.getText(),
-                myMysqlPasswordTextField.getToolTipText());
+                myMysqlPasswordTextField.getText());
         config.save();
     }
 }

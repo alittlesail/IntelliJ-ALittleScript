@@ -9,89 +9,31 @@ import java.util.regex.Pattern;
 
 public class ALittleMysqlData extends ALittleLinkData {
     private Project mProject;
-    private Timestamp mLastModified;
-    private String mFilePath;
+    private String mUrl;
+    private String mName;
     
-    public ALittleMysqlData(Project project, String filePath) {
+    public ALittleMysqlData(Project project, String url, String name) {
         mProject = project;
-        mLastModified = null;
-        mFilePath = filePath;
+        mUrl = url;
+        mName = name;
     }
 
     public Project getProject() { return mProject; }
 
-    public enum ChangeType
-    {
-        CT_NONE,
-        CT_DELETED,
-        CT_CHANGED,
-    }
-
-    // 对应的文件是否发生变化
-    public ChangeType isChanged() {
-        if (mFilePath == null) return ChangeType.CT_NONE;
-
-        Date oldLastModifier = mLastModified;
-        load();
-        if (oldLastModifier == null) {
-            if (mLastModified == null) {
-                return ChangeType.CT_NONE;
-            }
-            return ChangeType.CT_CHANGED;
-        } else {
-            if (mLastModified == null) {
-                return ChangeType.CT_DELETED;
-            } else if (oldLastModifier.equals(mLastModified)) {
-                return ChangeType.CT_NONE;
-            }
-            return ChangeType.CT_CHANGED;
-        }
-    }
-
     // 读取文件并解析mysql头部
     public String load() {
-        long time1 = System.currentTimeMillis();
-        String url = null;
         try {
-            Pattern pattern = Pattern.compile("/(\\w+)\\.(\\w+)\\?");
-            Matcher matcher = pattern.matcher(mFilePath);
-            if (!matcher.find() || matcher.groupCount() != 2) return "数据库名和表名抓取失败:" + mFilePath;
-            String dbName = matcher.group(1);
-            String tableName = matcher.group(2);
-
-            String newFilePath = mFilePath.replaceFirst("/(\\w+)\\.(\\w+)\\?", "/information_schema?");
-
-            url = "jdbc:mysql://" + newFilePath + "&serverTimezone=UTC";
-            Connection conn = ALittleMysqlDataManager.getConn(url);
-            if (conn == null) throw new Exception("连接创建失败:" + url);
-
-            {
-                Timestamp lastModified = null;
-                Statement stmt = conn.createStatement();
-                // 字段名，数据类型，注释，key类型
-                ResultSet rs = stmt.executeQuery("SELECT `update_time`,`create_time` FROM `tables` WHERE `table_schema`=\""
-                        + dbName + "\" AND `table_name`=\"" + tableName + "\";");
-                while (rs.next()) {
-                    lastModified = rs.getTimestamp(1);
-                    if (lastModified == null)
-                        lastModified = rs.getTimestamp(2);
-                }
-                rs.close();
-                stmt.close();
-
-                if (lastModified == null) {
-                    throw new Exception("表不存在:" + dbName + "." + tableName);
-                }
-
-                if (mLastModified != null && mLastModified.equals(lastModified)) {
-                    return null;
-                }
-
-                mLastModified = lastModified;
-            }
-
             mVarList = new ArrayList<>();
             mStringList = null;
+
+            String[] split = mName.split("\\.");
+            if (split.length != 2) {
+                return "格式不正确:" + mName;
+            }
+            String dbName = split[0];
+            String tableName = split[1];
+
+            Connection conn = DriverManager.getConnection(mUrl);
 
             Map<String, String> indexMap = new HashMap<>();
             {
@@ -106,6 +48,7 @@ public class ALittleMysqlData extends ALittleLinkData {
                     if (indexMap.get(columnName) != null) {
                         rs.close();
                         stmt.close();
+                        conn.close();
                         return "暂不支持联合索引";
                     }
                     if (indexName.equals("PRIMARY")) {
@@ -147,6 +90,7 @@ public class ALittleMysqlData extends ALittleLinkData {
                         if (index != null) {
                             rs.close();
                             stmt.close();
+                            conn.close();
                             return "tinyint类型(字段名:" + data.name + ")不支持作为表索引";
                         } else {
                             dataType = "bool";
@@ -155,6 +99,7 @@ public class ALittleMysqlData extends ALittleLinkData {
                         if (index != null) {
                             rs.close();
                             stmt.close();
+                            conn.close();
                             return "double类型(字段名:" + data.name + ")不支持作为表索引";
                         } else {
                             dataType = "double";
@@ -169,14 +114,16 @@ public class ALittleMysqlData extends ALittleLinkData {
                         if (index != null) {
                             rs.close();
                             stmt.close();
+                            conn.close();
                             return "text类型(字段名:" + data.name + ")不支持作为表索引";
                         } else {
                             if (data.comment.isEmpty()) {
                                 rs.close();
                                 stmt.close();
+                                conn.close();
                                 return "text类型(字段名:" + data.name + ")对应的高级类型必须填写在注释字段,和注释内容用分号隔开, 格式为 类型;注释内容";
                             }
-                            String[] split = data.comment.split(";");
+                            split = data.comment.split(";");
                             data.comment = "";
                             if (split.length > 1) {
                                 data.comment = split[1].trim();
@@ -186,6 +133,7 @@ public class ALittleMysqlData extends ALittleLinkData {
                     } else {
                         rs.close();
                         stmt.close();
+                        conn.close();
                         return "不支持生成的类型:" + dataType + "(字段名:" + data.name + "),请使用以下:varchar,int,bigint,text";
                     }
                     data.type = dataType;
@@ -194,11 +142,10 @@ public class ALittleMysqlData extends ALittleLinkData {
                 rs.close();
                 stmt.close();
             }
+            conn.close();
         } catch (Exception e) {
-            mLastModified = null;
             mVarList = new ArrayList<>();
             mStringList = null;
-            ALittleMysqlDataManager.removeConn(url);
             return e.getMessage();
         }
         return null;

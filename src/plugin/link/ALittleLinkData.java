@@ -19,6 +19,13 @@ public class ALittleLinkData {
     protected List<ALittleLinkInfo> mVarList = new ArrayList<>();
     protected List<String> mStringList = null;
 
+    public enum ChangeType
+    {
+        CT_CREATED,
+        CT_DELETED,
+        CT_CHANGED,
+    }
+
     public boolean check(@NotNull List<ALittleStructVarDec> varDecList) {
         if (varDecList.size() != mVarList.size()) return true;
 

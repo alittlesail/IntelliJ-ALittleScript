@@ -4,7 +4,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.FileHelper;
-import plugin.alittle.PsiHelper;
 
 import java.io.*;
 
@@ -58,6 +57,7 @@ public class ALittleLinkConfig {
             if (!mMysqlIp.isEmpty() && !mMysqlPort.isEmpty() && !mMysqlUser.isEmpty() && !mMysqlPassword.isEmpty()) {
                 mMysqlUrl = "jdbc:mysql://" + mMysqlIp + ":" + mMysqlPort
                         + "/information_schema?user=" + mMysqlUser + "&password=" + mMysqlPassword + "&serverTimezone=UTC";
+                ALittleMysqlDataManager.setWatch(mModule, mMysqlUrl);
             }
             if (!mCsvPath.isEmpty()) {
                 ALittleCsvDataManager.setWatch(mModule, mCsvPath);
@@ -124,6 +124,8 @@ public class ALittleLinkConfig {
         } else {
             mMysqlUrl = "";
         }
+
+        ALittleMysqlDataManager.setWatch(mModule, mMysqlUrl);
     }
     @NotNull
     public String getMysqlUrl() {

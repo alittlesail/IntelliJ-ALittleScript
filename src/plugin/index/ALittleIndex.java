@@ -247,7 +247,6 @@ public class ALittleIndex {
             public void run() {
                 try {
                     ALittleCsvDataManager.checkAndChangeForStruct(structDec);
-                    ALittleMysqlDataManager.checkAndChange(structDec);
                 } catch (ALittleGuessException ignored) {
 
                 }
@@ -291,12 +290,16 @@ public class ALittleIndex {
         }
         set.add(structDec);
 
-        try {
-            if (mIsRefreshed)
-            ALittleMysqlDataManager.checkAndChange(structDec);
-        } catch (ALittleGuessException ignored) {
+        // 变化
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    ALittleMysqlDataManager.checkAndChangeForStruct(structDec);
+                } catch (ALittleGuessException ignored) {
 
-        }
+                }
+            }
+        });
     }
 
     public HashSet<ALittleStructDec> getMysqlData(@NotNull String path) {

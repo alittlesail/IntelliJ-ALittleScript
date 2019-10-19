@@ -51,6 +51,6 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
         }
 
         ALittleCsvDataManager.checkForStruct(myElement);
-        ALittleMysqlDataManager.checkMysql(myElement);
+        ALittleMysqlDataManager.checkForStruct(myElement);
     }
 }
