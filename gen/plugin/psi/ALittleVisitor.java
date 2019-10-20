@@ -67,6 +67,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitCmdModifier(@NotNull ALittleCmdModifier o) {
+    visitPsiElement(o);
+  }
+
   public void visitCoModifier(@NotNull ALittleCoModifier o) {
     visitPsiElement(o);
   }
@@ -151,7 +155,15 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitGenericFunctorParamTail(@NotNull ALittleGenericFunctorParamTail o) {
+    visitPsiElement(o);
+  }
+
   public void visitGenericFunctorParamType(@NotNull ALittleGenericFunctorParamType o) {
+    visitPsiElement(o);
+  }
+
+  public void visitGenericFunctorReturnTail(@NotNull ALittleGenericFunctorReturnTail o) {
     visitPsiElement(o);
   }
 

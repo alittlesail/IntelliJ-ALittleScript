@@ -77,6 +77,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "@Msg"                { return MSG; }
   "@Csv"                { return CSV; }
   "@Mysql"              { return MYSQL; }
+  "@Cmd"                { return CMD; }
   "..."                 { return TYPE_TAIL; }
   "register"            { return REGISTER; }
   "public"              { return PUBLIC; }

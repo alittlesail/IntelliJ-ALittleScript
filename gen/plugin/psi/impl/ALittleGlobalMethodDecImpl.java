@@ -37,6 +37,12 @@ public class ALittleGlobalMethodDecImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
+  public ALittleCmdModifier getCmdModifier() {
+    return findChildByClass(ALittleCmdModifier.class);
+  }
+
+  @Override
+  @Nullable
   public ALittleCoModifier getCoModifier() {
     return findChildByClass(ALittleCoModifier.class);
   }

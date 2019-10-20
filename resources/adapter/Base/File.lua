@@ -138,6 +138,21 @@ function File_MakeDeepDir(path)
 	end
 end
 
+function File_PathEndWithSplit(file_path)
+	local len = string.len(file_path)
+	if len == 0 then
+		return file_path
+	end
+	local byte = string.byte(file_path, len)
+	if byte == 47 or byte == 92 then
+		return file_path
+	end
+	if Find(file_path, "\\") ~= nil then
+		return file_path .. "\\"
+	end
+	return file_path .. "/"
+end
+
 function File_GetFileNameByPath(file_path)
 	local list = String_SplitSepList(file_path, {"/", "\\"})
 	local l = maxn(list)

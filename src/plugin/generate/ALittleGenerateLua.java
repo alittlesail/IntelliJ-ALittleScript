@@ -2117,6 +2117,7 @@ public class ALittleGenerateLua {
         content.append("\n");
 
         ALittleProtoModifier protoModifier = root.getProtoModifier();
+        ALittleCmdModifier cmdModifier = root.getCmdModifier();
         if (protoModifier != null) {
             String text = protoModifier.getText();
 
@@ -2192,6 +2193,36 @@ public class ALittleGenerateLua {
                     GenerateReflectStructInfo(guessReturnStruct);
                 }
             }
+        } else if (cmdModifier != null) {
+            PsiElement desc = cmdModifier.getStringContent();
+            if (desc == null) throw new Exception("@Cmd 后必须输入指令的描述");
+
+            List<String> varList = new ArrayList<>();
+            List<String> nameList = new ArrayList<>();
+            for (String paramName : paramNameList) {
+                nameList.add("\"" + paramName + "\"");
+            }
+
+            if (paramDec != null) {
+                List<ALittleMethodParamOneDec> oneDecList = paramDec.getMethodParamOneDecList();
+                for (ALittleMethodParamOneDec oneDec : oneDecList) {
+                    varList.add("\"" + oneDec.getAllType().guessType().value + "\"");
+                }
+            }
+
+            content.append(preTab)
+                    .append(namespacePre)
+                    .append("RegCmdCallback(\"")
+                    .append(methodName)
+                    .append("\", ")
+                    .append(methodName)
+                    .append(", {")
+                    .append(String.join(",", varList))
+                    .append("}, {")
+                    .append(String.join(",", nameList))
+                    .append("}, ")
+                    .append(desc.getText())
+                    .append(")\n");
         }
 
         return content.toString();

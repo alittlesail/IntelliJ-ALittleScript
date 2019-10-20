@@ -14,14 +14,14 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public class ALittleGenericFunctorParamTypeImpl extends ASTWrapperPsiElement implements ALittleGenericFunctorParamType {
+public class ALittleCmdModifierImpl extends ASTWrapperPsiElement implements ALittleCmdModifier {
 
-  public ALittleGenericFunctorParamTypeImpl(@NotNull ASTNode node) {
+  public ALittleCmdModifierImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitGenericFunctorParamType(this);
+    visitor.visitCmdModifier(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -30,15 +30,9 @@ public class ALittleGenericFunctorParamTypeImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  @NotNull
-  public List<ALittleAllType> getAllTypeList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ALittleAllType.class);
-  }
-
-  @Override
   @Nullable
-  public ALittleGenericFunctorParamTail getGenericFunctorParamTail() {
-    return findChildByClass(ALittleGenericFunctorParamTail.class);
+  public PsiElement getStringContent() {
+    return findChildByType(STRING_CONTENT);
   }
 
   @Override

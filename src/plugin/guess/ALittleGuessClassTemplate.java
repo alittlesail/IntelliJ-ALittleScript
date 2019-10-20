@@ -64,6 +64,7 @@ public class ALittleGuessClassTemplate extends ALittleGuess {
         if (templateExtends != null && templateExtends.isChanged()) {
             return true;
         }
+        if (!element.isValid()) return true;
         return ALittleTreeChangeListener.getGuessTypeList(element) == null;
     }
 }

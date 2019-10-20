@@ -36,6 +36,12 @@ public class ALittleGenericFunctorReturnTypeImpl extends ASTWrapperPsiElement im
   }
 
   @Override
+  @Nullable
+  public ALittleGenericFunctorReturnTail getGenericFunctorReturnTail() {
+    return findChildByClass(ALittleGenericFunctorReturnTail.class);
+  }
+
+  @Override
   @NotNull
   public ALittleGuess guessType() throws ALittleGuessException {
     return ALittlePsiImplUtil.guessType(this);

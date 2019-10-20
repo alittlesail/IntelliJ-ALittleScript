@@ -32,7 +32,18 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
         }
     }
 
-    public void checkError() throws ALittleGuessException {
+    private void checkCmdError() throws ALittleGuessException {
+        ALittleCmdModifier modifier = myElement.getCmdModifier();
+        if (modifier == null) return;
+
+        if (myElement.getTemplateDec() != null)
+            throw new ALittleGuessException(myElement, "带@Cmd的全局函数，不能使用模板");
+
+        PsiElement desc = modifier.getStringContent();
+        if (desc == null) throw new ALittleGuessException(myElement, "带@Cmd的全局函数格式错误，请修改为 @Cmd \"指令描述\"");
+    }
+
+    private void checkProtoError() throws ALittleGuessException {
         ALittleProtoModifier modifier = myElement.getProtoModifier();
         if (modifier == null) return;
 
@@ -40,6 +51,9 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
         ALittleMethodReturnDec returnDec = myElement.getMethodReturnDec();
 
         String text = modifier.getText();
+
+        if (myElement.getTemplateDec() != null)
+            throw new ALittleGuessException(myElement, "带" + text + "的全局函数，不能使用模板");
 
         if (paramDec == null) throw new ALittleGuessException(myElement, "带" + text + "的全局函数，必须有参数");
         List<ALittleAllType> returnList = new ArrayList<>();
@@ -121,5 +135,10 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
                 checkStructExtends(returnList.get(0), ((ALittleGuessStruct)returnGuessList.get(0)).element);
             }
         }
+    }
+
+    public void checkError() throws ALittleGuessException {
+        checkCmdError();
+        checkProtoError();
     }
 }

@@ -51,12 +51,20 @@ public class ALittleGenericTypeReference extends ALittleReference<ALittleGeneric
                     info.functorParamList.add(guess);
                     info.functorParamNameList.add(guess.value);
                 }
+                ALittleGenericFunctorParamTail paramTail = paramType.getGenericFunctorParamTail();
+                if (paramTail != null) {
+                    info.functorParamTail = new ALittleGuessParamTail(paramTail.getText());
+                }
             }
             ALittleGenericFunctorReturnType return_type = dec.getGenericFunctorReturnType();
             if (return_type != null) {
                 List<ALittleAllType> allTypeList = return_type.getAllTypeList();
                 for (ALittleAllType allType : allTypeList) {
                     info.functorReturnList.add(allType.guessType());
+                }
+                ALittleGenericFunctorReturnTail returnTail = return_type.getGenericFunctorReturnTail();
+                if (returnTail != null) {
+                    info.functorReturnTail = new ALittleGuessReturnTail(returnTail.getText());
                 }
             }
             info.UpdateValue();

@@ -158,6 +158,17 @@ public static File_MakeDeepDir(string path)
     }
 }
 
+// 修正路径
+public static File_PathEndWithSplit(string file_path) : string
+{
+    auto len = lua.String.len(file_path);
+    if (len == 0) return file_path;
+    auto byte = lua.String.byte(file_path, len);
+    if (byte == 47 || byte == 92) return file_path;
+    if (Find(file_path, "\\") != null) return file_path.."\\";
+    return file_path.."/";
+}
+
 // 从路径中获取文件名(带后缀)
 public static File_GetFileNameByPath(string file_path) : string
 {

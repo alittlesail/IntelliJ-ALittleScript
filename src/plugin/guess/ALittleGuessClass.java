@@ -97,6 +97,7 @@ public class ALittleGuessClass extends ALittleGuess {
         for (ALittleGuess guess : templateMap.values()) {
             if (guess.isChanged()) return true;
         }
+        if (!element.isValid()) return true;
         return ALittleTreeChangeListener.getGuessTypeList(element) == null;
     }
 }

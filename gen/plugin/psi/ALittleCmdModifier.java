@@ -8,13 +8,10 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public interface ALittleGenericFunctorReturnType extends PsiElement {
-
-  @NotNull
-  List<ALittleAllType> getAllTypeList();
+public interface ALittleCmdModifier extends PsiElement {
 
   @Nullable
-  ALittleGenericFunctorReturnTail getGenericFunctorReturnTail();
+  PsiElement getStringContent();
 
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;

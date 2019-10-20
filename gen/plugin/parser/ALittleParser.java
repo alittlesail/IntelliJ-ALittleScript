@@ -537,6 +537,27 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // CMD STRING_CONTENT?
+  public static boolean cmdModifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cmdModifier")) return false;
+    if (!nextTokenIs(b, CMD)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, CMD_MODIFIER, null);
+    r = consumeToken(b, CMD);
+    p = r; // pin = 1
+    r = r && cmdModifier_1(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // STRING_CONTENT?
+  private static boolean cmdModifier_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cmdModifier_1")) return false;
+    consumeToken(b, STRING_CONTENT);
+    return true;
+  }
+
+  /* ********************************************************** */
   // async | await
   public static boolean coModifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "coModifier")) return false;
@@ -1235,32 +1256,55 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // allType (COMMA allType)*
+  // TYPE_TAIL
+  public static boolean genericFunctorParamTail(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorParamTail")) return false;
+    if (!nextTokenIs(b, TYPE_TAIL)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TYPE_TAIL);
+    exit_section_(b, m, GENERIC_FUNCTOR_PARAM_TAIL, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // genericFunctorParamTail | (allType (COMMA allType)* (COMMA genericFunctorParamTail)?)
   public static boolean genericFunctorParamType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "genericFunctorParamType")) return false;
-    boolean r, p;
+    boolean r;
     Marker m = enter_section_(b, l, _NONE_, GENERIC_FUNCTOR_PARAM_TYPE, "<generic functor param type>");
+    r = genericFunctorParamTail(b, l + 1);
+    if (!r) r = genericFunctorParamType_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // allType (COMMA allType)* (COMMA genericFunctorParamTail)?
+  private static boolean genericFunctorParamType_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorParamType_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
     r = allType(b, l + 1);
-    p = r; // pin = 1
-    r = r && genericFunctorParamType_1(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    r = r && genericFunctorParamType_1_1(b, l + 1);
+    r = r && genericFunctorParamType_1_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // (COMMA allType)*
-  private static boolean genericFunctorParamType_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "genericFunctorParamType_1")) return false;
+  private static boolean genericFunctorParamType_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorParamType_1_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!genericFunctorParamType_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "genericFunctorParamType_1", c)) break;
+      if (!genericFunctorParamType_1_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "genericFunctorParamType_1_1", c)) break;
     }
     return true;
   }
 
   // COMMA allType
-  private static boolean genericFunctorParamType_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "genericFunctorParamType_1_0")) return false;
+  private static boolean genericFunctorParamType_1_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorParamType_1_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
@@ -1269,8 +1313,38 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r;
   }
 
+  // (COMMA genericFunctorParamTail)?
+  private static boolean genericFunctorParamType_1_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorParamType_1_2")) return false;
+    genericFunctorParamType_1_2_0(b, l + 1);
+    return true;
+  }
+
+  // COMMA genericFunctorParamTail
+  private static boolean genericFunctorParamType_1_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorParamType_1_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && genericFunctorParamTail(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
   /* ********************************************************** */
-  // COLON allType (COMMA allType)*
+  // TYPE_TAIL
+  public static boolean genericFunctorReturnTail(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorReturnTail")) return false;
+    if (!nextTokenIs(b, TYPE_TAIL)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TYPE_TAIL);
+    exit_section_(b, m, GENERIC_FUNCTOR_RETURN_TAIL, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // COLON (genericFunctorReturnTail | (allType (COMMA allType)* (COMMA genericFunctorReturnTail)?))
   public static boolean genericFunctorReturnType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "genericFunctorReturnType")) return false;
     if (!nextTokenIs(b, COLON)) return false;
@@ -1278,30 +1352,70 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, GENERIC_FUNCTOR_RETURN_TYPE, null);
     r = consumeToken(b, COLON);
     p = r; // pin = 1
-    r = r && report_error_(b, allType(b, l + 1));
-    r = p && genericFunctorReturnType_2(b, l + 1) && r;
+    r = r && genericFunctorReturnType_1(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
+  // genericFunctorReturnTail | (allType (COMMA allType)* (COMMA genericFunctorReturnTail)?)
+  private static boolean genericFunctorReturnType_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorReturnType_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = genericFunctorReturnTail(b, l + 1);
+    if (!r) r = genericFunctorReturnType_1_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // allType (COMMA allType)* (COMMA genericFunctorReturnTail)?
+  private static boolean genericFunctorReturnType_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorReturnType_1_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = allType(b, l + 1);
+    r = r && genericFunctorReturnType_1_1_1(b, l + 1);
+    r = r && genericFunctorReturnType_1_1_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
   // (COMMA allType)*
-  private static boolean genericFunctorReturnType_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "genericFunctorReturnType_2")) return false;
+  private static boolean genericFunctorReturnType_1_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorReturnType_1_1_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!genericFunctorReturnType_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "genericFunctorReturnType_2", c)) break;
+      if (!genericFunctorReturnType_1_1_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "genericFunctorReturnType_1_1_1", c)) break;
     }
     return true;
   }
 
   // COMMA allType
-  private static boolean genericFunctorReturnType_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "genericFunctorReturnType_2_0")) return false;
+  private static boolean genericFunctorReturnType_1_1_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorReturnType_1_1_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
     r = r && allType(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (COMMA genericFunctorReturnTail)?
+  private static boolean genericFunctorReturnType_1_1_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorReturnType_1_1_2")) return false;
+    genericFunctorReturnType_1_1_2_0(b, l + 1);
+    return true;
+  }
+
+  // COMMA genericFunctorReturnTail
+  private static boolean genericFunctorReturnType_1_1_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "genericFunctorReturnType_1_1_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && genericFunctorReturnTail(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1392,7 +1506,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // protoModifier? accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec
+  // (protoModifier | cmdModifier)? accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec
   public static boolean globalMethodDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "globalMethodDec")) return false;
     boolean r, p;
@@ -1411,11 +1525,20 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // protoModifier?
+  // (protoModifier | cmdModifier)?
   private static boolean globalMethodDec_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "globalMethodDec_0")) return false;
-    protoModifier(b, l + 1);
+    globalMethodDec_0_0(b, l + 1);
     return true;
+  }
+
+  // protoModifier | cmdModifier
+  private static boolean globalMethodDec_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "globalMethodDec_0_0")) return false;
+    boolean r;
+    r = protoModifier(b, l + 1);
+    if (!r) r = cmdModifier(b, l + 1);
+    return r;
   }
 
   // accessModifier?

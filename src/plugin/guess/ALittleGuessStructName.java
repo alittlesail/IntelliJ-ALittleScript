@@ -23,6 +23,7 @@ public class ALittleGuessStructName extends ALittleGuess {
     }
 
     public boolean isChanged() {
+        if (!element.isValid()) return true;
         return ALittleTreeChangeListener.getGuessTypeList(element) == null;
     }
 

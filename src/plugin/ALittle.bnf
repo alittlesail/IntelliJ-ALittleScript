@@ -56,6 +56,7 @@
       MSG                  =  '@Msg'
       CSV                  =  '@Csv'
       MYSQL                =  '@Mysql'
+      CMD                  =  '@Cmd'
       TYPE_TAIL            =  '...'
 
       WHITE_SPACE          = 'regexp:\s+'
@@ -77,6 +78,8 @@ accessModifier ::= public | private | protected
 coModifier ::= async | await
 // 协议修饰符
 protoModifier ::= HTTP | HTTP_DOWNLOAD | HTTP_UPLOAD |  MSG
+// 命令行修饰符
+cmdModifier ::= CMD STRING_CONTENT? {pin=1}
 // CSV联动修饰符
 csvModifier ::= CSV STRING_CONTENT {pin=1}
 // MYSQL联动修饰符
@@ -159,7 +162,7 @@ classMethodDec ::= accessModifier? coModifier? fun methodNameDec templateDec? me
 // 类静态函数定义
 classStaticDec ::= accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec {pin=3}
 // 全局函数
-globalMethodDec ::= protoModifier? accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec {pin=4}
+globalMethodDec ::= (protoModifier | cmdModifier)? accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec {pin=4}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -269,8 +272,10 @@ genericType ::= genericListType | genericMapType | genericFunctorType
 genericMapType ::= Map LESS allType COMMA allType GREATER {pin=1}
 genericListType ::= List LESS allType GREATER {pin=1}
 genericFunctorType ::= Functor LESS coModifier? LPAREN genericFunctorParamType? RPAREN genericFunctorReturnType? GREATER {pin=1}
-genericFunctorParamType ::= allType (COMMA allType)* {pin=1}
-genericFunctorReturnType ::=  COLON allType (COMMA allType)* {pin=1}
+genericFunctorParamType ::= genericFunctorParamTail | (allType (COMMA allType)* (COMMA genericFunctorParamTail)?)
+genericFunctorParamTail ::= TYPE_TAIL
+genericFunctorReturnType ::=  COLON (genericFunctorReturnTail | (allType (COMMA allType)* (COMMA genericFunctorReturnTail)?)) {pin=1}
+genericFunctorReturnTail ::= TYPE_TAIL
 
 // 基本类型
 primitiveType ::= bool | double | int | I64 | any | string

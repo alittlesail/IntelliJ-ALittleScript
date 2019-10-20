@@ -13,6 +13,9 @@ public interface ALittleGenericFunctorParamType extends PsiElement {
   @NotNull
   List<ALittleAllType> getAllTypeList();
 
+  @Nullable
+  ALittleGenericFunctorParamTail getGenericFunctorParamTail();
+
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;
 

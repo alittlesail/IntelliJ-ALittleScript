@@ -16,7 +16,7 @@ public class ALittleCompletionContributor extends CompletionContributor {
             ,"for","do","while","break","return","cast","reflect"
             ,"get","set","fun","static","Ctor","Functor","this","using"
             ,"public","protected","private","instance","pcall","ncall","nsend"
-            ,"async","await","yield","bind","Http","HttpDownload","HttpUpload","Msg","Csv","Mysql"
+            ,"async","await","yield","bind","Http","HttpDownload","HttpUpload","Msg","Cmd","Csv","Mysql"
     };
 
     public ALittleCompletionContributor() {

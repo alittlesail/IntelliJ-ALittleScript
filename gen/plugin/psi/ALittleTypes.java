@@ -23,6 +23,7 @@ public interface ALittleTypes {
   IElementType CLASS_SETTER_DEC = new ALittleElementType("CLASS_SETTER_DEC");
   IElementType CLASS_STATIC_DEC = new ALittleElementType("CLASS_STATIC_DEC");
   IElementType CLASS_VAR_DEC = new ALittleElementType("CLASS_VAR_DEC");
+  IElementType CMD_MODIFIER = new ALittleElementType("CMD_MODIFIER");
   IElementType CONST_VALUE = new ALittleElementType("CONST_VALUE");
   IElementType CO_MODIFIER = new ALittleElementType("CO_MODIFIER");
   IElementType CSV_MODIFIER = new ALittleElementType("CSV_MODIFIER");
@@ -44,7 +45,9 @@ public interface ALittleTypes {
   IElementType FOR_START_STAT = new ALittleElementType("FOR_START_STAT");
   IElementType FOR_STEP_CONDITION = new ALittleElementType("FOR_STEP_CONDITION");
   IElementType FOR_STEP_STAT = new ALittleElementType("FOR_STEP_STAT");
+  IElementType GENERIC_FUNCTOR_PARAM_TAIL = new ALittleElementType("GENERIC_FUNCTOR_PARAM_TAIL");
   IElementType GENERIC_FUNCTOR_PARAM_TYPE = new ALittleElementType("GENERIC_FUNCTOR_PARAM_TYPE");
+  IElementType GENERIC_FUNCTOR_RETURN_TAIL = new ALittleElementType("GENERIC_FUNCTOR_RETURN_TAIL");
   IElementType GENERIC_FUNCTOR_RETURN_TYPE = new ALittleElementType("GENERIC_FUNCTOR_RETURN_TYPE");
   IElementType GENERIC_FUNCTOR_TYPE = new ALittleElementType("GENERIC_FUNCTOR_TYPE");
   IElementType GENERIC_LIST_TYPE = new ALittleElementType("GENERIC_LIST_TYPE");
@@ -155,6 +158,7 @@ public interface ALittleTypes {
   IElementType BREAK = new ALittleTokenType("break");
   IElementType CAST = new ALittleTokenType("cast");
   IElementType CLASS = new ALittleTokenType("class");
+  IElementType CMD = new ALittleTokenType("@Cmd");
   IElementType COLON = new ALittleTokenType(":");
   IElementType COMMA = new ALittleTokenType(",");
   IElementType COMMENT = new ALittleTokenType("COMMENT");
@@ -285,6 +289,9 @@ public interface ALittleTypes {
       else if (type == CLASS_VAR_DEC) {
         return new ALittleClassVarDecImpl(node);
       }
+      else if (type == CMD_MODIFIER) {
+        return new ALittleCmdModifierImpl(node);
+      }
       else if (type == CONST_VALUE) {
         return new ALittleConstValueImpl(node);
       }
@@ -348,8 +355,14 @@ public interface ALittleTypes {
       else if (type == FOR_STEP_STAT) {
         return new ALittleForStepStatImpl(node);
       }
+      else if (type == GENERIC_FUNCTOR_PARAM_TAIL) {
+        return new ALittleGenericFunctorParamTailImpl(node);
+      }
       else if (type == GENERIC_FUNCTOR_PARAM_TYPE) {
         return new ALittleGenericFunctorParamTypeImpl(node);
+      }
+      else if (type == GENERIC_FUNCTOR_RETURN_TAIL) {
+        return new ALittleGenericFunctorReturnTailImpl(node);
       }
       else if (type == GENERIC_FUNCTOR_RETURN_TYPE) {
         return new ALittleGenericFunctorReturnTypeImpl(node);

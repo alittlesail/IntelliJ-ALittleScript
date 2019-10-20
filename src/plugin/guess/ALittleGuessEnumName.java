@@ -25,6 +25,7 @@ public class ALittleGuessEnumName extends ALittleGuess {
 
     @Override
     public boolean isChanged() {
+        if (!element.isValid()) return true;
         return ALittleTreeChangeListener.getGuessTypeList(element) == null;
     }
 

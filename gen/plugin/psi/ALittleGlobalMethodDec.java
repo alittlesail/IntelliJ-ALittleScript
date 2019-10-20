@@ -14,6 +14,9 @@ public interface ALittleGlobalMethodDec extends PsiElement {
   ALittleAccessModifier getAccessModifier();
 
   @Nullable
+  ALittleCmdModifier getCmdModifier();
+
+  @Nullable
   ALittleCoModifier getCoModifier();
 
   @Nullable
