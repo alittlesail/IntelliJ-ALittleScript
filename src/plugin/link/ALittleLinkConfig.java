@@ -12,6 +12,7 @@ public class ALittleLinkConfig {
 
     private Module mModule;
 
+    private @NotNull String mOutputPath = "";
     private @NotNull String mCsvPath = "";
     private @NotNull String mMysqlIp = "";
     private @NotNull String mMysqlPort = "";
@@ -41,6 +42,8 @@ public class ALittleLinkConfig {
                 String value = line.substring(index + 1);
                 if (key.equals("csv_path")) {
                     mCsvPath = value;
+                } else if (key.equals("output_path")) {
+                    mOutputPath = value;
                 } else if (key.equals("mysql_ip")) {
                     mMysqlIp = value;
                 } else if (key.equals("mysql_port")) {
@@ -72,6 +75,7 @@ public class ALittleLinkConfig {
             FileWriter writer = new FileWriter(path);
             BufferedWriter wr = new BufferedWriter(writer); // 建立一个对象，它把文件内容转成计算机能读懂的语言
             wr.write("csv_path=" + mCsvPath + "\n");
+            wr.write("output_path=" + mOutputPath + "\n");
             wr.write("mysql_ip=" + mMysqlIp + "\n");
             wr.write("mysql_port=" + mMysqlPort + "\n");
             wr.write("mysql_user=" + mMysqlUser + "\n");
@@ -80,6 +84,23 @@ public class ALittleLinkConfig {
             writer.close();
         } catch (Exception ignored) {
         }
+    }
+
+    @NotNull
+    public String getOutputPath() {
+        return mOutputPath;
+    }
+    @NotNull
+    public String getOutputPathWithEnd() {
+        if (mOutputPath.isEmpty()) return mOutputPath;
+        if (mOutputPath.endsWith("/")) return mOutputPath;
+        if (mOutputPath.endsWith("\\")) return mOutputPath;
+        if (mOutputPath.lastIndexOf('\\') != -1) return mOutputPath + "\\";
+        return mOutputPath + "/";
+    }
+    public void setOutputPath(@NotNull String value) {
+        if (mOutputPath.equals(value)) return;
+        mOutputPath = value;
     }
 
     @NotNull

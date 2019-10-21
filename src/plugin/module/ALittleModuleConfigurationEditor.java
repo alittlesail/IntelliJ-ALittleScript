@@ -23,7 +23,7 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
     private boolean mModified = false;
 
     // 输出目录
-    private JTextField myOutputTextField;
+    private JTextField myOutputPathTextField;
 
     // Csv目录
     private JTextField myCsvPathTextField;
@@ -43,25 +43,23 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
     public JComponent createComponent() {
         final JPanel outputPathsPanel = new JPanel(new GridBagLayout());
 
-        myOutputTextField = addConfigureUI(outputPathsPanel, "脚本生成目录:");
+        myOutputPathTextField = addConfigureUI(outputPathsPanel, "脚本生成目录:");
         myCsvPathTextField = addConfigureUI(outputPathsPanel, "Csv目录:");
         myMysqlIpTextField = addConfigureUI(outputPathsPanel, "Mysql IP:");
         myMysqlPortTextField = addConfigureUI(outputPathsPanel, "Mysql Port:");
         myMysqlUserTextField = addConfigureUI(outputPathsPanel, "Mysql User:");
         myMysqlPasswordTextField = addConfigureUI(outputPathsPanel, "Mysql Password:");
 
-        // fill with data
-        updateOutputPathPresentation();
-
         Module module = mState.getRootModel().getModule();
         ALittleLinkConfig config = ALittleLinkConfig.getConfig(module);
+        myOutputPathTextField.setText(config.getOutputPath());
         myCsvPathTextField.setText(config.getCsvPath());
         myMysqlIpTextField.setText(config.getMysqlIp());
         myMysqlPortTextField.setText(config.getMysqlPort());
         myMysqlUserTextField.setText(config.getMysqlUser());
         myMysqlPasswordTextField.setText(config.getMysqlPassword());
 
-        listenChange(myOutputTextField);
+        listenChange(myOutputPathTextField);
         listenChange(myCsvPathTextField);
         listenChange(myMysqlIpTextField);
         listenChange(myMysqlPortTextField);
@@ -94,18 +92,6 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
         panel.add(textField, new GridBagConstraints(1, GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0, GridBagConstraints.EAST,
                 GridBagConstraints.HORIZONTAL, new Insets(6, 4, 0, 0), 0, 0));
         return textField;
-    }
-
-    private void updateOutputPathPresentation() {
-        final VirtualFile compilerOutputPath = getCompilerExtension().getCompilerOutputPath();
-        if (compilerOutputPath != null) {
-            myOutputTextField.setText(FileUtil.toSystemDependentName(compilerOutputPath.getPath()));
-        } else {
-            final String compilerOutputUrl = getCompilerExtension().getCompilerOutputUrl();
-            if (compilerOutputUrl != null) {
-                myOutputTextField.setText(FileUtil.toSystemDependentName(VfsUtilCore.urlToPath(compilerOutputUrl)));
-            }
-        }
     }
 
     @Override
@@ -141,10 +127,10 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
     @Override
     public void apply() throws ConfigurationException {
         mModified = false;
-        getCompilerExtension().setCompilerOutputPath(VfsUtilCore.pathToUrl(myOutputTextField.getText()));
 
         Module module = mState.getRootModel().getModule();
         ALittleLinkConfig config = ALittleLinkConfig.getConfig(module);
+        config.setOutputPath(myOutputPathTextField.getText());
         config.setCsvPath(myCsvPathTextField.getText());
         config.setMysql(myMysqlIpTextField.getText(),
                 myMysqlPortTextField.getText(),

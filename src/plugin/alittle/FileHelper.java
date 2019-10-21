@@ -4,6 +4,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.vfs.VirtualFile;
 import plugin.component.StdLibraryProvider;
+import plugin.link.ALittleLinkConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -92,17 +93,7 @@ public class FileHelper {
 
     // 获取输出路径
     public static String calcOutPath(Module module) throws Exception {
-        CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
-        if (extension == null) {
-            throw new Exception("该模块没有编译目录设置");
-        }
-        VirtualFile outFile = extension.getCompilerOutputPath();
-        if (outFile == null) {
-            throw new Exception("没有设置脚本生成目录");
-        }
-        String outPath = outFile.getPath();
-        if (outPath.endsWith(File.separator)) return outPath;
-        return outPath + File.separator;
+        return calcModulePath(module) + ALittleLinkConfig.getConfig(module).getOutputPathWithEnd();
     }
 
     // 获取lua脚本路径
