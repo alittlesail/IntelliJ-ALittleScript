@@ -1,6 +1,8 @@
 package plugin.index;
 
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -249,6 +251,21 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         if (listener == null) return false;
         if (listener.isLoading()) return true;
         return false;
+    }
+
+    public void AddModule(@NotNull Module module) {
+        PsiManager psi_mgr = PsiManager.getInstance(mProject);
+        VirtualFile[] roots = ModuleRootManager.getInstance(module).getSourceRoots();
+        for (VirtualFile root : roots) {
+            loadDir(psi_mgr, root);
+        }
+    }
+
+    public void RemoveModule(@NotNull Module module) {
+        VirtualFile[] roots = ModuleRootManager.getInstance(module).getSourceRoots();
+        for (VirtualFile root : roots) {
+            handleDirDelete(mProject, root);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

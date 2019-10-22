@@ -1,7 +1,11 @@
 package plugin.index;
 
+import com.intellij.ProjectTopics;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.ModuleListener;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -65,7 +69,7 @@ public class ALittleIndex {
         mMysqlStructSet = new HashMap<>();
     }
 
-    private void loadDir(PsiManager psi_mgr, VirtualFile root) {
+    protected void loadDir(PsiManager psi_mgr, VirtualFile root) {
         if (root.isDirectory()) {
             VirtualFile[] files = root.getChildren();
             if (files != null) {
@@ -142,6 +146,25 @@ public class ALittleIndex {
 
         mReloading = false;
         mReloaded = true;
+
+        mProject.getMessageBus().connect().subscribe(ProjectTopics.MODULES
+                , new ModuleListener() {
+                    @Override
+                    public void moduleAdded(@NotNull Project project, @NotNull Module module) {
+                        if (ALittleTreeChangeListener.isReloading(project)) return;
+                        ALittleTreeChangeListener listener = ALittleTreeChangeListener.sMap.get(project);
+                        if (listener == null) return;
+                        listener.AddModule(module);
+                    }
+
+                    @Override
+                    public void beforeModuleRemoved(@NotNull Project project, @NotNull Module module) {
+                        if (ALittleTreeChangeListener.isReloading(project)) return;
+                        ALittleTreeChangeListener listener = ALittleTreeChangeListener.sMap.get(project);
+                        if (listener == null) return;
+                        listener.RemoveModule(module);
+                    }
+                });
     }
 
     public void refresh() {

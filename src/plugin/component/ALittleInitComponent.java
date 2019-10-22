@@ -1,10 +1,14 @@
 package plugin.component;
 
 import com.intellij.AppTopics;
+import com.intellij.ProjectTopics;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.BaseComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.ModuleListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
@@ -78,6 +82,7 @@ public class ALittleInitComponent implements BaseComponent {
                         }
                     }
         });
+
 
         ProjectManager.getInstance().addProjectManagerListener(
                 new VetoableProjectManagerListener() {
