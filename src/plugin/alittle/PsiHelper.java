@@ -108,6 +108,15 @@ public class PsiHelper {
         return null;
     }
 
+    // 判断某个是不是register
+    public static boolean isRegister(@NotNull PsiElement element) {
+        ALittleNamespaceDec dec = getNamespaceDec(element.getContainingFile());
+        if (dec == null) {
+            return false;
+        }
+        return dec.getRegisterModifier() != null;
+    }
+
     // 获取某个元素的命名域
     @NotNull
     public static String getNamespaceName(@NotNull PsiElement element) {

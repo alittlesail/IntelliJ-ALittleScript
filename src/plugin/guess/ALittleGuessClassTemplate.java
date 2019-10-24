@@ -2,6 +2,7 @@ package plugin.guess;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleTemplatePairDec;
 
@@ -14,6 +15,7 @@ public class ALittleGuessClassTemplate extends ALittleGuess {
     public @NotNull ALittleTemplatePairDec element;
 
     public ALittleGuessClassTemplate(@NotNull ALittleTemplatePairDec e, ALittleGuess t, boolean ic, boolean is) {
+        isRegister = PsiHelper.isRegister(e);
         element = e;
         templateExtends = t;
         isClass = ic;

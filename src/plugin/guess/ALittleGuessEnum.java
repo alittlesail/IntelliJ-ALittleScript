@@ -2,6 +2,7 @@ package plugin.guess;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleEnumDec;
 
@@ -13,6 +14,7 @@ public class ALittleGuessEnum extends ALittleGuess {
 
     public @NotNull ALittleEnumDec element;
     public ALittleGuessEnum(@NotNull String namespaceName, @NotNull String enumName, @NotNull ALittleEnumDec e) {
+        isRegister = PsiHelper.isRegister(e);
         mNamespaceName = namespaceName;
         mEnumName = enumName;
         element = e;

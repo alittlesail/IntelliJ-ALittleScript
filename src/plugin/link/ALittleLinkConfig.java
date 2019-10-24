@@ -66,6 +66,7 @@ public class ALittleLinkConfig {
                 ALittleCsvDataManager.setWatch(mModule, mCsvPath);
             }
         } catch (Exception ignored) {
+            mOutputPath = "Script";
         }
     }
 

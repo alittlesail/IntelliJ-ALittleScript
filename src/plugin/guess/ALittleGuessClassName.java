@@ -1,7 +1,7 @@
 package plugin.guess;
 
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleClassNameDec;
 
@@ -13,6 +13,7 @@ public class ALittleGuessClassName extends ALittleGuess {
 
     public @NotNull ALittleClassNameDec element;
     public ALittleGuessClassName(@NotNull String namespaceName, @NotNull String className, @NotNull ALittleClassNameDec e) {
+        isRegister = PsiHelper.isRegister(e);
         mNamespaceName = namespaceName;
         mClassName = className;
         element = e;

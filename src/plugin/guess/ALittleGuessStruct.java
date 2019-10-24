@@ -1,6 +1,7 @@
 package plugin.guess;
 
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleStructDec;
 
@@ -12,6 +13,7 @@ public class ALittleGuessStruct extends ALittleGuess {
 
     public @NotNull ALittleStructDec element;
     public ALittleGuessStruct(@NotNull String namespaceName, @NotNull String structName, @NotNull ALittleStructDec e) {
+        isRegister = PsiHelper.isRegister(e);
         mNamespaceName = namespaceName;
         mStructName = structName;
         element = e;

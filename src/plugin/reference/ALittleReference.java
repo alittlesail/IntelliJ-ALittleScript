@@ -50,6 +50,9 @@ public abstract class ALittleReference<T extends PsiElement> extends PsiReferenc
         return new ArrayList<>();
     }
 
+    @Override
+    public boolean multiGuessTypes() { return false; }
+
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {

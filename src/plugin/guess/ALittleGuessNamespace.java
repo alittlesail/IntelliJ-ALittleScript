@@ -2,6 +2,7 @@ package plugin.guess;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleNamespaceDec;
 
@@ -11,6 +12,7 @@ public class ALittleGuessNamespace extends ALittleGuess {
     private @NotNull String mNamespaceName;
     public @NotNull ALittleNamespaceDec element;
     public ALittleGuessNamespace(@NotNull String namespaceName, @NotNull ALittleNamespaceDec e) {
+        isRegister = e.getRegisterModifier() != null;
         mNamespaceName = namespaceName;
         element = e;
     }

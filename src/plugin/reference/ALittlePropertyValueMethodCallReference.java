@@ -99,6 +99,9 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         return guessList;
     }
 
+    @Override
+    public boolean multiGuessTypes() { return true; }
+
     private void AnalysisTemplate(@NotNull Map<String, ALittleGuess> fillMap,
                                   @NotNull ALittleGuess leftGuess, @NotNull PsiElement rightSrc, @NotNull ALittleGuess rightGuess) throws ALittleGuessException {
         // 如果任何一方是any，那么就认为可以相等

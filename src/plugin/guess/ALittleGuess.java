@@ -6,6 +6,7 @@ import java.util.Map;
 
 public abstract class ALittleGuess {
     public @NotNull String value = "";
+    public boolean isRegister = false;
     public ALittleGuess() { }
     public boolean isChanged() {
         return true;

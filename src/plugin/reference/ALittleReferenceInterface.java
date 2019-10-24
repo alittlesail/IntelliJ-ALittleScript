@@ -16,4 +16,6 @@ public interface ALittleReferenceInterface {
     public List<InlayInfo> getParameterHints() throws ALittleGuessException;
     @NotNull
     public abstract List<ALittleGuess> guessTypes() throws ALittleGuessException;
+
+    public abstract boolean multiGuessTypes();
 }

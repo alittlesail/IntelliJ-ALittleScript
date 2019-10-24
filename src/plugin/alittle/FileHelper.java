@@ -101,9 +101,7 @@ public class FileHelper {
         if (StdLibraryProvider.isPluginSelf(module.getProject())) {
             return calcModulePath(module) + "resources/adapter" + File.separator;
         } else {
-            String outPath = calcOutPath(module);
-            if (module.getName().equals("Engine")) return outPath + "Engine/";
-            return outPath + "Script/";
+            return calcOutPath(module);
         }
     }
 

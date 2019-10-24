@@ -2,6 +2,7 @@ package plugin.guess;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleClassNameDec;
 import plugin.psi.ALittleGenericFunctorType;
@@ -24,6 +25,7 @@ public class ALittleGuessFunctor extends ALittleGuess {
 
     public @NotNull PsiElement element; // 产生当前Functor的节点对象
     public ALittleGuessFunctor(@NotNull PsiElement e) {
+        isRegister = PsiHelper.isRegister(e);
         element = e;
     }
 
