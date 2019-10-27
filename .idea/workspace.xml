@@ -140,16 +140,4 @@
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.lua" />
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <condition expression="myElement.getText().equals(&quot;FramePlay&quot;)" language="JAVA" />
-          <url>file://$PROJECT_DIR$/src/plugin/reference/ALittleValueStatReference.java</url>
-          <line>19</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
 </project>

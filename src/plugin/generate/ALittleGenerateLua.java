@@ -998,6 +998,7 @@ public class ALittleGenerateLua {
                 content.append(GenerateValueFactorStat(valueFactorStat));
             }
 
+            String split = ".";
             // 后面跟着后缀属性
             List<ALittlePropertyValueSuffix> suffixList = propValue.getPropertyValueSuffixList();
             for (int index = 0; index < suffixList.size(); ++index) {
@@ -1019,7 +1020,7 @@ public class ALittleGenerateLua {
                     ALittleGuess guess = dotIdName.guessType();
 
                     if (!isLuaNamespace) {
-                        String split = ".";
+                        split = ".";
                         // 如果是函数名
                         if (guess instanceof ALittleGuessFunctor) {
                             ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
@@ -1184,7 +1185,7 @@ public class ALittleGenerateLua {
                             ALittleValueStat valueStat = valueStatList.get(i);
 
                             // 如果是成员、setter、gettter函数，第一个参数要放在最前面
-                            if (i == 0 && (preTypeFunctor.element instanceof ALittleClassMethodDec
+                            if (i == 0 && !split.equals(":") && (preTypeFunctor.element instanceof ALittleClassMethodDec
                                         || preTypeFunctor.element instanceof ALittleClassGetterDec
                                     || preTypeFunctor.element instanceof ALittleClassSetterDec)) {
                                 paramList.add(0, GenerateValueStat(valueStat));
