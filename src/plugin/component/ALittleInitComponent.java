@@ -69,7 +69,7 @@ public class ALittleInitComponent implements BaseComponent {
 
                                 ALittleGenerateLua lua = new ALittleGenerateLua();
                                 try {
-                                    lua.GenerateLua((ALittleFile) psiFile, false);
+                                    lua.GenerateLua((ALittleFile) psiFile, true,false);
                                 } catch (ALittleGuessException e) {
                                     System.out.println(psiFile.getName() + ":生成lua代码失败:" + e.getError());
                                 } catch (Exception e) {

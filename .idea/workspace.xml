@@ -61,12 +61,8 @@
     <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
-      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="plugin.parser" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="plugin.psi" />
@@ -81,14 +77,18 @@
       <recent name="D:\Software\ALittleScript\trunk\resources\std\Register" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="plugin.action" />
       <recent name="plugin.link" />
       <recent name="plugin.csv" />
       <recent name="plugin.reference" />
       <recent name="plugin.guess" />
-      <recent name="plugin.index" />
     </key>
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="plugin.parser" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
+      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -139,5 +139,16 @@
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.lua" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/plugin/component/ALittleInitComponent.java</url>
+          <line>59</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

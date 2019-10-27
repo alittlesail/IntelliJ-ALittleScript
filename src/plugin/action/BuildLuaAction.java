@@ -18,7 +18,9 @@ import plugin.psi.ALittleFile;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GenerateLuaAction extends AnAction {
+public class BuildLuaAction extends AnAction {
+    protected boolean mRebuild = false;
+
     private void generateDir(PsiManager psiMgr, VirtualFile root) throws Exception {
         if (root.isDirectory()) {
             VirtualFile[] files = root.getChildren();
@@ -31,7 +33,7 @@ public class GenerateLuaAction extends AnAction {
             PsiFile psiFile = psiMgr.findFile(root);
             if (psiFile instanceof ALittleFile) {
                 ALittleGenerateLua lua = new ALittleGenerateLua();
-                lua.GenerateLua((ALittleFile)psiFile, true);
+                lua.GenerateLua((ALittleFile)psiFile, mRebuild, true);
             }
         }
     }
@@ -49,27 +51,29 @@ public class GenerateLuaAction extends AnAction {
 
         // 创建文件夹
         try {
-            // 需要重新构建的模块
-            Set<Module> moduleSet = new HashSet<>();
+            if (mRebuild) {
+                // 需要重新构建的模块
+                Set<Module> moduleSet = new HashSet<>();
 
-            // 检查是否有模块在里面
-            for (VirtualFile targetFile : targetFileArray) {
-                String targetFilePath = targetFile.getPath();
-                Module[] modules = ModuleManager.getInstance(project).getModules();
-                for (Module module : modules) {
-                    VirtualFile file = module.getModuleFile();
-                    if (file == null) continue;
-                    file = file.getParent();
-                    if (file == null) continue;
-                    if (file.getPath().equals(targetFilePath)) {
-                        moduleSet.add(module);
+                // 检查是否有模块在里面
+                for (VirtualFile targetFile : targetFileArray) {
+                    String targetFilePath = targetFile.getPath();
+                    Module[] modules = ModuleManager.getInstance(project).getModules();
+                    for (Module module : modules) {
+                        VirtualFile file = module.getModuleFile();
+                        if (file == null) continue;
+                        file = file.getParent();
+                        if (file == null) continue;
+                        if (file.getPath().equals(targetFilePath)) {
+                            moduleSet.add(module);
+                        }
                     }
                 }
-            }
 
-            // 重构涉及到的模块
-            for (Module module : moduleSet) {
-                FileHelper.rebuildPath(FileHelper.calcScriptPath(module));
+                // 重构涉及到的模块
+                for (Module module : moduleSet) {
+                    FileHelper.rebuildPath(FileHelper.calcScriptPath(module));
+                }
             }
 
             for (VirtualFile targetFile : targetFileArray) {

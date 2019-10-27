@@ -87,9 +87,14 @@
             id="ShowLuaFile">
       <add-to-group group-id="RefactoringMenu" anchor="first"/>
     </action>
-    <action class="plugin.action.GenerateLuaAction"
-            text="GenerateLua"
-            id="GenerateLua">
+    <action class="plugin.action.ReBuildLuaAction"
+            text="ReBuildLua"
+            id="ReBuildLua">
+      <add-to-group group-id="RefactoringMenu" anchor="first"/>
+    </action>
+    <action class="plugin.action.BuildLuaAction"
+            text="BuildLua"
+            id="BuildLua">
       <add-to-group group-id="RefactoringMenu" anchor="first"/>
     </action>
   </actions>

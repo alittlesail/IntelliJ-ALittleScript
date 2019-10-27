@@ -1,5 +1,6 @@
 package plugin.generate;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -12,6 +13,7 @@ import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
 import plugin.alittle.FileHelper;
 import plugin.guess.*;
+import plugin.link.ALittleCsvDataManager;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
 import plugin.reference.ALittleReference;
@@ -69,14 +71,7 @@ public class ALittleGenerateLua {
         }
     }
 
-    public void GenerateLua(ALittleFile alittleFile, boolean fullCheck) throws Exception {
-        // 获取语法错误
-        try {
-            checkErrorElement(alittleFile, fullCheck);
-        } catch (ALittleGuessException e) {
-            throw new Exception(e.getElement().getContainingFile().getName() + "有语法错误:" + e.getError());
-        }
-
+    public void GenerateLua(ALittleFile alittleFile, boolean rebuild, boolean fullCheck) throws Exception {
         ALittleNamespaceDec namespaceDec = PsiHelper.getNamespaceDec(alittleFile);
         if (namespaceDec == null) throw new Exception("没有定义命名域 namespace");
 
@@ -85,18 +80,43 @@ public class ALittleGenerateLua {
             return;
         }
 
-        // 生成代码
-        String content = GenerateNamespace(namespaceDec);
-
+        // 获取语法错误
+        try {
+            checkErrorElement(alittleFile, fullCheck);
+        } catch (ALittleGuessException e) {
+            throw new Exception(e.getElement().getContainingFile().getName() + "有语法错误:" + e.getError());
+        }
         // 保存到文件
         FileIndexFacade facade = FileIndexFacade.getInstance(alittleFile.getProject());
         Module module = facade.getModuleForFile(alittleFile.getVirtualFile());
         if (module == null) {
             return;
         }
+        String aliRelPath = FileHelper.calcALittleRelPath(module, alittleFile.getVirtualFile());
+        String luaFullPath = FileHelper.calcScriptPath(module) + aliRelPath + "lua";
 
-        String alittleRelPath = FileHelper.calcALittleRelPath(module, alittleFile.getVirtualFile());
-        FileHelper.writeFile(FileHelper.calcScriptPath(module) + alittleRelPath + "lua", content);
+        // 如果不是rebuild，那么就检查生成文件和源代码文件的最后修改时间
+        if (!rebuild) {
+            File luaFile = new File(luaFullPath);
+            if (luaFile.exists()) {
+                File aliFile = new File(alittleFile.getVirtualFile().getPath());
+                if (aliFile.exists() && luaFile.lastModified() > aliFile.lastModified()) {
+                    return;
+                }
+            }
+        }
+
+        // 生成代码
+        String content = GenerateNamespace(namespaceDec);
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            public void run() {
+                // 保存到文件
+                try {
+                    FileHelper.writeFile(luaFullPath, content);
+                } catch (Exception ignored) {
+                }
+            }
+        });
 
         // 复制标准库
         if (!StdLibraryProvider.isPluginSelf(module.getProject())) {
