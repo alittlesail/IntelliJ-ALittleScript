@@ -36,6 +36,12 @@ public class ALittleReflectValueImpl extends ASTWrapperPsiElement implements ALi
   }
 
   @Override
+  @Nullable
+  public ALittleValueStat getValueStat() {
+    return findChildByClass(ALittleValueStat.class);
+  }
+
+  @Override
   @NotNull
   public ALittleGuess guessType() throws ALittleGuessException {
     return ALittlePsiImplUtil.guessType(this);

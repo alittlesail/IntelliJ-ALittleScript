@@ -13,6 +13,9 @@ public interface ALittleReflectValue extends PsiElement {
   @Nullable
   ALittleCustomType getCustomType();
 
+  @Nullable
+  ALittleValueStat getValueStat();
+
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;
 

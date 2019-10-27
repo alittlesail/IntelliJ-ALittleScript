@@ -14,8 +14,8 @@ public struct ClassInfo
     ClassInfo __super;                  // 父类信息
     List<ClassInfo> __element;   // 模板元素
     Map<string, ClassInfo> __child;     // 继承于当前的子模板
-    Map<string, Functor<(ObjectInfo):any>> __getter;    // getter
-    Map<string, Functor<(ObjectInfo, any)>> __setter;   // setter
+    Map<string, Functor<(any):any>> __getter;    // getter
+    Map<string, Functor<(any, any)>> __setter;   // setter
 }
 
 public struct ObjectInfo
@@ -206,15 +206,8 @@ protected static Template(ClassInfo clazz, string name, ...) : ClassInfo
     return template;
 }
 
-// 获取类
-public static GetClass(any object) : ClassInfo
-{
-    if (type(object) != "table") return null;
-    return cast<ObjectInfo>(object).__class;
-}
-
 // 创建对象
-public static NewObject(any clazz, ...) : any
+public static NewObject(ClassInfo clazz, ...) : any
 {
     return cast<Functor<(any):any>>(clazz)(...);
 }

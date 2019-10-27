@@ -300,8 +300,11 @@ tcallStat ::= tcall LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
 wrapValueStat ::= LPAREN valueStat RPAREN
 // 常量值
 constValue ::= true | false | STRING_CONTENT | DIGIT_CONTENT | null
-// 反射机制 返回的是一个json字符串
-reflectValue ::= reflect LESS customType GREATER {pin=1}
+// 反射机制
+reflectValue ::= reflect (reflectCustomType | reflectValueStat) {pin=1}
+private reflectCustomType ::= LESS customType GREATER {pin=1}
+private reflectValueStat ::= LPAREN valueStat RPAREN {pin=1}
+
 // 属性
 propertyValue ::= propertyValueFirstType propertyValueSuffix*
 

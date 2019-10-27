@@ -18,19 +18,29 @@ public class ALittleReflectValueReference extends ALittleReference<ALittleReflec
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        if (myElement.getCustomType() == null) throw new ALittleGuessException(myElement, "没有填写反射类型");
-
-        ALittleGuess guess = myElement.getCustomType().guessType();
-        if (guess instanceof ALittleGuessStruct) {
-            return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "StructInfo");
-        } else if (guess instanceof ALittleGuessClass) {
-            return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "ClassInfo");
-        } else if (guess instanceof ALittleGuessClassTemplate) {
-            ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
-            if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass) {
-                return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "ClassInfo");
-            } else if (guessClassTemplate.isStruct) {
+        if (myElement.getCustomType() != null) {
+            ALittleGuess guess = myElement.getCustomType().guessType();
+            if (guess instanceof ALittleGuessStruct) {
                 return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "StructInfo");
+            } else if (guess instanceof ALittleGuessClass) {
+                return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "ClassInfo");
+            } else if (guess instanceof ALittleGuessClassTemplate) {
+                ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate) guess;
+                if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass) {
+                    return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "ClassInfo");
+                } else if (guessClassTemplate.isStruct) {
+                    return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "StructInfo");
+                }
+            }
+        } else if (myElement.getValueStat() != null) {
+            ALittleGuess guess = myElement.getValueStat().guessType();
+            if (guess instanceof ALittleGuessClass) {
+                return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "ClassInfo");
+            } else if (guess instanceof ALittleGuessClassTemplate) {
+                ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate) guess;
+                if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass) {
+                    return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "ClassInfo");
+                }
             }
         }
         return new ArrayList<>();
@@ -38,29 +48,41 @@ public class ALittleReflectValueReference extends ALittleReference<ALittleReflec
 
     public void checkError() throws ALittleGuessException {
         ALittleCustomType customType = myElement.getCustomType();
-        if (customType == null) {
-            throw new ALittleGuessException(myElement, "没有指定反射对象");
-        }
-
-        ALittleGuess guess = customType.guessType();
-        if (guess instanceof ALittleGuessStruct) {
-            checkStructExtends(((ALittleGuessStruct) guess).element);
-            return;
-        }
-
-        if (guess instanceof ALittleGuessClass) {
-            return;
-        }
-
-        if (guess instanceof ALittleGuessClassTemplate) {
-            ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
-            if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass) {
-                return;
-            } else if (guessClassTemplate.isStruct) {
+        ALittleValueStat valueStat = myElement.getValueStat();
+        if (customType != null) {
+            ALittleGuess guess = customType.guessType();
+            if (guess instanceof ALittleGuessStruct) {
+                checkStructExtends(((ALittleGuessStruct) guess).element);
                 return;
             }
+
+            if (guess instanceof ALittleGuessClass) {
+                return;
+            }
+
+            if (guess instanceof ALittleGuessClassTemplate) {
+                ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+                if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass) {
+                    return;
+                } else if (guessClassTemplate.isStruct) {
+                    return;
+                }
+            }
+        } else if (valueStat != null) {
+            ALittleGuess guess = valueStat.guessType();
+            if (guess instanceof ALittleGuessClass) {
+                return;
+            }
+
+            if (guess instanceof ALittleGuessClassTemplate) {
+                ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+                if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass) {
+                    return;
+                }
+            }
         }
-        throw new ALittleGuessException(myElement, "反射对象必须是struct或者是class");
+
+        throw new ALittleGuessException(myElement, "反射对象必须是struct或者是class以及class对象");
     }
 
     private void checkStructExtends(@NotNull ALittleStructDec dec) throws ALittleGuessException {

@@ -25,4 +25,7 @@ public class ALittleTemplateDecReference extends ALittleReference<ALittleTemplat
         }
         return guessList;
     }
+
+    @Override
+    public boolean multiGuessTypes() { return true; }
 }

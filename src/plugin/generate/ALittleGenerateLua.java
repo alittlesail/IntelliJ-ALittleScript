@@ -878,43 +878,54 @@ public class ALittleGenerateLua {
     @NotNull
     public String GenerateReflectValue(ALittleReflectValue reflectValue) throws Exception {
         ALittleCustomType customType = reflectValue.getCustomType();
-        if (customType == null) throw new Exception("reflect表达式没有设置反射对象");
+        ALittleValueStat valueStat = reflectValue.getValueStat();
+        if (customType != null) {
+            ALittleGuess guess = customType.guessType();
+            if (guess instanceof ALittleGuessStruct) {
+                ALittleGuessStruct guessStruct = (ALittleGuessStruct) guess;
 
-        ALittleGuess guess = customType.guessType();
-        if (guess instanceof ALittleGuessStruct) {
-            ALittleGuessStruct guessStruct = (ALittleGuessStruct)guess;
+                String namespacePre = "ALittle.";
+                if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
-            String namespacePre = "ALittle.";
-            if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-            String content = namespacePre + "FindStructByName(\"" + guessStruct.value + "\")";
-            GenerateReflectStructInfo(guessStruct);
-            return content;
-        } else if (guess instanceof ALittleGuessClass) {
-            ALittleGuessClass guessClass = (ALittleGuessClass)guess;
-            String name = guessClass.value;
-            if (guessClass.usingName != null) name = guessClass.usingName;
-            String split[] = name.split("\\.");
-            if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
-                return split[1];
-            } else {
-                return name;
-            }
-        } else if (guess instanceof ALittleGuessClassTemplate) {
-            ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
-            if (guessClassTemplate.templateExtends != null
-                    || guessClassTemplate.isClass || guessClassTemplate.isStruct) {
-                ALittleTemplateDec templateDec = (ALittleTemplateDec)guessClassTemplate.element.getParent();
-                if (templateDec.getParent() instanceof ALittleClassDec) {
-                    int index = templateDec.getTemplatePairDecList().indexOf(guessClassTemplate.element);
-                    return "self.__class.__element[" + (index + 1) + "]";
+                String content = namespacePre + "FindStructByName(\"" + guessStruct.value + "\")";
+                GenerateReflectStructInfo(guessStruct);
+                return content;
+            } else if (guess instanceof ALittleGuessClass) {
+                ALittleGuessClass guessClass = (ALittleGuessClass) guess;
+                String name = guessClass.value;
+                if (guessClass.usingName != null) name = guessClass.usingName;
+                String split[] = name.split("\\.");
+                if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
+                    return split[1];
                 } else {
-                    return guessClassTemplate.value;
+                    return name;
+                }
+            } else if (guess instanceof ALittleGuessClassTemplate) {
+                ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate) guess;
+                if (guessClassTemplate.templateExtends != null
+                        || guessClassTemplate.isClass || guessClassTemplate.isStruct) {
+                    ALittleTemplateDec templateDec = (ALittleTemplateDec) guessClassTemplate.element.getParent();
+                    if (templateDec.getParent() instanceof ALittleClassDec) {
+                        int index = templateDec.getTemplatePairDecList().indexOf(guessClassTemplate.element);
+                        return "self.__class.__element[" + (index + 1) + "]";
+                    } else {
+                        return guessClassTemplate.value;
+                    }
+                }
+            }
+        } else if (valueStat != null) {
+            ALittleGuess guess = valueStat.guessType();
+            if (guess instanceof ALittleGuessClass) {
+                return "(" + GenerateValueStat(valueStat) + ").__class";
+            } else if (guess instanceof ALittleGuessClassTemplate) {
+                ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate) guess;
+                if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass) {
+                    return "(" + GenerateValueStat(valueStat) + ").__class";
                 }
             }
         }
 
-        throw new Exception("reflect只能反射class或者struct");
+        throw new Exception("reflect只能反射struct或者class以及class对象");
     }
 
     private void GenerateReflectStructInfo(@NotNull ALittleGuessStruct guessStruct) throws Exception {

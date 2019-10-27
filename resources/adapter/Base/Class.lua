@@ -139,13 +139,6 @@ function Template(clazz, name, ...)
 	return template
 end
 
-function GetClass(object)
-	if type(object) ~= "table" then
-		return nil
-	end
-	return object.__class
-end
-
 function NewObject(clazz, ...)
 	return clazz(...)
 end

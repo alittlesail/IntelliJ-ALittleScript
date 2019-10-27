@@ -3140,18 +3140,76 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // reflect LESS customType GREATER
+  // LESS (customType) GREATER
+  static boolean reflectCustomType(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "reflectCustomType")) return false;
+    if (!nextTokenIs(b, LESS)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, LESS);
+    p = r; // pin = 1
+    r = r && report_error_(b, reflectCustomType_1(b, l + 1));
+    r = p && consumeToken(b, GREATER) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (customType)
+  private static boolean reflectCustomType_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "reflectCustomType_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = customType(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // reflect (reflectCustomType | reflectValueStat)
   public static boolean reflectValue(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "reflectValue")) return false;
     if (!nextTokenIs(b, REFLECT)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, REFLECT_VALUE, null);
-    r = consumeTokens(b, 1, REFLECT, LESS);
+    r = consumeToken(b, REFLECT);
     p = r; // pin = 1
-    r = r && report_error_(b, customType(b, l + 1));
-    r = p && consumeToken(b, GREATER) && r;
+    r = r && reflectValue_1(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // reflectCustomType | reflectValueStat
+  private static boolean reflectValue_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "reflectValue_1")) return false;
+    boolean r;
+    r = reflectCustomType(b, l + 1);
+    if (!r) r = reflectValueStat(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // LPAREN (valueStat) RPAREN
+  static boolean reflectValueStat(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "reflectValueStat")) return false;
+    if (!nextTokenIs(b, LPAREN)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, LPAREN);
+    p = r; // pin = 1
+    r = r && report_error_(b, reflectValueStat_1(b, l + 1));
+    r = p && consumeToken(b, RPAREN) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (valueStat)
+  private static boolean reflectValueStat_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "reflectValueStat_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = valueStat(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
