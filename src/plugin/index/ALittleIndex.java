@@ -268,11 +268,7 @@ public class ALittleIndex {
         // 变化
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             public void run() {
-                try {
-                    ALittleCsvDataManager.checkAndChangeForStruct(structDec);
-                } catch (ALittleGuessException ignored) {
-
-                }
+                ALittleCsvDataManager.checkAndChangeForStruct(structDec);
             }
         });
     }
@@ -316,11 +312,7 @@ public class ALittleIndex {
         // 变化
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             public void run() {
-                try {
-                    ALittleMysqlDataManager.checkAndChangeForStruct(structDec);
-                } catch (ALittleGuessException ignored) {
-
-                }
+                ALittleMysqlDataManager.checkAndChangeForStruct(structDec);
             }
         });
     }

@@ -18,7 +18,7 @@ private auto mkdir = lua.lfs.mkdir;
 // 文件加载接口
 public class IFileLoader
 {
-    public fun Load(string file_path) : string {}
+    public fun Load(string file_path) : string { return null; }
 }
 
 // 最普通的文件加载器
@@ -37,7 +37,7 @@ public class NormalFileLoader : IFileLoader
 // 文件保存接口
 public class IFileSaver
 {
-    public fun Save(string file_path, string content) : bool {}
+    public fun Save(string file_path, string content) : bool { return false; }
 }
 
 // 最普通的文件保存期

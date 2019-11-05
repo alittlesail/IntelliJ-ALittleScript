@@ -42,9 +42,9 @@ public static FindMsgRpcCallback(int msg_id) : Functor<await(IMsgCommon, any) : 
 public class IMsgCommonNative
 {
     public fun SetID(int id) {}         // 设置连接对象全局ID
-    public fun GetID() : int {}         // 获取连接对象全局ID
+    public fun GetID() : int { return 0; }         // 获取连接对象全局ID
     public fun Connect(string ip, int port) {}  // 主动连接
-    public fun IsConnected() : bool {}      // 是否已经连接
+    public fun IsConnected() : bool { return false; }      // 是否已经连接
     public fun SendFactory(lua.MessageWriteFactory factory) {}  // 发送请求
     public fun Close() {}               // 关闭连接
 }

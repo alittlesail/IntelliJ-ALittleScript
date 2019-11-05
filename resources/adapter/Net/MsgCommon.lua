@@ -42,12 +42,14 @@ function IMsgCommonNative:SetID(id)
 end
 
 function IMsgCommonNative:GetID()
+	return 0
 end
 
 function IMsgCommonNative:Connect(ip, port)
 end
 
 function IMsgCommonNative:IsConnected()
+	return false
 end
 
 function IMsgCommonNative:SendFactory(factory)

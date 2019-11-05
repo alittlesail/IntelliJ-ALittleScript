@@ -9,6 +9,7 @@ local ___coroutine = coroutine
 IHttpFileSenderNative = Class(nil, "ALittle.IHttpFileSenderNative")
 
 function IHttpFileSenderNative:GetID()
+	return 0
 end
 
 function IHttpFileSenderNative:SetURL(url, file_path, download, start_size)
@@ -21,20 +22,25 @@ function IHttpFileSenderNative:Stop()
 end
 
 function IHttpFileSenderNative:GetPath()
+	return ""
 end
 
 function IHttpFileSenderNative:GetCurrentSize()
+	return 0
 end
 
 function IHttpFileSenderNative:GetTotalSize()
+	return 0
 end
 
 IHttpFileSender = Class(nil, "ALittle.IHttpFileSender")
 
 function IHttpFileSender:SendDownloadRPC(method, content)
+	return "not impl"
 end
 
 function IHttpFileSender:SendUploadRPC(method, content)
+	return "not impl", nil
 end
 
 function IHttpFileSender.InvokeDownload(method, client, content)

@@ -20,6 +20,7 @@ end
 IHttpFileReceiver = Class(nil, "ALittle.IHttpFileReceiver")
 
 function IHttpFileReceiver:StartReceiveFile(file_path, start_size)
+	return "not impl"
 end
 
 local __all_callback = {}

@@ -44,7 +44,7 @@ public class ALittlePsiImplUtil {
         }
         guessTypeInfoList = ref.guessTypes();
 
-        // 如果是两个，并且一个是regiter，一个不是。那么就要把register那个删掉
+        // 如果是两个，并且一个是register，一个不是。那么就要把register那个删掉
         if (!ref.multiGuessTypes() && guessTypeInfoList.size() == 2 && guessTypeInfoList.get(0).value.equals(guessTypeInfoList.get(1).value)) {
             if (guessTypeInfoList.get(0).isRegister && !guessTypeInfoList.get(1).isRegister) {
                 guessTypeInfoList.remove(0);

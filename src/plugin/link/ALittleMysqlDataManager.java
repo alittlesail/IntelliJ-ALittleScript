@@ -200,11 +200,7 @@ public class ALittleMysqlDataManager {
                 if (file == null) continue;
                 Module m = facade.getModuleForFile(file);
                 if (!moduleSet.contains(m)) continue;
-                try {
-                    checkAndChangeForStruct(dec);
-                } catch (ALittleGuessException ignored) {
-
-                }
+                checkAndChangeForStruct(dec);
             }
             return;
         }
@@ -221,6 +217,7 @@ public class ALittleMysqlDataManager {
             set = new HashSet<>(set);
             for (ALittleStructDec dec : set) {
                 FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
+                if (dec.getContainingFile() == null) continue;
                 VirtualFile file = dec.getContainingFile().getVirtualFile();
                 if (file == null) continue;
                 Module m = facade.getModuleForFile(file);
@@ -241,6 +238,7 @@ public class ALittleMysqlDataManager {
             set = new HashSet<>(set);
             for (ALittleStructDec dec : set) {
                 FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
+                if (dec.getContainingFile() == null) continue;
                 VirtualFile file = dec.getContainingFile().getVirtualFile();
                 if (file == null) continue;
                 Module m = facade.getModuleForFile(file);
@@ -330,13 +328,17 @@ public class ALittleMysqlDataManager {
         }
     }
 
-    public static void checkAndChangeForStruct(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
+    public static void checkAndChangeForStruct(@NotNull ALittleStructDec structDec) {
         WriteCommandAction.writeCommandAction(structDec.getProject()).run(() -> {
-            ALittleMysqlData mysqlData = ALittleMysqlDataManager.checkForStruct(structDec);
-            if (mysqlData == null) return;
+            try {
+                ALittleMysqlData mysqlData = ALittleMysqlDataManager.checkForStruct(structDec);
+                if (mysqlData == null) return;
 
-            List<String> varList = mysqlData.generateVarList();
-            ALittleMysqlDataManager.handleChangeForStruct(structDec, varList);
+                List<String> varList = mysqlData.generateVarList();
+                ALittleMysqlDataManager.handleChangeForStruct(structDec, varList);
+            } catch (ALittleGuessException ignored) {
+
+            }
         });
     }
 }

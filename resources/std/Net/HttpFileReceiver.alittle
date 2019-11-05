@@ -15,7 +15,7 @@ public class IHttpFileReceiverNative
 public class IHttpFileReceiver
 {
     // 提供服务器使用的接口
-    public await fun StartReceiveFile(string file_path, int start_size) : string {}
+    public await fun StartReceiveFile(string file_path, int start_size) : string { return "not impl"; }
 }
 
 private auto __all_callback = new Map<string, Functor<await(IHttpFileReceiver, any):any>>();

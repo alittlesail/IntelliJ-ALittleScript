@@ -135,11 +135,7 @@ public class ALittleCsvDataManager {
                 if (file == null) continue;
                 Module m = facade.getModuleForFile(file);
                 if (!moduleSet.contains(m)) continue;
-                try {
-                    checkAndChangeForStruct(dec);
-                } catch (ALittleGuessException ignored) {
-
-                }
+                checkAndChangeForStruct(dec);
             }
             return;
         }
@@ -156,6 +152,7 @@ public class ALittleCsvDataManager {
             set = new HashSet<>(set);
             for (ALittleStructDec dec : set) {
                 FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
+                if (dec.getContainingFile() == null) continue;
                 VirtualFile file = dec.getContainingFile().getVirtualFile();
                 if (file == null) continue;
                 Module m = facade.getModuleForFile(file);
@@ -176,6 +173,7 @@ public class ALittleCsvDataManager {
             set = new HashSet<>(set);
             for (ALittleStructDec dec : set) {
                 FileIndexFacade facade = FileIndexFacade.getInstance(dec.getProject());
+                if (dec.getContainingFile() == null) continue;
                 VirtualFile file = dec.getContainingFile().getVirtualFile();
                 if (file == null) continue;
                 Module m = facade.getModuleForFile(file);
@@ -261,13 +259,16 @@ public class ALittleCsvDataManager {
     }
 
     // 对struct检查，如果有变化就直接执行变化
-    public static void checkAndChangeForStruct(@NotNull ALittleStructDec structDec) throws ALittleGuessException {
+    public static void checkAndChangeForStruct(@NotNull ALittleStructDec structDec) {
         WriteCommandAction.writeCommandAction(structDec.getProject()).run(() -> {
-            ALittleCsvData csvData = ALittleCsvDataManager.checkForStruct(structDec);
-            if (csvData == null) return;
+            try {
+                ALittleCsvData csvData = ALittleCsvDataManager.checkForStruct(structDec);
+                if (csvData == null) return;
 
-            List<String> varList = csvData.generateVarList();
-            ALittleMysqlDataManager.handleChangeForStruct(structDec, varList);
+                List<String> varList = csvData.generateVarList();
+                ALittleCsvDataManager.handleChangeForStruct(structDec, varList);
+            } catch (ALittleGuessException ignored) {
+            }
         });
     }
 }

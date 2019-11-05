@@ -237,7 +237,6 @@ function SingleKeyTableIndexConfig:GetOne(index)
 	for k, _ in ___pairs(keys) do
 		return self._parent:GetData(k)
 	end
-	return nil
 end
 
 function SingleKeyTableIndexConfig:GetList(index)

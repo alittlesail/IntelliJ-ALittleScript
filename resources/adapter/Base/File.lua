@@ -21,6 +21,7 @@ local mkdir = lfs.mkdir
 IFileLoader = Class(nil, "ALittle.IFileLoader")
 
 function IFileLoader:Load(file_path)
+	return nil
 end
 
 assert(IFileLoader, " extends class:IFileLoader is nil")
@@ -39,6 +40,7 @@ end
 IFileSaver = Class(nil, "ALittle.IFileSaver")
 
 function IFileSaver:Save(file_path, content)
+	return false
 end
 
 assert(IFileSaver, " extends class:IFileSaver is nil")

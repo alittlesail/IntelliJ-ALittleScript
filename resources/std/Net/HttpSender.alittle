@@ -3,18 +3,18 @@ namespace ALittle;
 // 连接对象
 public class IHttpSenderNative
 {
-    public fun GetID() : int {}                         // 获取HttpSender的全局ID
+    public fun GetID() : int { return 0; }                         // 获取HttpSender的全局ID
     public fun SetURL(string url, string content) {}    // 设置请求数据，url是请求路径，如果content不为null，那么就是post请求
     public fun Start() {}                               // 开始请求
     public fun Stop() {}                                // 停止请求
-    public fun GetResponse() : string {}                // 获取请求结果
+    public fun GetResponse() : string { return null;}                // 获取请求结果
 }
 
 // Http协议接口类，负责请求发送
 public class IHttpSender
 {
     // 提供子类继承
-    protected await fun SendRPC(string method, any content) : string, any {}
+    protected await fun SendRPC(string method, any content) : string, any { return "not impl", null; }
 
     // 提供框架调用
     protected await static Invoke(string method, IHttpSender client, any content) : string, any { return client.SendRPC(method, content); }

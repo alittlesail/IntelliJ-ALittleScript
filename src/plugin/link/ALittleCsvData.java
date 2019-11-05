@@ -30,8 +30,8 @@ public class ALittleCsvData extends ALittleLinkData {
                     new FileInputStream(file), StandardCharsets.UTF_8); // 建立一个输入流对象reader
             BufferedReader br = new BufferedReader(reader);
             String commentLine = br.readLine();
-            String nameLine = br.readLine();
             String typeLine = br.readLine();
+            String nameLine = br.readLine();
             br.close();
             reader.close();
 
@@ -41,10 +41,10 @@ public class ALittleCsvData extends ALittleLinkData {
 
             String[] commentList = commentLine.split(",");
             if (commentList.length == 0) return "注释行是空的";
-            String[] nameList = nameLine.split(",");
-            if (nameList.length == 0) return "字段行是空的";
             String[] typeList = typeLine.split(",");
             if (typeList.length == 0) return "类型行是空的";
+            String[] nameList = nameLine.split(",");
+            if (nameList.length == 0) return "字段行是空的";
 
             if (typeList.length != nameList.length) return "类型的列数和字段的列数不一致";
 

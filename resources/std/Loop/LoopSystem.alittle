@@ -3,11 +3,11 @@ namespace ALittle;
 
 public class LoopObject
 {
-    public fun IsCompleted() : bool {}
+    public fun IsCompleted() : bool { return true; }
     public fun Completed() {}
     protected fun Update(int frame_time) {}
     public fun Reset() {}
-    public fun SetTime(int time) : int, bool {}
+    public fun SetTime(int time) : int, bool { return time, true; }
     public fun SetCompleted() {}
     public fun Start() {}
     public fun Close() {}

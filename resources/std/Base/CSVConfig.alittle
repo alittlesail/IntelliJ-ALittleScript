@@ -239,7 +239,6 @@ class SingleKeyTableIndexConfig<INDEX, KEY, T : struct>
         if (keys == null) return null;
         for (auto k, auto _ in keys)
             return this._parent.GetData(k);
-        return null;
     }
 
     public fun GetList(INDEX index) : List<T>

@@ -9,6 +9,7 @@ local ___coroutine = coroutine
 IHttpSenderNative = Class(nil, "ALittle.IHttpSenderNative")
 
 function IHttpSenderNative:GetID()
+	return 0
 end
 
 function IHttpSenderNative:SetURL(url, content)
@@ -21,11 +22,13 @@ function IHttpSenderNative:Stop()
 end
 
 function IHttpSenderNative:GetResponse()
+	return nil
 end
 
 IHttpSender = Class(nil, "ALittle.IHttpSender")
 
 function IHttpSender:SendRPC(method, content)
+	return "not impl", nil
 end
 
 function IHttpSender.Invoke(method, client, content)

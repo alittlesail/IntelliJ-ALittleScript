@@ -4,9 +4,9 @@ namespace ALittle;
 public class ICSVFile
 {
     public fun Close() {}
-    public fun ReadCell(int lua_row, int lua_col) : string {}
-    public fun GetRowCount() : int {}
-    public fun GetColCount() : int {}
+    public fun ReadCell(int lua_row, int lua_col) : string { return ""; }
+    public fun GetRowCount() : int { return 0; }
+    public fun GetColCount() : int { return 0; }
 }
 
 public struct CSVInvokeInfo
