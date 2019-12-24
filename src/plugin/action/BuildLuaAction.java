@@ -7,16 +7,19 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import org.jetbrains.annotations.NotNull;
 import plugin.generate.ALittleGenerateLua;
 import plugin.alittle.FileHelper;
 import plugin.alittle.SendLogRunnable;
 import plugin.psi.ALittleFile;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 public class BuildLuaAction extends AnAction {
     protected boolean mRebuild = false;
@@ -40,38 +43,47 @@ public class BuildLuaAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent event) {
+        // 获取当前项目
         Project project = event.getProject();
         if (project == null) return;
+        // 获取选中的文件
         VirtualFile[] targetFileArray = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
         if (targetFileArray == null) return;
-
+        // 获取管理器
         PsiManager psiMgr = PsiManager.getInstance(project);
+        // 发送日志
         SendLogRunnable.SendLog("gen all lua file");
+        // 提示消息框
         Messages.showMessageDialog(project, "开始执行lua代码生成", "提示", Messages.getInformationIcon());
 
         // 创建文件夹
         try {
             if (mRebuild) {
-                // 需要重新构建的模块
-                Set<Module> moduleSet = new HashSet<>();
+                // 整理模块路径
+                HashMap<String, Module> map = new HashMap<>();
+                // 获取当前所有模块
+                Module[] modules = ModuleManager.getInstance(project).getModules();
+                // 遍历模块
+                for (Module module : modules) {
+                    VirtualFile file = module.getModuleFile();
+                    if (file == null) continue;
+                    file = file.getParent();
+                    if (file == null) continue;
+                    // 判断模块文件所在的文件夹是否和virtualFile一致
+                    map.put(file.getPath(), module);
+                }
 
-                // 检查是否有模块在里面
+                // 收集模块
+                HashSet<Module> set = new HashSet<>();
                 for (VirtualFile targetFile : targetFileArray) {
-                    String targetFilePath = targetFile.getPath();
-                    Module[] modules = ModuleManager.getInstance(project).getModules();
-                    for (Module module : modules) {
-                        VirtualFile file = module.getModuleFile();
-                        if (file == null) continue;
-                        file = file.getParent();
-                        if (file == null) continue;
-                        if (file.getPath().equals(targetFilePath)) {
-                            moduleSet.add(module);
-                        }
+                    Module module = map.get(targetFile.getPath());
+                    if (module != null) {
+                        set.add(module);
                     }
                 }
 
                 // 重构涉及到的模块
-                for (Module module : moduleSet) {
+                for (Module module : set) {
                     FileHelper.rebuildPath(FileHelper.calcScriptPath(module));
                 }
             }

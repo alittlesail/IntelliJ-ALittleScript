@@ -1,7 +1,6 @@
 package plugin.alittle;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.vfs.VirtualFile;
 import plugin.component.StdLibraryProvider;
 import plugin.link.ALittleLinkConfig;
