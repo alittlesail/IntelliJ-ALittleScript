@@ -50,7 +50,7 @@
   <depends>com.intellij.modules.lang</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <fileTypeFactory implementation="plugin.filetype.ALittleFileTypeFactory"/>
+    <fileType name="ALittle File" implementationClass="plugin.filetype.ALittleFileType" fieldName="INSTANCE" language="ALittle" extensions="alittle"/>
     <lang.parserDefinition language="ALittle" implementationClass="plugin.hightlight.ALittleParserDefinition"/>
     <lang.syntaxHighlighterFactory language="ALittle" implementationClass="plugin.hightlight.ALittleSyntaxHighlighterFactory"/>
     <lang.formatter language="ALittle" implementationClass="plugin.format.ALittleFormattingModelBuilder" />

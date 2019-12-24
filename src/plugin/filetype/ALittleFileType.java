@@ -8,7 +8,7 @@ import plugin.component.ALittleLanguage;
 
 import javax.swing.*;
 
-public class ALittleFileType extends LanguageFileType {
+public class ALittleFileType extends LanguageFileType  {
     public static final ALittleFileType INSTANCE = new ALittleFileType();
 
     protected ALittleFileType() {
