@@ -7,14 +7,19 @@ import plugin.psi.*;
 import java.util.*;
 
 public class ALittleAccessData {
+    // Key1:元素类型，Key2:名称，Value:对应的元素集合
     public Map<PsiHelper.PsiElementType, Map<String, Set<PsiElement>>> elementMap;
 
     public ALittleAccessData() {
         elementMap = new HashMap<>();
     }
 
+    // 添加元素
     public void addALittleNameDec(@NotNull PsiElement nameDec) {
+        // 获取名称
         String name = nameDec.getText();
+
+        // 计算类型
         PsiHelper.PsiElementType type;
         if (nameDec instanceof ALittleClassNameDec) {
             type = PsiHelper.PsiElementType.CLASS_NAME;
@@ -31,19 +36,14 @@ public class ALittleAccessData {
         } else {
             return;
         }
-        Map<String, Set<PsiElement>> map = elementMap.get(type);
-        if (map == null) {
-            map = new HashMap<>();
-            elementMap.put(type, map);
-        }
-        Set<PsiElement> set = map.get(name);
-        if (set == null) {
-            set = new HashSet<>();
-            map.put(name, set);
-        }
+
+        // 添加到映射表
+        Map<String, Set<PsiElement>> map = elementMap.computeIfAbsent(type, k -> new HashMap<>());
+        Set<PsiElement> set = map.computeIfAbsent(name, k -> new HashSet<>());
         set.add(nameDec);
     }
 
+    // 查找元素
     public void findALittleNameDecList(PsiHelper.PsiElementType type, @NotNull String name, @NotNull List<PsiElement> result) {
         Map<String, Set<PsiElement>> map = elementMap.get(type);
         if (map == null) return;
@@ -60,8 +60,12 @@ public class ALittleAccessData {
         }
     }
 
+    // 移除元素
     public void removeALittleNameDec(@NotNull PsiElement nameDec) {
+        // 获取名称
         String name = nameDec.getText();
+
+        // 计算类型
         PsiHelper.PsiElementType type;
         if (nameDec instanceof ALittleClassNameDec) {
             type = PsiHelper.PsiElementType.CLASS_NAME;
@@ -78,10 +82,13 @@ public class ALittleAccessData {
         } else {
             return;
         }
+
         Map<String, Set<PsiElement>> map = elementMap.get(type);
         if (map == null) return;
+
         Set<PsiElement> set = map.get(name);
         if (set == null) return;
+
         set.remove(nameDec);
         if (set.isEmpty()) {
             map.remove(name);

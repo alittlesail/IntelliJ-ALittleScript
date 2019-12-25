@@ -26,8 +26,7 @@ public class ALittleCsvData extends ALittleLinkData {
         mStringList = null;
         try {
             File file = new File(mFilePath);
-            InputStreamReader reader = new InputStreamReader(
-                    new FileInputStream(file), StandardCharsets.UTF_8); // 建立一个输入流对象reader
+            InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8); // 建立一个输入流对象reader
             BufferedReader br = new BufferedReader(reader);
             String commentLine = br.readLine();
             String typeLine = br.readLine();

@@ -43,13 +43,9 @@ public class ALittleCsvDataManager {
         Path path = Paths.get(csvPath);
         try {
             WatchKey key = path.register(mWatchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-            Set<Module> set = mKeyMap.get(key);
-            if (set == null) {
-                set = new HashSet<>();
-                mKeyMap.put(key, set);
-            }
+            Set<Module> set = mKeyMap.computeIfAbsent(key, k -> new HashSet<>());
             set.add(module);
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
     }
 
@@ -64,7 +60,7 @@ public class ALittleCsvDataManager {
                     while (true) {
                         try {
                             WatchKey watchKey = mWatchService.take();
-                            for (WatchEvent event : watchKey.pollEvents()) {
+                            for (WatchEvent<?> event : watchKey.pollEvents()) {
                                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                                     public void run() {
                                         if (event.kind().equals(StandardWatchEventKinds.ENTRY_MODIFY)) {
@@ -258,13 +254,13 @@ public class ALittleCsvDataManager {
     // 对struct检查，如果有变化就直接执行变化
     public static void checkAndChangeForStruct(@NotNull ALittleStructDec structDec) {
         WriteCommandAction.writeCommandAction(structDec.getProject()).run(() -> {
-            try {
-                ALittleCsvData csvData = ALittleCsvDataManager.checkForStruct(structDec);
-                if (csvData == null) return;
+                try {
+                    ALittleCsvData csvData = ALittleCsvDataManager.checkForStruct(structDec);
+                    if (csvData == null) return;
 
-                List<String> varList = csvData.generateVarList();
-                ALittleCsvDataManager.handleChangeForStruct(structDec, varList);
-            } catch (ALittleGuessException ignored) {
+                    List<String> varList = csvData.generateVarList();
+                    ALittleCsvDataManager.handleChangeForStruct(structDec, varList);
+                } catch (ALittleGuessException ignored) {
             }
         });
     }

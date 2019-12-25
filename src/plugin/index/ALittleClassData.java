@@ -8,12 +8,14 @@ import plugin.psi.*;
 import java.util.*;
 
 public class ALittleClassData {
+    // Key1:访问权限，Key2:属性类型，Key3:名称，Value:元素
     private Map<PsiHelper.ClassAccessType, Map<PsiHelper.ClassAttrType, Map<String, PsiElement>>> dataMap;
 
     public ALittleClassData() {
         dataMap = new HashMap<>();
     }
 
+    // 添加类元素
     public void addALittleClassChildDec(@NotNull PsiElement dec) {
         // 模板定义特殊处理
         if (dec instanceof ALittleTemplateDec) {
@@ -29,11 +31,13 @@ public class ALittleClassData {
         PsiHelper.ClassAttrType attrType;
         String name;
 
+        // 处理模板参数
         if (dec instanceof ALittleTemplatePairDec) {
             ALittleTemplatePairDec pairDec = (ALittleTemplatePairDec)dec;
             name = pairDec.getIdContent().getText();
             accessType = PsiHelper.ClassAccessType.PUBLIC;
             attrType = PsiHelper.ClassAttrType.TEMPLATE;
+        // 处理成员变量
         } else if (dec instanceof ALittleClassVarDec) {
             ALittleClassVarDec varDec = (ALittleClassVarDec) dec;
             PsiElement nameDec = varDec.getIdContent();
@@ -41,6 +45,7 @@ public class ALittleClassData {
             name = nameDec.getText();
             accessType = PsiHelper.calcAccessType(varDec.getAccessModifier());
             attrType = PsiHelper.ClassAttrType.VAR;
+        // 处理成员函数
         } else if (dec instanceof ALittleClassMethodDec) {
             ALittleClassMethodDec methodDec = (ALittleClassMethodDec)dec;
             ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
@@ -49,6 +54,7 @@ public class ALittleClassData {
             name = nameDec.getText();
             accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
             attrType = PsiHelper.ClassAttrType.FUN;
+        // 处理getter函数
         } else if (dec instanceof ALittleClassGetterDec) {
             ALittleClassGetterDec methodDec = (ALittleClassGetterDec)dec;
             ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
@@ -57,6 +63,7 @@ public class ALittleClassData {
             name = nameDec.getText();
             accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
             attrType = PsiHelper.ClassAttrType.GETTER;
+        // 处理setter函数
         } else if (dec instanceof ALittleClassSetterDec) {
             ALittleClassSetterDec methodDec = (ALittleClassSetterDec)dec;
             ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
@@ -65,6 +72,7 @@ public class ALittleClassData {
             name = nameDec.getText();
             accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
             attrType = PsiHelper.ClassAttrType.SETTER;
+        // 处理静态函数
         } else if (dec instanceof ALittleClassStaticDec) {
             ALittleClassStaticDec methodDec = (ALittleClassStaticDec)dec;
             ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
@@ -77,27 +85,20 @@ public class ALittleClassData {
             return;
         }
 
-        Map<PsiHelper.ClassAttrType, Map<String, PsiElement>> map = dataMap.get(accessType);
-        if (map == null) {
-            map = new HashMap<>();
-            dataMap.put(accessType, map);
-        }
-        Map<String, PsiElement> elementMap = map.get(attrType);
-        if (elementMap == null) {
-            elementMap = new HashMap<>();
-            map.put(attrType, elementMap);
-        }
+        Map<PsiHelper.ClassAttrType, Map<String, PsiElement>> map = dataMap.computeIfAbsent(accessType, k -> new HashMap<>());
+        Map<String, PsiElement> elementMap = map.computeIfAbsent(attrType, k -> new HashMap<>());
         elementMap.put(name, dec);
     }
 
+    // 获取元素集合
     private Map<String, PsiElement> getElementMap(PsiHelper.ClassAttrType attrType, PsiHelper.ClassAccessType accessType) {
         Map<PsiHelper.ClassAttrType, Map<String, PsiElement>> map = dataMap.get(accessType);
         if (map == null) return null;
         return map.get(attrType);
     }
 
-    public void findClassAttrList(@NotNull ALittleClassDec classDec,
-                                  int accessLevel,
+    // 查找类属性集合
+    public void findClassAttrList(int accessLevel,
                                   PsiHelper.ClassAttrType type,
                                   String name,
                                   @NotNull List<PsiElement> result) {

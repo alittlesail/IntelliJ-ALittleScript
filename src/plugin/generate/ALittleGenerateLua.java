@@ -1,6 +1,5 @@
 package plugin.generate;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -13,10 +12,8 @@ import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
 import plugin.alittle.FileHelper;
 import plugin.guess.*;
-import plugin.link.ALittleCsvDataManager;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
-import plugin.reference.ALittleReference;
 import plugin.reference.ALittleReferenceInterface;
 import plugin.reference.ALittleReferenceUtil;
 
@@ -27,13 +24,20 @@ import java.util.List;
 import java.util.Map;
 
 public class ALittleGenerateLua {
+    // 当前文件命名域
     private String mNamespaceName = "";
+    // 底层接口的命名域前缀
+    private String mALittleGenNamespacePre = "";
 
+    // 标记是否使用rawset
     private boolean mOpenRawSet = false;
+    // 使用rawset的数量
     private int mRawsetUseCount = 0;
 
+    // 当前文件需要处理的反射信息
     private Map<String, String> mReflectMap;
 
+    // 复制标准库
     private void copyStdLibrary(String moduleBasePath) throws Exception {
         File file = new File(moduleBasePath + "/std");
         if (file.exists()) return;
@@ -53,14 +57,15 @@ public class ALittleGenerateLua {
         }
     }
 
+    // 检查语法错误
     private void checkErrorElement(PsiElement element, boolean fullCheck) throws ALittleGuessException {
         for(PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof PsiErrorElement) {
                 throw new ALittleGuessException(child, ((PsiErrorElement) child).getErrorDescription());
             }
 
+            // 判断语义错误
             if (fullCheck) {
-                // 检查错误，给元素上色
                 PsiReference ref = element.getReference();
                 if (ref instanceof ALittleReferenceInterface) {
                     ((ALittleReferenceInterface) ref).checkError();
@@ -71,7 +76,9 @@ public class ALittleGenerateLua {
         }
     }
 
+    // 生成lua代码
     public void GenerateLua(ALittleFile alittleFile, boolean rebuild, boolean fullCheck) throws Exception {
+        // 获取命名域
         ALittleNamespaceDec namespaceDec = PsiHelper.getNamespaceDec(alittleFile);
         if (namespaceDec == null) throw new Exception("没有定义命名域 namespace");
 
@@ -86,12 +93,15 @@ public class ALittleGenerateLua {
         } catch (ALittleGuessException e) {
             throw new Exception(e.getElement().getContainingFile().getName() + "有语法错误:" + e.getError());
         }
+
         // 保存到文件
         FileIndexFacade facade = FileIndexFacade.getInstance(alittleFile.getProject());
         Module module = facade.getModuleForFile(alittleFile.getVirtualFile());
         if (module == null) {
             return;
         }
+
+        // alittle相对路径，lua完全路径
         String aliRelPath = FileHelper.calcALittleRelPath(module, alittleFile.getVirtualFile());
         String luaFullPath = FileHelper.calcScriptPath(module) + aliRelPath + "lua";
 
@@ -108,15 +118,7 @@ public class ALittleGenerateLua {
 
         // 生成代码
         String content = GenerateNamespace(namespaceDec);
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            public void run() {
-                // 保存到文件
-                try {
-                    FileHelper.writeFile(luaFullPath, content);
-                } catch (Exception ignored) {
-                }
-            }
-        });
+        FileHelper.writeFile(luaFullPath, content);
 
         // 复制标准库
         if (!StdLibraryProvider.isPluginSelf(module.getProject())) {
@@ -124,14 +126,12 @@ public class ALittleGenerateLua {
         }
     }
 
+    // 生成bind命令
     @NotNull
     private String GenerateBindStat(ALittleBindStat bindStat) throws Exception {
         List<ALittleValueStat> valueStatList = bindStat.getValueStatList();
 
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-        String content = namespacePre + "Bind(";
+        String content = mALittleGenNamespacePre + "Bind(";
         List<String> paramList = new ArrayList<>();
         for (ALittleValueStat valueStat : valueStatList) {
             paramList.add(GenerateValueStat(valueStat));
@@ -141,14 +141,12 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成tcall命令
     @NotNull
-    private String GenerateTcallStat(ALittleTcallStat pcallStat) throws Exception {
-        List<ALittleValueStat> valueStatList = pcallStat.getValueStatList();
+    private String GenerateTcallStat(ALittleTcallStat tcallStat) throws Exception {
+        List<ALittleValueStat> valueStatList = tcallStat.getValueStatList();
 
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-        String content = namespacePre + "TCall(";
+        String content = mALittleGenNamespacePre + "TCall(";
         List<String> paramList = new ArrayList<>();
         for (ALittleValueStat valueStat : valueStatList) {
             paramList.add(GenerateValueStat(valueStat));
@@ -158,6 +156,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成new List
     @NotNull
     private String GenerateOpNewListStat(ALittleOpNewListStat opNewList) throws Exception {
         List<ALittleValueStat> valueStatList = opNewList.getValueStatList();
@@ -172,6 +171,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成new
     @NotNull
     private String GenerateOpNewStat(ALittleOpNewStat opNewStat) throws Exception {
         // 如果是通用类型
@@ -200,7 +200,7 @@ public class ALittleGenerateLua {
             } else if (guess instanceof ALittleGuessClassTemplate) {
                 ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
                 if (guessClassTemplate.templateExtends != null) {
-                    // 不处理
+                    // 留到下面的代码进行处理
                 } else if (guessClassTemplate.isStruct) {
                     return "{}";
                 } else if (guessClassTemplate.isClass) {
@@ -208,6 +208,7 @@ public class ALittleGenerateLua {
                 }
             }
 
+            // 生成customType名
             String content = GenerateCustomType(customType);
             content += "(";
             List<String> paramList = new ArrayList<>();
@@ -216,14 +217,15 @@ public class ALittleGenerateLua {
                 paramList.add(GenerateValueStat(valueStat));
             }
             content += String.join(", ", paramList);
-
             content += ")";
+
             return content;
         }
 
         throw new Exception("new 未知类型");
     }
 
+    // 生成customType定义中的模板参数列表
     @NotNull
     private void GenerateCustomTypeTemplateList(List<ALittleGuess> guessList,
                                        @NotNull List<String> templateParamList,
@@ -232,10 +234,13 @@ public class ALittleGenerateLua {
             ALittleGuess guess = guessList.get(index);
             if (guess instanceof ALittleGuessClass) {
                 ALittleGuessClass guessClass = (ALittleGuessClass)guess;
+                // 如果没有模板参数
                 if (guessClass.templateList.isEmpty()) {
+                    // 获取类名
                     String name = guessClass.value;
+                    // 如果是有using定义而来，就使用usingName
                     if (guessClass.usingName != null) name = guessClass.usingName;
-
+                    // 拆分名称，检查命名域，如果与当前相同，或者是lua，那么就去掉
                     String[] split = name.split("\\.");
                     if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
                         templateParamList.add(split[1]);
@@ -243,28 +248,32 @@ public class ALittleGenerateLua {
                         templateParamList.add(name);
                     }
                     templateParamNameList.add(name);
+                // 有模板参数
                 } else {
-                    String templateName = guessClass.GetNamespaceName() + "." + guessClass.GetClassName();
-                    String className = templateName;
-                    List<String> subTemplateParamList = new ArrayList<>();
-                    List<String> subTemplateParamNameList = new ArrayList<>();
+                    // 检查模板参数
                     List<ALittleGuess> subGuessList = new ArrayList<>();
                     for (ALittleGuess subGuess : guessClass.templateList) {
                         ALittleGuess valueGuess = guessClass.templateMap.get(subGuess.value);
                         if (valueGuess == null) throw new Exception("参数模板没有填充完毕");
                         subGuessList.add(valueGuess);
                     }
+                    // 获取子模板参数
+                    List<String> subTemplateParamList = new ArrayList<>();
+                    List<String> subTemplateParamNameList = new ArrayList<>();
                     GenerateCustomTypeTemplateList(subGuessList, subTemplateParamList, subTemplateParamNameList);
 
-                    templateName += "<" + String.join(", ", subTemplateParamNameList) + ">";
-                    String namespacePre = "ALittle.";
-                    if (mNamespaceName.equals("ALittle")) namespacePre = "";
+                    // 带命名域的类名
+                    String fullClassName = guessClass.GetNamespaceName() + "." + guessClass.GetClassName();
 
+                    // 计算实际类名
+                    String className = fullClassName;
                     if (guessClass.GetNamespaceName().equals(mNamespaceName) || guessClass.GetNamespaceName().equals("lua")) {
                         className = guessClass.GetClassName();
                     }
+                    // 计算模板名
+                    String templateName = fullClassName + "<" + String.join(", ", subTemplateParamNameList) + ">";
 
-                    String content = namespacePre + "Template(" + className;
+                    String content = mALittleGenNamespacePre + "Template(" + className;
                     content += ", \"" + templateName + "\"";
                     if (!subTemplateParamList.isEmpty()) {
                         content += ", " + String.join(", ", subTemplateParamList);
@@ -273,19 +282,22 @@ public class ALittleGenerateLua {
                     templateParamNameList.add(templateName);
                     templateParamList.add(content);
                 }
+            // 如果是类模板参数
             } else if (guess instanceof ALittleGuessClassTemplate) {
                 templateParamList.add("self.__class.__element[" + (index + 1) + "]");
+                // 如果是结构体
                 if (((ALittleGuessClassTemplate)guess).isStruct) {
                     templateParamNameList.add("\"..self.__class.__element[" + (index + 1) + "].name..\"");
+                // 如果是类
                 } else {
                     templateParamNameList.add("\"..self.__class.__element[" + (index + 1) + "].__name..\"");
                 }
+            // 如果是结构体
             } else if (guess instanceof ALittleGuessStruct) {
                 templateParamNameList.add(guess.value);
-                String namespacePre = "ALittle.";
-                if (mNamespaceName.equals("ALittle")) namespacePre = "";
-                templateParamList.add(namespacePre + "FindStructByName(\"" + guess.value + "\")");
+                templateParamList.add(mALittleGenNamespacePre + "FindStructByName(\"" + guess.value + "\")");
                 GenerateReflectStructInfo((ALittleGuessStruct)guess);
+            // 其他类型，直接填nil
             } else {
                 templateParamNameList.add(guess.value);
                 templateParamList.add("nil");
@@ -293,15 +305,16 @@ public class ALittleGenerateLua {
         }
     }
 
+    // 生成customType
     @NotNull
     private String GenerateCustomType(ALittleCustomType customType) throws Exception {
         ALittleGuess guess = customType.guessType();
         // 如果是结构体名，那么就当表来处理
         if (guess instanceof ALittleGuessStruct) {
             return "{}";
-            // 如果是类名
+        // 如果是类
         } else if (guess instanceof ALittleGuessClass) {
-            // 如果是类名
+            // 计算customType的类名，如果和当前文件命名与一致，或者是在lua命名域下，取消命名域前缀
             String className = customType.getIdContent().getText();
             ALittleCustomTypeDotId dotId = customType.getCustomTypeDotId();
             if (dotId != null) {
@@ -316,24 +329,23 @@ public class ALittleGenerateLua {
             }
             ALittleGuessClass guessClass = (ALittleGuessClass)guess;
 
-            List<ALittleAllType> allTypeList = customType.getAllTypeList();
             // 如果有填充模板参数，那么就模板模板
+            List<ALittleAllType> allTypeList = customType.getAllTypeList();
             if (!allTypeList.isEmpty()) {
-                List<String> templateParamList = new ArrayList<>();
-                List<String> templateParamNameList = new ArrayList<>();
+                // 获取所有模板参数
                 List<ALittleGuess> guessList = new ArrayList<>();
                 for (ALittleAllType allType : allTypeList) {
                     guessList.add(allType.guessType());
                 }
+                // 生成模板信息
+                List<String> templateParamList = new ArrayList<>();
+                List<String> templateParamNameList = new ArrayList<>();
                 GenerateCustomTypeTemplateList(guessList, templateParamList, templateParamNameList);
 
                 String templateName = guessClass.GetNamespaceName() + "." + guessClass.GetClassName();
-
                 templateName += "<" + String.join(", ", templateParamNameList) + ">";
-                String namespacePre = "ALittle.";
-                if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
-                String content = namespacePre + "Template(" + className;
+                String content = mALittleGenNamespacePre + "Template(" + className;
                 content += ", \"" + templateName + "\"";
                 if (!templateParamList.isEmpty()) {
                     content += ", " + String.join(", ", templateParamList);
@@ -344,20 +356,21 @@ public class ALittleGenerateLua {
             } else {
                 return className;
             }
-            // 如果是模板
+        // 如果是模板元素
         } else if (guess instanceof ALittleGuessClassTemplate) {
             ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
             // 检查下标
             ALittleTemplatePairDec templatePairDec = guessClassTemplate.element;
             ALittleTemplateDec templateDec = (ALittleTemplateDec)templatePairDec.getParent();
             int index = templateDec.getTemplatePairDecList().indexOf(templatePairDec);
-
+            // 模板元素
             return "self.__class.__element[" + (index + 1) + "]";
         }
 
         throw new Exception("未知的表达式类型");
     }
 
+    // 生成8级运算符
     @NotNull
     private String GenerateOp8Suffix(ALittleOp8Suffix suffix) throws Exception {
         String opString = suffix.getOp8().getText();
@@ -426,6 +439,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成7级运算符
     @NotNull
     private String GenerateOp7Suffix(ALittleOp7Suffix suffix) throws Exception {
         String opString = suffix.getOp7().getText();
@@ -493,6 +507,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成6级运算符
     @NotNull
     private String GenerateOp6Suffix(ALittleOp6Suffix suffix) throws Exception {
         String opString = suffix.getOp6().getText();
@@ -560,6 +575,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成5级运算符
     @NotNull
     private String GenerateOp5Suffix(ALittleOp5Suffix suffix) throws Exception {
         String opString = suffix.getOp5().getText();
@@ -624,6 +640,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成4级运算符
     @NotNull
     private String GenerateOp4Suffix(ALittleOp4Suffix suffix) throws Exception {
         String opString = suffix.getOp4().getText();
@@ -688,6 +705,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成3级运算符
     @NotNull
     private String GenerateOp3Suffix(ALittleOp3Suffix suffix) throws Exception {
         String opString = suffix.getOp3().getText();
@@ -740,6 +758,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成2级运算符
     @NotNull
     private String GenerateOp2SuffixEx(ALittleOp2SuffixEx suffix) throws Exception {
         if (suffix.getOp3Suffix() != null) {
@@ -794,6 +813,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成值表达式
     @NotNull
     private String GenerateValueStat(ALittleValueStat rootStat) throws Exception {
         ALittleValueFactorStat valueFactor = rootStat.getValueFactorStat();
@@ -864,6 +884,7 @@ public class ALittleGenerateLua {
         throw new Exception("GenerateValueFactor出现未知类型");
     }
 
+    // 生成常量
     @NotNull
     private String GenerateConstValue(ALittleConstValue constValue) throws Exception {
         String content = "";
@@ -875,6 +896,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成反射
     @NotNull
     public String GenerateReflectValue(ALittleReflectValue reflectValue) throws Exception {
         ALittleCustomType customType = reflectValue.getCustomType();
@@ -883,18 +905,15 @@ public class ALittleGenerateLua {
             ALittleGuess guess = customType.guessType();
             if (guess instanceof ALittleGuessStruct) {
                 ALittleGuessStruct guessStruct = (ALittleGuessStruct) guess;
-
-                String namespacePre = "ALittle.";
-                if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-                String content = namespacePre + "FindStructByName(\"" + guessStruct.value + "\")";
+                String content = mALittleGenNamespacePre + "FindStructByName(\"" + guessStruct.value + "\")";
                 GenerateReflectStructInfo(guessStruct);
                 return content;
             } else if (guess instanceof ALittleGuessClass) {
                 ALittleGuessClass guessClass = (ALittleGuessClass) guess;
                 String name = guessClass.value;
+                // 如果是using定义而来，那么就使用usingName
                 if (guessClass.usingName != null) name = guessClass.usingName;
-                String split[] = name.split("\\.");
+                String[] split = name.split("\\.");
                 if (split.length == 2 && (split[0].equals(mNamespaceName) || split[0].equals("lua"))) {
                     return split[1];
                 } else {
@@ -902,8 +921,7 @@ public class ALittleGenerateLua {
                 }
             } else if (guess instanceof ALittleGuessClassTemplate) {
                 ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate) guess;
-                if (guessClassTemplate.templateExtends != null
-                        || guessClassTemplate.isClass || guessClassTemplate.isStruct) {
+                if (guessClassTemplate.templateExtends != null || guessClassTemplate.isClass || guessClassTemplate.isStruct) {
                     ALittleTemplateDec templateDec = (ALittleTemplateDec) guessClassTemplate.element.getParent();
                     if (templateDec.getParent() instanceof ALittleClassDec) {
                         int index = templateDec.getTemplatePairDecList().indexOf(guessClassTemplate.element);
@@ -928,6 +946,7 @@ public class ALittleGenerateLua {
         throw new Exception("reflect只能反射struct或者class以及class对象");
     }
 
+    // 生成struct的反射信息
     private void GenerateReflectStructInfo(@NotNull ALittleGuessStruct guessStruct) throws Exception {
         if (mReflectMap.containsKey(guessStruct.value)) return;
 
@@ -952,12 +971,12 @@ public class ALittleGenerateLua {
         if (split_list.length != 2) return;
 
         String content = "{\n";
-        content += "name = \"" + guessStruct.value + "\",";
-        content += "ns_name = \"" + split_list[0] + "\",";
-        content += "rl_name = \"" + split_list[1] + "\",";
-        content += "hash_code = " + PsiHelper.JSHash(guessStruct.value) + ",\n";
-        content += "name_list = {" + String.join(",", nameList) +"},\n";
-        content += "type_list = {" + String.join(",", typeList) + "}\n";
+        content += "name = \"" + guessStruct.value + "\",";         // 全称
+        content += "ns_name = \"" + split_list[0] + "\",";          // 命名域名
+        content += "rl_name = \"" + split_list[1] + "\",";          // struct名
+        content += "hash_code = " + PsiHelper.JSHash(guessStruct.value) + ",\n";        // 哈希值
+        content += "name_list = {" + String.join(",", nameList) +"},\n";      // 成员名列表
+        content += "type_list = {" + String.join(",", typeList) + "}\n";      // 类型名列表
         content += "}";
         mReflectMap.put(guessStruct.value, content);
 
@@ -966,6 +985,7 @@ public class ALittleGenerateLua {
         }
     }
 
+    // 生成属性值表达式
     @NotNull
     private String GeneratePropertyValue(ALittlePropertyValue propValue) throws Exception {
         try {
@@ -1103,22 +1123,17 @@ public class ALittleGenerateLua {
                     }
                     ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
                     if (preTypeFunctor.functorProto != null) {
-                        String namespaceName = "";
-                        if (!mNamespaceName.equals("ALittle")) {
-                            namespaceName = "ALittle.";
-                        }
-
                         if (preTypeFunctor.functorProto.equals("@Http")) {
-                            content = new StringBuilder(namespaceName + "IHttpSender.Invoke");
+                            content = new StringBuilder(mALittleGenNamespacePre + "IHttpSender.Invoke");
                         } else if (preTypeFunctor.functorProto.equals("@HttpDownload")) {
-                            content = new StringBuilder(namespaceName + "IHttpFileSender.InvokeDownload");
+                            content = new StringBuilder(mALittleGenNamespacePre + "IHttpFileSender.InvokeDownload");
                         } else if (preTypeFunctor.functorProto.equals("@HttpUpload")) {
-                            content = new StringBuilder(namespaceName + "IHttpFileSender.InvokeUpload");
+                            content = new StringBuilder(mALittleGenNamespacePre + "IHttpFileSender.InvokeUpload");
                         } else if (preTypeFunctor.functorProto.equals("@Msg")) {
                             if (preTypeFunctor.functorReturnList.isEmpty()) {
-                                content = new StringBuilder(namespaceName + "IMsgCommon.Invoke");
+                                content = new StringBuilder(mALittleGenNamespacePre + "IMsgCommon.Invoke");
                             } else {
-                                content = new StringBuilder(namespaceName + "IMsgCommon.InvokeRPC");
+                                content = new StringBuilder(mALittleGenNamespacePre + "IMsgCommon.InvokeRPC");
                             }
                         }
 
@@ -1153,11 +1168,7 @@ public class ALittleGenerateLua {
                     } else {
                         List<String> paramList = new ArrayList<>();
 
-                        String namespaceName = "";
-                        if (!mNamespaceName.equals("ALittle")) {
-                            namespaceName = "ALittle.";
-                        }
-
+                        // 生成模板参数
                         List<ALittleGuess> templateList = reference.generateTemplateParamList();
                         for (ALittleGuess guess : templateList) {
                             if (guess instanceof ALittleGuessClass) {
@@ -1168,7 +1179,7 @@ public class ALittleGenerateLua {
                                     paramList.add(guessClass.value);
                                 }
                             } else if (guess instanceof ALittleGuessStruct) {
-                                paramList.add(namespaceName + "FindStructByName(\"" + guess.value + "\")");
+                                paramList.add(mALittleGenNamespacePre + "FindStructByName(\"" + guess.value + "\")");
                                 GenerateReflectStructInfo((ALittleGuessStruct)guess);
                             } else if (guess instanceof ALittleGuessClassTemplate) {
                                 ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
@@ -1180,11 +1191,11 @@ public class ALittleGenerateLua {
                             }
                         }
 
+                        // 生成实际参数
                         List<ALittleValueStat> valueStatList = methodCall.getValueStatList();
                         for (int i = 0; i < valueStatList.size(); ++i) {
                             ALittleValueStat valueStat = valueStatList.get(i);
-
-                            // 如果是成员、setter、gettter函数，第一个参数要放在最前面
+                            // 如果是成员、setter、getter函数，第一个参数要放在最前面
                             if (i == 0 && !split.equals(":") && (preTypeFunctor.element instanceof ALittleClassMethodDec
                                         || preTypeFunctor.element instanceof ALittleClassGetterDec
                                     || preTypeFunctor.element instanceof ALittleClassSetterDec)) {
@@ -1207,11 +1218,13 @@ public class ALittleGenerateLua {
         }
     }
 
+    // 生成表达式
     @NotNull
     private String GeneratePropertyValueExpr(ALittlePropertyValueExpr root, String preTab) throws Exception {
         return preTab + GeneratePropertyValue(root.getPropertyValue()) + "\n";
     }
 
+    // 生成using
     @NotNull
     private String GenerateUsingDec(ALittleUsingDec root, String preTab) throws Exception {
         ALittleUsingNameDec nameDec = root.getUsingNameDec();
@@ -1241,6 +1254,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成异常表达式
     @NotNull
     private String GenerateThrowExpr(ALittleThrowExpr throwExpr, String preTab) throws Exception {
         List<ALittleValueStat> valueStatList = throwExpr.getValueStatList();
@@ -1254,11 +1268,7 @@ public class ALittleGenerateLua {
             throw new Exception("throw只有一个参数");
         }
 
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-        String replaceTest = "Throw";
-        String content = preTab + namespacePre + replaceTest + "(";
+        String content = preTab + mALittleGenNamespacePre + "Throw(";
         List<String> paramList = new ArrayList<>();
         for (int i = 0; i < valueStatList.size(); ++i) {
             paramList.add(GenerateValueStat(valueStatList.get(i)));
@@ -1268,6 +1278,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成断言表达式
     @NotNull
     private String GenerateAssertExpr(ALittleAssertExpr assertExpr, String preTab) throws Exception {
         List<ALittleValueStat> valueStatList = assertExpr.getValueStatList();
@@ -1278,11 +1289,7 @@ public class ALittleGenerateLua {
             throw new Exception("assert第二个参数必须是string类型");
         }
 
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle")) namespacePre = "";
-
-        String replaceTest = "Assert";
-        String content = preTab + namespacePre + replaceTest + "(";
+        String content = preTab + mALittleGenNamespacePre + "Assert(";
         List<String> paramList = new ArrayList<>();
         for (int i = 0; i < valueStatList.size(); ++i) {
             paramList.add(GenerateValueStat(valueStatList.get(i)));
@@ -1292,6 +1299,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成1级运算符
     @NotNull
     private String GenerateOp1Expr(ALittleOp1Expr root, String preTab) throws Exception {
         ALittleValueStat valueStat = root.getValueStat();
@@ -1312,6 +1320,7 @@ public class ALittleGenerateLua {
         throw new Exception("GenerateOp1Expr未知类型:" + op1String);
     }
 
+    // 生成变量定义以及赋值表达式
     @NotNull
     private String GenerateVarAssignExpr(ALittleVarAssignExpr root, String preTab, String preString) throws Exception {
         List<ALittleVarAssignDec> pairDecList = root.getVarAssignDecList();
@@ -1328,29 +1337,33 @@ public class ALittleGenerateLua {
         content += String.join(", ", nameList);
 
         ALittleValueStat valueStat = root.getValueStat();
-        if (valueStat == null)
-            return content + "\n";
+        if (valueStat == null) return content + "\n";
 
         return content + " = " + GenerateValueStat(valueStat) + "\n";
     }
 
+    // 生成赋值表达式
     @NotNull
     private String GenerateOpAssignExpr(ALittleOpAssignExpr root, String preTab) throws Exception {
         List<ALittlePropertyValue> propValueList = root.getPropertyValueList();
+
+        // 变量列表
         List<String> contentList = new ArrayList<>();
         for (ALittlePropertyValue propValue : propValueList) {
             contentList.add(GeneratePropertyValue(propValue));
         }
-
         String propValueResult = String.join(", ", contentList);
 
+        // 如果没有赋值，可以直接返回定义
         ALittleOpAssign opAssign = root.getOpAssign();
         ALittleValueStat valueStat = root.getValueStat();
         if (opAssign == null || valueStat == null)
             return preTab + propValueResult + "\n";
 
+        // 获取赋值表达式
         String valueStatResult = GenerateValueStat(valueStat);
 
+        // 处理等号
         if (opAssign.getText().equals("=")) {
             // 这里做优化
             // 把 self._attr = value 优化为  rawset(self, "_attr", value)
@@ -1407,6 +1420,7 @@ public class ALittleGenerateLua {
         return content;
     }
 
+    // 生成else表达式
     @NotNull
     private String GenerateElseExpr(ALittleElseExpr root, String preTab) throws Exception {
         StringBuilder content = new StringBuilder(preTab);
@@ -1418,6 +1432,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成elseif表达式
     @NotNull
     private String GenerateElseIfExpr(ALittleElseIfExpr root, String preTab) throws Exception {
         ALittleValueStat valueStat = root.getValueStat();
@@ -1439,6 +1454,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成if表达式
     @NotNull
     private String GenerateIfExpr(ALittleIfExpr root, String preTab) throws Exception {
         ALittleValueStat valueStat = root.getValueStat();
@@ -1473,6 +1489,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成for表达式
     @NotNull
     private String GenerateForExpr(ALittleForExpr root, String preTab) throws Exception {
         ALittleForStepCondition forStepCondition = root.getForStepCondition();
@@ -1564,6 +1581,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成while表达式
     @NotNull
     private String GenerateWhileExpr(ALittleWhileExpr root, String preTab) throws Exception {
         ALittleValueStat valueStat = root.getValueStat();
@@ -1583,6 +1601,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成do while表达式
     @NotNull
     private String GenerateDoWhileExpr(ALittleDoWhileExpr rootExpr, String preTab) throws Exception {
         ALittleValueStat valueStat = rootExpr.getValueStat();
@@ -1606,6 +1625,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成子表达式组
     @NotNull
     private String GenerateWrapExpr(ALittleWrapExpr rootExpr, String preTab) throws Exception {
         StringBuilder content = new StringBuilder(preTab + "do\n");
@@ -1620,6 +1640,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成return表达式
     @NotNull
     private String GenerateReturnExpr(ALittleReturnExpr rootExpr, String preTab) throws Exception {
         if (rootExpr.getReturnYield() != null) {
@@ -1638,6 +1659,7 @@ public class ALittleGenerateLua {
         return preTab + "return" + valueStatResult + "\n";
     }
 
+    // 生成break表达式
     @NotNull
     private String GenerateFlowExpr(ALittleFlowExpr root, String preTab) throws Exception {
         String content = root.getText();
@@ -1647,6 +1669,7 @@ public class ALittleGenerateLua {
         throw new Exception("未知的操作语句:" + content);
     }
 
+    // 生成任意表达式
     @NotNull
     private String GenerateAllExpr(ALittleAllExpr root, String preTab) throws Exception {
         PsiElement[] childList = root.getChildren();
@@ -1685,6 +1708,7 @@ public class ALittleGenerateLua {
         return String.join("\n", exprList);
     }
 
+    // 生成枚举
     @NotNull
     private String GenerateEnum(ALittleEnumDec root, String preTab) throws Exception {
         ALittleEnumNameDec nameDec = root.getEnumNameDec();
@@ -1730,6 +1754,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成类
     @NotNull
     private String GenerateClass(ALittleClassDec root, String preTab) throws Exception {
         ALittleClassNameDec nameDec = root.getClassNameDec();
@@ -1740,9 +1765,6 @@ public class ALittleGenerateLua {
         //类声明//////////////////////////////////////////////////////////////////////////////////////////
         String className = nameDec.getIdContent().getText();
         StringBuilder content = new StringBuilder();
-
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
         ALittleClassExtendsDec extendsDec = root.getClassExtendsDec();
         String extendsName = "";
@@ -1768,7 +1790,7 @@ public class ALittleGenerateLua {
         content.append(preTab)
                 .append(className)
                 .append(" = ")
-                .append(namespacePre)
+                .append(mALittleGenNamespacePre)
                 .append("Class(")
                 .append(extendsName)
                 .append(", \"")
@@ -1946,7 +1968,7 @@ public class ALittleGenerateLua {
             if (classMethodDec.getCoModifier() != null && classMethodDec.getCoModifier().getText().equals("async")) {
                 content.append(preTab)
                         .append(className).append(".").append(classMethodNameDec.getIdContent().getText())
-                        .append(" = ").append(namespacePre).append("CoWrap(")
+                        .append(" = ").append(mALittleGenNamespacePre).append("CoWrap(")
                         .append(className).append(".").append(classMethodNameDec.getIdContent().getText())
                         .append(")\n");
             }
@@ -2015,7 +2037,7 @@ public class ALittleGenerateLua {
             if (classStaticDec.getCoModifier() != null && classStaticDec.getCoModifier().getText().equals("async")) {
                 content.append(preTab)
                         .append(className).append(".").append(classMethodNameDec.getIdContent().getText())
-                        .append(" = ").append(namespacePre).append("CoWrap(")
+                        .append(" = ").append(mALittleGenNamespacePre).append("CoWrap(")
                         .append(className).append(".").append(classMethodNameDec.getIdContent().getText())
                         .append(")\n");
             }
@@ -2026,6 +2048,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成单例
     @NotNull
     private String GenerateInstance(ALittleInstanceDec root, String preTab) throws Exception {
         ALittleVarAssignExpr varAssignExpr = root.getVarAssignExpr();
@@ -2059,15 +2082,13 @@ public class ALittleGenerateLua {
         return content + " = " + GenerateValueStat(valueStat) + "\n";
     }
 
+    // 生成全局函数
     @NotNull
     private String GenerateGlobalMethod(ALittleGlobalMethodDec root, String preTab) throws Exception {
         ALittleMethodNameDec globalMethodNameDec = root.getMethodNameDec();
         if (globalMethodNameDec == null) {
             throw new Exception("全局函数没有函数名");
         }
-
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle")) namespacePre = "";
 
         String methodName = globalMethodNameDec.getIdContent().getText();
 
@@ -2142,7 +2163,7 @@ public class ALittleGenerateLua {
         // 协程判定
         if (root.getCoModifier() != null && root.getCoModifier().getText().equals("async")) {
             content.append(preTab).append(methodName)
-                    .append(" = ").append(namespacePre).append("CoWrap(")
+                    .append(" = ").append(mALittleGenNamespacePre).append("CoWrap(")
                     .append(methodName).append(")\n");
         }
 
@@ -2173,7 +2194,7 @@ public class ALittleGenerateLua {
             if (text.equals("@Http")) {
                 if (returnList.size() != 1) throw new Exception("带" + text + "的全局函数，有且仅有一个返回值");
                 content.append(preTab)
-                        .append(namespacePre)
+                        .append(mALittleGenNamespacePre)
                         .append("RegHttpCallback(\"")
                         .append(guessParamStruct.value)
                         .append("\", ")
@@ -2182,7 +2203,7 @@ public class ALittleGenerateLua {
             } else if (text.equals("@HttpDownload")) {
                 if (returnList.size() != 2) throw new Exception("带" + text + "的全局函数，有且仅有两个返回值");
                 content.append(preTab)
-                        .append(namespacePre)
+                        .append(mALittleGenNamespacePre)
                         .append("RegHttpDownloadCallback(\"")
                         .append(guessParamStruct.value)
                         .append("\", ")
@@ -2191,7 +2212,7 @@ public class ALittleGenerateLua {
             } else if (text.equals("@HttpUpload")) {
                 if (returnList.size() != 1) throw new Exception("带" + text + "的全局函数，有且仅有一个返回值");
                 content.append(preTab)
-                        .append(namespacePre)
+                        .append(mALittleGenNamespacePre)
                         .append("RegHttpFileCallback(\"")
                         .append(guessParamStruct.value)
                         .append("\", ")
@@ -2202,7 +2223,7 @@ public class ALittleGenerateLua {
                 GenerateReflectStructInfo(guessParamStruct);
                 if (guessReturn == null) {
                     content.append(preTab)
-                            .append(namespacePre)
+                            .append(mALittleGenNamespacePre)
                             .append("RegMsgCallback(")
                             .append(PsiHelper.JSHash(guessParamStruct.value))
                             .append(", ")
@@ -2213,7 +2234,7 @@ public class ALittleGenerateLua {
                     ALittleGuessStruct guessReturnStruct = (ALittleGuessStruct)guessReturn;
 
                     content.append(preTab)
-                            .append(namespacePre)
+                            .append(mALittleGenNamespacePre)
                             .append("RegMsgRpcCallback(")
                             .append(PsiHelper.JSHash(guessParamStruct.value))
                             .append(", ")
@@ -2243,7 +2264,7 @@ public class ALittleGenerateLua {
             }
 
             content.append(preTab)
-                    .append(namespacePre)
+                    .append(mALittleGenNamespacePre)
                     .append("RegCmdCallback(\"")
                     .append(methodName)
                     .append("\", ")
@@ -2260,6 +2281,7 @@ public class ALittleGenerateLua {
         return content.toString();
     }
 
+    // 生成命名域
     @NotNull
     private String GenerateNamespace(ALittleNamespaceDec root) throws Exception {
         ALittleNamespaceNameDec nameDec = root.getNamespaceNameDec();
@@ -2267,8 +2289,12 @@ public class ALittleGenerateLua {
             throw new Exception("命名域没有定义名字");
         }
         mNamespaceName = nameDec.getIdContent().getText();
+        mALittleGenNamespacePre = "ALittle.";
+        if (mNamespaceName.equals("ALittle")) mALittleGenNamespacePre = "";
+
         mReflectMap = new HashMap<>();
 
+        // 如果是lua命名域，那么就不要使用module
         StringBuilder content;
         if (mNamespaceName.equals("lua"))
             content = new StringBuilder("\n");
@@ -2311,12 +2337,8 @@ public class ALittleGenerateLua {
         content.append("local ___coroutine = coroutine\n");
         content.append("\n");
 
-        String namespacePre = "ALittle.";
-        if (mNamespaceName.equals("ALittle"))
-            namespacePre = "";
-
         for (Map.Entry<String, String> entry : mReflectMap.entrySet()) {
-            content.append(namespacePre)
+            content.append(mALittleGenNamespacePre)
                     .append("RegStruct(")
                     .append(PsiHelper.JSHash(entry.getKey()))
                     .append(", \"")

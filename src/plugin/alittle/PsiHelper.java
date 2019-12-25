@@ -357,10 +357,10 @@ public class PsiHelper {
 
         ALittleClassData data = listener.getClassData(classDec);
         if (data != null) {
-            data.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.FUN, name, result);
-            data.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.GETTER, name, result);
-            data.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.SETTER, name, result);
-            data.findClassAttrList(classDec, accessLevel, PsiHelper.ClassAttrType.STATIC, name, result);
+            data.findClassAttrList(accessLevel, PsiHelper.ClassAttrType.FUN, name, result);
+            data.findClassAttrList(accessLevel, PsiHelper.ClassAttrType.GETTER, name, result);
+            data.findClassAttrList(accessLevel, PsiHelper.ClassAttrType.SETTER, name, result);
+            data.findClassAttrList(accessLevel, PsiHelper.ClassAttrType.STATIC, name, result);
         }
 
         // 处理继承

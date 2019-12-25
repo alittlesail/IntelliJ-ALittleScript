@@ -3,9 +3,6 @@ package plugin.link;
 import com.intellij.openapi.project.Project;
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ALittleMysqlData extends ALittleLinkData {
     private Project mProject;

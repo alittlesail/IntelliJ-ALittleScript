@@ -16,7 +16,6 @@ import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
-import java.nio.file.WatchKey;
 import java.sql.*;
 import java.util.*;
 

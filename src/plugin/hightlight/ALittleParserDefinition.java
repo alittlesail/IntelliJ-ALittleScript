@@ -21,7 +21,8 @@ public class ALittleParserDefinition implements ParserDefinition {
     public static final TokenSet NUMBER_CONTENT_SET = TokenSet.create(ALittleTypes.DIGIT_CONTENT);
     public static final TokenSet BAD_CHARACTER_SET = TokenSet.create(TokenType.BAD_CHARACTER);
 
-    public static final TokenSet KEYWORD_SET = TokenSet.create(ALittleTypes.CAST, ALittleTypes.REFLECT, ALittleTypes.AUTO, ALittleTypes.ANY, ALittleTypes.INT, ALittleTypes.I64, ALittleTypes.DOUBLE, ALittleTypes.STRING, ALittleTypes.BOOL,
+    public static final TokenSet KEYWORD_SET = TokenSet.create(ALittleTypes.CAST, ALittleTypes.REFLECT, ALittleTypes.AUTO,
+            ALittleTypes.ANY, ALittleTypes.INT, ALittleTypes.I64, ALittleTypes.DOUBLE, ALittleTypes.STRING, ALittleTypes.BOOL,
             ALittleTypes.CLASS, ALittleTypes.ENUM, ALittleTypes.STRUCT, ALittleTypes.ASSERT, ALittleTypes.THROW, ALittleTypes.TCALL,
             ALittleTypes.PUBLIC, ALittleTypes.PRIVATE, ALittleTypes.PROTECTED, ALittleTypes.STATIC, ALittleTypes.USING,
             ALittleTypes.BREAK, ALittleTypes.CTOR, ALittleTypes.YIELD, ALittleTypes.ASYNC, ALittleTypes.AWAIT, ALittleTypes.BIND,
@@ -39,8 +40,8 @@ public class ALittleParserDefinition implements ParserDefinition {
             ALittleTypes.QUOTIENT_ASSIGN, ALittleTypes.RBRACE, ALittleTypes.RBRACK, ALittleTypes.REMAINDER, ALittleTypes.REMAINDER_ASSIGN, ALittleTypes.RPAREN,
             ALittleTypes.SEMI);
 
-    public static final TokenSet ANNO_SET = TokenSet.create(ALittleTypes.HTTP, ALittleTypes.CMD, ALittleTypes.HTTP_DOWNLOAD, ALittleTypes.HTTP_UPLOAD, ALittleTypes.MSG, ALittleTypes.CSV, ALittleTypes.MYSQL
-            );
+    public static final TokenSet ANNO_SET = TokenSet.create(ALittleTypes.CSV, ALittleTypes.MYSQL, ALittleTypes.CMD, ALittleTypes.MSG
+            , ALittleTypes.HTTP, ALittleTypes.HTTP_DOWNLOAD, ALittleTypes.HTTP_UPLOAD);
 
     @NotNull
     @Override

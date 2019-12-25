@@ -14,7 +14,7 @@ public class ALittleModuleConfigurationEditorProvider implements ModuleConfigura
     public ModuleConfigurationEditor[] createEditors(ModuleConfigurationState moduleConfigurationState) {
         List<ModuleConfigurationEditor> editors = new ArrayList<>();
         Module module = moduleConfigurationState.getRootModel().getModule();
-        ModuleType module_type = ModuleType.get(module);
+        ModuleType<?> module_type = ModuleType.get(module);
         if (module_type == ALittleModuleType.getInstance()) {
             editors.add(new ALittleModuleConfigurationEditor(moduleConfigurationState));
         }

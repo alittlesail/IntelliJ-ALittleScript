@@ -1,6 +1,5 @@
 package plugin.guess;
 
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;

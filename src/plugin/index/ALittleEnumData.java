@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ALittleEnumData {
+    // Key:名称，Value:成员
     private Map<String, ALittleEnumVarDec> dataMap;
 
     public ALittleEnumData() {

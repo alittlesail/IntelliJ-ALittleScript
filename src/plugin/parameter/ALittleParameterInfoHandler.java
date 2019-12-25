@@ -12,11 +12,9 @@ import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessFunctor;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
-import plugin.reference.ALittleReferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittlePropertyValueMethodCall, String> {
     @Override
@@ -80,20 +78,20 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
             return;
         }
         int index = context.getCurrentParameterIndex();
-        String[] string_list = o.split(", ");
+        String[] stringList = o.split(", ");
 
-        int start_index = 0;
-        int end_index = 0;
-        if (string_list.length > index) {
+        int startIndex = 0;
+        int endIndex = 0;
+        if (stringList.length > index) {
             for (int i = 0; i <= index; ++i) {
                 if (i != index) {
-                    start_index += string_list[i].length() + 2;
+                    startIndex += stringList[i].length() + 2;
                 } else {
-                    end_index = start_index + string_list[i].length();
+                    endIndex = startIndex + stringList[i].length();
                 }
             }
         }
-        context.setupUIComponentPresentation(o, start_index, end_index, !context.isUIComponentEnabled(), false, false,
+        context.setupUIComponentPresentation(o, startIndex, endIndex, !context.isUIComponentEnabled(), false, false,
                 context.getDefaultParameterColor());
     }
 }

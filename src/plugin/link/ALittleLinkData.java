@@ -1,17 +1,11 @@
 package plugin.link;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.psi.ALittleAllType;
 import plugin.psi.ALittleStructVarDec;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +13,7 @@ public class ALittleLinkData {
     protected List<ALittleLinkInfo> mVarList = new ArrayList<>();
     protected List<String> mStringList = null;
 
-    public enum ChangeType
-    {
+    public enum ChangeType {
         CT_CREATED,
         CT_DELETED,
         CT_CHANGED,
@@ -40,7 +33,7 @@ public class ALittleLinkData {
             if (element == null) return true;
             if (!data.name.equals(element.getText())) return true;
             element = varDec;
-            int loop = 10;  // 添加Loop，放置以后语法变更，这里出现非常大的循环
+            int loop = 10;  // 添加Loop，防止以后语法变更，这里出现非常大的循环
             do {
                 element = element.getNextSibling();
                 if (element == null || element instanceof ALittleStructVarDec) {

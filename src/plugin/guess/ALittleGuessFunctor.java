@@ -4,10 +4,6 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
-import plugin.psi.ALittleClassNameDec;
-import plugin.psi.ALittleGenericFunctorType;
-import plugin.psi.ALittleGenericType;
-import plugin.reference.ALittleReferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
