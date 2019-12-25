@@ -156,6 +156,7 @@ public class ALittleReferenceUtil {
         if (element instanceof ALittleWrapValueStat) return new ALittleWrapValueStatReference((ALittleWrapValueStat)element, range);
 
         if (element instanceof ALittleThrowExpr) return new ALittleThrowExprReference((ALittleThrowExpr)element, range);
+        if (element instanceof ALittleAssertExpr) return new ALittleAssertExprReference((ALittleAssertExpr)element, range);
 
         return null;
     }
