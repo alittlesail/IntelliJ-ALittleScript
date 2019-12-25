@@ -8,5 +8,4 @@ public class ALittleLanguage extends Language {
     private ALittleLanguage() {
         super("ALittle");
     }
-
 }

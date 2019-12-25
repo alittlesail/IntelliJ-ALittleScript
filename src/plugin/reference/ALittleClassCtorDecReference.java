@@ -27,10 +27,10 @@ public class ALittleClassCtorDecReference extends ALittleReference<ALittleClassC
         if (!(parent instanceof ALittleClassDec)) return;
         ALittleClassDec classDec = (ALittleClassDec)parent;
 
-        PsiHelper.ClassExtendsData classExtendsData = PsiHelper.findClassExtends(classDec);
-        if (classExtendsData == null) return;
+        ALittleClassDec classExtendsDec = PsiHelper.findClassExtends(classDec);
+        if (classExtendsDec == null) return;
 
-        ALittleClassCtorDec extendsCtorDec = PsiHelper.findFirstCtorDecFromExtends(classExtendsData.dec, 100);
+        ALittleClassCtorDec extendsCtorDec = PsiHelper.findFirstCtorDecFromExtends(classExtendsDec, 100);
         if (extendsCtorDec == null) return;
 
         // 参数必须一致并且可转化

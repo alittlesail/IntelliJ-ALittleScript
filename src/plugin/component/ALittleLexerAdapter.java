@@ -1,6 +1,5 @@
 package plugin.component;
 
-
 import com.intellij.lexer.FlexAdapter;
 import plugin._ALittleLexer;
 

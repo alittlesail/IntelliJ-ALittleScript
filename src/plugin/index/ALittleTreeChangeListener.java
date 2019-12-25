@@ -191,6 +191,7 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
     }
 
     public static void handleDirDelete(Project project, VirtualFile virtualFile) {
+        // 如果是文件夹
         if (virtualFile.isDirectory()) {
             VirtualFile[] fileList = virtualFile.getChildren();
             if (fileList != null) {
@@ -198,7 +199,7 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
                     handleDirDelete(project, file);
                 }
             }
-            // 如果是文件
+        // 如果是文件
         } else {
             PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
             if (file instanceof ALittleFile) {

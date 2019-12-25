@@ -314,8 +314,8 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         if (!(parent.getParent() instanceof ALittleClassDec)) return;
         ALittleClassDec classDec = (ALittleClassDec)parent.getParent();
         // 计算父类
-        PsiHelper.ClassExtendsData classExtendsData = PsiHelper.findClassExtends(classDec);
-        if (classExtendsData == null) return;
+        ALittleClassDec classExtendsDec = PsiHelper.findClassExtends(classDec);
+        if (classExtendsDec == null) return;
 
         PsiHelper.ClassAttrType attrType;
         if (parent instanceof ALittleClassMethodDec) {
@@ -330,7 +330,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             return;
         }
 
-        PsiElement result = PsiHelper.findFirstClassAttrFromExtends(classExtendsData.dec, attrType, mKey, 100);
+        PsiElement result = PsiHelper.findFirstClassAttrFromExtends(classExtendsDec, attrType, mKey, 100);
         if (!(result instanceof ALittleMethodNameDec)) return;
         ALittleMethodNameDec methodNameDec = (ALittleMethodNameDec)result;
 

@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleBlock extends AbstractBlock {
-    private SpacingBuilder m_spacing_builder;
+    private SpacingBuilder m_spacingBuilder;
 
     protected ALittleBlock(@NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment,
-                           SpacingBuilder spacing_builder) {
+                           SpacingBuilder spacingBuilder) {
         super(node, wrap, alignment);
-        m_spacing_builder = spacing_builder;
+        m_spacingBuilder = spacingBuilder;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class ALittleBlock extends AbstractBlock {
                 Block block = new ALittleBlock(child,
                         Wrap.createWrap(WrapType.NONE, false),
                         Alignment.createAlignment(),
-                        m_spacing_builder);
+                        m_spacingBuilder);
                 blocks.add(block);
             }
             child = child.getTreeNext();
@@ -40,8 +40,7 @@ public class ALittleBlock extends AbstractBlock {
     }
 
     @Override
-    public Indent getIndent()
-    {
+    public Indent getIndent() {
         PsiElement element = myNode.getPsi();
         PsiElement parent = element.getParent();
         IElementType type = myNode.getElementType();
@@ -93,7 +92,7 @@ public class ALittleBlock extends AbstractBlock {
     @Nullable
     @Override
     public Spacing getSpacing(@Nullable Block child1, @NotNull Block child2) {
-        return m_spacing_builder.getSpacing(this, child1, child2);
+        return m_spacingBuilder.getSpacing(this, child1, child2);
     }
 
     @Override

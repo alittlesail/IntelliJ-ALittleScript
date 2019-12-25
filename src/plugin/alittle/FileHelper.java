@@ -73,13 +73,14 @@ public class FileHelper {
 
     // 获取模块路径
     public static String calcModulePath(Module module) throws Exception {
-        String module_name = module.getName();
-        String module_file_path = module.getModuleFilePath();
-        String module_file_name = module_name + ".iml";
-        if (!module_file_path.endsWith(module_file_name))
-            throw new Exception("模块文件路径:" + module_file_path + "没有以:" + module_file_name + "结尾");
-
-        return module_file_path.substring(0, module_file_path.length() - module_file_name.length());
+        VirtualFile file = module.getModuleFile();
+        if (file == null) throw new Exception("模块文件不存在");
+        file = file.getParent();
+        if (file == null) throw new Exception("模块文件所在的文件夹不存在");
+        String path = file.getPath();
+        if (path.endsWith("/") || path.endsWith("\\"))
+            return path;
+        return path + "/";
     }
 
     // 重新构建一个空的文件夹
@@ -98,7 +99,7 @@ public class FileHelper {
     // 获取lua脚本路径
     public static String calcScriptPath(Module module) throws Exception {
         if (StdLibraryProvider.isPluginSelf(module.getProject())) {
-            return calcModulePath(module) + "resources/adapter" + File.separator;
+            return calcModulePath(module) + "resources/adapter/";
         } else {
             return calcOutPath(module);
         }
@@ -113,26 +114,26 @@ public class FileHelper {
             throw new Exception("当前文件不在模块路径下:" + file_path);
         }
 
-        String alittle_rel_path = file_path.substring(module_base_path.length());
+        String alittleRelPath = file_path.substring(module_base_path.length());
         // 如果是插件项目本身就特殊处理
         if (StdLibraryProvider.isPluginSelf(module.getProject())) {
-            if (!alittle_rel_path.startsWith("resources/std")) {
+            if (!alittleRelPath.startsWith("resources/std")) {
                 throw new Exception("不支持该目录下的文件生成:" + file_path);
             }
-            alittle_rel_path = alittle_rel_path.substring("resources/std/".length());
+            alittleRelPath = alittleRelPath.substring("resources/std/".length());
         // 其他模块必须
         } else {
-            if (!alittle_rel_path.startsWith("src")) {
+            if (!alittleRelPath.startsWith("src")) {
                 throw new Exception("不支持该目录下的文件生成:" + file_path);
             }
-            alittle_rel_path = alittle_rel_path.substring("src/".length());
+            alittleRelPath = alittleRelPath.substring("src/".length());
         }
 
         String ext = "alittle";
-        if (!alittle_rel_path.endsWith(ext)) {
+        if (!alittleRelPath.endsWith(ext)) {
             throw new Exception("要生成的代码文件后缀名必须是alittle:" + file_path);
         }
-        return alittle_rel_path.substring(0, alittle_rel_path.length() - ext.length());
+        return alittleRelPath.substring(0, alittleRelPath.length() - ext.length());
     }
 
     // 创建文件并写入

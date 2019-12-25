@@ -3,15 +3,11 @@ package plugin.alittle;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessClassTemplate;
-import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleClassData;
 import plugin.index.ALittleEnumData;
 import plugin.index.ALittleStructData;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
-import plugin.reference.ALittleReferenceUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,12 +17,22 @@ import java.util.Map;
 public class PsiHelper {
     // 判断字符串是不是整型值
     public static boolean isInt(@NotNull String content) {
-        try {
-            double v = Double.parseDouble(content);
-            return v == Math.floor(v) && !content.contains(".");
-        } catch (NumberFormatException e) {
-            return true;
+        // 不论值如何，只要包含小数点，那么就不是整数
+        if (content.contains(".")) {
+            return false;
         }
+
+        // 尝试转换为整型
+        try {
+            if (content.startsWith("0x"))
+                Integer.parseInt(content.substring(2), 16);
+            else
+                Integer.parseInt(content, 10);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        return true;
     }
 
     // 计算哈希值
@@ -45,31 +51,31 @@ public class PsiHelper {
     // 类的属性类型
     public enum ClassAttrType
     {
-        VAR,
-        FUN,
-        GETTER,
-        SETTER,
-        STATIC,
-        TEMPLATE,
+        VAR,            // 成员变量
+        FUN,            // 成员函数
+        GETTER,         // getter函数
+        SETTER,         // setter函数
+        STATIC,         // 静态函数
+        TEMPLATE,       // 模板参数
     }
 
     // 访问权限类型
     public enum ClassAccessType
     {
-        PUBLIC,
-        PROTECTED,
-        PRIVATE,
+        PUBLIC,         // 全局可访问
+        PROTECTED,      // 本命名域可访问
+        PRIVATE,        // 本类可访问
     }
 
     // 元素类型
     public enum PsiElementType
     {
-        CLASS_NAME,
-        ENUM_NAME,
-        STRUCT_NAME,
-        INSTANCE_NAME,
-        GLOBAL_METHOD,
-        USING_NAME,
+        CLASS_NAME,         // 类名
+        ENUM_NAME,          // 枚举名
+        STRUCT_NAME,        // 结构体名
+        INSTANCE_NAME,      // 单例名
+        GLOBAL_METHOD,      // 全局函数
+        USING_NAME,         // using名
     }
 
     // 获取访问权限类型
@@ -110,7 +116,7 @@ public class PsiHelper {
 
     // 判断某个是不是register
     public static boolean isRegister(@NotNull PsiElement element) {
-        ALittleNamespaceDec dec = getNamespaceDec(element.getContainingFile());
+        ALittleNamespaceDec dec = getNamespaceDec(element.getContainingFile().getOriginalFile() );
         if (dec == null) {
             return false;
         }
@@ -172,7 +178,6 @@ public class PsiHelper {
 
     // 检查是否在静态函数中
     public static boolean isInClassStaticMethod(@NotNull PsiElement dec) {
-
         PsiElement parent = dec;
         while (true) {
             if (parent == null) break;
@@ -192,14 +197,13 @@ public class PsiHelper {
             } else if (parent instanceof ALittleGlobalMethodDec) {
                 return false;
             }
-
             parent = parent.getParent();
         }
 
         return false;
     }
 
-    // 获取这个结构体的所有成员
+    // 根据名称，获取这个结构体的成员列表
     public static void findStructVarDecList(@NotNull ALittleStructDec structDec,
                                                 String name,
                                                 @NotNull List<ALittleStructVarDec> result,
@@ -222,6 +226,7 @@ public class PsiHelper {
         }
     }
 
+    // 根据名称，获取这个枚举中的成员
     public static void findEnumVarDecList(@NotNull ALittleEnumDec enumDec, String name, @NotNull List<ALittleEnumVarDec> result) {
         ALittleTreeChangeListener listener = ALittleTreeChangeListener.getListener(enumDec.getProject());
         if (listener == null) return;
@@ -232,43 +237,7 @@ public class PsiHelper {
         }
     }
 
-    // 根据枚举字段名，获取对应的值
-    public static Integer getEnumVarValue(ALittleEnumDec enumDec, String name) {
-        if (enumDec == null) return null;
-
-        // 初始值
-        int enumValue = -1;
-
-        List<ALittleEnumVarDec> varDecList = enumDec.getEnumVarDecList();
-        for (ALittleEnumVarDec varDec : varDecList) {
-            PsiElement varNameDec = varDec.getIdContent();
-            if (varNameDec == null) continue;
-
-            // 如果设定为数字，那么就要设置一下
-            if (varDec.getDigitContent() != null) {
-                String value = varDec.getDigitContent().getText();
-                if (!isInt(value)) {
-                    return null;
-                }
-                // 把字符串转为数值
-                if (value.startsWith("0x"))
-                    enumValue = Integer.parseInt(value.substring(2), 16);
-                else
-                    enumValue = Integer.parseInt(value);
-                if (varNameDec.getText().equals(name)) {
-                    return enumValue;
-                }
-                // 如果没有设定值，那么就默认+1
-            } else if (varDec.getStringContent() == null) {
-                ++enumValue;
-                if (varNameDec.getText().equals(name)) {
-                    return enumValue;
-                }
-            }
-        }
-        return null;
-    }
-
+    // 过滤名称相同的元素
     public static List<PsiElement> filterSameName(@NotNull List<PsiElement> list) {
         Map<String, PsiElement> map = new HashMap<>();
         for (int i = list.size() - 1; i >= 0; --i) {
@@ -303,12 +272,8 @@ public class PsiHelper {
         return null;
     }
 
-    public static class ClassExtendsData
-    {
-        public ALittleClassDec dec;
-    }
     // 计算class的父类
-    public static ClassExtendsData findClassExtends(@NotNull ALittleClassDec dec) {
+    public static ALittleClassDec findClassExtends(@NotNull ALittleClassDec dec) {
         ALittleClassExtendsDec classExtendsDec = dec.getClassExtendsDec();
         if (classExtendsDec == null) return null;
 
@@ -327,46 +292,58 @@ public class PsiHelper {
                 , PsiHelper.PsiElementType.CLASS_NAME, dec.getContainingFile().getOriginalFile()
                 , namespaceName, classNameDec.getText(), true);
         if (result instanceof ALittleClassNameDec) {
-            ClassExtendsData data = new ClassExtendsData();
-            data.dec = (ALittleClassDec)result.getParent();
-            return data;
+            return (ALittleClassDec)result.getParent();
         }
         return null;
     }
 
+    // 计算在dec这个类中，对targetDec成员的访问权限
     public static int calcAccessLevelByTargetClassDec(int accessLevel, @NotNull ALittleClassDec dec, @NotNull ALittleClassDec targetDec) {
+        // 如果当前访问权限已经只剩下public，就直接返回
         if (accessLevel <= PsiHelper.sAccessOnlyPublic) {
             return accessLevel;
         }
+        // 如果dec和目标dec一致，那么直接返回
         if (dec.equals(targetDec)) {
             return accessLevel;
         }
-        ClassExtendsData classExtendsData = findClassExtends(dec);
-        if (classExtendsData == null) {
-            if (getNamespaceName(dec).equals(getNamespaceName(targetDec))) {
-                return PsiHelper.sAccessProtectedAndPublic;
-            }
-            return PsiHelper.sAccessOnlyPublic;
+
+        // 检查dec的父类，然后判断父类和targetDec的访问权限
+        ALittleClassDec classExtendsDec = findClassExtends(dec);
+        if (classExtendsDec != null) {
+            return calcAccessLevelByTargetClassDec(accessLevel, classExtendsDec, targetDec);
         }
-        return calcAccessLevelByTargetClassDec(accessLevel, classExtendsData.dec, targetDec);
+
+        // 如果没有父类，检查是否是在相同命名域下，如果是那么可以访问public和protected
+        if (getNamespaceName(dec).equals(getNamespaceName(targetDec))) {
+            return PsiHelper.sAccessProtectedAndPublic;
+        }
+
+        // 否则只能访问public
+        return PsiHelper.sAccessOnlyPublic;
     }
 
+    // 计算任意元素访问targetDec的访问权限
     public static int calcAccessLevelByTargetClassDecForElement(@NotNull PsiElement element, @NotNull ALittleClassDec targetDec) {
-        // 计算当前元素所在的类
+        // 默认为public
         int accessLevel =  PsiHelper.sAccessOnlyPublic;
+
+        // 如果这个元素在类中，那么可以通过类和targetDec访问权限直接计算
         ALittleClassDec myClassDec = PsiHelper.findClassDecFromParent(element);
         if (myClassDec != null) {
             accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, targetDec);
+        // 如果元素不在类中，那么element在lua中，或者和targetDec相同，则返回sAccessProtectedAndPublic
         } else {
             String namespaceName = PsiHelper.getNamespaceName(element);
             if (namespaceName.equals("lua") || namespaceName.equals(PsiHelper.getNamespaceName(targetDec))) {
                 accessLevel = PsiHelper.sAccessProtectedAndPublic;
             }
         }
+
         return accessLevel;
     }
 
-    // 获取函数列表
+    // 根据名称，获取函数列表
     public static void findClassMethodNameDecList(@NotNull ALittleClassDec classDec,
                                                   int accessLevel,
                                                   String name,
@@ -387,13 +364,13 @@ public class PsiHelper {
         }
 
         // 处理继承
-        ClassExtendsData classExtendsData = findClassExtends(classDec);
-        if (classExtendsData != null) {
-            findClassMethodNameDecList(classExtendsData.dec, accessLevel, name, result, deep - 1);
+        ALittleClassDec classExtendsDec = findClassExtends(classDec);
+        if (classExtendsDec != null) {
+            findClassMethodNameDecList(classExtendsDec, accessLevel, name, result, deep - 1);
         }
     }
 
-    // 获取类的属性列表
+    // 根据名称，获取类的属性列表
     public static void findClassAttrList(@NotNull ALittleClassDec classDec,
                                          int accessLevel,
                                          PsiHelper.ClassAttrType attrType,
@@ -407,13 +384,13 @@ public class PsiHelper {
         ALittleTreeChangeListener.findClassAttrList(classDec, accessLevel, attrType, name, result);
 
         // 处理继承
-        ClassExtendsData classExtendsData = findClassExtends(classDec);
-        if (classExtendsData != null) {
-            findClassAttrList(classExtendsData.dec, accessLevel, attrType, name, result, deep - 1);
+        ALittleClassDec classExtendsDec = findClassExtends(classDec);
+        if (classExtendsDec != null) {
+            findClassAttrList(classExtendsDec, accessLevel, attrType, name, result, deep - 1);
         }
     }
 
-    // 获取继承的构造函数
+    // 根据名称，获取继承的构造函数
     public static ALittleClassCtorDec findFirstCtorDecFromExtends(@NotNull ALittleClassDec classDec, int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return null;
@@ -425,15 +402,15 @@ public class PsiHelper {
         }
 
         // 处理继承
-        ClassExtendsData classExtendsData = findClassExtends(classDec);
-        if (classExtendsData != null) {
-            return findFirstCtorDecFromExtends(classExtendsData.dec, deep - 1);
+        ALittleClassDec classExtendsDec = findClassExtends(classDec);
+        if (classExtendsDec != null) {
+            return findFirstCtorDecFromExtends(classExtendsDec, deep - 1);
         }
 
         return null;
     }
 
-    // 获取继承的属性
+    // 根据名称，获取继承的属性
     public static PsiElement findFirstClassAttrFromExtends(@NotNull ALittleClassDec classDec,
                                                            PsiHelper.ClassAttrType attrType,
                                                            String name,
@@ -447,38 +424,43 @@ public class PsiHelper {
         if (result != null) return result;
 
         // 处理继承
-        ClassExtendsData classExtendsData = findClassExtends(classDec);
-        if (classExtendsData != null) {
-            return findFirstClassAttrFromExtends(classExtendsData.dec, attrType, name, deep - 1);
+        ALittleClassDec classExtendsDec = findClassExtends(classDec);
+        if (classExtendsDec != null) {
+            return findFirstClassAttrFromExtends(classExtendsDec, attrType, name, deep - 1);
         }
 
         return null;
     }
 
-    // 查找函数的参数
+    // 根据名称，查找函数的参数列表
     @NotNull
     public static List<ALittleMethodParamNameDec> findMethodParamNameDecList(PsiElement methodDec, String name) {
         List<ALittleMethodParamOneDec> paramOneDecList = new ArrayList<>();
+        // 处理构造函数的参数列表
         if (methodDec instanceof ALittleClassCtorDec) {
             ALittleMethodParamDec methodParamDec = ((ALittleClassCtorDec) methodDec).getMethodParamDec();
             if (methodParamDec != null) {
                 List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
                 paramOneDecList.addAll(paramOneDecTmpList);
             }
+        // 处理成员函数的参数列表
         } else if (methodDec instanceof ALittleClassMethodDec) {
             ALittleMethodParamDec methodParamDec = ((ALittleClassMethodDec) methodDec).getMethodParamDec();
             if (methodParamDec != null) {
                 List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
                 paramOneDecList.addAll(paramOneDecTmpList);
             }
+        // 处理静态函数的参数列表
         } else if (methodDec instanceof ALittleClassStaticDec) {
             ALittleMethodParamDec methodParamDec = ((ALittleClassStaticDec) methodDec).getMethodParamDec();
             if (methodParamDec != null) {
                 List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
                 paramOneDecList.addAll(paramOneDecTmpList);
             }
+        // 处理setter函数的参数列表
         } else if (methodDec instanceof ALittleClassSetterDec) {
             paramOneDecList.add(((ALittleClassSetterDec) methodDec).getMethodParamOneDec());
+        // 处理全局函数的参数列表
         } else if (methodDec instanceof ALittleGlobalMethodDec) {
             ALittleMethodParamDec methodParamDec = ((ALittleGlobalMethodDec) methodDec).getMethodParamDec();
             if (methodParamDec != null) {
@@ -498,13 +480,13 @@ public class PsiHelper {
         return result;
     }
 
-    // 查找表达式定义的函数名
+    // 根据名称，查找变量名所在的定义元素
     @NotNull
     public static List<ALittleVarAssignNameDec> findVarAssignNameDecList(PsiElement element, String name) {
         List<ALittleVarAssignNameDec> varDecList = new ArrayList<>();
 
-        ALittleAllExpr rootAllExpr = null;
         // 计算出所在的表达式
+        ALittleAllExpr rootAllExpr = null;
         PsiElement parent = element;
         while (parent != null) {
             if (parent instanceof ALittleAllExpr) {
@@ -519,6 +501,7 @@ public class PsiHelper {
         return varDecList;
     }
 
+    // 根据名称，查找定义表达式名列表
     private static void findVarAssignNameDecList(@NotNull ALittleAllExpr allExpr,
                                                  @NotNull List<ALittleVarAssignNameDec> varDecList,
                                                  @NotNull String name) {
@@ -529,16 +512,16 @@ public class PsiHelper {
         if (parent instanceof ALittleMethodBodyDec) {
             ALittleMethodBodyDec curExpr = (ALittleMethodBodyDec)parent;
             allExprList = curExpr.getAllExprList();
-            // 处理for循环
+        // 处理for循环
         } else if (parent instanceof ALittleForExpr) {
             findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
 
             ALittleForExpr curExpr = (ALittleForExpr)parent;
             allExprList = curExpr.getAllExprList();
 
-            // for 内部有一个临时变量
             ALittleForStepCondition stepCondition = curExpr.getForStepCondition();
             ALittleForInCondition inCondition = curExpr.getForInCondition();
+            // 步进式的for有一个临时变量
             if (stepCondition != null) {
                 ALittleForStartStat startStat = stepCondition.getForStartStat();
                 if (startStat != null) {
@@ -550,6 +533,7 @@ public class PsiHelper {
                         }
                     }
                 }
+            // 迭代式的for有多个临时变量
             } else if (inCondition != null) {
                 List<ALittleForPairDec> pairDecList = inCondition.getForPairDecList();
                 for (ALittleForPairDec pairDec : pairDecList) {
@@ -561,32 +545,32 @@ public class PsiHelper {
                     }
                 }
             }
-            // 处理while循环
+        // 处理while循环
         } else if (parent instanceof ALittleWhileExpr) {
             findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
             ALittleWhileExpr curExpr = (ALittleWhileExpr)parent;
             allExprList = curExpr.getAllExprList();
-            // 处理do while
+        // 处理do while
         } else if (parent instanceof ALittleDoWhileExpr) {
             findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
             ALittleDoWhileExpr curExpr = (ALittleDoWhileExpr)parent;
             allExprList = curExpr.getAllExprList();
-            // 处理 if
+        // 处理 if
         } else if (parent instanceof ALittleIfExpr) {
             findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
             ALittleIfExpr curExpr = (ALittleIfExpr)parent;
             allExprList = curExpr.getAllExprList();
-            // 处理 else if
+        // 处理 else if
         } else if (parent instanceof ALittleElseIfExpr) {
             findVarAssignNameDecList((ALittleAllExpr)parent.getParent().getParent(), varDecList, name);
             ALittleElseIfExpr curExpr = (ALittleElseIfExpr)parent;
             allExprList = curExpr.getAllExprList();
-            // 处理 else
+        // 处理 else
         } else if (parent instanceof ALittleElseExpr) {
             findVarAssignNameDecList((ALittleAllExpr)parent.getParent().getParent(), varDecList, name);
             ALittleElseExpr curExpr = (ALittleElseExpr)parent;
             allExprList = curExpr.getAllExprList();
-            // 处理 wrap
+        // 处理 wrap
         } else if (parent instanceof ALittleWrapExpr) {
             findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
             ALittleWrapExpr curExpr = (ALittleWrapExpr)parent;
@@ -599,9 +583,11 @@ public class PsiHelper {
             // 如果已经遍历到当前，那么就可以返回了
             if (expr.equals(allExpr)) return;
 
+            // 获取定义表达式
             ALittleVarAssignExpr varAssignExpr = expr.getVarAssignExpr();
             if (varAssignExpr == null) continue;
 
+            // 获取变量名列表
             List<ALittleVarAssignDec> varAssignDecList = varAssignExpr.getVarAssignDecList();
             for (ALittleVarAssignDec varAssignDec : varAssignDecList) {
                 ALittleVarAssignNameDec varAssignNameDec = varAssignDec.getVarAssignNameDec();

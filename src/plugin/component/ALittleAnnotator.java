@@ -2,11 +2,9 @@ package plugin.component;
 
 import com.intellij.lang.annotation.*;
 import com.intellij.psi.*;
-import net.sf.cglib.asm.$MethodVisitor;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuessException;
 import plugin.reference.ALittleReferenceInterface;
-import plugin.reference.ALittleReferenceUtil;
 
 public class ALittleAnnotator implements Annotator {
     @Override
