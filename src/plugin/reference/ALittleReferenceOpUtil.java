@@ -631,11 +631,9 @@ public class ALittleReferenceOpUtil {
             if (rightGuess.value.equals("I64")) {
                 throw new ALittleGuessException(rightSrc, "I64赋值给int，需要使用cast<int>()做强制类型转换");
             }
-
             if (rightGuess.value.equals("double")) {
                 throw new ALittleGuessException(rightSrc, "double赋值给int，需要使用cast<int>()做强制类型转换");
             }
-
             throw new ALittleGuessException(rightSrc, "要求是int, 不能是:" + rightGuess.value);
         }
 

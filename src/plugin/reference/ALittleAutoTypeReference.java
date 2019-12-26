@@ -4,7 +4,6 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.alittle.PsiHelper;
 import plugin.guess.*;
 import plugin.psi.*;
 
@@ -37,6 +36,7 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
             int index = pairDecList.indexOf(varAssignDec);
             // 获取函数对应的那个返回值类型
             List<ALittleGuess> methodCallGuessList = valueStat.guessTypes();
+            // 如果有"..."作为返回值结尾
             boolean hasTail = !methodCallGuessList.isEmpty() && methodCallGuessList.get(methodCallGuessList.size() - 1) instanceof ALittleGuessReturnTail;
             if (hasTail) {
                 if (index >= methodCallGuessList.size() - 1) {
@@ -76,15 +76,16 @@ public class ALittleAutoTypeReference extends ALittleReference<ALittleAutoType> 
                     } else if (index == 1) {
                         guessList.add(((ALittleGuessList)valueGuessList.get(0)).subType);
                     }
-                    // 处理Map
+                // 处理Map
                 } else if (valueGuessList.size() == 1 && valueGuessList.get(0)  instanceof ALittleGuessMap) {
                     // 如果是key，那么就取key的类型
                     if (index == 0) {
                         guessList.add(((ALittleGuessMap)valueGuessList.get(0)).keyType);
-                        // 如果是value，那么就取value的类型
+                    // 如果是value，那么就取value的类型
                     } else if (index == 1) {
                         guessList.add(((ALittleGuessMap)valueGuessList.get(0)).valueType);
                     }
+                // 如果是pairs函数
                 } else if (ALittleReferenceUtil.IsPairsFunction(valueGuessList)) {
                     guessList.add(valueGuessList.get(2));
                 }

@@ -3,6 +3,7 @@ package plugin.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -32,8 +33,13 @@ public class BuildLuaAction extends AnAction {
         } else {
             PsiFile psiFile = psiMgr.findFile(root);
             if (psiFile instanceof ALittleFile) {
-                ALittleGenerateLua lua = new ALittleGenerateLua();
-                lua.GenerateLua((ALittleFile)psiFile, mRebuild, true);
+                try {
+                    ALittleGenerateLua lua = new ALittleGenerateLua();
+                    lua.GenerateLua((ALittleFile) psiFile, mRebuild, true);
+                } catch (Exception e) {
+                    FileEditorManager.getInstance(psiFile.getProject()).openFile(psiFile.getVirtualFile(), true);
+                    throw e;
+                }
             }
         }
     }

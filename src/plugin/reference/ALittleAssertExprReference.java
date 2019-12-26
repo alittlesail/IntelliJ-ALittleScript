@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.ALittleAssertExpr;
-import plugin.psi.ALittleThrowExpr;
 import plugin.psi.ALittleValueStat;
 
 import java.util.ArrayList;
