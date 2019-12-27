@@ -20,6 +20,7 @@ public class ALittleCompletionContributor extends CompletionContributor {
     };
 
     public ALittleCompletionContributor() {
+
         extend(CompletionType.BASIC,
                 PlatformPatterns.psiElement(ALittleTypes.ID_CONTENT).withLanguage(ALittleLanguage.INSTANCE),
                 new CompletionProvider<CompletionParameters>() {
@@ -29,6 +30,10 @@ public class ALittleCompletionContributor extends CompletionContributor {
                         PsiElement element = parameters.getPosition();
                         PsiElement parent = element.getParent();
                         if (parent instanceof ALittlePropertyValueDotIdName) {
+                            return;
+                        }
+                        String text = element.getText();
+                        if (text.equals("IntellijIdeaRulezzz")) {
                             return;
                         }
                         for (String keyword : KEYWORD_LIST) {

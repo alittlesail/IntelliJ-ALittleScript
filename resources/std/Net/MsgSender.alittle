@@ -9,7 +9,7 @@ public static FindMsgSender(int id) : IMsgCommon { return __MsgSenderMap[id]; }
 public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
 {
     private int _heartbeat;                 // 心跳间隔时间
-    private LoopFunction _heartbeat_loop;   //
+    private int _heartbeat_loop;   //
     private bool _check_heartbeat;
     private Functor<()> _callback;
 
@@ -127,7 +127,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
         if (this._check_heartbeat)
         {
             // 获取当前时间
-            int send_time = lua.os.clock();
+            int send_time = lua.os.time();
             // 计算合适的间隔时间
             double default_delta = this._heartbeat / 2;
 
@@ -136,37 +136,31 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
             if (delta_time > default_delta)
             delta_time = default_delta;
             // 定时检查
-            LoopFunction check_loop = new LoopFunction(bind(this.CheckHeartbeat, this, send_time, lua.math.floor(delta_time), lua.math.floor(delta_time)), 1, lua.math.floor(delta_time), 1);
-            check_loop.Start();
+            A_LoopSystem.AddTimer(lua.math.floor(delta_time) * 1000
+                                 , bind(this.CheckHeartbeat, this, send_time, lua.math.floor(delta_time)));
         }
     }
 
     // 心跳包检测
-    private fun CheckHeartbeat(int send_time, int cmp_time, int delta_time)
+    private fun CheckHeartbeat(int send_time, int delta_time)
     {
-        // 由得时候，以为APP被挂起，所有线程无条件挂起，导致LoopSystem时间跳跃。会立即执行当前的回调函数
-        // 所以确认当前时间和发送时间是否在delta_time范围内，否则必须重新创建一个LoopFunction
+        // 有的时候，以为APP被挂起，所有线程无条件挂起，导致LoopSystem时间跳跃。会立即执行当前的回调函数
+        // 所以确认当前时间和发送时间是否在delta_time+2范围内，如果没有则放弃当前检查
 
         // 获取当前时间
         int invoke_time = lua.os.time();
-        // 计算真实的间隔时间
-        int interval = invoke_time - send_time;
-        // 如果真实的间隔时间，小于制定的间隔时间，那么重新创建一个LoopFunction
-        if (delta_time > interval)
-        {
-            // 减少间隔时间
-            delta_time = delta_time - interval;
-            LoopFunction check_loop = new LoopFunction(bind(this.CheckHeartbeat, this, send_time*1000, cmp_time, delta_time), 1, delta_time, 1);
-            A_WeakLoopSystem.AddUpdater(check_loop);
-            return;
-        }
+        // 获取间隔时间
+        int interval_time = invoke_time - send_time;
+        // 如果调用的时间和发送的时间超过delta_time，说明是线程挂起导致的，这个时候可以跳过不用检查
+        if (interval_time > delta_time + 2) return;
+
         // 如果当前毫秒数 减去 最后一次接受数据包的毫秒数，超过指定范围
         // 那么就表示连接已经断了
-        if (this._last_recv_time > 0 && send_time - this._last_recv_time > cmp_time)
+        if (this._last_recv_time > 0 && send_time - this._last_recv_time > delta_time)
         {
             // 如果没有连接成功，那么直接返回
             if (this._interface.IsConnected() == false)
-            return;
+                return;
             // 主动关闭连接
             this.Close("心跳检测失败，主动断开连接");
             // 调用断开连接回调
@@ -184,8 +178,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
             return;
         if (this._heartbeat_loop != null)
             return;
-        this._heartbeat_loop = new LoopFunction(bind(this.SendHeartbeat, this, null), -1, this._heartbeat * 1000, 1);
-        this._heartbeat_loop.Start();
+        this._heartbeat_loop = A_LoopSystem.AddTimer(1, bind(this.SendHeartbeat, this, null), -1, this._heartbeat * 1000);
     }
     // 停止发送心跳包
     private fun StopHeartbeat()
@@ -193,7 +186,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
         if (this._heartbeat_loop == null)
             return;
         this._last_recv_time = 0;
-        this._heartbeat_loop.Close();
+        A_LoopSystem.RemoveTimer(this._heartbeat_loop);
         this._heartbeat_loop = null;
     }
 }

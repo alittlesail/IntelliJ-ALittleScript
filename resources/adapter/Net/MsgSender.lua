@@ -89,7 +89,7 @@ function MsgSenderTemplate:SendHeartbeat(max_ms)
 	self._write_factory:SetRpcID(0)
 	self._interface:SendFactory(self._write_factory)
 	if self._check_heartbeat then
-		local send_time = os.clock()
+		local send_time = os.time()
 		local default_delta = self._heartbeat / 2
 		local delta_time = max_ms
 		if delta_time == nil then
@@ -98,21 +98,17 @@ function MsgSenderTemplate:SendHeartbeat(max_ms)
 		if delta_time > default_delta then
 			delta_time = default_delta
 		end
-		local check_loop = LoopFunction(Bind(self.CheckHeartbeat, self, send_time, math.floor(delta_time), math.floor(delta_time)), 1, math.floor(delta_time), 1)
-		check_loop:Start()
+		A_LoopSystem:AddTimer(math.floor(delta_time) * 1000, Bind(self.CheckHeartbeat, self, send_time, math.floor(delta_time)))
 	end
 end
 
-function MsgSenderTemplate:CheckHeartbeat(send_time, cmp_time, delta_time)
+function MsgSenderTemplate:CheckHeartbeat(send_time, delta_time)
 	local invoke_time = os.time()
-	local interval = invoke_time - send_time
-	if delta_time > interval then
-		delta_time = delta_time - interval
-		local check_loop = LoopFunction(Bind(self.CheckHeartbeat, self, send_time * 1000, cmp_time, delta_time), 1, delta_time, 1)
-		A_WeakLoopSystem:AddUpdater(check_loop)
+	local interval_time = invoke_time - send_time
+	if interval_time > delta_time + 2 then
 		return
 	end
-	if self._last_recv_time > 0 and send_time - self._last_recv_time > cmp_time then
+	if self._last_recv_time > 0 and send_time - self._last_recv_time > delta_time then
 		if self._interface:IsConnected() == false then
 			return
 		end
@@ -133,8 +129,7 @@ function MsgSenderTemplate:StartHeartbeat()
 	if self._heartbeat_loop ~= nil then
 		return
 	end
-	self._heartbeat_loop = LoopFunction(Bind(self.SendHeartbeat, self, nil), -1, self._heartbeat * 1000, 1)
-	self._heartbeat_loop:Start()
+	self._heartbeat_loop = A_LoopSystem:AddTimer(1, Bind(self.SendHeartbeat, self, nil), -1, self._heartbeat * 1000)
 end
 
 function MsgSenderTemplate:StopHeartbeat()
@@ -142,7 +137,7 @@ function MsgSenderTemplate:StopHeartbeat()
 		return
 	end
 	self._last_recv_time = 0
-	self._heartbeat_loop:Close()
+	A_LoopSystem:RemoveTimer(self._heartbeat_loop)
 	self._heartbeat_loop = nil
 end
 

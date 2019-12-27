@@ -20,12 +20,18 @@ public class LoopSystem
     private Map<LoopObject, bool> _loop_cache;
     private bool _cache_empty;
 
+    private lua.TimerSystem _timer;
+    private Map<int, Functor<()>> _handler_map;
+
     public Ctor(bool weak)
     {
         this._loop_updaters = new Map<LoopObject, bool>();
         this._in_update = false;
         this._loop_cache = new Map<LoopObject, bool>();
         this._cache_empty = true;
+
+        this._timer = new lua.TimerSystem();
+        this._handler_map = new Map<int, Functor<()>>();
 
         if (weak) Setweak(this._loop_updaters, true, false);
     }
@@ -66,6 +72,25 @@ public class LoopSystem
     public fun HasUpdater(LoopObject updater) : bool
     {
         return this._loop_updaters[updater] != null || this._loop_cache[updater] == true;
+    }
+
+    // 添加定时器
+    public fun AddTimer(int delay_ms, Functor<()> callback, int loop, int interval_ms) : int
+    {
+        if (callback == null) return 0;
+        if (loop == null) loop = 1;
+        if (interval_ms == null) interval_ms = 1;
+        int id = this._timer.AddTimer(delay_ms, loop, interval_ms);
+        this._handler_map[id] = callback;
+        return id;
+    }
+
+    // 移除定时器
+    public fun RemoveTimer(int id) : bool
+    {
+        if (id == null) return false;
+        this._handler_map[id] = null;
+        return this._timer.RemoveTimer(id);
     }
 
     // 更新
@@ -116,6 +141,28 @@ public class LoopSystem
         
         // 标记为不在更新中
         this._in_update = false;
+
+        this._timer.UpdateTime(frame_time);
+        while (true)
+        {
+            int id = this._timer.Poll();
+            if (id == 0) break;
+
+            if (id < 0)
+            {
+                auto handle = this._handler_map[-id];
+                if (handle != null)
+                {
+                    handle();
+                    this._handler_map[-id] = null;
+                }
+            }
+            else
+            {
+                auto handle = this._handler_map[id];
+                if (handle != null) handle();
+            }
+        }
     }
 }
 

@@ -134,7 +134,7 @@ public class IMsgCommon
         if (id == 0)
         {
             // 记录最后接受时间
-            this._last_recv_time = lua.os.clock();
+            this._last_recv_time = lua.os.time();
             return;
         }
 

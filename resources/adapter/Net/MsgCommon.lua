@@ -107,7 +107,7 @@ end
 
 function IMsgCommon:HandleMessage(id, rpc_id, factory)
 	if id == 0 then
-		self._last_recv_time = os.clock()
+		self._last_recv_time = os.time()
 		return
 	end
 	if rpc_id == 0 then
