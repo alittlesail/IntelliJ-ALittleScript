@@ -6,7 +6,6 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.*;
 import plugin.psi.*;
-import plugin.psi.impl.ALittleClassMethodDecImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -35,7 +35,7 @@ public class ALittleTypedHandler extends TypedHandlerDelegate {
                     String nextChar = null;
                     if (offset + 1 < editor.getDocument().getTextLength())
                         nextChar = editor.getDocument().getText(new TextRange(offset, offset + 1));
-                    if (nextChar == null || nextChar.equals("\n")) {
+                    if (nextChar == null || nextChar.equals("\n") || nextChar.equals(";")) {
                         editor.getDocument().insertString(offset, ")");
                         editor.getCaretModel().moveToOffset(offset);
                         return Result.STOP;

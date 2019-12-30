@@ -289,13 +289,17 @@ valueStat ::= opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7S
 valueFactorStat ::= wrapValueStat | constValue | propertyValue | reflectValue
 
 // new
-opNewStat ::= new (customType | genericType) LPAREN (valueStat (COMMA valueStat)*)? RPAREN {pin=1}
+opNewStat ::= new (customType | genericType) LPAREN (valueStat opNewStatValueStatPair*)? RPAREN {pin=1}
+private opNewStatValueStatPair ::= COMMA valueStat {pin=1}
 // list 快捷表达式
-opNewListStat ::= LBRACK (valueStat (COMMA valueStat)*)? RBRACK {pin=1}
+opNewListStat ::= LBRACK (valueStat opNewListStatValueStatPair*)? RBRACK {pin=1}
+private opNewListStatValueStatPair ::= COMMA valueStat {pin=1}
 // bind
-bindStat ::= bind LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
+bindStat ::= bind LPAREN (valueStat bindStatValueStatPair*)? RPAREN  {pin=1}
+private bindStatValueStatPair ::= COMMA valueStat {pin=1}
 // tcall
-tcallStat ::= tcall LPAREN (valueStat (COMMA valueStat)*)? RPAREN  {pin=1}
+tcallStat ::= tcall LPAREN (valueStat tcallStatValueStatPair*)? RPAREN  {pin=1}
+private tcallStatValueStatPair ::= COMMA valueStat {pin=1}
 // 值
 wrapValueStat ::= LPAREN valueStat RPAREN
 // 常量值

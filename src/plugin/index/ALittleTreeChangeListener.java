@@ -239,7 +239,7 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
     public static void handleRefresh(Project project) {
         ALittleTreeChangeListener listener = getListener(project);
         if (listener == null) return;
-        listener.refresh();
+        listener.reload();
     }
 
     public static boolean isReloading(Project project) {

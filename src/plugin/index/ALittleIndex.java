@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.PathUtil;
 import com.intellij.util.io.URLUtil;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.StdLibraryProvider;
@@ -46,7 +47,6 @@ public class ALittleIndex {
     // 已加载的文件列表
     boolean mReloading = false;         // 是否正在加载
     boolean mReloaded = false;          // 是否加载完成
-    boolean mIsRefreshed = false;       // 是否刷新过
 
     // Csv数据联动
     protected Map<String, HashSet<ALittleStructDec>>  mCsvStructSet; // 收集csv路径对应的struct集合
@@ -104,6 +104,8 @@ public class ALittleIndex {
     }
 
     public void reload() {
+        if (mReloaded) return;
+
         mAllDataMap = new HashMap<>();
         mGlobalAccessMap = new HashMap<>();
         mNamespaceAccessMap = new HashMap<>();
@@ -163,12 +165,6 @@ public class ALittleIndex {
                         listener.RemoveModule(module);
                     }
                 });
-    }
-
-    public void refresh() {
-        if (mIsRefreshed) return;
-        mIsRefreshed = true;
-        reload();
     }
 
     // 添加类索引数据
