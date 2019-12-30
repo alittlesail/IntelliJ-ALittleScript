@@ -303,15 +303,15 @@ __ps_read_data_map["int"] = PS_ReadInt
 __ps_read_data_map["I64"] = PS_ReadI64
 __ps_read_data_map["string"] = PS_ReadString
 __ps_read_data_map["double"] = PS_ReadDouble
-local find = Find
+local find = string.find
 local sub = string.sub
 local len = string.len
 local byte = string.byte
 function CreateSubInfo(sub_type)
-	if find(sub_type, "List", 1) == 1 then
+	if find(sub_type, "List", 1, true) == 1 then
 		return CreateArrayInfo(sub_type)
 	end
-	if find(sub_type, "Map", 1) == 1 then
+	if find(sub_type, "Map", 1, true) == 1 then
 		return CreateMapInfo(sub_type)
 	end
 	local wfunc = __ps_write_data_map[sub_type]
@@ -355,7 +355,7 @@ function CreateMapInfo(var_type)
 	invoke_info.wfunc = PS_WriteMap
 	invoke_info.rfunc = PS_ReadMap
 	invoke_info.key_info = CreateSubInfo(sub(sub_type, 1, comma_index - 1))
-	invoke_info.value_info = CreateSubInfo(sub(sub_type, comma_index + 1))
+	invoke_info.value_info = CreateSubInfo(sub(sub_type, comma_index + 1, nil))
 	return invoke_info
 end
 

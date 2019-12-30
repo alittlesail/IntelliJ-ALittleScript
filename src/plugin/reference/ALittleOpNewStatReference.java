@@ -1,5 +1,6 @@
 package plugin.reference;
 
+import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.*;
@@ -85,8 +86,8 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
                     param_type_list.add(param_one_dec.getAllType().guessType());
                 }
 
-                if (param_type_list.size() < valueStatList.size()) {
-                    throw new ALittleGuessException(myElement, "new的类的构造函数调用最多需要" + param_type_list.size() + "个参数,不能是:" + valueStatList.size() + "个");
+                if (param_type_list.size() != valueStatList.size()) {
+                    throw new ALittleGuessException(myElement, "new的类的构造函数调用需要" + param_type_list.size() + "个参数,不能是:" + valueStatList.size() + "个");
                 }
 
                 for (int i = 0; i < valueStatList.size(); ++i) {
@@ -102,5 +103,60 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
 
             throw new ALittleGuessException(myElement, "只能new结构体和类");
         }
+    }
+
+    @NotNull
+    public List<InlayInfo> getParameterHints() throws ALittleGuessException {
+        List<InlayInfo> result = new ArrayList<>();
+
+        List<ALittleValueStat> valueStatList = myElement.getValueStatList();
+
+        ALittleCustomType customType = myElement.getCustomType();
+        if (customType == null) return result;
+
+        ALittleGuess guess = customType.guessType();
+
+        if (guess instanceof ALittleGuessClassTemplate) {
+            ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+            if (guessClassTemplate.templateExtends != null) {
+                guess = guessClassTemplate.templateExtends;
+            }
+        }
+
+        if (guess instanceof ALittleGuessClass) {
+            ALittleClassDec classDec = ((ALittleGuessClass) guess).element;
+            List<ALittleClassCtorDec> ctorDecList = classDec.getClassCtorDecList();
+            if (ctorDecList.size() < 1) {
+                return result;
+            }
+
+            ALittleMethodParamDec paramDec = ctorDecList.get(0).getMethodParamDec();
+            if (paramDec == null) {
+                return result;
+            }
+
+            List<ALittleMethodParamOneDec> paramOneDecList = paramDec.getMethodParamOneDecList();
+            if (paramOneDecList.isEmpty()) {
+                return result;
+            }
+
+            for (int i = 0; i < paramOneDecList.size(); ++i) {
+                ALittleMethodParamOneDec paramOneDec = paramOneDecList.get(i);
+                if (paramOneDec.getMethodParamNameDec() == null) {
+                    return result;
+                }
+                if (i >= valueStatList.size()) {
+                    return result;
+                }
+                String name = paramOneDec.getMethodParamNameDec().getText();
+                // 参数占位符直接跳过
+                if (name.equals("...")) continue;
+                ALittleValueStat valueStat = valueStatList.get(i);
+                String valueName = valueStat.getText();
+                if (name.equals(valueName)) continue;
+                result.add(new InlayInfo(name, valueStat.getNode().getStartOffset()));
+            }
+        }
+        return result;
     }
 }

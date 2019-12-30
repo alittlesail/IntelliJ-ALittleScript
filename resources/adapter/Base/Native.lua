@@ -38,8 +38,8 @@ function RandInt(min, max)
 	return math.random(min, max)
 end
 
-function Find(content, substring, init)
-	return string.find(content, substring, init, true)
+function Find(content, substring)
+	return string.find(content, substring, 1, true)
 end
 
 function TCall(...)
@@ -78,7 +78,7 @@ TimeSecond = {
 }
 
 function GetNextTodayBeginTime()
-	local date = DateInfo()
+	local date = DateInfo(nil)
 	date.hour = 0
 	date.min = 0
 	date.sec = 0
@@ -88,7 +88,7 @@ end
 local __VersionTime = 0
 local __VersionIndex = 0
 function NewTimeAndIndex()
-	local cur_time = os.time()
+	local cur_time = os.time(nil)
 	if __VersionTime == cur_time then
 		__VersionIndex = __VersionIndex + 1
 	elseif cur_time > __VersionTime then

@@ -11,12 +11,15 @@ function ICSVFile:Close()
 end
 
 function ICSVFile:ReadCell(lua_row, lua_col)
+	return ""
 end
 
 function ICSVFile:GetRowCount()
+	return 0
 end
 
 function ICSVFile:GetColCount()
+	return 0
 end
 
 local floor = math.floor
@@ -87,13 +90,13 @@ __csv_read_data_map["string"] = CSV_ReadString
 __csv_read_data_map["double"] = CSV_ReadDouble
 __split_list = {"#", "*", "|"}
 __split_list_last = __split_list[maxn(__split_list)]
-local find = Find
+local find = string.find
 local sub = string.sub
 function CreateCSVSubInfo(sub_type, split_index)
-	if find(sub_type, "List", 1) == 1 then
+	if find(sub_type, "List", 1, true) == 1 then
 		return CreateCSVArrayInfo(sub_type, split_index)
 	end
-	if find(sub_type, "Map", 1) == 1 then
+	if find(sub_type, "Map", 1, true) == 1 then
 		Assert(false, "不支持Map解析")
 	end
 	local func = __csv_read_data_map[sub_type]

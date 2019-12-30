@@ -63,7 +63,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
         // 初始化标记时间
         this._last_recv_time = 0;
         // 立刻发送一个心跳包，这样服务器可以很好的分辨出WebSocket
-        this.SendHeartbeat();
+        this.SendHeartbeat(null);
         // 启动定时心跳
         this.StartHeartbeat();
 
@@ -127,7 +127,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
         if (this._check_heartbeat)
         {
             // 获取当前时间
-            int send_time = lua.os.time();
+            int send_time = lua.os.time(null);
             // 计算合适的间隔时间
             double default_delta = this._heartbeat / 2;
 
@@ -137,7 +137,8 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
             delta_time = default_delta;
             // 定时检查
             A_LoopSystem.AddTimer(lua.math.floor(delta_time) * 1000
-                                 , bind(this.CheckHeartbeat, this, send_time, lua.math.floor(delta_time)));
+                                 , bind(this.CheckHeartbeat, this, send_time, lua.math.floor(delta_time))
+                                 , null, null);
         }
     }
 
@@ -148,7 +149,7 @@ public class MsgSenderTemplate<MI : IMsgCommonNative> : IMsgCommon
         // 所以确认当前时间和发送时间是否在delta_time+2范围内，如果没有则放弃当前检查
 
         // 获取当前时间
-        int invoke_time = lua.os.time();
+        int invoke_time = lua.os.time(null);
         // 获取间隔时间
         int interval_time = invoke_time - send_time;
         // 如果调用的时间和发送的时间超过delta_time，说明是线程挂起导致的，这个时候可以跳过不用检查

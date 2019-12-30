@@ -39,9 +39,9 @@ public static RandInt(int min, int max) : int
     return cast<int>(lua.math.random(min, max));
 }
 
-public static Find(string content, string substring, int init) : int, int
+public static Find(string content, string substring) : int, int
 {
-    return lua.String.find(content, substring, init, true);
+    return lua.String.find(content, substring, 1, true);
 }
 
 // 提供给关键字tcall使用
@@ -89,7 +89,7 @@ public enum TimeSecond
 // 获取明天开始的时间
 public static GetNextTodayBeginTime() : int
 {
-    auto date = DateInfo();
+    auto date = DateInfo(null);
     date.hour = 0;
     date.min = 0;
     date.sec = 0;
@@ -101,7 +101,7 @@ private int __VersionTime = 0;
 private int __VersionIndex = 0;
 public static NewTimeAndIndex() : int, int
 {
-    auto cur_time = lua.os.time();
+    auto cur_time = lua.os.time(null);
     if (__VersionTime == cur_time)
         __VersionIndex = __VersionIndex + 1;
     elseif (cur_time > __VersionTime)

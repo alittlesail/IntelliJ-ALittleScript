@@ -31,6 +31,15 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<PsiElem
     public PsiElement findElementForParameterInfo(CreateParameterInfoContext context) {
         PsiFile file = context.getFile();
         ALittlePropertyValueMethodCall callStat = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittlePropertyValueMethodCall.class, false);
+        ALittleOpNewStat newStat = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittleOpNewStat.class, false);
+        if (callStat != null && newStat != null) {
+            if (Math.abs(callStat.getNode().getStartOffset() - context.getOffset())
+                > Math.abs(newStat.getNode().getStartOffset() - context.getOffset()))
+                callStat = null;
+            else
+                newStat = null;
+        }
+
         if (callStat != null) {
             PsiReference ref = callStat.getReference();
             if (!(ref instanceof ALittlePropertyValueMethodCallReference)) return null;
@@ -55,7 +64,6 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<PsiElem
             return callStat;
         }
 
-        ALittleOpNewStat newStat = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittleOpNewStat.class, false);
         if (newStat != null) {
             ALittleCustomType customType = newStat.getCustomType();
             if (customType == null) return null;
@@ -117,8 +125,16 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<PsiElem
     public PsiElement findElementForUpdatingParameterInfo(UpdateParameterInfoContext context) {
         PsiFile file = context.getFile();
         ALittlePropertyValueMethodCall callStat = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittlePropertyValueMethodCall.class, false);
-        if (callStat != null) return callStat;
         ALittleOpNewStat newStat = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittleOpNewStat.class, false);
+        if (callStat != null && newStat != null) {
+            if (Math.abs(callStat.getNode().getStartOffset() - context.getOffset())
+                    > Math.abs(newStat.getNode().getStartOffset() - context.getOffset()))
+                callStat = null;
+            else
+                newStat = null;
+        }
+
+        if (callStat != null) return callStat;
         if (newStat != null) return newStat;
         return null;
     }

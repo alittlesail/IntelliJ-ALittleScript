@@ -335,6 +335,10 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                     throw new ALittleGuessException(valueStat, "第" + (i + 1) + "个参数类型和函数定义的参数类型不同:" + e.getError());
                 }
             }
+
+            if (preTypeFunctor.functorParamList.size() > valueStatList.size()) {
+                throw new ALittleGuessException(myElement, "该函数调用需要" + preTypeFunctor.functorParamList.size()+ "个参数，而不是" + valueStatList.size() + "个");
+            }
         }
 
         // 检查这个函数是不是await

@@ -93,14 +93,14 @@ protected auto __split_list = ["#","*","|"];
 protected auto __split_list_last = __split_list[maxn(__split_list)];
 
 //构造部分//////////////////////////////////////////////////////////////////////////////////////////////////////////-
-private auto find = Find;
+private auto find = lua.String.find;
 private auto sub = lua.String.sub;
 protected static CreateCSVSubInfo(string sub_type, int split_index) : CSVInvokeInfo
 {
-    if (find(sub_type, "List", 1) == 1)
+    if (find(sub_type, "List", 1, true) == 1)
         return CreateCSVArrayInfo(sub_type, split_index);
 
-    if (find(sub_type, "Map", 1) == 1)
+    if (find(sub_type, "Map", 1, true) == 1)
         assert(false, "不支持Map解析");
 
     auto func = __csv_read_data_map[sub_type];

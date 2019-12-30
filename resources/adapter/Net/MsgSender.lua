@@ -42,7 +42,7 @@ end
 
 function MsgSenderTemplate:HandleConnectSucceed()
 	self._last_recv_time = 0
-	self:SendHeartbeat()
+	self:SendHeartbeat(nil)
 	self:StartHeartbeat()
 	local result, reason = coroutine.resume(self._co, nil)
 	if result ~= true then
@@ -89,7 +89,7 @@ function MsgSenderTemplate:SendHeartbeat(max_ms)
 	self._write_factory:SetRpcID(0)
 	self._interface:SendFactory(self._write_factory)
 	if self._check_heartbeat then
-		local send_time = os.time()
+		local send_time = os.time(nil)
 		local default_delta = self._heartbeat / 2
 		local delta_time = max_ms
 		if delta_time == nil then
@@ -98,12 +98,12 @@ function MsgSenderTemplate:SendHeartbeat(max_ms)
 		if delta_time > default_delta then
 			delta_time = default_delta
 		end
-		A_LoopSystem:AddTimer(math.floor(delta_time) * 1000, Bind(self.CheckHeartbeat, self, send_time, math.floor(delta_time)))
+		A_LoopSystem:AddTimer(math.floor(delta_time) * 1000, Bind(self.CheckHeartbeat, self, send_time, math.floor(delta_time)), nil, nil)
 	end
 end
 
 function MsgSenderTemplate:CheckHeartbeat(send_time, delta_time)
-	local invoke_time = os.time()
+	local invoke_time = os.time(nil)
 	local interval_time = invoke_time - send_time
 	if interval_time > delta_time + 2 then
 		return

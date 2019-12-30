@@ -45,7 +45,7 @@ public static ExecuteCommand(string cmd)
     else
     {
         method = lua.String.sub(cmd, 1, index - 1);
-        param = lua.String.sub(cmd, index + 1);
+        param = lua.String.sub(cmd, index + 1, null);
     }
 
     if (lua.String.upper(method) == "HELP")

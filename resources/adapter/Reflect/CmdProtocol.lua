@@ -32,7 +32,7 @@ function ExecuteCommand(cmd)
 		param = ""
 	else
 		method = string.sub(cmd, 1, index - 1)
-		param = string.sub(cmd, index + 1)
+		param = string.sub(cmd, index + 1, nil)
 	end
 	if string.upper(method) == "HELP" then
 		local method_list = {}

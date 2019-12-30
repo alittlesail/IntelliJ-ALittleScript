@@ -9,7 +9,7 @@ local ___coroutine = coroutine
 local byte = string.byte
 local sub = string.sub
 local len = string.len
-local find = Find
+local find = string.find
 local concat = table.concat
 local type = type
 local tostring = tostring
@@ -45,10 +45,10 @@ function String_Split(target, sep)
 	local fields_count = 0
 	local start_pos = 1
 	while true do
-		local start_index = find(target, sep, start_pos)
+		local start_index = find(target, sep, start_pos, true)
 		if start_index == nil then
 			fields_count = fields_count + 1
-			fields[fields_count] = sub(target, start_pos)
+			fields[fields_count] = sub(target, start_pos, nil)
 			break
 		end
 		fields_count = fields_count + 1
@@ -72,7 +72,7 @@ function String_SplitSepList(target, sep_list)
 		local start_index
 		local end_index
 		for _, sep in ___ipairs(sep_list) do
-			local start_index_tmp = find(target, sep, start_pos)
+			local start_index_tmp = find(target, sep, start_pos, true)
 			if start_index_tmp ~= nil then
 				if start_index == nil or start_index_tmp < start_index then
 					start_index = start_index_tmp
@@ -81,10 +81,10 @@ function String_SplitSepList(target, sep_list)
 			end
 		end
 		if start_index == nil then
-			local value = sub(target, start_pos)
+			local value = sub(target, start_pos, nil)
 			if len(value) > 0 then
 				fields_count = fields_count + 1
-				fields[fields_count] = sub(target, start_pos)
+				fields[fields_count] = sub(target, start_pos, nil)
 			end
 			break
 		end
@@ -103,7 +103,7 @@ function String_Join(list, sep)
 end
 
 function String_UrlAppendParam(url, param)
-	if find(url, "?", 1) == nil then
+	if find(url, "?", 1, true) == nil then
 		url = url .. "?"
 	else
 		url = url .. "&"
@@ -118,7 +118,7 @@ function String_UrlAppendParamMap(url, param)
 		count = count + 1
 		list[count] = key .. "=" .. tostring(value)
 	end
-	if find(url, "?", 1) == nil then
+	if find(url, "?", 1, true) == nil then
 		url = url .. "?"
 	else
 		url = url .. "&"
@@ -130,28 +130,28 @@ function String_UrlAnalyse(url)
 	local info = {}
 	info.value_map = {}
 	local start_pos = 1
-	local start_index = find(url, "http://", start_pos)
+	local start_index = find(url, "http://", start_pos, true)
 	if start_index ~= nil then
 		info.protocol = "http"
 		start_pos = start_index + len("http://")
 	else
-		start_index = find(url, "https://", start_pos)
+		start_index = find(url, "https://", start_pos, true)
 		if start_index ~= nil then
 			info.protocol = "https"
 			start_pos = start_index + len("https://")
 		end
 	end
 	local ip_and_port = nil
-	start_index = find(url, "/", start_pos)
+	start_index = find(url, "/", start_pos, true)
 	if start_index ~= nil then
 		ip_and_port = sub(url, start_pos, start_index - 1)
 	else
-		ip_and_port = sub(url, start_pos)
+		ip_and_port = sub(url, start_pos, nil)
 	end
-	local ip_start = find(ip_and_port, ":", 1)
+	local ip_start = find(ip_and_port, ":", 1, true)
 	if ip_start ~= nil then
 		info.ip = sub(ip_and_port, 1, ip_start - 1)
-		info.port = floor(tonumber(sub(ip_and_port, ip_start + 1)))
+		info.port = floor(tonumber(sub(ip_and_port, ip_start + 1, nil)))
 	else
 		info.ip = ip_and_port
 		info.port = 80
@@ -163,17 +163,17 @@ function String_UrlAnalyse(url)
 		return info
 	end
 	start_pos = start_index
-	start_index = find(url, "?", start_pos)
+	start_index = find(url, "?", start_pos, true)
 	if start_index ~= nil then
 		info.path = sub(url, start_pos, start_index - 1)
 	else
-		info.path = sub(url, start_pos)
+		info.path = sub(url, start_pos, nil)
 	end
 	if start_index == nil then
 		return info
 	end
 	start_pos = start_index + 1
-	local param_list = String_Split(sub(url, start_pos), "&")
+	local param_list = String_Split(sub(url, start_pos, nil), "&")
 	for k, v in ___ipairs(param_list) do
 		local param_list_list = String_Split(v, "=")
 		if param_list_list[1] ~= nil and param_list_list[2] ~= nil then
@@ -191,7 +191,7 @@ function StringGenerateID:Ctor()
 end
 
 function StringGenerateID:GenID(pre)
-	local cur_time = time()
+	local cur_time = time(nil)
 	if cur_time ~= self._string_last_time then
 		self._string_last_time = cur_time
 		self._string_last_index = 0

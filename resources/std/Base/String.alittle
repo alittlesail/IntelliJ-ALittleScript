@@ -4,7 +4,7 @@ namespace ALittle;
 private auto byte = lua.String.byte;
 private auto sub = lua.String.sub;
 private auto len = lua.String.len;
-private auto find = Find;
+private auto find = lua.String.find;
 private auto concat = lua.table.concat;
 private auto type = lua.type;
 private auto tostring = lua.tostring;
@@ -46,11 +46,11 @@ public static String_Split(string target, string sep) : List<string>
     int start_pos = 1;
     while (true)
     {
-        int start_index = find(target, sep, start_pos);
+        int start_index = find(target, sep, start_pos, true);
         if (start_index == null)
         {
             ++fields_count;
-            fields[fields_count] = sub(target, start_pos);
+            fields[fields_count] = sub(target, start_pos, null);
             break;
         }
         ++fields_count;
@@ -75,7 +75,7 @@ public static String_SplitSepList(string target, List<string> sep_list) : List<s
         int end_index;
         for (int _, string sep in sep_list)
         {
-            int start_index_tmp = find(target, sep, start_pos);
+            int start_index_tmp = find(target, sep, start_pos, true);
             if (start_index_tmp != null)
             {
                 if (start_index == null || start_index_tmp < start_index)
@@ -87,11 +87,11 @@ public static String_SplitSepList(string target, List<string> sep_list) : List<s
         }
         if (start_index == null)
         {
-            string value = sub(target, start_pos);
+            string value = sub(target, start_pos, null);
             if (len(value) > 0)
             {
                 ++ fields_count;
-                fields[fields_count] = sub(target, start_pos);
+                fields[fields_count] = sub(target, start_pos, null);
             }
             break;
         }
@@ -116,7 +116,7 @@ public static String_Join<T>(List<T> list, string sep) : string
 // 往Url尾巴添加参数
 public static String_UrlAppendParam(string url, string param) : string
 {
-    if (find(url, "?", 1) == null)
+    if (find(url, "?", 1, true) == null)
         url = url .. "?";
     else
         url = url .. "&";
@@ -133,7 +133,7 @@ public static String_UrlAppendParamMap(string url, Map<string, any> param) : str
         list[count] = key.."="..tostring(value);
     }
 
-    if (find(url, "?", 1) == null)
+    if (find(url, "?", 1, true) == null)
         url = url .. "?";
     else
         url = url .. "&";
@@ -156,7 +156,7 @@ public static String_UrlAnalyse(string url) : UrlAnalyseInfo
     info.value_map = new Map<string, string>();
 
     int start_pos = 1;
-    int start_index = find(url, "http://", start_pos);
+    int start_index = find(url, "http://", start_pos, true);
     if (start_index != null)
     {
         info.protocol = "http";
@@ -164,7 +164,7 @@ public static String_UrlAnalyse(string url) : UrlAnalyseInfo
     }
     else
     {
-        start_index = find(url, "https://", start_pos);
+        start_index = find(url, "https://", start_pos, true);
         if (start_index != null)
         {
             info.protocol = "https";
@@ -173,17 +173,17 @@ public static String_UrlAnalyse(string url) : UrlAnalyseInfo
     }
 
     string ip_and_port = null;
-    start_index = find(url, "/", start_pos);
+    start_index = find(url, "/", start_pos, true);
     if (start_index != null)
         ip_and_port = sub(url, start_pos, start_index - 1);
     else
-        ip_and_port = sub(url, start_pos);
+        ip_and_port = sub(url, start_pos, null);
 
-    int ip_start = find(ip_and_port, ":", 1);
+    int ip_start = find(ip_and_port, ":", 1, true);
     if (ip_start != null)
     {
         info.ip = sub(ip_and_port, 1, ip_start - 1);
-        info.port = floor(tonumber(sub(ip_and_port, ip_start + 1)));
+        info.port = floor(tonumber(sub(ip_and_port, ip_start + 1, null)));
     }
     else
     {
@@ -197,18 +197,18 @@ public static String_UrlAnalyse(string url) : UrlAnalyseInfo
         return info;
 
     start_pos = start_index;
-    start_index = find(url, "?", start_pos);
+    start_index = find(url, "?", start_pos, true);
     if (start_index != null)
         info.path = sub(url, start_pos, start_index - 1);
     else
-        info.path = sub(url, start_pos);
+        info.path = sub(url, start_pos, null);
 
     if (start_index == null)
         return info;
 
     start_pos = start_index + 1;
 
-    List<string> param_list = String_Split(sub(url, start_pos), "&");
+    List<string> param_list = String_Split(sub(url, start_pos, null), "&");
     for (int k, string v in param_list)
     {
         List<string> param_list_list = String_Split(v, "=");
@@ -232,7 +232,7 @@ class StringGenerateID
 
     public fun GenID(string pre) : string
     {
-        int cur_time = time();
+        int cur_time = time(null);
         if (cur_time != this._string_last_time)
         {
             this._string_last_time = cur_time;
