@@ -317,7 +317,8 @@ propertyValueSuffix ::= propertyValueDotId | propertyValueBracketValue | propert
 propertyValueDotId ::= DOT propertyValueDotIdName {pin=1}
 propertyValueDotIdName ::= ID_CONTENT
 propertyValueBracketValue ::= LBRACK valueStat RBRACK {pin=1}
-propertyValueMethodCall ::= propertyValueMethodTemplate? LPAREN (valueStat (COMMA valueStat)*)? RPAREN {pin=2}
+propertyValueMethodCall ::= propertyValueMethodTemplate? LPAREN (valueStat propertyValueMethodCallValueStatPair*)? RPAREN {pin=2}
+private propertyValueMethodCallValueStatPair ::= COMMA valueStat {pin=1}
 propertyValueMethodTemplate ::= LESS allType propertyValueMethodTemplatePair* GREATER {pin=1}
 private propertyValueMethodTemplatePair ::= COMMA allType {pin=1}
 

@@ -44,6 +44,9 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<ALittle
                 return null;
             }
             ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
+            if (preTypeFunctor.functorParamNameList.isEmpty()) {
+                return null;
+            }
             List<String> list = new ArrayList<>();
             list.add(String.join(", ", preTypeFunctor.functorParamNameList));
             context.setItemsToShow(list.toArray());

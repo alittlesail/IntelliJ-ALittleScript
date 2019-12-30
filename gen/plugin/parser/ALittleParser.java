@@ -2997,7 +2997,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // propertyValueMethodTemplate? LPAREN (valueStat (COMMA valueStat)*)? RPAREN
+  // propertyValueMethodTemplate? LPAREN (valueStat propertyValueMethodCallValueStatPair*)? RPAREN
   public static boolean propertyValueMethodCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "propertyValueMethodCall")) return false;
     if (!nextTokenIs(b, "<property value method call>", LESS, LPAREN)) return false;
@@ -3019,14 +3019,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (valueStat (COMMA valueStat)*)?
+  // (valueStat propertyValueMethodCallValueStatPair*)?
   private static boolean propertyValueMethodCall_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "propertyValueMethodCall_2")) return false;
     propertyValueMethodCall_2_0(b, l + 1);
     return true;
   }
 
-  // valueStat (COMMA valueStat)*
+  // valueStat propertyValueMethodCallValueStatPair*
   private static boolean propertyValueMethodCall_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "propertyValueMethodCall_2_0")) return false;
     boolean r;
@@ -3037,26 +3037,29 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (COMMA valueStat)*
+  // propertyValueMethodCallValueStatPair*
   private static boolean propertyValueMethodCall_2_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "propertyValueMethodCall_2_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!propertyValueMethodCall_2_0_1_0(b, l + 1)) break;
+      if (!propertyValueMethodCallValueStatPair(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "propertyValueMethodCall_2_0_1", c)) break;
     }
     return true;
   }
 
+  /* ********************************************************** */
   // COMMA valueStat
-  private static boolean propertyValueMethodCall_2_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "propertyValueMethodCall_2_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+  static boolean propertyValueMethodCallValueStatPair(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "propertyValueMethodCallValueStatPair")) return false;
+    if (!nextTokenIs(b, COMMA)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, COMMA);
+    p = r; // pin = 1
     r = r && valueStat(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -3140,7 +3143,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LESS (customType) GREATER
+  // LESS customType GREATER
   static boolean reflectCustomType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "reflectCustomType")) return false;
     if (!nextTokenIs(b, LESS)) return false;
@@ -3148,20 +3151,10 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, LESS);
     p = r; // pin = 1
-    r = r && report_error_(b, reflectCustomType_1(b, l + 1));
+    r = r && report_error_(b, customType(b, l + 1));
     r = p && consumeToken(b, GREATER) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  // (customType)
-  private static boolean reflectCustomType_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "reflectCustomType_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = customType(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -3188,7 +3181,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LPAREN (valueStat) RPAREN
+  // LPAREN valueStat RPAREN
   static boolean reflectValueStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "reflectValueStat")) return false;
     if (!nextTokenIs(b, LPAREN)) return false;
@@ -3196,20 +3189,10 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, LPAREN);
     p = r; // pin = 1
-    r = r && report_error_(b, reflectValueStat_1(b, l + 1));
+    r = r && report_error_(b, valueStat(b, l + 1));
     r = p && consumeToken(b, RPAREN) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  // (valueStat)
-  private static boolean reflectValueStat_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "reflectValueStat_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = valueStat(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
