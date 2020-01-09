@@ -1807,13 +1807,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   static boolean methodParamPairDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "methodParamPairDec")) return false;
     if (!nextTokenIs(b, COMMA)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_);
+    boolean r;
+    Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
-    p = r; // pin = 1
     r = r && methodParamOneDec(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -1833,13 +1832,12 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   static boolean methodParamTailPairDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "methodParamTailPairDec")) return false;
     if (!nextTokenIs(b, COMMA)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_);
+    boolean r;
+    Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
-    p = r; // pin = 1
     r = r && methodParamTailDec(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

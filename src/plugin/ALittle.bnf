@@ -141,8 +141,8 @@ methodParamNameDec ::= ID_CONTENT
 methodParamTailDec ::= TYPE_TAIL
 methodReturnTailDec ::= TYPE_TAIL
 methodParamDec ::= LPAREN ((methodParamOneDec methodParamPairDec* methodParamTailPairDec?) | methodParamTailDec)? RPAREN {pin=1}
-private methodParamPairDec ::= COMMA methodParamOneDec {pin=1}
-private methodParamTailPairDec ::= COMMA methodParamTailDec {pin=1}
+private methodParamPairDec ::= COMMA methodParamOneDec
+private methodParamTailPairDec ::= COMMA methodParamTailDec
 // 函数体部分
 methodBodyDec ::= LBRACE allExpr* RBRACE {pin=1}
 // 函数名部分
