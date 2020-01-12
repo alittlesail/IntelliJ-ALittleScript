@@ -42,20 +42,20 @@ public class HttpFileReceiverTemplate<NATIVE : IHttpFileReceiverNative> : IHttpF
     private string _file_path;
     private NATIVE _interface;
 
-    private bool _invoked;
+    private bool _received;
 
     public Ctor(int http_id, lua.thread co)
     {
         this._http_id = http_id;
         this._co = co;
-        this._invoked = false;
+        this._received = false;
         this._interface = new NATIVE();
     }
 
     public await fun StartReceiveFile(string file_path, int start_size) : string
     {
-        if (this._invoked) return "StartReceiveFile已经被调用过";
-        this._invoked = true;
+        if (this._received) return "StartReceiveFile已经被调用过";
+        this._received = true;
         this._interface.StartReceiveFile(this._http_id, file_path, start_size);
         return yield;
     }
@@ -66,7 +66,7 @@ public class HttpFileReceiverTemplate<NATIVE : IHttpFileReceiverNative> : IHttpF
         if (!result) Error(reason);
     }
 
-    public get invoked() : bool { return this._invoked; }
+    public get received() : bool { return this._received; }
 
     protected fun SendString(string content)
     {

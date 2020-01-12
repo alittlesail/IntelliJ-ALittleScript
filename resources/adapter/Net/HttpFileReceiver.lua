@@ -43,19 +43,19 @@ HttpFileReceiverTemplate = Class(IHttpFileReceiver, "ALittle.HttpFileReceiverTem
 function HttpFileReceiverTemplate:Ctor(http_id, co)
 	___rawset(self, "_http_id", http_id)
 	___rawset(self, "_co", co)
-	___rawset(self, "_invoked", false)
+	___rawset(self, "_received", false)
 	___rawset(self, "_interface", self.__class.__element[1]())
 end
 
-function HttpFileReceiverTemplate.__getter:invoked()
-	return self._invoked
+function HttpFileReceiverTemplate.__getter:received()
+	return self._received
 end
 
 function HttpFileReceiverTemplate:StartReceiveFile(file_path, start_size)
-	if self._invoked then
+	if self._received then
 		return "StartReceiveFile已经被调用过"
 	end
-	self._invoked = true
+	self._received = true
 	self._interface:StartReceiveFile(self._http_id, file_path, start_size)
 	return ___coroutine.yield()
 end
