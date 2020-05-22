@@ -14,361 +14,390 @@
   tokenTypeClass="plugin.psi.ALittleTokenType"
 
   tokens=[
-      LBRACE               =  '{'
-      RBRACE               =  '}'
-      LBRACK               =  '['
-      RBRACK               =  ']'
-      LPAREN               =  '('
-      RPAREN               =  ')'
-      COLON                =  ':'
-      SEMI                 =  ';'
-      COMMA                =  ','
-      EQ                   =  '=='
-      ASSIGN               =  '='
-      NOT_EQ               =  '!='
-      NOT                  =  '!'
-      PLUS_PLUS            =  '++'
-      PLUS_ASSIGN          =  '+='
-      PLUS                 =  '+'
-      CONCAT               =  '..'
-      MINUS_MINUS          =  '--'
-      MINUS_ASSIGN         =  '-='
-      MINUS                =  '-'
-      COND_OR              =  '||'
-      COND_AND             =  '&&'
-      LESS_OR_EQUAL        =  '<='
-      LESS                 =  '<'
-      MUL_ASSIGN           =  '*='
-      MUL                  =  '*'
-      QUOTIENT_ASSIGN      =  '/='
-      QUOTIENT             =  '/'
-      REMAINDER_ASSIGN     =  '%='
-      REMAINDER            =  '%'
-      GREATER_OR_EQUAL     =  '>='
-      GREATER              =  '>'
-      DOT                  =  '.'
-      APOS                 =  "'"
-      QUOTE                =  '"'
-      BACK                 =  '\'
-      HTTP                 =  '@Http'
-      HTTP_DOWNLOAD        =  '@HttpDownload'
-      HTTP_UPLOAD          =  '@HttpUpload'
-      MSG                  =  '@Msg'
-      CSV                  =  '@Csv'
-      MYSQL                =  '@Mysql'
-      CMD                  =  '@Cmd'
-      TYPE_TAIL            =  '...'
+      LBRACE                =  '{'
+      RBRACE                =  '}'
+      LBRACK                =  '['
+      RBRACK                =  ']'
+      LPAREN                =  '('
+      RPAREN                =  ')'
+      COLON                 =  ':'
+      SEMI                  =  ';'
+      COMMA                 =  ','
+      EQ                    =  '=='
+      ASSIGN                =  '='
+      NOT_EQ                =  '!='
+      NOT                   =  '!'
+      PLUS_PLUS             =  '++'
+      PLUS_ASSIGN           =  '+='
+      PLUS                  =  '+'
+      CONCAT                =  '..'
+      MINUS_MINUS           =  '--'
+      MINUS_ASSIGN          =  '-='
+      MINUS                 =  '-'
+      COND_OR               =  '||'
+      COND_AND              =  '&&'
+      LESS_OR_EQUAL         =  '<='
+      LESS                  =  '<'
+      MUL_ASSIGN            =  '*='
+      MUL                   =  '*'
+      QUOTIENT_ASSIGN       =  '/='
+      QUOTIENT              =  '/'
+      REMAINDER_ASSIGN      =  '%='
+      REMAINDER             =  '%'
+      GREATER_OR_EQUAL      =  '>='
+      GREATER               =  '>'
+      DOT                   =  '.'
+      APOS                  =  "'"
+      QUOTE                 =  '"'
+      BACK                  =  '\'
+      TYPE_TAIL             =  '...'
 
-      WHITE_SPACE          = 'regexp:\s+'
-      COMMENT              = 'regexp://.*'
-      DIGIT_CONTENT        = 'regexp:0x[0-9a-fA-F]+|\d+(\.\d*)?'
-      STRING_CONTENT       = 'regexp:"([^"\\]|\\.)*"'
-      ID_CONTENT           = 'regexp:[_a-zA-Z][_a-zA-Z0-9]*'
+      WHITE_SPACE           = 'regexp:\s+'
+      LINE_COMMENT          = 'regexp://.*'
+      BLOCK_COMMENT         = 'regexp:/\*([^*/]|\*(?!/)|/(?<!\*))*((?=\*/))(\*/)'
+      NUMBER                = 'regexp:0x[0-9a-fA-F]+|\d+(\.\d*)?'
+      TEXT                  = 'regexp:"([^"\\]|\\.)*"'
+      ID                    = 'regexp:[_a-zA-Z][_a-zA-Z0-9]*'
   ]
 }
 
-alittleFile ::= namespaceDec?
+alittleFile ::= NamespaceDec?
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//修饰符////////////////////////////////////////////////////////////////////////////////////
 // 注册修饰符，如果有这个修饰，那么就不会生成目标代码
-registerModifier ::= register
-// 访问修饰符
-accessModifier ::= public | private | protected
-// 协程修饰符
-coModifier ::= async | await
-// 协议修饰符
-protoModifier ::= HTTP | HTTP_DOWNLOAD | HTTP_UPLOAD |  MSG
-// 命令行修饰符
-cmdModifier ::= CMD STRING_CONTENT? {pin=1}
-// CSV联动修饰符
-csvModifier ::= CSV STRING_CONTENT {pin=1}
-// MYSQL联动修饰符
-mysqlModifier ::= MYSQL STRING_CONTENT {pin=1}
+RegisterModifier ::= register
+// 访问修饰符，public表示全局可访问，private本文件，子类可访问，protected当前命名域内可访问
+AccessModifier ::= public | private | protected
+// 协程修饰符，用于修饰函数，async表示一个协程函数，await表示必须在协程函数里面调用
+CoroutineModifier ::= async | await
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 协议修饰符
+ProtocolModifier ::= Http | HttpDownload | HttpUpload | Msg
+
+// 命令修饰符，用于开发人员指令执行函数
+CommandBodyDec ::= '(' TEXT ')' {pin=1}
+CommandModifier ::= Cmd CommandBodyDec? {pin=1}
+
+// 是否可以为null，用于修饰函数形参
+NullableModifier ::= Nullable
+
+// 语言生效修饰符，用于修饰结构体，枚举，类，类成员变量，类成员函数，类静态函数，全局函数
+// 表示修饰目标只有在规定的语言范围内生效
+LanguageNameDec ::= ID
+
+private LanguageBodyDecTail ::= ',' LanguageNameDec {pin=1}
+LanguageBodyDec ::= '(' (LanguageNameDec LanguageBodyDecTail*)? ')' {pin=1}
+LanguageModifier ::= Language LanguageBodyDec? {pin=1}
+
+// 常量修饰符，用于修饰函数。表示这个函数不会对数据进行修改
+ConstModifier ::= Const
+
+// 原生修饰
+NativeModifier ::= Native
+
+// 属性修饰符汇总
+AttributeModifier ::= '[' (NativeModifier | LanguageModifier | ConstModifier | NullableModifier | ProtocolModifier | CommandModifier)? ']' {pin=1}
+// 所有修饰符汇总
+Modifier ::= AttributeModifier | AccessModifier | CoroutineModifier | RegisterModifier
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 // 命名域
-namespaceDec ::= registerModifier? namespace namespaceNameDec SEMI (globalMethodDec | classDec | enumDec | structDec | instanceDec | usingDec | opAssignExpr | propertyValueExpr)* {pin=2}
-namespaceNameDec ::= ID_CONTENT
+NamespaceDec ::= Modifier* namespace NamespaceNameDec ';' NamespaceElementDec* {pin=2}
+NamespaceElementDec ::= Modifier* (GlobalMethodDec | ClassDec | EnumDec | StructDec | UsingDec | InstanceDec | OpAssignExpr)
+NamespaceNameDec ::= ID
 
 // 模板定义
-templateDec ::= LESS templatePairDec (COMMA templatePairDec)* GREATER {pin=1}
-templatePairDec ::= ID_CONTENT templateExtendsDec? {pin=1}
-private templateExtendsDec ::= COLON (allType | templateExtendsClassDec | templateExtendsStructDec) {pin=1}
-templateExtendsClassDec ::= class
-templateExtendsStructDec ::= struct
+private TemplateDecTail ::= ',' TemplatePairDec {pin=1}
+TemplateDec ::= '<' TemplatePairDec TemplateDecTail* '>' {pin=1}
+TemplatePairDec ::= TemplateNameDec TemplateExtendsDec? {pin=1}
+TemplateNameDec ::= ID
+TemplateExtendsDec ::= ':' (AllType | TemplateExtendsClassDec | TemplateExtendsStructDec) {pin=1}
+TemplateExtendsClassDec ::= class
+TemplateExtendsStructDec ::= struct
 
 // 类定义
-classDec ::= accessModifier? class classNameDec templateDec? classExtendsDec? classBodyDec {pin=2}
-classNameDec ::= ID_CONTENT
-classExtendsDec ::= COLON (namespaceNameDec DOT)? classNameDec {pin=1}
-private classBodyDec ::= LBRACE (classVarDec | classCtorDec | classGetterDec | classSetterDec | classStaticDec | classMethodDec)* RBRACE {pin=1}
+ClassDec ::= class (ClassNameDec TemplateDec? ClassExtendsDec? ClassBodyDec?)? {pin=1}
+ClassNameDec ::= ID
+ClassExtendsDec ::= ':' (NamespaceNameDec '.')? ClassNameDec {pin=1}
+ClassElementDec ::= Modifier* (ClassCtorDec | ClassGetterDec | ClassSetterDec | ClassStaticDec | ClassMethodDec | ClassVarDec)
+ClassBodyDec ::= '{' ClassElementDec* '}' {pin=1}
+ClassVarDec ::= AllType ClassVarNameDec ';' {pin=1}
+ClassVarNameDec ::= ID
 
 // 结构体定义
-structDec ::= structDataModifier? accessModifier? struct structNameDec structExtendsDec? structBodyDec {pin=3}
-structNameDec ::= ID_CONTENT
-structExtendsDec ::= COLON (namespaceNameDec DOT)? structNameDec {pin=1}
-private structBodyDec ::= LBRACE (structVarDec)* RBRACE {pin=1}
-private structDataModifier ::= csvModifier | mysqlModifier
+StructDec ::= struct (StructNameDec StructExtendsDec? StructBodyDec?)? {pin=1}
+StructNameDec ::= ID
+StructExtendsDec ::= ':' (NamespaceNameDec '.')? StructNameDec {pin=1}
+StructBodyDec ::= '{' (StructOptionDec | StructVarDec)* '}' {pin=1}
+StructVarDec ::= AllType StructVarNameDec ';' {pin=1}
+StructVarNameDec ::= ID
+StructOptionDec ::= option StructOptionNameDec '=' TEXT ';' {pin=1}
+StructOptionNameDec ::= ID
 
 // 枚举定义
-enumDec ::= accessModifier? enum enumNameDec enumBodyDec  {pin=2}
-enumNameDec ::= ID_CONTENT
-private enumBodyDec ::= LBRACE (enumVarDec(COMMA enumVarDec)* COMMA?)? RBRACE {pin=1}
+EnumDec ::= enum (EnumNameDec EnumBodyDec?)? {pin=1}
+EnumNameDec ::= ID
+EnumBodyDec ::= '{' EnumVarDec* '}' {pin=1}
+private EnumVarDecTail ::= '=' (NUMBER | TEXT) {pin=1}
+EnumVarDec ::= EnumVarNameDec EnumVarDecTail? ';' {pin=1}
+EnumVarNameDec ::= ID
 
 // 全局变量
-instanceDec ::= accessModifier? varAssignExpr {pin=2}
+InstanceDec ::= VarAssignExpr
 
 // using定义
-usingDec ::= accessModifier? using usingNameDec ASSIGN allType SEMI {pin=2}
-usingNameDec ::= ID_CONTENT
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 类成员变量定义
-classVarDec ::= accessModifier? allType ID_CONTENT SEMI {pin=2}
-
-// 结构体成员变量定义
-structVarDec ::= allType ID_CONTENT SEMI {pin=1}
-
-// 枚举成员定义
-enumVarDec::= ID_CONTENT (ASSIGN (DIGIT_CONTENT | STRING_CONTENT))? {pin=1}
+UsingDec ::= using UsingNameDec '=' AllType ';' {pin=1}
+UsingNameDec ::= ID
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 函数参数部分
-methodParamOneDec ::= allType methodParamNameDec {pin=1}
-methodParamNameDec ::= ID_CONTENT
-methodParamTailDec ::= TYPE_TAIL
-methodReturnTailDec ::= TYPE_TAIL
-methodParamDec ::= LPAREN ((methodParamOneDec methodParamPairDec* methodParamTailPairDec?) | methodParamTailDec)? RPAREN {pin=1}
-private methodParamPairDec ::= COMMA methodParamOneDec
-private methodParamTailPairDec ::= COMMA methodParamTailDec
+MethodParamTailDec ::= '...'
+private MethodParamTypeDec ::= AllType MethodParamNameDec {pin=1}
+MethodParamOneDec ::= MethodParamTailDec | Modifier* MethodParamTypeDec
+MethodParamNameDec ::= ID
+private MethodParamDecTail ::= ',' MethodParamOneDec
+MethodParamDec ::= '(' (MethodParamOneDec MethodParamDecTail*)? ')' {pin=1}
+MethodGetterParamDec ::= '(' ')' {pin=1}
+MethodSetterParamDec ::= '(' MethodParamOneDec ')' {pin=1}
+
 // 函数体部分
-methodBodyDec ::= LBRACE allExpr* RBRACE {pin=1}
+MethodBodyDec ::= '{' AllExpr* '}' {pin=1}
 // 函数名部分
-methodNameDec ::= ID_CONTENT
+MethodNameDec ::= ID
 // 函数返回值类型
-methodReturnDec ::= COLON ((allType (COMMA allType)* methodReturnTailPairDec?) | methodReturnTailDec) {pin=1}
-private methodReturnTailPairDec ::= COMMA methodReturnTailDec
+MethodReturnTailDec ::= '...'
+MethodReturnOneDec ::= MethodReturnTailDec | AllType
+private MethodReturnDecTail ::= ',' MethodReturnOneDec {pin=1}
+MethodReturnDec ::= ':' (MethodReturnOneDec MethodReturnDecTail*)? {pin=1}
 
 // 类构造函数定义
-classCtorDec ::= accessModifier? Ctor methodParamDec methodBodyDec {pin=2}
+ClassCtorDec ::= ctor (MethodParamDec MethodBodyDec?)? {pin=1}
 // 类getter函数
-classGetterDec ::= accessModifier? get methodNameDec LPAREN RPAREN COLON allType methodBodyDec {pin=2}
+ClassGetterDec ::= get (MethodNameDec (MethodGetterParamDec (':' (AllType MethodBodyDec?)?)?)?)? {pin=1}
 // 类setter函数
-classSetterDec ::= accessModifier? set methodNameDec LPAREN methodParamOneDec RPAREN methodBodyDec {pin=2}
+ClassSetterDec ::= set (MethodNameDec (MethodSetterParamDec MethodBodyDec?)?)? {pin=1}
 // 类成员函数定义
-classMethodDec ::= accessModifier? coModifier? fun methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec {pin=3}
+ClassMethodDec ::= fun (MethodNameDec (TemplateDec? MethodParamDec MethodReturnDec? MethodBodyDec?)?)? {pin=1}
 // 类静态函数定义
-classStaticDec ::= accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec {pin=3}
+ClassStaticDec ::= static (MethodNameDec (TemplateDec? MethodParamDec MethodReturnDec? MethodBodyDec?)?)? {pin=1}
 // 全局函数
-globalMethodDec ::= (protoModifier | cmdModifier)? accessModifier? coModifier? static methodNameDec templateDec? methodParamDec methodReturnDec? methodBodyDec {pin=4}
+GlobalMethodDec ::= static (MethodNameDec (TemplateDec? MethodParamDec MethodReturnDec? MethodBodyDec?)?)? {pin=1}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 表达式
-allExpr ::= varAssignExpr |
-            opAssignExpr |
-            op1Expr |
-            ifExpr |
-            forExpr |
-            whileExpr |
-            doWhileExpr |
-            returnExpr |
-            flowExpr |
-            wrapExpr |
-            propertyValueExpr |
-            throwExpr |
-            assertExpr |
-            emptyExpr
+AllExpr ::= Modifier* (IfExpr |
+            ForExpr |
+            WhileExpr |
+            DoWhileExpr |
+            ReturnExpr |
+            FlowExpr |
+            ThrowExpr |
+            AssertExpr |
+            WrapExpr |
+            Op1Expr |
+            EmptyExpr |
+            VarAssignExpr |
+            OpAssignExpr)
 
 // 空语句
-emptyExpr ::= SEMI
+EmptyExpr ::= ';'
 
 // for 流程控制
-forExpr ::= for forCondition (forBody | allExpr) {pin=1}
-private forCondition ::= LPAREN (forStepCondition | forInCondition) RPAREN {pin=1}
-private forBody ::= LBRACE allExpr* RBRACE {pin=1}
+ForExpr ::= for ForCondition (ForBody | AllExpr) {pin=1}
+ForCondition ::= '(' var ForPairDec (ForStepCondition | ForInCondition) ')' {pin=1}
+ForBody ::= '{' AllExpr* '}' {pin=1}
 
-forStepCondition ::= forStartStat forStepConditionEndStep
-private forStepConditionEndStep ::= COMMA forEndStat forStepConditionStep {pin=1}
-private forStepConditionStep ::= COMMA forStepStat {pin=1}
-forStartStat ::= forPairDec ASSIGN valueStat {pin=2}
-forEndStat ::= valueStat
-forStepStat ::= valueStat
+ForStepCondition ::= ForStartStat ';' ForEndStat ';' ForStepStat {pin=2}
+ForStartStat ::= '=' ValueStat {pin=1}
+ForEndStat ::= ValueStat
+ForStepStat ::= ValueStat
 
-forInCondition ::= forPairDec forInConditionPairDec* forInConditionInDec {pin=1}
-private forInConditionPairDec ::= COMMA forPairDec {pin=1}
-private forInConditionInDec ::= in valueStat {pin=1}
-forPairDec ::= (autoType | allType) varAssignNameDec {pin=1}
+private ForInConditionTail ::= ',' ForPairDec {pin=1}
+ForInCondition ::= ForInConditionTail* in ValueStat {pin=2}
+private ForPairDecTail ::= ':' AllType {pin=1}
+ForPairDec ::= VarAssignNameDec ForPairDecTail?
 
 // while 流程控制
-whileExpr ::= while whileCondition (whileBody | allExpr) {pin=1}
-private whileCondition ::= LPAREN valueStat RPAREN {pin=1}
-private whileBody ::= LBRACE allExpr* RBRACE {pin=1}
+WhileExpr ::= while WhileCondition (WhileBody | AllExpr) {pin=1}
+WhileCondition ::= '(' ValueStat? ')' {pin=1}
+WhileBody ::= '{' AllExpr* '}' {pin=1}
 
 // do while 流程控制
-doWhileExpr ::= do doWhileBody while doWhileCondition SEMI {pin=1}
-private doWhileCondition ::= LPAREN valueStat RPAREN {pin=1}
-private doWhileBody ::= LBRACE allExpr* RBRACE {pin=1}
+DoWhileExpr ::= do DoWhileBody while DoWhileCondition ';'{pin=1}
+DoWhileCondition ::= '(' ValueStat? ')' {pin=1}
+DoWhileBody ::= '{' AllExpr* '}' {pin=1}
 
 // if else 流程控制
-ifExpr ::= if ifCondition (ifBody | allExpr) elseIfExpr* elseExpr? {pin=1}
-private ifCondition ::= LPAREN valueStat RPAREN {pin=1}
-private ifBody ::= LBRACE allExpr* RBRACE {pin=1}
-elseExpr ::= else (elseBody | allExpr) {pin=1}
-private elseBody ::= LBRACE allExpr* RBRACE {pin=1}
-elseIfExpr ::= elseif elseIfCondition (elseIfBody | allExpr) {pin=1}
-private elseIfCondition ::= LPAREN valueStat RPAREN {pin=1}
-private elseIfBody ::= LBRACE allExpr* RBRACE {pin=1}
+IfExpr ::= if IfCondition (IfBody | AllExpr) ElseIfExpr* ElseExpr? {pin=1}
+IfCondition ::= '(' ValueStat? ')' {pin=1}
+IfBody ::= '{' AllExpr* '}' {pin=1}
+ElseExpr ::= else (ElseBody | AllExpr) {pin=1}
+ElseBody ::= '{' AllExpr* '}' {pin=1}
+ElseIfExpr ::= elseif ElseIfCondition (ElseIfBody | AllExpr) {pin=1}
+ElseIfCondition ::= '(' ValueStat? ')' {pin=1}
+ElseIfBody ::= '{' AllExpr* '}' {pin=1}
 
 // 表达式包装 比如 { 表达式列表 }
-wrapExpr ::= LBRACE allExpr* RBRACE {pin=1}
+WrapExpr ::= '{' AllExpr* '}' {pin=1}
 
 // return
-returnExpr ::= return ((valueStat (COMMA valueStat)*) | returnYield)? SEMI {pin=1}
-returnYield ::= yield
+private ReturnExprTail ::= ',' ValueStat
+ReturnExpr ::= return ((ValueStat ReturnExprTail*) | ReturnYield)? ';' {pin=1}
+ReturnYield ::= yield
 
-// break, [ continue 后续添加功能 ]
-flowExpr ::= break SEMI {pin=1}
+// break
+FlowExpr ::= (break | continue) ';' {pin=1}
 
 // 定义语句
-varAssignExpr ::= varAssignDec varAssignPairDec* varAssignValueStat? SEMI {pin=1}
-private varAssignValueStat ::= ASSIGN valueStat {pin=1}
-private varAssignPairDec ::= COMMA varAssignDec {pin=1}
-varAssignDec ::= (autoType | allType) varAssignNameDec {pin=2}
-varAssignNameDec ::= ID_CONTENT
+private VarAssignExprTail1 ::= ',' VarAssignDec {pin=1}
+private VarAssignExprTail2 ::= '=' ValueStat {pin=1}
+VarAssignExpr ::= var VarAssignDec VarAssignExprTail1* VarAssignExprTail2? ';' {pin=1}
+private VarAssignDecTail1 ::= ':' AllType {pin=1}
+VarAssignDec ::= VarAssignNameDec VarAssignDecTail1?
+VarAssignNameDec ::= ID
 
 // 赋值
-opAssign ::= ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | QUOTIENT_ASSIGN | REMAINDER_ASSIGN
-opAssignExpr ::= propertyValue ((COMMA propertyValue)* opAssignValueStat)? SEMI {pin=1}
-private opAssignValueStat ::= opAssign valueStat {pin=1}
-
-// 调用表达式
-propertyValueExpr ::= propertyValue SEMI {pin=1}
+OpAssign ::= '=' | '+=' | '-=' | '*=' | '/=' | '%='
+private OpAssignExprTail1 ::= ',' PropertyValue {pin=1}
+private OpAssignExprTail2 ::= OpAssignExprTail1* OpAssign ValueStat {pin=2}
+OpAssignExpr ::= PropertyValue OpAssignExprTail2? ';'
 
 // 单目运算表达式
-op1Expr ::= op1 valueStat SEMI {pin=1}
+Op1Expr ::= Op1 ValueStat ';' {pin=1}
 
 // throw
-throwExpr ::= throw LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI {pin=1}
+private ThrowExprTail ::= ',' ValueStat {pin=1}
+ThrowExpr ::= throw '(' (ValueStat ThrowExprTail*)? ')' ';' {pin=1}
 
 // assert
-assertExpr ::= assert LPAREN (valueStat (COMMA valueStat)*)? RPAREN SEMI {pin=1}
+private AssertExprTail ::= ',' ValueStat {pin=1}
+AssertExpr ::= assert '(' (ValueStat AssertExprTail*)? ')' ';' {pin=1}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 所有类型
-allType ::= primitiveType | genericType | customType
+AllType ::= AllTypeConst? (PrimitiveType | GenericType | CustomType)
+AllTypeConst ::= const
 
 // 自定义类型
-customType ::= ID_CONTENT customTypeDotId? customTypeTemplate? {pin=1}
-customTypeDotId ::= DOT customTypeDotIdName {pin=1}
-customTypeDotIdName ::= ID_CONTENT
-private customTypeTemplate ::= LESS allType customTypeTemplatePair* GREATER {pin=1}
-private customTypeTemplatePair ::= COMMA allType {pin=1}
+CustomType ::= CustomTypeName CustomTypeDotId? CustomTypeTemplate?
+CustomTypeName ::= ID
+CustomTypeDotId ::= '.' CustomTypeDotIdName {pin=1}
+CustomTypeDotIdName ::= ID
+CustomTypeTemplate ::= '<' AllType (',' AllType)* '>' {pin=1}
 
 // 通用类型
-genericType ::= genericListType | genericMapType | genericFunctorType
-genericMapType ::= Map LESS allType COMMA allType GREATER {pin=1}
-genericListType ::= List LESS allType GREATER {pin=1}
-genericFunctorType ::= Functor LESS coModifier? LPAREN genericFunctorParamType? RPAREN genericFunctorReturnType? GREATER {pin=1}
-genericFunctorParamType ::= genericFunctorParamTail | (allType (COMMA allType)* (COMMA genericFunctorParamTail)?)
-genericFunctorParamTail ::= TYPE_TAIL
-genericFunctorReturnType ::=  COLON (genericFunctorReturnTail | (allType (COMMA allType)* (COMMA genericFunctorReturnTail)?)) {pin=1}
-genericFunctorReturnTail ::= TYPE_TAIL
+GenericType ::= GenericListType | GenericMapType | GenericFunctorType
+private GenericMapTypeTail ::= ',' AllType {pin=1}
+GenericMapType ::= Map '<' AllType GenericMapTypeTail '>' {pin=1}
+GenericListType ::= List '<' AllType '>' {pin=1}
+GenericFunctorType ::= Functor '<' AllTypeConst? CoroutineModifier? '(' GenericFunctorParamType? ')' GenericFunctorReturnType? '>' {pin=1}
+
+GenericFunctorParamOneType ::= GenericFunctorParamTail | AllType
+GenericFunctorParamTail ::= '...'
+private GenericFunctorParamTypeTail ::= ',' GenericFunctorParamOneType {pin=1}
+GenericFunctorParamType ::= GenericFunctorParamOneType GenericFunctorParamTypeTail*
+
+GenericFunctorReturnTail ::= '...'
+GenericFunctorReturnOneType ::= GenericFunctorReturnTail | AllType
+private GenericFunctorReturnTypeTail ::= ',' GenericFunctorReturnOneType {pin=1}
+GenericFunctorReturnType ::=  ':' GenericFunctorReturnOneType GenericFunctorReturnTypeTail* {pin=1}
 
 // 基本类型
-primitiveType ::= bool | double | int | I64 | any | string
-
-// 推导类型
-autoType ::= auto
+PrimitiveType ::= bool | double | int | long | any | string
 
 //复合值///////////////////////////////////////////////////////////////////
-// 复合值
-valueStat ::= opNewStat | op3Stat | op2Stat | op4Stat | op5Stat | op6Stat | op7Stat | op8Stat | valueFactorStat | opNewListStat | bindStat | tcallStat | methodParamTailDec
-valueFactorStat ::= wrapValueStat | constValue | propertyValue | reflectValue
+ValueStat ::= OpNewStat | OpNewListStat | BindStat | TcallStat | Op2Stat | ValueOpStat
+ValueFactorStat ::= WrapValueStat | ConstValue | ReflectValue | PropertyValue | MethodParamTailDec | CoroutineStat
+ValueOpStat ::= ValueFactorStat (Op3Stat | Op4Stat | Op5Stat | Op6Stat | Op7Stat | Op8Stat)?
 
 // new
-opNewStat ::= new (customType | genericType) LPAREN (valueStat opNewStatValueStatPair*)? RPAREN {pin=1}
-private opNewStatValueStatPair ::= COMMA valueStat {pin=1}
+private OpNewStatTail ::= ',' ValueStat {pin=1}
+OpNewStat ::= new (CustomType | GenericType) '(' (ValueStat OpNewStatTail*)? ')' {pin=1}
 // list 快捷表达式
-opNewListStat ::= LBRACK (valueStat opNewListStatValueStatPair*)? RBRACK {pin=1}
-private opNewListStatValueStatPair ::= COMMA valueStat {pin=1}
+private OpNewListStatTail ::= ',' ValueStat {pin=1}
+OpNewListStat ::= '[' (ValueStat OpNewListStatTail*)? ']' {pin=1}
 // bind
-bindStat ::= bind LPAREN (valueStat bindStatValueStatPair*)? RPAREN  {pin=1}
-private bindStatValueStatPair ::= COMMA valueStat {pin=1}
+private BindStatTail ::= ',' ValueStat {pin=1}
+BindStat ::= bind '(' (ValueStat BindStatTail*)? ')' {pin=1}
 // tcall
-tcallStat ::= tcall LPAREN (valueStat tcallStatValueStatPair*)? RPAREN  {pin=1}
-private tcallStatValueStatPair ::= COMMA valueStat {pin=1}
+private TcallStatTail ::= ',' ValueStat {pin=1}
+TcallStat ::= tcall '(' (ValueStat TcallStatTail*)? ')' {pin=1}
 // 值
-wrapValueStat ::= LPAREN valueStat RPAREN
+WrapValueStat ::= '(' ValueStat ')' {pin=1}
 // 常量值
-constValue ::= true | false | STRING_CONTENT | DIGIT_CONTENT | null
+ConstValue ::= true | false | null | TEXT | NUMBER
+
+// 当前协程对象
+CoroutineStat ::= co
+
 // 反射机制
-reflectValue ::= reflect (reflectCustomType | reflectValueStat) {pin=1}
-private reflectCustomType ::= LESS customType GREATER {pin=1}
-private reflectValueStat ::= LPAREN valueStat RPAREN {pin=1}
+ReflectValue ::= reflect (ReflectCustomType | ReflectValueStat) {pin=1}
+ReflectCustomType ::= '<' CustomType '>' {pin=1}
+ReflectValueStat ::= '(' ValueStat ')' {pin=1}
 
 // 属性
-propertyValue ::= propertyValueFirstType propertyValueSuffix*
+PropertyValue ::= PropertyValueFirstType PropertyValueSuffix*
 
-propertyValueFirstType ::= propertyValueCustomType | propertyValueThisType | propertyValueCastType
-propertyValueCastType ::= cast LESS allType GREATER LPAREN valueFactorStat RPAREN {pin=1}
-propertyValueCustomType ::= ID_CONTENT
-propertyValueThisType ::= this
+PropertyValueFirstType ::= PropertyValueThisType | PropertyValueCastType | PropertyValueCustomType
+PropertyValueCastType ::= cast '<' AllType '>' '(' ValueFactorStat ')' {pin=1}
+PropertyValueCustomType ::= ID
+PropertyValueThisType ::= this
 
-propertyValueSuffix ::= propertyValueDotId | propertyValueBracketValue | propertyValueMethodCall
-propertyValueDotId ::= DOT propertyValueDotIdName {pin=1}
-propertyValueDotIdName ::= ID_CONTENT
-propertyValueBracketValue ::= LBRACK valueStat RBRACK {pin=1}
-propertyValueMethodCall ::= propertyValueMethodTemplate? LPAREN (valueStat propertyValueMethodCallValueStatPair*)? RPAREN {pin=2}
-private propertyValueMethodCallValueStatPair ::= COMMA valueStat {pin=1}
-propertyValueMethodTemplate ::= LESS allType propertyValueMethodTemplatePair* GREATER {pin=1}
-private propertyValueMethodTemplatePair ::= COMMA allType {pin=1}
+PropertyValueSuffix ::= PropertyValueDotId | PropertyValueBracketValue | PropertyValueMethodCall
+PropertyValueDotId ::= '.' PropertyValueDotIdName {pin=1}
+PropertyValueDotIdName ::= ID
+PropertyValueBracketValue ::= '[' ValueStat ']' {pin=1}
+private PropertyValueMethodCallTail ::= ',' ValueStat {pin=1}
+PropertyValueMethodCall ::= PropertyValueMethodTemplate? '(' (ValueStat PropertyValueMethodCallTail*)? ')' {pin=2}
+private PropertyValueMethodTemplateTail ::= ',' AllType {pin=1}
+PropertyValueMethodTemplate ::= '{' AllType PropertyValueMethodTemplateTail* '}' {pin=1}
 
-// op 类型的运算，编号越大，优先级越低///////////////////////////////////////////////////
+// Op 类型的运算，编号越大，优先级越低///////////////////////////////////////////////////
 
 // 双目运算
-op8 ::= COND_OR
-op8Stat ::= valueFactorStat op8Suffix op8SuffixEx*
-op8Suffix ::= op8 (valueFactorStat | op2Value) op8SuffixEe*
-op8SuffixEe ::= op3Suffix | op4Suffix | op5Suffix | op6Suffix | op7Suffix
-op8SuffixEx ::= op8Suffix
+Op8 ::= '||'
+Op8Stat ::= Op8Suffix Op8SuffixEx*
+Op8Suffix ::= Op8 (ValueFactorStat | Op2Value) Op8SuffixEe* {pin=1}
+Op8SuffixEe ::= Op3Suffix | Op4Suffix | Op5Suffix | Op6Suffix | Op7Suffix
+Op8SuffixEx ::= Op8Suffix
 
-op7 ::= COND_AND
-op7Stat ::= valueFactorStat op7Suffix op7SuffixEx*
-op7Suffix ::= op7 (valueFactorStat | op2Value) op7SuffixEe*
-op7SuffixEe ::= op3Suffix | op4Suffix | op5Suffix | op6Suffix
-op7SuffixEx ::= op7Suffix | op8Suffix
+Op7 ::= '&&'
+Op7Stat ::= Op7Suffix Op7SuffixEx*
+Op7Suffix ::= Op7 (ValueFactorStat | Op2Value) Op7SuffixEe* {pin=1}
+Op7SuffixEe ::= Op3Suffix | Op4Suffix | Op5Suffix | Op6Suffix
+Op7SuffixEx ::= Op7Suffix | Op8Suffix
 
-op6 ::= LESS | LESS_OR_EQUAL | GREATER | GREATER_OR_EQUAL | EQ | NOT_EQ
-op6Stat ::= valueFactorStat op6Suffix op6SuffixEx*
-op6Suffix ::= op6 (valueFactorStat | op2Value) op6SuffixEe*
-op6SuffixEe ::= op3Suffix | op4Suffix | op5Suffix
-op6SuffixEx ::= op6Suffix | op7Suffix | op8Suffix
+Op6 ::=  '<=' | '<' | '>=' | '>' | '==' | '!='
+Op6Stat ::= Op6Suffix Op6SuffixEx*
+Op6Suffix ::= Op6 (ValueFactorStat | Op2Value) Op6SuffixEe* {pin=1}
+Op6SuffixEe ::= Op3Suffix | Op4Suffix | Op5Suffix
+Op6SuffixEx ::= Op6Suffix | Op7Suffix | Op8Suffix
 
-op5 ::= CONCAT
-op5Stat ::= valueFactorStat op5Suffix op5SuffixEx*
-op5Suffix ::= op5 (valueFactorStat | op2Value) op5SuffixEe*
-op5SuffixEe ::= op3Suffix | op4Suffix
-op5SuffixEx ::= op5Suffix | op6Suffix | op7Suffix | op8Suffix
+Op5 ::= '..'
+Op5Stat ::= Op5Suffix Op5SuffixEx*
+Op5Suffix ::= Op5 (ValueFactorStat | Op2Value) Op5SuffixEe* {pin=1}
+Op5SuffixEe ::= Op3Suffix | Op4Suffix
+Op5SuffixEx ::= Op5Suffix | Op6Suffix | Op7Suffix | Op8Suffix
 
-op4 ::= PLUS | MINUS
-op4Stat ::= valueFactorStat op4Suffix op4SuffixEx*
-op4Suffix ::= op4 (valueFactorStat | op2Value) op4SuffixEe*
-op4SuffixEe ::= op3Suffix
-op4SuffixEx ::= op4Suffix | op5Suffix | op6Suffix | op7Suffix | op8Suffix
+Op4 ::= '+' | '-'
+Op4Stat ::= Op4Suffix Op4SuffixEx*
+Op4Suffix ::= Op4 (ValueFactorStat | Op2Value) Op4SuffixEe* {pin=1}
+Op4SuffixEe ::= Op3Suffix
+Op4SuffixEx ::= Op4Suffix | Op5Suffix | Op6Suffix | Op7Suffix | Op8Suffix
 
-op3 ::= MUL | QUOTIENT | REMAINDER
-op3Stat ::= valueFactorStat op3Suffix op3SuffixEx*
-op3Suffix ::= op3 (valueFactorStat | op2Value)
-op3SuffixEx ::= op3Suffix | op4Suffix | op5Suffix | op6Suffix | op7Suffix | op8Suffix
+Op3 ::= '*' | '/' | '%'
+Op3Stat ::= Op3Suffix Op3SuffixEx*
+Op3Suffix ::= Op3 (ValueFactorStat | Op2Value) {pin=1}
+Op3SuffixEx ::= Op3Suffix | Op4Suffix | Op5Suffix | Op6Suffix | Op7Suffix | Op8Suffix
 
 // 单目运算
-op2 ::= NOT | MINUS
-op2Stat ::= op2Value op2SuffixEx*
-op2Value ::= op2 valueFactorStat
-op2SuffixEx ::= op3Suffix | op4Suffix | op5Suffix | op6Suffix | op7Suffix | op8Suffix
+Op2 ::= '!' | '-'
+Op2Stat ::= Op2Value Op2SuffixEx*
+Op2Value ::= Op2 ValueFactorStat {pin=1}
+Op2SuffixEx ::= Op3Suffix | Op4Suffix | Op5Suffix | Op6Suffix | Op7Suffix | Op8Suffix
 
 // 优先级1 前缀自加，前缀自减 从右到左
-op1 ::= PLUS_PLUS | MINUS_MINUS
+Op1 ::= '++' | '--'
