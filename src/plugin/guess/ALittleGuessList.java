@@ -5,40 +5,58 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public class ALittleGuessList extends ALittleGuess {
-    public @NotNull ALittleGuess subType;
+    public ALittleGuess sub_type;
+    public boolean is_native;
 
-    public ALittleGuessList(@NotNull ALittleGuess sub) {
-        subType = sub;
+    public ALittleGuessList(ALittleGuess p_sub_type, boolean p_is_const, boolean p_is_native)
+    {
+        sub_type = p_sub_type;
+        is_const = p_is_const;
+        is_native = p_is_native;
     }
 
     @Override
-    public void UpdateValue() {
-        value = "List<" + subType.value + ">";
+    public boolean hasAny()
+    {
+        return sub_type.hasAny();
     }
 
     @Override
-    public boolean isChanged() {
-        return subType.isChanged();
+    public boolean needReplace()
+    {
+        return sub_type.needReplace();
     }
 
     @Override
-    @NotNull
-    public ALittleGuess Clone() {
-        ALittleGuessList guess = new ALittleGuessList(subType);
-        guess.UpdateValue();
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
+    {
+        ALittleGuess replace = sub_type.replaceTemplate(fill_map);
+        if (replace == null) return null;
+        ALittleGuessList guess = new ALittleGuessList(replace, is_const, is_native);
+        guess.updateValue();
         return guess;
     }
 
     @Override
-    public boolean NeedReplace() {
-        return subType.NeedReplace();
+    public ALittleGuess clone()
+    {
+        ALittleGuessList guess = new ALittleGuessList(sub_type, is_const, is_native);
+        guess.updateValue();
+        return guess;
     }
 
     @Override
-    @NotNull
-    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
-        ALittleGuessList guess = new ALittleGuessList(subType.ReplaceTemplate(fillMap));
-        guess.UpdateValue();
-        return guess;
+    public void updateValue()
+    {
+        value = "";
+        if (is_const) value += "const ";
+        if (is_native) value += "native ";
+        value += "List<" + sub_type.getValue() + ">";
+    }
+
+    @Override
+    public boolean isChanged()
+    {
+        return sub_type.isChanged();
     }
 }

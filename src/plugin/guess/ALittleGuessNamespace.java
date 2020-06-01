@@ -1,47 +1,61 @@
 package plugin.guess;
 
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleNamespaceDec;
 
 import java.util.Map;
 
 public class ALittleGuessNamespace extends ALittleGuess {
-    private @NotNull String mNamespaceName;
-    public @NotNull ALittleNamespaceDec element;
-    public ALittleGuessNamespace(@NotNull String namespaceName, @NotNull ALittleNamespaceDec e) {
-        isRegister = e.getRegisterModifier() != null;
-        mNamespaceName = namespaceName;
-        element = e;
+    // 命名域
+    public String namespace_name = "";
+
+    // 元素对象
+    public ALittleNamespaceDec namespace_dec;
+
+    public ALittleGuessNamespace(String p_namespace_name, ALittleNamespaceDec p_namespace_dec)
+    {
+        is_register = PsiHelper.isRegister(p_namespace_dec);
+        namespace_name = p_namespace_name;
+        namespace_dec = p_namespace_dec;
     }
 
     @Override
-    public void UpdateValue() {
-        value = mNamespaceName;
+    public PsiElement getElement()
+    {
+        return namespace_dec;
     }
 
     @Override
-    public boolean isChanged() {
-        if (!element.isValid()) return true;
-        return ALittleTreeChangeListener.getGuessTypeList(element) == null;
-    }
-
-    @Override
-    @NotNull
-    public ALittleGuess Clone() {
-        ALittleGuessNamespace guess = new ALittleGuessNamespace(mNamespaceName, element);
-        guess.UpdateValue();
-        return guess;
-    }
-
-    @Override
-    public boolean NeedReplace() {
+    public boolean needReplace()
+    {
         return false;
     }
 
     @Override
-    @NotNull
-    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
+    {
         return this;
+    }
+
+    @Override
+    public ALittleGuess clone()
+    {
+        ALittleGuessNamespace guess = new ALittleGuessNamespace(namespace_name, namespace_dec);
+        guess.updateValue();
+        return guess;
+    }
+    @Override
+    public void updateValue()
+    {
+        value = namespace_name;
+    }
+
+    @Override
+    public boolean isChanged()
+    {
+        return ALittleTreeChangeListener.getGuessTypeList(namespace_dec) == null;
     }
 }

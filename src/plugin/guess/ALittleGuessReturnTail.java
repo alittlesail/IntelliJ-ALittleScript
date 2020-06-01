@@ -1,37 +1,38 @@
 package plugin.guess;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
 
 public class ALittleGuessReturnTail extends ALittleGuess {
-    public ALittleGuessReturnTail(@NotNull String v) {
-        value = v;
+    public ALittleGuessReturnTail(String p_value)
+    {
+        value = p_value;
     }
 
     @Override
-    public boolean isChanged() {
+    public boolean needReplace()
+    {
         return false;
     }
 
     @Override
-    public void UpdateValue() {}
-    @Override
-    @NotNull
-    public ALittleGuess Clone() {
-        ALittleGuessReturnTail guess = new ALittleGuessReturnTail(value);
-        guess.UpdateValue();
-        return guess;
-    }
-
-    @Override
-    public boolean NeedReplace() {
-        return false;
-    }
-
-    @Override
-    @NotNull
-    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
+    {
         return this;
+    }
+
+    @Override
+    public ALittleGuess clone()
+    {
+        return new ALittleGuessReturnTail(value);
+    }
+
+    @Override
+    public void updateValue()
+    {
+    }
+
+    public boolean isChanged()
+    {
+        return false;
     }
 }

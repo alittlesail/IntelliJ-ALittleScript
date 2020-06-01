@@ -1,5 +1,6 @@
 package plugin.guess;
 
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
@@ -8,44 +9,57 @@ import plugin.psi.ALittleEnumNameDec;
 import java.util.Map;
 
 public class ALittleGuessEnumName extends ALittleGuess {
-    private @NotNull String mNamespaceName;
-    private @NotNull String mEnumName;
+    // 命名域和枚举名
+    public String namespace_name = "";
+    public String enum_name = "";
 
-    public @NotNull ALittleEnumNameDec element;
-    public ALittleGuessEnumName(@NotNull String namespaceName, @NotNull String enumName, @NotNull ALittleEnumNameDec e) {
-        isRegister = PsiHelper.isRegister(e);
-        mNamespaceName = namespaceName;
-        mEnumName = enumName;
-        element = e;
+    // 元素对象
+    public ALittleEnumNameDec enum_name_dec;
+
+    public ALittleGuessEnumName(String p_namespace_name, String p_enum_name
+            , ALittleEnumNameDec p_enum_name_dec)
+    {
+        is_register = PsiHelper.isRegister(p_enum_name_dec);
+        namespace_name = p_namespace_name;
+        enum_name = p_enum_name;
+        enum_name_dec = p_enum_name_dec;
     }
 
     @Override
-    public void UpdateValue() {
-        value = mNamespaceName + "." + mEnumName;
+    public PsiElement getElement()
+    {
+        return enum_name_dec;
     }
 
     @Override
-    public boolean isChanged() {
-        if (!element.isValid()) return true;
-        return ALittleTreeChangeListener.getGuessTypeList(element) == null;
-    }
-
-    @Override
-    @NotNull
-    public ALittleGuess Clone() {
-        ALittleGuessEnumName guess = new ALittleGuessEnumName(mNamespaceName, mEnumName, element);
-        guess.UpdateValue();
-        return guess;
-    }
-
-    @Override
-    public boolean NeedReplace() {
+    public boolean needReplace()
+    {
         return false;
     }
 
     @Override
-    @NotNull
-    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
+    {
         return this;
+    }
+
+    @Override
+    public ALittleGuess clone()
+    {
+        ALittleGuessEnumName guess = new ALittleGuessEnumName(namespace_name, enum_name, enum_name_dec);
+        guess.updateValue();
+        return guess;
+    }
+
+    @Override
+    public void updateValue()
+    {
+        value = namespace_name + "." + enum_name;
+    }
+
+    @Override
+    public boolean isChanged()
+    {
+        return ALittleTreeChangeListener.getGuessTypeList(enum_name_dec) == null;
     }
 }

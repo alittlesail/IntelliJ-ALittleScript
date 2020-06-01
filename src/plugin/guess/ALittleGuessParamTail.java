@@ -5,33 +5,38 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public class ALittleGuessParamTail extends ALittleGuess {
-    public ALittleGuessParamTail(@NotNull String v) {
-        value = v;
+
+    public ALittleGuessParamTail(String p_value)
+    {
+        value = p_value;
     }
 
     @Override
-    public boolean isChanged() {
+    public boolean needReplace()
+    {
         return false;
     }
 
     @Override
-    public void UpdateValue() {}
-    @Override
-    @NotNull
-    public ALittleGuess Clone() {
-        ALittleGuessParamTail guess = new ALittleGuessParamTail(value);
-        guess.UpdateValue();
-        return guess;
-    }
-
-    @Override
-    public boolean NeedReplace() {
-        return false;
-    }
-
-    @Override
-    @NotNull
-    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
+    {
         return this;
+    }
+
+    @Override
+    public ALittleGuess clone()
+    {
+        return new ALittleGuessParamTail(value);
+    }
+
+    @Override
+    public void updateValue()
+    {
+    }
+
+    @Override
+    public boolean isChanged()
+    {
+        return false;
     }
 }

@@ -1,5 +1,6 @@
 package plugin.guess;
 
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
@@ -8,43 +9,57 @@ import plugin.psi.ALittleStructNameDec;
 import java.util.Map;
 
 public class ALittleGuessStructName extends ALittleGuess {
-    private @NotNull String mNamespaceName;
-    private @NotNull String mStructName;
+    // 命名域和结构体名
+    public String namespace_name = "";
+    public String struct_name = "";
 
-    public @NotNull ALittleStructNameDec element;
-    public ALittleGuessStructName(@NotNull String namespaceName, @NotNull String structName, @NotNull ALittleStructNameDec e) {
-        isRegister = PsiHelper.isRegister(e);
-        mNamespaceName = namespaceName;
-        mStructName = structName;
-        element = e;
+    // 元素对象
+    public ALittleStructNameDec struct_name_dec;
+
+    public ALittleGuessStructName(String p_namespace_name, String p_struct_name
+            , ALittleStructNameDec p_struct_name_dec)
+    {
+        is_register = PsiHelper.isRegister(p_struct_name_dec);
+        namespace_name = p_namespace_name;
+        struct_name = p_struct_name;
+        struct_name_dec = p_struct_name_dec;
     }
 
     @Override
-    public void UpdateValue() {
-        value = mNamespaceName + "." + mStructName;
-    }
-
-    public boolean isChanged() {
-        if (!element.isValid()) return true;
-        return ALittleTreeChangeListener.getGuessTypeList(element) == null;
+    public PsiElement getElement()
+    {
+        return struct_name_dec;
     }
 
     @Override
-    @NotNull
-    public ALittleGuess Clone() {
-        ALittleGuessStructName guess = new ALittleGuessStructName(mNamespaceName, mStructName, element);
-        guess.UpdateValue();
-        return guess;
-    }
-
-    @Override
-    public boolean NeedReplace() {
+    public boolean needReplace()
+    {
         return false;
     }
 
     @Override
-    @NotNull
-    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
+    {
         return this;
+    }
+
+    @Override
+    public ALittleGuess clone()
+    {
+        ALittleGuessStructName guess = new ALittleGuessStructName(namespace_name, struct_name, struct_name_dec);
+        guess.updateValue();
+        return guess;
+    }
+
+    @Override
+    public void updateValue()
+    {
+        value = namespace_name + "." + struct_name;
+    }
+
+    @Override
+    public boolean isChanged()
+    {
+        return ALittleTreeChangeListener.getGuessTypeList(struct_name_dec) == null;
     }
 }

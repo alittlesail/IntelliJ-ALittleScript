@@ -20,18 +20,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0fa83c02-5800-4982-b0b2-fb9c6fa549c9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/IGG.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/IGG.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/ALittle.bnf" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/ALittle.bnf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/_ALittleLexer.flex" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/_ALittleLexer.flex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/FileHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/FileHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleCompletionContributor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleCompletionContributor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleLineMarkerProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleLineMarkerProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuess.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessClass.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessClass.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/module/ALittleModuleConfigurationEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/module/ALittleModuleConfigurationEditor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessClassName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessClassName.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessClassTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessClassTemplate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessConst.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessConst.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessEnumName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessEnumName.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessFunctor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessFunctor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessList.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessList.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessNamespace.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessNamespace.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessNamespaceName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessNamespaceName.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessParamTail.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessParamTail.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessPrimitive.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessPrimitive.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessReturnTail.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessReturnTail.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessStruct.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessStruct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessStructName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessStructName.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,11 +122,11 @@
       <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="plugin.guess" />
       <recent name="plugin.reference" />
       <recent name="plugin.action" />
       <recent name="plugin.link" />
       <recent name="plugin.csv" />
-      <recent name="plugin.guess" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
@@ -190,6 +194,10 @@
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="414" y="154" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1590116336985" />
+    <state x="-1155" y="225" key="#com.intellij.ide.util.MemberChooser" timestamp="1590996047260">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1155" y="225" key="#com.intellij.ide.util.MemberChooser/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590996047260" />
     <state x="-1230" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1590976918754">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
@@ -212,10 +220,10 @@
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1258" y="118" width="596" height="804" key="find.popup/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590981146199" />
-    <state x="-1304" y="240" key="run.anything.popup" timestamp="1590976206301">
+    <state x="-1304" y="240" key="run.anything.popup" timestamp="1590995407000">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="-1304" y="240" key="run.anything.popup/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590976206301" />
+    <state x="-1304" y="240" key="run.anything.popup/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590995407000" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

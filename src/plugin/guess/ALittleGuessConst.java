@@ -7,38 +7,37 @@ import java.util.List;
 import java.util.Map;
 
 public class ALittleGuessConst extends ALittleGuess {
-    public static List<ALittleGuess> sConstNullGuess;
-    static {
-        sConstNullGuess = new ArrayList<>();
-        sConstNullGuess.add(new ALittleGuessConst("null"));
-    }
-
-    public ALittleGuessConst(@NotNull String v) {
-        value = v;
+    public ALittleGuessConst(String p_value)
+    {
+        value = p_value;
     }
 
     @Override
-    public boolean isChanged() {
+    public boolean needReplace()
+    {
         return false;
     }
 
     @Override
-    public void UpdateValue() {}
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
+    {
+        return this;
+    }
 
     @Override
-    @NotNull
-    public ALittleGuess Clone() {
+    public ALittleGuess clone()
+    {
         return new ALittleGuessConst(value);
     }
 
     @Override
-    public boolean NeedReplace() {
-        return false;
+    public void updateValue()
+    {
     }
 
     @Override
-    @NotNull
-    public ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap) {
-        return this;
+    public boolean isChanged()
+    {
+        return false;
     }
 }
