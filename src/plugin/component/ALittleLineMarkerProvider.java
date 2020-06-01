@@ -47,7 +47,7 @@ public class ALittleLineMarkerProvider extends RelatedItemLineMarkerProvider {
                         NavigationGutterIconBuilder.create(ALittleIcons.OVERRIDE).
                                 setTargets(methodNameDec).
                                 setTooltipText("override");
-                result.add(builder.createLineMarkerInfo(myElement.getIdContent()));
+                result.add(builder.createLineMarkerInfo(myElement.getId()));
             }
         }
     }

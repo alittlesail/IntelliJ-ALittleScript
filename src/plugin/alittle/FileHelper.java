@@ -3,11 +3,13 @@ package plugin.alittle;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import plugin.component.StdLibraryProvider;
+import plugin.guess.ALittleGuessException;
 import plugin.link.ALittleLinkConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 public class FileHelper {
     // 删除文件夹
@@ -144,5 +146,13 @@ public class FileHelper {
         FileOutputStream file_out = new FileOutputStream(new File(path));
         file_out.write(content.getBytes(StandardCharsets.UTF_8));
         file_out.close();
+    }
+
+    // 获取目标根路径
+    public static String calcRootFullPath(String module_path, String ext)
+    {
+        String out_pre = "";
+        if (ext.equals("js")) out_pre = "JS";
+        return module_path + out_pre + "Script\\";
     }
 }

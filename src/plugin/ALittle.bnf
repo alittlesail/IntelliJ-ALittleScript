@@ -1,5 +1,6 @@
 {
   parserClass="plugin.parser.ALittleParser"
+  parserUtilClass="plugin.parser.ALittleParserUtil"
 
   mixin="com.intellij.extapi.psi.ASTWrapperPsiElement"
   methods=[guessType guessTypes getReference]
@@ -54,10 +55,10 @@
 
       WHITE_SPACE           = 'regexp:\s+'
       LINE_COMMENT          = 'regexp://.*'
-      BLOCK_COMMENT         = 'regexp:/\*([^*/]|\*(?!/)|/(?<!\*))*((?=\*/))(\*/)'
-      NUMBER                = 'regexp:0x[0-9a-fA-F]+|\d+(\.\d*)?'
-      TEXT                  = 'regexp:"([^"\\]|\\.)*"'
-      ID                    = 'regexp:[_a-zA-Z][_a-zA-Z0-9]*'
+      BLOCK_COMMENT         = 'regexp:/\*(.|\n)*\*/'
+      NUMBER_CONTENT        = 'regexp:0x[0-9a-fA-F]+|\d+(\.\d*)?'
+      TEXT_CONTENT          = 'regexp:"([^"\\]|\\.)*"'
+      ID_CONTENT            = 'regexp:[_a-zA-Z][_a-zA-Z0-9]*'
   ]
 }
 
@@ -75,7 +76,7 @@ CoroutineModifier ::= async | await
 ProtocolModifier ::= Http | HttpDownload | HttpUpload | Msg
 
 // 命令修饰符，用于开发人员指令执行函数
-CommandBodyDec ::= '(' TEXT ')' {pin=1}
+CommandBodyDec ::= '(' TEXT_CONTENT ')' {pin=1}
 CommandModifier ::= Cmd CommandBodyDec? {pin=1}
 
 // 是否可以为null，用于修饰函数形参
@@ -83,10 +84,10 @@ NullableModifier ::= Nullable
 
 // 语言生效修饰符，用于修饰结构体，枚举，类，类成员变量，类成员函数，类静态函数，全局函数
 // 表示修饰目标只有在规定的语言范围内生效
-LanguageNameDec ::= ID
+LanguageNameDec ::= ID_CONTENT
 
-private LanguageBodyDecTail ::= ',' LanguageNameDec {pin=1}
-LanguageBodyDec ::= '(' (LanguageNameDec LanguageBodyDecTail*)? ')' {pin=1}
+private LanguageNameDec_ ::= ',' LanguageNameDec {pin=1}
+LanguageBodyDec ::= '(' (LanguageNameDec LanguageNameDec_*)? ')' {pin=1}
 LanguageModifier ::= Language LanguageBodyDec? {pin=1}
 
 // 常量修饰符，用于修饰函数。表示这个函数不会对数据进行修改
@@ -105,77 +106,78 @@ Modifier ::= AttributeModifier | AccessModifier | CoroutineModifier | RegisterMo
 // 命名域
 NamespaceDec ::= Modifier* namespace NamespaceNameDec ';' NamespaceElementDec* {pin=2}
 NamespaceElementDec ::= Modifier* (GlobalMethodDec | ClassDec | EnumDec | StructDec | UsingDec | InstanceDec | OpAssignExpr)
-NamespaceNameDec ::= ID
+NamespaceNameDec ::= ID_CONTENT
 
 // 模板定义
-private TemplateDecTail ::= ',' TemplatePairDec {pin=1}
-TemplateDec ::= '<' TemplatePairDec TemplateDecTail* '>' {pin=1}
+private TemplatePairDec_ ::= ',' TemplatePairDec {pin=1}
+TemplateDec ::= '<' TemplatePairDec TemplatePairDec_* '>' {pin=1}
 TemplatePairDec ::= TemplateNameDec TemplateExtendsDec? {pin=1}
-TemplateNameDec ::= ID
+TemplateNameDec ::= ID_CONTENT
 TemplateExtendsDec ::= ':' (AllType | TemplateExtendsClassDec | TemplateExtendsStructDec) {pin=1}
 TemplateExtendsClassDec ::= class
 TemplateExtendsStructDec ::= struct
 
 // 类定义
 ClassDec ::= class (ClassNameDec TemplateDec? ClassExtendsDec? ClassBodyDec?)? {pin=1}
-ClassNameDec ::= ID
+ClassNameDec ::= ID_CONTENT
 ClassExtendsDec ::= ':' (NamespaceNameDec '.')? ClassNameDec {pin=1}
 ClassElementDec ::= Modifier* (ClassCtorDec | ClassGetterDec | ClassSetterDec | ClassStaticDec | ClassMethodDec | ClassVarDec)
 ClassBodyDec ::= '{' ClassElementDec* '}' {pin=1}
 ClassVarDec ::= AllType ClassVarNameDec ';' {pin=1}
-ClassVarNameDec ::= ID
+ClassVarNameDec ::= ID_CONTENT
 
 // 结构体定义
 StructDec ::= struct (StructNameDec StructExtendsDec? StructBodyDec?)? {pin=1}
-StructNameDec ::= ID
+StructNameDec ::= ID_CONTENT
 StructExtendsDec ::= ':' (NamespaceNameDec '.')? StructNameDec {pin=1}
 StructBodyDec ::= '{' (StructOptionDec | StructVarDec)* '}' {pin=1}
 StructVarDec ::= AllType StructVarNameDec ';' {pin=1}
-StructVarNameDec ::= ID
-StructOptionDec ::= option StructOptionNameDec '=' TEXT ';' {pin=1}
-StructOptionNameDec ::= ID
+StructVarNameDec ::= ID_CONTENT
+StructOptionDec ::= option StructOptionNameDec '=' TEXT_CONTENT ';' {pin=1}
+StructOptionNameDec ::= ID_CONTENT
 
 // 枚举定义
 EnumDec ::= enum (EnumNameDec EnumBodyDec?)? {pin=1}
-EnumNameDec ::= ID
+EnumNameDec ::= ID_CONTENT
 EnumBodyDec ::= '{' EnumVarDec* '}' {pin=1}
-private EnumVarDecTail ::= '=' (NUMBER | TEXT) {pin=1}
-EnumVarDec ::= EnumVarNameDec EnumVarDecTail? ';' {pin=1}
-EnumVarNameDec ::= ID
+private EnumVarDecValue_ ::= '=' (NUMBER_CONTENT | TEXT_CONTENT) {pin=1}
+EnumVarDec ::= EnumVarNameDec EnumVarDecValue_? ';' {pin=1}
+EnumVarNameDec ::= ID_CONTENT
 
 // 全局变量
 InstanceDec ::= VarAssignExpr
 
 // using定义
 UsingDec ::= using UsingNameDec '=' AllType ';' {pin=1}
-UsingNameDec ::= ID
+UsingNameDec ::= ID_CONTENT
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 函数参数部分
 MethodParamTailDec ::= '...'
-private MethodParamTypeDec ::= AllType MethodParamNameDec {pin=1}
-MethodParamOneDec ::= MethodParamTailDec | Modifier* MethodParamTypeDec
-MethodParamNameDec ::= ID
-private MethodParamDecTail ::= ',' MethodParamOneDec
-MethodParamDec ::= '(' (MethodParamOneDec MethodParamDecTail*)? ')' {pin=1}
+private MethodParamNameDec_ ::= AllType MethodParamNameDec {pin=1}
+MethodParamOneDec ::= MethodParamTailDec | Modifier* MethodParamNameDec_
+MethodParamNameDec ::= ID_CONTENT
+private MethodParamOneDec_ ::= ',' MethodParamOneDec {pin=1}
+MethodParamDec ::= '(' (MethodParamOneDec MethodParamOneDec_*)? ')' {pin=1}
 MethodGetterParamDec ::= '(' ')' {pin=1}
 MethodSetterParamDec ::= '(' MethodParamOneDec ')' {pin=1}
 
 // 函数体部分
 MethodBodyDec ::= '{' AllExpr* '}' {pin=1}
 // 函数名部分
-MethodNameDec ::= ID
+MethodNameDec ::= ID_CONTENT
 // 函数返回值类型
 MethodReturnTailDec ::= '...'
 MethodReturnOneDec ::= MethodReturnTailDec | AllType
-private MethodReturnDecTail ::= ',' MethodReturnOneDec {pin=1}
-MethodReturnDec ::= ':' (MethodReturnOneDec MethodReturnDecTail*)? {pin=1}
+private MethodReturnOneDec_ ::= ',' MethodReturnOneDec {pin=1}
+MethodReturnDec ::= ':' (MethodReturnOneDec MethodReturnOneDec_*)? {pin=1}
 
 // 类构造函数定义
 ClassCtorDec ::= ctor (MethodParamDec MethodBodyDec?)? {pin=1}
 // 类getter函数
-ClassGetterDec ::= get (MethodNameDec (MethodGetterParamDec (':' (AllType MethodBodyDec?)?)?)?)? {pin=1}
+private MethodBodyDec_ ::= ':' (AllType MethodBodyDec?)? {pin=1}
+ClassGetterDec ::= get (MethodNameDec (MethodGetterParamDec MethodBodyDec_?)?)? {pin=1}
 // 类setter函数
 ClassSetterDec ::= set (MethodNameDec (MethodSetterParamDec MethodBodyDec?)?)? {pin=1}
 // 类成员函数定义
@@ -215,10 +217,10 @@ ForStartStat ::= '=' ValueStat {pin=1}
 ForEndStat ::= ValueStat
 ForStepStat ::= ValueStat
 
-private ForInConditionTail ::= ',' ForPairDec {pin=1}
-ForInCondition ::= ForInConditionTail* in ValueStat {pin=2}
-private ForPairDecTail ::= ':' AllType {pin=1}
-ForPairDec ::= VarAssignNameDec ForPairDecTail?
+private ForPairDec_ ::= ',' ForPairDec {pin=1}
+ForInCondition ::= ForPairDec_* in ValueStat {pin=2}
+private ForPairDecAllType_ ::= ':' AllType {pin=1}
+ForPairDec ::= VarAssignNameDec ForPairDecAllType_?
 
 // while 流程控制
 WhileExpr ::= while WhileCondition (WhileBody | AllExpr) {pin=1}
@@ -244,37 +246,37 @@ ElseIfBody ::= '{' AllExpr* '}' {pin=1}
 WrapExpr ::= '{' AllExpr* '}' {pin=1}
 
 // return
-private ReturnExprTail ::= ',' ValueStat
-ReturnExpr ::= return ((ValueStat ReturnExprTail*) | ReturnYield)? ';' {pin=1}
+private ReturnExprValueStat_ ::= ',' ValueStat
+ReturnExpr ::= return ((ValueStat ReturnExprValueStat_*) | ReturnYield)? ';' {pin=1}
 ReturnYield ::= yield
 
 // break
 FlowExpr ::= (break | continue) ';' {pin=1}
 
 // 定义语句
-private VarAssignExprTail1 ::= ',' VarAssignDec {pin=1}
-private VarAssignExprTail2 ::= '=' ValueStat {pin=1}
-VarAssignExpr ::= var VarAssignDec VarAssignExprTail1* VarAssignExprTail2? ';' {pin=1}
-private VarAssignDecTail1 ::= ':' AllType {pin=1}
-VarAssignDec ::= VarAssignNameDec VarAssignDecTail1?
-VarAssignNameDec ::= ID
+private VarAssignExprVarAssignDec_ ::= ',' VarAssignDec {pin=1}
+private VarAssignExprValueStat_ ::= '=' ValueStat {pin=1}
+VarAssignExpr ::= var VarAssignDec VarAssignExprVarAssignDec_* VarAssignExprValueStat_? ';' {pin=1}
+private VarAssignNameDecAllType_ ::= ':' AllType {pin=1}
+VarAssignDec ::= VarAssignNameDec VarAssignNameDecAllType_?
+VarAssignNameDec ::= ID_CONTENT
 
 // 赋值
 OpAssign ::= '=' | '+=' | '-=' | '*=' | '/=' | '%='
-private OpAssignExprTail1 ::= ',' PropertyValue {pin=1}
-private OpAssignExprTail2 ::= OpAssignExprTail1* OpAssign ValueStat {pin=2}
-OpAssignExpr ::= PropertyValue OpAssignExprTail2? ';'
+private PropertyValue_ ::= ',' PropertyValue {pin=1}
+private OpAssignExprTail_ ::= PropertyValue_* OpAssign ValueStat {pin=2}
+OpAssignExpr ::= PropertyValue OpAssignExprTail_? ';'
 
 // 单目运算表达式
 Op1Expr ::= Op1 ValueStat ';' {pin=1}
 
 // throw
-private ThrowExprTail ::= ',' ValueStat {pin=1}
-ThrowExpr ::= throw '(' (ValueStat ThrowExprTail*)? ')' ';' {pin=1}
+private ThrowExprValueStat_ ::= ',' ValueStat {pin=1}
+ThrowExpr ::= throw '(' (ValueStat ThrowExprValueStat_*)? ')' ';' {pin=1}
 
 // assert
-private AssertExprTail ::= ',' ValueStat {pin=1}
-AssertExpr ::= assert '(' (ValueStat AssertExprTail*)? ')' ';' {pin=1}
+private AssertExprValueStat_ ::= ',' ValueStat {pin=1}
+AssertExpr ::= assert '(' (ValueStat AssertExprValueStat_*)? ')' ';' {pin=1}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 所有类型
@@ -283,27 +285,27 @@ AllTypeConst ::= const
 
 // 自定义类型
 CustomType ::= CustomTypeName CustomTypeDotId? CustomTypeTemplate?
-CustomTypeName ::= ID
+CustomTypeName ::= ID_CONTENT
 CustomTypeDotId ::= '.' CustomTypeDotIdName {pin=1}
-CustomTypeDotIdName ::= ID
+CustomTypeDotIdName ::= ID_CONTENT
 CustomTypeTemplate ::= '<' AllType (',' AllType)* '>' {pin=1}
 
 // 通用类型
 GenericType ::= GenericListType | GenericMapType | GenericFunctorType
-private GenericMapTypeTail ::= ',' AllType {pin=1}
-GenericMapType ::= Map '<' AllType GenericMapTypeTail '>' {pin=1}
+private GenericMapTypeAllType_ ::= ',' AllType {pin=1}
+GenericMapType ::= Map '<' AllType GenericMapTypeAllType_ '>' {pin=1}
 GenericListType ::= List '<' AllType '>' {pin=1}
 GenericFunctorType ::= Functor '<' AllTypeConst? CoroutineModifier? '(' GenericFunctorParamType? ')' GenericFunctorReturnType? '>' {pin=1}
 
 GenericFunctorParamOneType ::= GenericFunctorParamTail | AllType
 GenericFunctorParamTail ::= '...'
-private GenericFunctorParamTypeTail ::= ',' GenericFunctorParamOneType {pin=1}
-GenericFunctorParamType ::= GenericFunctorParamOneType GenericFunctorParamTypeTail*
+private GenericFunctorParamOneType_ ::= ',' GenericFunctorParamOneType {pin=1}
+GenericFunctorParamType ::= GenericFunctorParamOneType GenericFunctorParamOneType_*
 
 GenericFunctorReturnTail ::= '...'
 GenericFunctorReturnOneType ::= GenericFunctorReturnTail | AllType
-private GenericFunctorReturnTypeTail ::= ',' GenericFunctorReturnOneType {pin=1}
-GenericFunctorReturnType ::=  ':' GenericFunctorReturnOneType GenericFunctorReturnTypeTail* {pin=1}
+private GenericFunctorReturnOneType_ ::= ',' GenericFunctorReturnOneType {pin=1}
+GenericFunctorReturnType ::=  ':' GenericFunctorReturnOneType GenericFunctorReturnOneType_* {pin=1}
 
 // 基本类型
 PrimitiveType ::= bool | double | int | long | any | string
@@ -314,21 +316,21 @@ ValueFactorStat ::= WrapValueStat | ConstValue | ReflectValue | PropertyValue | 
 ValueOpStat ::= ValueFactorStat (Op3Stat | Op4Stat | Op5Stat | Op6Stat | Op7Stat | Op8Stat)?
 
 // new
-private OpNewStatTail ::= ',' ValueStat {pin=1}
-OpNewStat ::= new (CustomType | GenericType) '(' (ValueStat OpNewStatTail*)? ')' {pin=1}
+private OpNewStatValueStat_ ::= ',' ValueStat {pin=1}
+OpNewStat ::= new (CustomType | GenericType) '(' (ValueStat OpNewStatValueStat_*)? ')' {pin=1}
 // list 快捷表达式
-private OpNewListStatTail ::= ',' ValueStat {pin=1}
-OpNewListStat ::= '[' (ValueStat OpNewListStatTail*)? ']' {pin=1}
+private OpNewListStatValueStat_ ::= ',' ValueStat {pin=1}
+OpNewListStat ::= '[' (ValueStat OpNewListStatValueStat_*)? ']' {pin=1}
 // bind
-private BindStatTail ::= ',' ValueStat {pin=1}
-BindStat ::= bind '(' (ValueStat BindStatTail*)? ')' {pin=1}
+private BindStatValueStat_ ::= ',' ValueStat {pin=1}
+BindStat ::= bind '(' (ValueStat BindStatValueStat_*)? ')' {pin=1}
 // tcall
-private TcallStatTail ::= ',' ValueStat {pin=1}
-TcallStat ::= tcall '(' (ValueStat TcallStatTail*)? ')' {pin=1}
+private TcallStatValueStat_ ::= ',' ValueStat {pin=1}
+TcallStat ::= tcall '(' (ValueStat TcallStatValueStat_*)? ')' {pin=1}
 // 值
 WrapValueStat ::= '(' ValueStat ')' {pin=1}
 // 常量值
-ConstValue ::= true | false | null | TEXT | NUMBER
+ConstValue ::= true | false | null | TEXT_CONTENT | NUMBER_CONTENT
 
 // 当前协程对象
 CoroutineStat ::= co
@@ -343,17 +345,17 @@ PropertyValue ::= PropertyValueFirstType PropertyValueSuffix*
 
 PropertyValueFirstType ::= PropertyValueThisType | PropertyValueCastType | PropertyValueCustomType
 PropertyValueCastType ::= cast '<' AllType '>' '(' ValueFactorStat ')' {pin=1}
-PropertyValueCustomType ::= ID
+PropertyValueCustomType ::= ID_CONTENT
 PropertyValueThisType ::= this
 
 PropertyValueSuffix ::= PropertyValueDotId | PropertyValueBracketValue | PropertyValueMethodCall
 PropertyValueDotId ::= '.' PropertyValueDotIdName {pin=1}
-PropertyValueDotIdName ::= ID
+PropertyValueDotIdName ::= ID_CONTENT
 PropertyValueBracketValue ::= '[' ValueStat ']' {pin=1}
-private PropertyValueMethodCallTail ::= ',' ValueStat {pin=1}
-PropertyValueMethodCall ::= PropertyValueMethodTemplate? '(' (ValueStat PropertyValueMethodCallTail*)? ')' {pin=2}
-private PropertyValueMethodTemplateTail ::= ',' AllType {pin=1}
-PropertyValueMethodTemplate ::= '{' AllType PropertyValueMethodTemplateTail* '}' {pin=1}
+private PropertyValueMethodCallValueStat_ ::= ',' ValueStat {pin=1}
+PropertyValueMethodCall ::= PropertyValueMethodTemplate? '(' (ValueStat PropertyValueMethodCallValueStat_*)? ')' {pin=2}
+private PropertyValueMethodTemplateAllType_ ::= ',' AllType {pin=1}
+PropertyValueMethodTemplate ::= '{' AllType PropertyValueMethodTemplateAllType_* '}' {pin=1}
 
 // Op 类型的运算，编号越大，优先级越低///////////////////////////////////////////////////
 

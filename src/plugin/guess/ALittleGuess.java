@@ -1,23 +1,28 @@
 package plugin.guess;
 
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.PsiElement;
 
 import java.util.Map;
 
 public abstract class ALittleGuess {
-    public @NotNull String value = "";
-    public boolean isRegister = false;
+    protected String value = "";
+    public boolean is_register = false;
+    public boolean is_const = false;
+
     public ALittleGuess() { }
-    public boolean isChanged() {
-        return true;
+
+    public boolean isChanged() { return true; }
+    public String getValue() { return value; }
+    public String getValueWithoutConst()
+    {
+        if (is_const) return value.substring("const ".length());
+        return value;
     }
-
-    public abstract void UpdateValue();
-
-    @NotNull
-    public abstract ALittleGuess Clone();
-
-    public abstract boolean NeedReplace();
-    @NotNull
-    public abstract ALittleGuess ReplaceTemplate(@NotNull Map<String, ALittleGuess> fillMap);
+    public void updateValue() { }
+    public ALittleGuess clone() { return null; }
+    public boolean needReplace() { return false; }
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map) { return null; }
+    public boolean hasAny() { return false; }
+    public String getTotalValue() { return value; }
+    public PsiElement getElement() { return null; }
 }

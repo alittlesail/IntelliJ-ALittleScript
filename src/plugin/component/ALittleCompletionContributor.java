@@ -22,7 +22,7 @@ public class ALittleCompletionContributor extends CompletionContributor {
     public ALittleCompletionContributor() {
 
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement(ALittleTypes.ID_CONTENT).withLanguage(ALittleLanguage.INSTANCE),
+                PlatformPatterns.psiElement(ALittleTypes.ID).withLanguage(ALittleLanguage.INSTANCE),
                 new CompletionProvider<CompletionParameters>() {
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                ProcessingContext context,

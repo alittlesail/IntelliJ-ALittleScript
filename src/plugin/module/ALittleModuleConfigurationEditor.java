@@ -25,15 +25,6 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
     // 输出目录
     private JTextField myOutputPathTextField;
 
-    // Csv目录
-    private JTextField myCsvPathTextField;
-
-    // Mysql配置
-    private JTextField myMysqlIpTextField;
-    private JTextField myMysqlPortTextField;
-    private JTextField myMysqlUserTextField;
-    private JTextField myMysqlPasswordTextField;
-
     protected ALittleModuleConfigurationEditor(final ModuleConfigurationState state) {
         mState = state;
     }
@@ -44,27 +35,12 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
         final JPanel outputPathsPanel = new JPanel(new GridBagLayout());
 
         myOutputPathTextField = addConfigureUI(outputPathsPanel, "脚本生成目录:");
-        myCsvPathTextField = addConfigureUI(outputPathsPanel, "Csv目录:");
-        myMysqlIpTextField = addConfigureUI(outputPathsPanel, "Mysql IP:");
-        myMysqlPortTextField = addConfigureUI(outputPathsPanel, "Mysql Port:");
-        myMysqlUserTextField = addConfigureUI(outputPathsPanel, "Mysql User:");
-        myMysqlPasswordTextField = addConfigureUI(outputPathsPanel, "Mysql Password:");
 
         Module module = mState.getRootModel().getModule();
         ALittleLinkConfig config = ALittleLinkConfig.getConfig(module);
         myOutputPathTextField.setText(config.getOutputPath());
-        myCsvPathTextField.setText(config.getCsvPath());
-        myMysqlIpTextField.setText(config.getMysqlIp());
-        myMysqlPortTextField.setText(config.getMysqlPort());
-        myMysqlUserTextField.setText(config.getMysqlUser());
-        myMysqlPasswordTextField.setText(config.getMysqlPassword());
 
         listenChange(myOutputPathTextField);
-        listenChange(myCsvPathTextField);
-        listenChange(myMysqlIpTextField);
-        listenChange(myMysqlPortTextField);
-        listenChange(myMysqlUserTextField);
-        listenChange(myMysqlPasswordTextField);
 
         final JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(IdeBorderFactory.createTitledBorder(ProjectBundle.message("project.roots.output.compiler.title")));
@@ -131,11 +107,6 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
         Module module = mState.getRootModel().getModule();
         ALittleLinkConfig config = ALittleLinkConfig.getConfig(module);
         config.setOutputPath(myOutputPathTextField.getText());
-        config.setCsvPath(myCsvPathTextField.getText());
-        config.setMysql(myMysqlIpTextField.getText(),
-                myMysqlPortTextField.getText(),
-                myMysqlUserTextField.getText(),
-                myMysqlPasswordTextField.getText());
         config.save();
     }
 }
