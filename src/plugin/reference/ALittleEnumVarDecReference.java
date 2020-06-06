@@ -17,19 +17,19 @@ public class ALittleEnumVarDecReference extends ALittleReference<ALittleEnumVarD
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        if (myElement.getStringContent() != null) {
-            return ALittleGuessPrimitive.sPrimitiveGuessMap.get("string");
+        if (myElement.getTextContent() != null) {
+            return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("string");
         } else {
-            return ALittleGuessPrimitive.sPrimitiveGuessMap.get("int");
+            return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("int");
         }
     }
 
     public void checkError() throws ALittleGuessException {
-        if (myElement.getDigitContent() == null) return;
+        if (myElement.getNumberContent() == null) return;
 
-        String value = myElement.getDigitContent().getText();
+        String value = myElement.getNumberContent().getText();
         if (!PsiHelper.isInt(value)) {
-            throw new ALittleGuessException(myElement.getDigitContent(), "枚举值必须是整数");
+            throw new ALittleGuessException(myElement.getNumberContent(), "枚举值必须是整数");
         }
     }
 }

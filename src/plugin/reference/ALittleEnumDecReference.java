@@ -6,9 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessEnum;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.ALittleEnumDec;
-import plugin.psi.ALittleEnumNameDec;
-import plugin.psi.ALittleEnumVarDec;
+import plugin.psi.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,28 +20,37 @@ public class ALittleEnumDecReference extends ALittleReference<ALittleEnumDec> {
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        ALittleEnumNameDec enumNameDec = myElement.getEnumNameDec();
-        if (enumNameDec == null) {
+        ALittleEnumNameDec name_dec = myElement.getEnumNameDec();
+        if (name_dec == null)
             throw new ALittleGuessException(myElement, "没有定义枚举名");
-        }
 
-        ALittleGuessEnum info = new ALittleGuessEnum(mNamespace, enumNameDec.getIdContent().getText(), myElement);
-        info.UpdateValue();
-
-        List<ALittleGuess> guessTypeList = new ArrayList<>();
-        guessTypeList.add(info);
-        return guessTypeList;
+        ALittleGuessEnum info = new ALittleGuessEnum(mNamespace, name_dec.getText(), myElement);
+        info.updateValue();
+        List<ALittleGuess> guess_list = new ArrayList<>();
+        guess_list.add(info);
+        return guess_list;
     }
 
     public void checkError() throws ALittleGuessException {
-        List<ALittleEnumVarDec> varDecList = myElement.getEnumVarDecList();
-        Set<String> nameSet = new HashSet<>();
-        for (ALittleEnumVarDec varDec : varDecList) {
-            PsiElement varNameDec = varDec.getIdContent();
-            if (nameSet.contains(varNameDec.getText())) {
-                throw new ALittleGuessException(varNameDec, "枚举字段名重复");
-            }
-            nameSet.add(varNameDec.getText());
+        ALittleEnumNameDec enum_name_dec = myElement.getEnumNameDec();
+        if (enum_name_dec == null)
+            throw new ALittleGuessException(myElement, "没有定义枚举名");
+
+        ALittleEnumBodyDec body_dec = myElement.getEnumBodyDec();
+        if (body_dec == null)
+            throw new ALittleGuessException(myElement, "没有定义枚举内容");
+
+        List<ALittleEnumVarDec> var_dec_list = body_dec.getEnumVarDecList();
+        Set<String> name_set = new HashSet<>();
+        for (ALittleEnumVarDec var_dec : var_dec_list)
+        {
+            ALittleEnumVarNameDec name_dec = var_dec.getEnumVarNameDec();
+            if (name_dec == null) continue;
+
+            String name = name_dec.getText();
+            if (name_set.contains(name))
+                throw new ALittleGuessException(name_dec, "枚举字段名重复");
+            name_set.add(name);
         }
     }
 }

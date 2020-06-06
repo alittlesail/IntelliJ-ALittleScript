@@ -15,22 +15,17 @@ public class ALittleCustomTypeDotIdNameReference extends ALittleCustomTypeCommon
    public ALittleCustomTypeDotIdNameReference(@NotNull ALittleCustomTypeDotIdName element, TextRange textRange) {
         super((ALittleCustomType)element.getParent().getParent(), element, textRange);
 
-        ALittleCustomType customType = (ALittleCustomType)element.getParent().getParent();
-        mNamespace = customType.getIdContent().getText();
-        mKey = element.getIdContent().getText();
+       ALittleCustomType custom_type = (ALittleCustomType)element.getParent().getParent();
+       ALittleCustomTypeName custom_type_name = custom_type.getCustomTypeName();
+       if (custom_type_name != null)
+           mNamespace = custom_type_name.getText();
+       else
+           mNamespace = "";
+       mKey = myElement.getText();
     }
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         Annotation anno = holder.createInfoAnnotation(myElement.getIdContent(), null);
         anno.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_REFERENCE);
-    }
-
-    public void checkError() throws ALittleGuessException {
-        List<ALittleGuess> guessList = myElement.guessTypes();
-        if (guessList.isEmpty()) {
-            throw new ALittleGuessException(myElement, "未知类型");
-        } else if (guessList.size() != 1) {
-            throw new ALittleGuessException(myElement, "重复定义");
-        }
     }
 }

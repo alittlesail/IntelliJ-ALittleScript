@@ -15,62 +15,105 @@ public class ALittleGenericTypeReference extends ALittleReference<ALittleGeneric
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        List<ALittleGuess> guessList = new ArrayList<>();
+        List<ALittleGuess> guess_list = new ArrayList<>();
 
-        if (myElement.getGenericListType() != null) {
+        // 处理List
+        if (myElement.getGenericListType() != null)
+        {
             ALittleGenericListType dec = myElement.getGenericListType();
-            ALittleAllType allType = dec.getAllType();
-            if (allType == null) return guessList;
-            ALittleGuess guessInfo = allType.guessType();
+            ALittleAllType all_type = dec.getAllType();
+            if (all_type == null) return guess_list;
 
-            ALittleGuessList info = new ALittleGuessList(guessInfo);
-            info.UpdateValue();
-            guessList.add(info);
-        } else if (myElement.getGenericMapType() != null) {
+            ALittleGuess guess = all_type.guessType();
+
+            ALittleGuessList info = new ALittleGuessList(guess, false, false);
+            info.updateValue();
+            guess_list.add(info);
+        }
+        // 处理Map
+        else if (myElement.getGenericMapType() != null)
+        {
             ALittleGenericMapType dec = myElement.getGenericMapType();
-            List<ALittleAllType> allTypeList = dec.getAllTypeList();
-            if (allTypeList.size() != 2) return guessList;
+            List<ALittleAllType> all_type_list = dec.getAllTypeList();
+            if (all_type_list.size() != 2) return null;
 
-            ALittleGuess keyGuessInfo = allTypeList.get(0).guessType();
-            ALittleGuess valueGuessInfo = allTypeList.get(1).guessType();
+            ALittleGuess key_guess = all_type_list.get(0).guessType();
+            ALittleGuess value_guess = all_type_list.get(1).guessType();
 
-            ALittleGuessMap info = new ALittleGuessMap(keyGuessInfo, valueGuessInfo);
-            info.UpdateValue();
-            guessList.add(info);
-        } else if (myElement.getGenericFunctorType() != null) {
+            ALittleGuessMap info = new ALittleGuessMap(key_guess, value_guess, false);
+            info.updateValue();
+            guess_list.add(info);
+        }
+        // 处理函数
+        else if (myElement.getGenericFunctorType() != null)
+        {
             ALittleGenericFunctorType dec = myElement.getGenericFunctorType();
-            ALittleGenericFunctorParamType paramType = dec.getGenericFunctorParamType();
+            if (dec != null)
+            {
+                ALittleGuessFunctor info = new ALittleGuessFunctor(myElement);
+                // 处理是不是const
+                info.const_modifier = dec.getAllTypeConst() != null;
+                // 处理是不是await
+                info.await_modifier = (dec.getCoroutineModifier() != null && dec.getCoroutineModifier().getText() == "await");
 
-            ALittleGuessFunctor info = new ALittleGuessFunctor(myElement);
-            info.functorAwait = (dec.getCoModifier() != null && dec.getCoModifier().getText().equals("await"));
+                // 处理参数
+                ALittleGenericFunctorParamType param_type = dec.getGenericFunctorParamType();
+                if (param_type != null)
+                {
+                    List<ALittleGenericFunctorParamOneType> param_one_list = param_type.getGenericFunctorParamOneTypeList();
+                    for (int i = 0; i < param_one_list.size(); ++i)
+                    {
+                        ALittleGenericFunctorParamOneType param_one = param_one_list.get(i);
+                        ALittleAllType all_type = param_one.getAllType();
+                        if (all_type != null)
+                        {
+                            ALittleGuess guess = all_type.guessType();
+                            info.param_list.add(guess);
+                            info.param_nullable_list.add(false);
+                            info.param_name_list.add(guess.getValue());
+                        }
+                        else
+                        {
+                            ALittleGenericFunctorParamTail param_tail = param_one.getGenericFunctorParamTail();
+                            if (param_tail == null)
+                                throw new ALittleGuessException(param_one, "未知类型");
+                            if (i + 1 != param_one_list.size())
+                                throw new ALittleGuessException(param_one, "参数占位符必须定义在最后");
+                            info.param_tail = new ALittleGuessParamTail(param_tail.getText());
+                        }
+                    }
+                }
 
-            if (paramType != null) {
-                List<ALittleAllType> allTypeList = paramType.getAllTypeList();
-                for (ALittleAllType allType : allTypeList) {
-                    ALittleGuess guess = allType.guessType();
-                    info.functorParamList.add(guess);
-                    info.functorParamNameList.add(guess.value);
+                // 处理返回值
+                ALittleGenericFunctorReturnType return_type = dec.getGenericFunctorReturnType();
+                if (return_type != null)
+                {
+                    List<ALittleGenericFunctorReturnOneType> return_one_list = return_type.getGenericFunctorReturnOneTypeList();
+                    for (int i = 0; i < return_one_list.size(); ++i)
+                    {
+                        ALittleGenericFunctorReturnOneType return_one = return_one_list.get(i);
+                        ALittleAllType all_type = return_one.getAllType();
+                        if (all_type != null)
+                        {
+                            ALittleGuess guess = all_type.guessType();
+                            info.return_list.add(guess);
+                        }
+                        else
+                        {
+                            ALittleGenericFunctorReturnTail return_tail = return_one.getGenericFunctorReturnTail();
+                            if (return_tail == null)
+                                throw new ALittleGuessException(return_one, "未知类型");
+                            if (i + 1 != return_one_list.size())
+                                throw new ALittleGuessException(return_one, "返回值占位符必须定义在最后");
+                            info.param_tail = new ALittleGuessParamTail(return_tail.getText());
+                        }
+                    }
                 }
-                ALittleGenericFunctorParamTail paramTail = paramType.getGenericFunctorParamTail();
-                if (paramTail != null) {
-                    info.functorParamTail = new ALittleGuessParamTail(paramTail.getText());
-                }
+                info.updateValue();
+                guess_list.add(info);
             }
-            ALittleGenericFunctorReturnType return_type = dec.getGenericFunctorReturnType();
-            if (return_type != null) {
-                List<ALittleAllType> allTypeList = return_type.getAllTypeList();
-                for (ALittleAllType allType : allTypeList) {
-                    info.functorReturnList.add(allType.guessType());
-                }
-                ALittleGenericFunctorReturnTail returnTail = return_type.getGenericFunctorReturnTail();
-                if (returnTail != null) {
-                    info.functorReturnTail = new ALittleGuessReturnTail(returnTail.getText());
-                }
-            }
-            info.UpdateValue();
-            guessList.add(info);
         }
 
-        return guessList;
+        return guess_list;
     }
 }

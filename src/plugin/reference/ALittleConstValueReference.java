@@ -23,32 +23,41 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        List<ALittleGuess> guessTypeList = new ArrayList<>();
-        if (myElement.getDigitContent() != null) {
-            if (PsiHelper.isInt(myElement.getDigitContent().getText()))
-                guessTypeList = ALittleGuessPrimitive.sPrimitiveGuessMap.get("int");
+        String text = myElement.getText();
+
+        if (myElement.getNumberContent() != null)
+        {
+            if (PsiHelper.isInt(myElement.getNumberContent().getText()))
+                return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("int");
             else
-                guessTypeList = ALittleGuessPrimitive.sPrimitiveGuessMap.get("double");
-        } else if (myElement.getStringContent() != null) {
-            guessTypeList = ALittleGuessPrimitive.sPrimitiveGuessMap.get("string");
-        } else if (myElement.getText().equals("true") || myElement.getText().equals("false")) {
-            guessTypeList = ALittleGuessPrimitive.sPrimitiveGuessMap.get("bool");
-        } else if (myElement.getText().equals("null")) {
-            guessTypeList = ALittleGuessConst.sConstNullGuess;
-        } else {
-            throw new ALittleGuessException(myElement, "未知的常量类型:" + myElement.getText());
+                return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("double");
         }
-        return guessTypeList;
+        else if (myElement.getText() != null)
+        {
+            return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("string");
+        }
+        else if (text.equals("true") || text.equals("false"))
+        {
+            return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("bool");
+        }
+        else if (text.equals("null"))
+        {
+            return ALittleGuessPrimitive.sConstNullGuess;
+        }
+        else
+        {
+            throw new ALittleGuessException(myElement, "未知的常量类型:" + text);
+        }
     }
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
-        if (myElement.getDigitContent() != null) {
+        if (myElement.getNumberContent() != null) {
             Annotation anno = holder.createInfoAnnotation(myElement, null);
             anno.setTextAttributes(DefaultLanguageHighlighterColors.NUMBER);
             return;
         }
 
-        if (myElement.getStringContent() != null) {
+        if (myElement.getTextContent() != null) {
             Annotation anno = holder.createInfoAnnotation(myElement, null);
             anno.setTextAttributes(DefaultLanguageHighlighterColors.STRING);
             return;

@@ -5,6 +5,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
@@ -15,20 +16,24 @@ public class ALittleCustomTypeReference extends ALittleCustomTypeCommonReference
     public ALittleCustomTypeReference(@NotNull ALittleCustomType element, TextRange textRange) {
         super(element, element, textRange);
 
-        mKey = element.getIdContent().getText();
+        mNamespace = PsiHelper.getNamespaceName(myElement);
+        ALittleCustomTypeName name_dec = myElement.getCustomTypeName();
+        if (name_dec != null) mKey = name_dec.getText();
 
-        ALittleCustomTypeDotId dotId = element.getCustomTypeDotId();
-        if (dotId != null) {
-            ALittleCustomTypeDotIdName dotIdName = dotId.getCustomTypeDotIdName();
-            if (dotIdName != null) {
+        ALittleCustomTypeDotId dot_id = myElement.getCustomTypeDotId();
+        if (dot_id != null)
+        {
+            ALittleCustomTypeDotIdName dot_id_name = dot_id.getCustomTypeDotIdName();
+            if (dot_id_name != null)
+            {
                 mNamespace = mKey;
-                mKey = dotIdName.getText();
+                mKey = dot_id_name.getText();
             }
         }
     }
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
-        Annotation anno = holder.createInfoAnnotation(myElement.getIdContent(), null);
+        Annotation anno = holder.createInfoAnnotation(myElement.getCustomTypeName(), null);
         anno.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_REFERENCE);
     }
 

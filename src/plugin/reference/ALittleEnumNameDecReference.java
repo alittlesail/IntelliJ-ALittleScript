@@ -20,6 +20,7 @@ import java.util.List;
 public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNameDec> {
     public ALittleEnumNameDecReference(@NotNull ALittleEnumNameDec element, TextRange textRange) {
         super(element, textRange);
+        mKey = element.getText();
     }
 
     @NotNull

@@ -33,7 +33,7 @@ public class ALittleClassStaticDecReference extends ALittleReference<ALittleClas
         ALittleMethodReturnDec return_dec = myElement.getMethodReturnDec();
         if (return_dec != null) return_count = return_dec.getMethodReturnOneDecList().size();
 
-        if (co_text != null && co_text.equals("async") && return_count > 0)
+        if (co_text.equals("async") && return_count > 0)
             throw new ALittleGuessException(return_dec, "带async修饰的函数，不能有返回值");
     }
 }

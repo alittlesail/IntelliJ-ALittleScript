@@ -12,6 +12,7 @@ import plugin.index.ALittleEnumData;
 import plugin.index.ALittleStructData;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
+import plugin.reference.ALittleLanguageModifierReference;
 import plugin.reference.ALittleReferenceInterface;
 
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class PsiHelper {
                     PsiReference ref = language.getReference();
                     if (!(ref instanceof ALittleLanguageModifierReference)) return false;
                     ALittleLanguageModifierReference modifier = (ALittleLanguageModifierReference)ref;
-                    return modifier.isLanguageEnanle();
+                    return modifier.isLanguageEnable();
                 }
             }
         }
@@ -381,6 +382,7 @@ public class PsiHelper {
     }
 
     // 获取协程类型
+    @NotNull
     public static String getCoroutineType(List<ALittleModifier> element_list)
     {
         for (ALittleModifier element : element_list)
@@ -388,7 +390,7 @@ public class PsiHelper {
             if (element.getCoroutineModifier() != null)
                 return element.getCoroutineModifier().getText();
         }
-        return null;
+        return "";
     }
 
     // 获取协议类型
@@ -508,7 +510,7 @@ public class PsiHelper {
     }
 
     // 获取这个元素所在的函数模板
-    public static ALittleTemplateDec findTemplateDecFromParent(@NotNull PsiElement dec) {
+    public static ALittleTemplateDec findMethodTemplateDecFromParent(@NotNull PsiElement dec) {
         while (dec != null && !(dec instanceof PsiFile)) {
             if (dec instanceof ALittleClassDec) {
                 return null;
