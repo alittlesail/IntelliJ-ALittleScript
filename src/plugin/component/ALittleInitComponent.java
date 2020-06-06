@@ -20,11 +20,9 @@ import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.SendLogRunnable;
-import plugin.link.ALittleCsvDataManager;
 import plugin.generate.ALittleGenerateLua;
 import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleTreeChangeListener;
-import plugin.link.ALittleMysqlDataManager;
 import plugin.psi.ALittleFile;
 
 import java.util.List;
@@ -40,11 +38,6 @@ public class ALittleInitComponent implements BaseComponent {
     }
 
     public void initComponent() {
-        // 初始化csv管理器
-        ALittleCsvDataManager.Setup();
-        // 初始化mysql管理器
-        ALittleMysqlDataManager.Setup();
-
         // 监听文件变化
         MessageBus bus = ApplicationManager.getApplication().getMessageBus();
         MessageBusConnection connection = bus.connect();
@@ -151,8 +144,6 @@ public class ALittleInitComponent implements BaseComponent {
     }
 
     public void disposeComponent() {
-        ALittleCsvDataManager.Shutdown();
-        ALittleMysqlDataManager.Shutdown();
         SendLogRunnable.SendLog("disposeComponent");
     }
 }

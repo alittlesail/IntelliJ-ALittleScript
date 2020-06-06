@@ -123,7 +123,8 @@ ClassNameDec ::= ID_CONTENT
 ClassExtendsDec ::= ':' (NamespaceNameDec '.')? ClassNameDec {pin=1}
 ClassElementDec ::= Modifier* (ClassCtorDec | ClassGetterDec | ClassSetterDec | ClassStaticDec | ClassMethodDec | ClassVarDec)
 ClassBodyDec ::= '{' ClassElementDec* '}' {pin=1}
-ClassVarDec ::= AllType ClassVarNameDec ';' {pin=1}
+ClassVarValueDec ::= '=' (ConstValue | OpNewStat) {pin=1}
+ClassVarDec ::= AllType ClassVarNameDec ClassVarValueDec? ';' {pin=1}
 ClassVarNameDec ::= ID_CONTENT
 
 // 结构体定义

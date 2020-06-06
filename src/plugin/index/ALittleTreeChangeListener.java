@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import groovy.util.MapEntry;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
@@ -56,20 +57,24 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
     }
 
     @NotNull
-    public static List<ALittleNamespaceNameDec> findNamespaceNameDecList(Project project, String namespaceName) {
-        List<ALittleNamespaceNameDec> result = new ArrayList<>();
+    public static Map<String, ALittleNamespaceNameDec> findNamespaceNameDecList(Project project, String namespaceName) {
+        Map<String, ALittleNamespaceNameDec> result = new HashMap<>();
 
         ALittleTreeChangeListener listener = getListener(project);
         if (listener == null) return result;
 
         if (namespaceName.isEmpty()) {
             for (Map.Entry<String, Map<ALittleNamespaceNameDec, ALittleAccessData>> entry : listener.mAllDataMap.entrySet()) {
-                result.addAll(entry.getValue().keySet());
+                for (ALittleNamespaceNameDec dec : entry.getValue().keySet())
+                    result.put(dec.getText(), dec);
             }
         } else {
             Map<ALittleNamespaceNameDec, ALittleAccessData> map = listener.mAllDataMap.get(namespaceName);
             if (map != null)
-                result.addAll(map.keySet());
+            {
+                for (ALittleNamespaceNameDec dec : map.keySet())
+                    result.put(dec.getText(), dec);
+            }
         }
         return result;
     }
@@ -88,7 +93,7 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         if (namespaceName.equals(fileNamespaceName)) {
             data = listener.mFileAccessMap.get(psiFile);
             if (data != null) {
-                data.findALittleNameDecList(type, name, result);
+                data.findNameDecList(type, name, result);
             }
         }
 
@@ -96,7 +101,7 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         if (fileNamespaceName.equals(namespaceName)) {
             data = listener.mNamespaceAccessMap.get(namespaceName);
             if (data != null) {
-                data.findALittleNameDecList(type, name, result);
+                data.findNameDecList(type, name, result);
             }
         }
 
@@ -104,12 +109,12 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         if (findInGlobal) {
             if (type == PsiHelper.PsiElementType.INSTANCE_NAME) {
                 for (ALittleAccessData accessData : listener.mGlobalAccessMap.values()) {
-                    accessData.findALittleNameDecList(type, name, result);
+                    accessData.findNameDecList(type, name, result);
                 }
             } else {
                 data = listener.mGlobalAccessMap.get(namespaceName);
                 if (data != null) {
-                    data.findALittleNameDecList(type, name, result);
+                    data.findNameDecList(type, name, result);
                 }
             }
         }

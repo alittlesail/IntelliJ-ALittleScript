@@ -57,7 +57,6 @@
     <annotator language="ALittle" implementationClass="plugin.component.ALittleAnnotator"/>
     <completion.contributor language="ALittle" implementationClass="plugin.component.ALittleCompletionContributor"/>
     <problemFileHighlightFilter implementation="plugin.hightlight.ALittleProblemFileHighlightFilter"/>
-    <additionalLibraryRootsProvider implementation="plugin.component.StdLibraryProvider"/>
     <typedHandler implementation="plugin.format.ALittleTypedHandler"/>
     <codeInsight.parameterNameHints language="ALittle" implementationClass="plugin.parameter.ALittleParameterHintsProvider"/>
     <codeInsight.parameterInfo language="ALittle" implementationClass="plugin.parameter.ALittleParameterInfoHandler"/>

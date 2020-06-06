@@ -83,6 +83,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitClassVarValueDec(@NotNull ALittleClassVarValueDec o) {
+    visitPsiElement(o);
+  }
+
   public void visitCommandBodyDec(@NotNull ALittleCommandBodyDec o) {
     visitPsiElement(o);
   }

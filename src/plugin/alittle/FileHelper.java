@@ -3,13 +3,10 @@ package plugin.alittle;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import plugin.component.StdLibraryProvider;
-import plugin.guess.ALittleGuessException;
-import plugin.link.ALittleLinkConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 public class FileHelper {
     // 删除文件夹
@@ -93,20 +90,6 @@ public class FileHelper {
             throw new Exception("路径创建失败 path:" + root_file_path.getPath());
     }
 
-    // 获取输出路径
-    public static String calcOutPath(Module module) throws Exception {
-        return calcModulePath(module) + ALittleLinkConfig.getConfig(module).getOutputPathWithEnd();
-    }
-
-    // 获取lua脚本路径
-    public static String calcScriptPath(Module module) throws Exception {
-        if (StdLibraryProvider.isPluginSelf(module.getProject())) {
-            return calcModulePath(module) + "resources/adapter/";
-        } else {
-            return calcOutPath(module);
-        }
-    }
-
     // 计算文件路径
     public static String calcALittleRelPath(Module module, VirtualFile file) throws Exception {
         String module_base_path = calcModulePath(module);
@@ -118,18 +101,10 @@ public class FileHelper {
 
         String alittleRelPath = file_path.substring(module_base_path.length());
         // 如果是插件项目本身就特殊处理
-        if (StdLibraryProvider.isPluginSelf(module.getProject())) {
-            if (!alittleRelPath.startsWith("resources/std")) {
-                throw new Exception("不支持该目录下的文件生成:" + file_path);
-            }
-            alittleRelPath = alittleRelPath.substring("resources/std/".length());
-        // 其他模块必须
-        } else {
-            if (!alittleRelPath.startsWith("src")) {
-                throw new Exception("不支持该目录下的文件生成:" + file_path);
-            }
-            alittleRelPath = alittleRelPath.substring("src/".length());
+        if (!alittleRelPath.startsWith("src")) {
+            throw new Exception("不支持该目录下的文件生成:" + file_path);
         }
+        alittleRelPath = alittleRelPath.substring("src/".length());
 
         String ext = "alittle";
         if (!alittleRelPath.endsWith(ext)) {

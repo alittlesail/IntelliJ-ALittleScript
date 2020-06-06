@@ -27,6 +27,7 @@ public interface ALittleTypes {
   IElementType CLASS_STATIC_DEC = new ALittleElementType("CLASS_STATIC_DEC");
   IElementType CLASS_VAR_DEC = new ALittleElementType("CLASS_VAR_DEC");
   IElementType CLASS_VAR_NAME_DEC = new ALittleElementType("CLASS_VAR_NAME_DEC");
+  IElementType CLASS_VAR_VALUE_DEC = new ALittleElementType("CLASS_VAR_VALUE_DEC");
   IElementType COMMAND_BODY_DEC = new ALittleElementType("COMMAND_BODY_DEC");
   IElementType COMMAND_MODIFIER = new ALittleElementType("COMMAND_MODIFIER");
   IElementType CONST_MODIFIER = new ALittleElementType("CONST_MODIFIER");
@@ -346,6 +347,9 @@ public interface ALittleTypes {
       }
       else if (type == CLASS_VAR_NAME_DEC) {
         return new ALittleClassVarNameDecImpl(node);
+      }
+      else if (type == CLASS_VAR_VALUE_DEC) {
+        return new ALittleClassVarValueDecImpl(node);
       }
       else if (type == COMMAND_BODY_DEC) {
         return new ALittleCommandBodyDecImpl(node);

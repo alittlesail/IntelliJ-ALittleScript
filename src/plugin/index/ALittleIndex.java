@@ -1,26 +1,17 @@
 package plugin.index;
 
 import com.intellij.ProjectTopics;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.ModuleListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.util.PathUtil;
-import com.intellij.util.io.URLUtil;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
-import plugin.component.StdLibraryProvider;
-import plugin.link.ALittleCsvDataManager;
 import plugin.guess.ALittleGuess;
-import plugin.link.ALittleMysqlDataManager;
 import plugin.psi.*;
 
-import java.io.File;
 import java.util.*;
 
 public class ALittleIndex {
@@ -127,23 +118,6 @@ public class ALittleIndex {
             loadDir(psi_mgr, root);
         }
 
-        if (!StdLibraryProvider.isPluginSelf(mProject)) {
-            try {
-                // 适配代码
-                String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
-                VirtualFile dir;
-                if (jarPath.endsWith(".jar"))
-                    dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "std"));
-                else
-                    dir = VfsUtil.findFileByIoFile(new File(jarPath + "/std"), true);
-
-                if (dir != null) {
-                    loadDir(psi_mgr, dir);
-                }
-            } catch (Exception ignored) {
-            }
-        }
-
         mReloading = false;
         mReloaded = true;
 
@@ -177,7 +151,7 @@ public class ALittleIndex {
         map.put(nameDec.getText(), classData);
 
         for (PsiElement child = classDec.getFirstChild(); child != null; child = child.getNextSibling()) {
-            classData.addALittleClassChildDec(child);
+            classData.addClassChildDec(child);
         }
     }
 
@@ -240,92 +214,6 @@ public class ALittleIndex {
         return map.get(nameDec.getText());
     }
 
-    // 添加Csv数据
-    public void addCsvData(@NotNull ALittleStructDec structDec) {
-        // 检查修饰符
-        ALittleCsvModifier csvModifier = structDec.getCsvModifier();
-        if (csvModifier == null) return;
-        PsiElement pathElement = csvModifier.getStringContent();
-        if (pathElement == null) return;
-
-        String path = pathElement.getText();
-        path = path.substring(1, path.length() - 1);
-        HashSet<ALittleStructDec> set = mCsvStructSet.computeIfAbsent(path, k -> new HashSet<>());
-        set.add(structDec);
-
-        // 变化
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            public void run() {
-                ALittleCsvDataManager.checkAndChangeForStruct(structDec);
-            }
-        });
-    }
-
-    // 获取Csv数据
-    public HashSet<ALittleStructDec> getCsvData(@NotNull String path) {
-        return mCsvStructSet.get(path);
-    }
-
-    // 移除Csv数据
-    public void removeCsvData(@NotNull ALittleStructDec structDec) {
-        // 检查修饰符
-        ALittleCsvModifier csvModifier = structDec.getCsvModifier();
-        if (csvModifier == null) return;
-        PsiElement pathElement = csvModifier.getStringContent();
-        if (pathElement == null) return;
-
-        String path = pathElement.getText();
-        path = path.substring(1, path.length() - 1);
-        HashSet<ALittleStructDec> set = mCsvStructSet.get(path);
-        if (set == null) return;
-        set.remove(structDec);
-        if (!set.isEmpty()) return;
-        mCsvStructSet.remove(path);
-    }
-
-    // 添加Mysql数据
-    public void addMysqlData(@NotNull ALittleStructDec structDec) {
-        // 检查修饰符
-        ALittleMysqlModifier mysqlModifier = structDec.getMysqlModifier();
-        if (mysqlModifier == null) return;
-        PsiElement pathElement = mysqlModifier.getStringContent();
-        if (pathElement == null) return;
-
-        String path = pathElement.getText();
-        path = path.substring(1, path.length() - 1);
-        HashSet<ALittleStructDec> set = mMysqlStructSet.computeIfAbsent(path, k -> new HashSet<>());
-        set.add(structDec);
-
-        // 变化
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            public void run() {
-                ALittleMysqlDataManager.checkAndChangeForStruct(structDec);
-            }
-        });
-    }
-
-    // 获取Mysql数据
-    public HashSet<ALittleStructDec> getMysqlData(@NotNull String path) {
-        return mMysqlStructSet.get(path);
-    }
-
-    // 移除Mysql数据
-    public void removeMysqlData(@NotNull ALittleStructDec structDec) {
-        // 检查修饰符
-        ALittleCsvModifier csvModifier = structDec.getCsvModifier();
-        if (csvModifier == null) return;
-        PsiElement pathElement = csvModifier.getStringContent();
-        if (pathElement == null) return;
-        String path = pathElement.getText();
-        path = path.substring(1, path.length() - 1);
-
-        HashSet<ALittleStructDec> set = mMysqlStructSet.get(path);
-        if (set == null) return;
-        set.remove(structDec);
-        if (!set.isEmpty()) return;
-        mMysqlStructSet.remove(path);
-    }
-
     // 添加命名域
     public void addNamespaceName(@NotNull ALittleNamespaceNameDec element) {
         // 清除标记
@@ -346,121 +234,117 @@ public class ALittleIndex {
         ALittleAccessData fileAccessData = mFileAccessMap.computeIfAbsent(element.getContainingFile().getOriginalFile(), k -> new ALittleAccessData());
 
         ALittleNamespaceDec namespaceDec = (ALittleNamespaceDec)element.getParent();
-        for(PsiElement child = namespaceDec.getFirstChild(); child != null; child = child.getNextSibling()) {
+        List<ALittleNamespaceElementDec> elementDecList = namespaceDec.getNamespaceElementDecList();
+        for (ALittleNamespaceElementDec elementDec : elementDecList) {
             // 添加类
-            if (child instanceof ALittleClassDec) {
-                ALittleClassDec dec = (ALittleClassDec)child;
+            if (elementDec.getClassDec() != null) {
+                ALittleClassDec dec = elementDec.getClassDec();
                 ALittleClassNameDec nameDec = dec.getClassNameDec();
                 if (nameDec == null) continue;
 
                 // 添加类数据
                 addClassData(dec);
                 // 添加到全权限
-                allAccessData.addALittleNameDec(nameDec);
+                allAccessData.addNameDec(nameDec);
                 // 按访问权限划分
-                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(elementDec.getModifierList());
                 if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
-                    globalAccessData.addALittleNameDec(nameDec);
+                    globalAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
-                    namespaceAccessData.addALittleNameDec(nameDec);
+                    namespaceAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
-                    fileAccessData.addALittleNameDec(nameDec);
+                    fileAccessData.addNameDec(nameDec);
                 }
             // 添加枚举
-            } else if (child instanceof ALittleEnumDec) {
-                ALittleEnumDec dec = (ALittleEnumDec)child;
+            } else if (elementDec.getEnumDec() != null) {
+                ALittleEnumDec dec = elementDec.getEnumDec();
                 ALittleEnumNameDec nameDec = dec.getEnumNameDec();
                 if (nameDec == null) continue;
 
                 // 添加枚举数据
                 addEnumData(dec);
                 // 添加到全权限
-                allAccessData.addALittleNameDec(nameDec);
+                allAccessData.addNameDec(nameDec);
                 // 按访问权限划分
-                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(elementDec.getModifierList());
                 if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
-                    globalAccessData.addALittleNameDec(nameDec);
+                    globalAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
-                    namespaceAccessData.addALittleNameDec(nameDec);
+                    namespaceAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
-                    fileAccessData.addALittleNameDec(nameDec);
+                    fileAccessData.addNameDec(nameDec);
                 }
             // 添加结构体
-            } else if (child instanceof ALittleStructDec) {
-                ALittleStructDec dec = (ALittleStructDec)child;
+            } else if (elementDec.getStructDec() != null) {
+                ALittleStructDec dec = elementDec.getStructDec();
                 ALittleStructNameDec nameDec = dec.getStructNameDec();
                 if (nameDec == null) continue;
-
-                // 添加Csv数据
-                addCsvData(dec);
-                // 添加Mysql数据
-                addMysqlData(dec);
                 // 添加结构体数据
                 addStructData(dec);
                 // 添加到全权限
-                allAccessData.addALittleNameDec(nameDec);
+                allAccessData.addNameDec(nameDec);
                 // 按访问权限划分
-                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(elementDec.getModifierList());
                 if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
-                    globalAccessData.addALittleNameDec(nameDec);
+                    globalAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
-                    namespaceAccessData.addALittleNameDec(nameDec);
+                    namespaceAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
-                    fileAccessData.addALittleNameDec(nameDec);
+                    fileAccessData.addNameDec(nameDec);
                 }
             // 添加全局函数
-            } else if (child instanceof ALittleGlobalMethodDec) {
-                ALittleGlobalMethodDec dec = (ALittleGlobalMethodDec)child;
+            } else if (elementDec.getGlobalMethodDec() != null) {
+                ALittleGlobalMethodDec dec = elementDec.getGlobalMethodDec();
                 ALittleMethodNameDec nameDec = dec.getMethodNameDec();
                 if (nameDec == null) continue;
 
                 // 添加到全权限
-                allAccessData.addALittleNameDec(nameDec);
+                allAccessData.addNameDec(nameDec);
                 // 按访问权限划分
-                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(elementDec.getModifierList());
                 if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
-                    globalAccessData.addALittleNameDec(nameDec);
+                    globalAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
-                    namespaceAccessData.addALittleNameDec(nameDec);
+                    namespaceAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
-                    fileAccessData.addALittleNameDec(nameDec);
+                    fileAccessData.addNameDec(nameDec);
                 }
             // 添加单例
-            } else if (child instanceof ALittleInstanceDec) {
-                ALittleInstanceDec dec = (ALittleInstanceDec) child;
-                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+            } else if (elementDec.getInstanceDec() != null) {
+                ALittleInstanceDec dec = elementDec.getInstanceDec();
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(elementDec.getModifierList());
 
                 List<ALittleVarAssignDec> varAssignDecList = dec.getVarAssignExpr().getVarAssignDecList();
                 for (ALittleVarAssignDec varAssignDec : varAssignDecList) {
                     ALittleVarAssignNameDec nameDec = varAssignDec.getVarAssignNameDec();
 
                     // 添加到全权限
-                    allAccessData.addALittleNameDec(nameDec);
+                    allAccessData.addNameDec(nameDec);
                     // 按访问权限划分
                     if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
-                        globalAccessData.addALittleNameDec(nameDec);
+                        globalAccessData.addNameDec(nameDec);
                     } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
-                        namespaceAccessData.addALittleNameDec(nameDec);
+                        namespaceAccessData.addNameDec(nameDec);
                     } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
-                        fileAccessData.addALittleNameDec(nameDec);
+                        fileAccessData.addNameDec(nameDec);
                     }
                 }
             // 添加using
-            } else if (child instanceof ALittleUsingDec) {
-                ALittleUsingDec dec = (ALittleUsingDec) child;
+            } else if (elementDec.getUsingDec() != null) {
+                ALittleUsingDec dec = elementDec.getUsingDec();
                 ALittleUsingNameDec nameDec = dec.getUsingNameDec();
                 if (nameDec == null) continue;
 
                 // 添加到全权限
-                allAccessData.addALittleNameDec(nameDec);
+                allAccessData.addNameDec(nameDec);
                 // 按访问权限划分
-                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(dec.getAccessModifier());
+                PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(elementDec.getModifierList());
                 if (accessType == PsiHelper.ClassAccessType.PUBLIC) {
-                    globalAccessData.addALittleNameDec(nameDec);
+                    globalAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PROTECTED) {
-                    namespaceAccessData.addALittleNameDec(nameDec);
+                    namespaceAccessData.addNameDec(nameDec);
                 } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
-                    fileAccessData.addALittleNameDec(nameDec);
+                    fileAccessData.addNameDec(nameDec);
                 }
             }
         }
@@ -493,13 +377,9 @@ public class ALittleIndex {
         for (Map.Entry<PsiHelper.PsiElementType, Map<String, Set<PsiElement>>> entry : allAccessData.elementMap.entrySet()) {
             for (Map.Entry<String, Set<PsiElement>> elementEntry : entry.getValue().entrySet()) {
                 for (PsiElement nameDec : elementEntry.getValue()) {
-                    if (globalAccessData != null) globalAccessData.removeALittleNameDec(nameDec);
-                    if (namespaceAccessData != null) namespaceAccessData.removeALittleNameDec(nameDec);
-                    if (fileAccessData != null) fileAccessData.removeALittleNameDec(nameDec);
-                    if (nameDec instanceof ALittleStructNameDec) {
-                        removeCsvData((ALittleStructDec)nameDec.getParent());
-                        removeMysqlData((ALittleStructDec)nameDec.getParent());
-                    }
+                    if (globalAccessData != null) globalAccessData.removeNameDec(nameDec);
+                    if (namespaceAccessData != null) namespaceAccessData.removeNameDec(nameDec);
+                    if (fileAccessData != null) fileAccessData.removeNameDec(nameDec);
                 }
             }
         }

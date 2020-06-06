@@ -14,14 +14,14 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public class ALittleClassVarDecImpl extends ASTWrapperPsiElement implements ALittleClassVarDec {
+public class ALittleClassVarValueDecImpl extends ASTWrapperPsiElement implements ALittleClassVarValueDec {
 
-  public ALittleClassVarDecImpl(@NotNull ASTNode node) {
+  public ALittleClassVarValueDecImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ALittleVisitor visitor) {
-    visitor.visitClassVarDec(this);
+    visitor.visitClassVarValueDec(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -30,21 +30,15 @@ public class ALittleClassVarDecImpl extends ASTWrapperPsiElement implements ALit
   }
 
   @Override
-  @NotNull
-  public ALittleAllType getAllType() {
-    return findNotNullChildByClass(ALittleAllType.class);
+  @Nullable
+  public ALittleConstValue getConstValue() {
+    return findChildByClass(ALittleConstValue.class);
   }
 
   @Override
   @Nullable
-  public ALittleClassVarNameDec getClassVarNameDec() {
-    return findChildByClass(ALittleClassVarNameDec.class);
-  }
-
-  @Override
-  @Nullable
-  public ALittleClassVarValueDec getClassVarValueDec() {
-    return findChildByClass(ALittleClassVarValueDec.class);
+  public ALittleOpNewStat getOpNewStat() {
+    return findChildByClass(ALittleOpNewStat.class);
   }
 
   @Override

@@ -5,25 +5,25 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.ProjectBundle;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ui.configuration.ModuleConfigurationState;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.VfsUtilCore;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.IdeBorderFactory;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.Nullable;
-import plugin.link.ALittleLinkConfig;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class ALittleModuleConfigurationEditor implements ModuleConfigurationEditor {
-    private ModuleConfigurationState mState;
+    private final ModuleConfigurationState mState;
     private boolean mModified = false;
 
     // 输出目录
-    private JTextField myOutputPathTextField;
+    private ComboBox<String> myTargetLanguageTextField;
 
     protected ALittleModuleConfigurationEditor(final ModuleConfigurationState state) {
         mState = state;
@@ -34,13 +34,11 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
     public JComponent createComponent() {
         final JPanel outputPathsPanel = new JPanel(new GridBagLayout());
 
-        myOutputPathTextField = addConfigureUI(outputPathsPanel, "脚本生成目录:");
+        myTargetLanguageTextField = addConfigureComboBox(outputPathsPanel, "目标语言:");
+        myTargetLanguageTextField.addItem("Lua");
+        myTargetLanguageTextField.addItem("JavaScript");
 
-        Module module = mState.getRootModel().getModule();
-        ALittleLinkConfig config = ALittleLinkConfig.getConfig(module);
-        myOutputPathTextField.setText(config.getOutputPath());
-
-        listenChange(myOutputPathTextField);
+        listenChange(myTargetLanguageTextField);
 
         final JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(IdeBorderFactory.createTitledBorder(ProjectBundle.message("project.roots.output.compiler.title")));
@@ -48,26 +46,45 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
         return panel;
     }
 
-    private void listenChange(JTextField textField) {
-        textField.addPropertyChangeListener(new PropertyChangeListener() {
-            String mTmp = textField.getText();
+    private void listenChange(JTextField item) {
+        item.addPropertyChangeListener(new PropertyChangeListener() {
+            final String mTmp = item.getText();
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (mModified) return;
-                if (mTmp.equals(textField.getToolTipText())) return;
+                if (mTmp.equals(item.getToolTipText())) return;
                 mModified = true;
             }
         });
     }
 
-    private JTextField addConfigureUI(JPanel panel, String labelText) {
+    private void listenChange(ComboBox<String> item) {
+        item.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                mModified = true;
+            }
+        });
+    }
+
+    private JTextField addConfigureTextField(JPanel panel, String labelText) {
         JLabel label = new JLabel(labelText);
-        JTextField textField = new JTextField();
+        JTextField item = new JTextField();
         panel.add(label, new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-                GridBagConstraints.NONE, new Insets(6, 0, 0, 4), 0, 0));
-        panel.add(textField, new GridBagConstraints(1, GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0, GridBagConstraints.EAST,
-                GridBagConstraints.HORIZONTAL, new Insets(6, 4, 0, 0), 0, 0));
-        return textField;
+                GridBagConstraints.NONE, JBUI.insets(6, 0, 0, 4), 0, 0));
+        panel.add(item, new GridBagConstraints(1, GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0, GridBagConstraints.EAST,
+                GridBagConstraints.HORIZONTAL, JBUI.insets(6, 4, 0, 0), 0, 0));
+        return item;
+    }
+
+    private ComboBox<String> addConfigureComboBox(JPanel panel, String labelText) {
+        JLabel label = new JLabel(labelText);
+        ComboBox<String> item = new ComboBox<>();
+        panel.add(label, new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+                GridBagConstraints.NONE, JBUI.insets(6, 0, 0, 4), 0, 0));
+        panel.add(item, new GridBagConstraints(1, GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0, GridBagConstraints.EAST,
+                GridBagConstraints.HORIZONTAL, JBUI.insets(6, 4, 0, 0), 0, 0));
+        return item;
     }
 
     @Override
@@ -105,8 +122,13 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
         mModified = false;
 
         Module module = mState.getRootModel().getModule();
-        ALittleLinkConfig config = ALittleLinkConfig.getConfig(module);
-        config.setOutputPath(myOutputPathTextField.getText());
+        ALittleConfig config = ALittleConfig.getConfig(module);
+
+        Object item = myTargetLanguageTextField.getSelectedItem();
+        if (item != null)
+            config.setTargetLanguage(item.toString());
+        else
+            config.setTargetLanguage("Lua");
         config.save();
     }
 }

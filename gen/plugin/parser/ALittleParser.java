@@ -769,7 +769,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // AllType ClassVarNameDec ';'
+  // AllType ClassVarNameDec ClassVarValueDec? ';'
   public static boolean ClassVarDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ClassVarDec")) return false;
     boolean r, p;
@@ -777,9 +777,17 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     r = AllType(b, l + 1);
     p = r; // pin = 1
     r = r && report_error_(b, ClassVarNameDec(b, l + 1));
+    r = p && report_error_(b, ClassVarDec_2(b, l + 1)) && r;
     r = p && consumeToken(b, SEMI) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // ClassVarValueDec?
+  private static boolean ClassVarDec_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassVarDec_2")) return false;
+    ClassVarValueDec(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
@@ -791,6 +799,29 @@ public class ALittleParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, ID_CONTENT);
     exit_section_(b, m, CLASS_VAR_NAME_DEC, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // '=' (ConstValue | OpNewStat)
+  public static boolean ClassVarValueDec(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassVarValueDec")) return false;
+    if (!nextTokenIs(b, ASSIGN)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, CLASS_VAR_VALUE_DEC, null);
+    r = consumeToken(b, ASSIGN);
+    p = r; // pin = 1
+    r = r && ClassVarValueDec_1(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // ConstValue | OpNewStat
+  private static boolean ClassVarValueDec_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassVarValueDec_1")) return false;
+    boolean r;
+    r = ConstValue(b, l + 1);
+    if (!r) r = OpNewStat(b, l + 1);
     return r;
   }
 

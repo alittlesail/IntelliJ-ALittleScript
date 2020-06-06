@@ -117,7 +117,7 @@ public class PsiHelper {
     }
 
     // 检查await
-    public static void CheckInvokeAwait(PsiElement element) throws ALittleGuessException
+    public static void checkInvokeAwait(PsiElement element) throws ALittleGuessException
     {
         // 检查这次所在的函数必须要有await或者async修饰
         PsiElement parent = element;
@@ -177,7 +177,7 @@ public class PsiHelper {
 
 
     // 判断是否存在
-    public static void CheckError(PsiElement parent, List<ALittleModifier> element_list) throws ALittleGuessException
+    public static void checkError(PsiElement parent, List<ALittleModifier> element_list) throws ALittleGuessException
     {
         int register_count = 0;
         int coroutine_count = 0;
@@ -369,7 +369,7 @@ public class PsiHelper {
     }
 
     // 获取是否是Nullable
-    public static boolean IsNullable(List<ALittleModifier> element_list)
+    public static boolean isNullable(List<ALittleModifier> element_list)
     {
         for (ALittleModifier element : element_list)
         {
@@ -409,7 +409,7 @@ public class PsiHelper {
         String desc;
     }
     // 获取命令类型
-    public static String GetCommandDetail(List<ALittleModifier> element_list)
+    public static String getCommandDetail(List<ALittleModifier> element_list)
     {
         CommandInfo info = new CommandInfo();
         for (ALittleModifier element : element_list)
@@ -1069,38 +1069,34 @@ public class PsiHelper {
         // 函数不能有返回值占位符
         if (guess.return_tail != null) return false;
         // 函数的第一个参数必须和guess_list第二个参数一致
-        if (guess.param_list.get(0).GetValue() != guess_list.get(1).GetValue()) return false;
+        if (!guess.param_list.get(0).getValue().equals(guess_list.get(1).getValue())) return false;
         // 函数的第二个参数必须和guess_list第二个参数一致
-        if (guess.param_list.get(1).GetValue() != guess_list.get(2).GetValue()) return false;
+        if (!guess.param_list.get(1).getValue().equals(guess_list.get(2).getValue())) return false;
         return true;
     }
 
     // 计算表达式需要使用什么样的变量方式
     public static String calcPairsTypeForLua(ALittleValueStat value_stat) throws ALittleGuessException
     {
-        String result = "";
         List<ALittleGuess> guess_list = value_stat.guessTypes();
 
         // 必出是模板容器
         if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessList)
         {
-            result = "___ipairs";
-            return null;
+            return "___ipairs";
         }
             else if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessMap)
         {
-            result = "___pairs";
-            return null;
+            return "___pairs";
         }
 
         // 已经是迭代函数了，就不需要包围修饰
-        if (IsPairsFunction(guess_list)) return null;
+        if (IsPairsFunction(guess_list)) return "";
 
         throw new ALittleGuessException(value_stat, "该表达式不能遍历");
     }
 
     // 计算表达式在for中使用in还是of
-    //
     public static Tuple2<String, Boolean> calcPairsTypeForJavaScript(ALittleValueStat value_stat) throws ALittleGuessException
     {
         String result = "Other";
@@ -1110,7 +1106,7 @@ public class PsiHelper {
         if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessList)
         {
             result = "List";
-            is_native = (guess_list.get(0) instanceof ALittleGuessList).is_native;
+            is_native = ((ALittleGuessList)guess_list.get(0)).is_native;
             return new Tuple2<>(result, is_native);
         }
         else if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessMap)
@@ -1146,7 +1142,7 @@ public class PsiHelper {
         ALittleGuessClass guess_class = (ALittleGuessClass)guess;
 
         // 检查是否一致
-        if (guess_class.getValueWithoutConst() == parent)
+        if (guess_class.getValueWithoutConst().equals(parent))
             return true;
 
         return isClassSuper(guess_class.class_dec, parent);
@@ -1173,14 +1169,14 @@ public class PsiHelper {
         ALittleGuessStruct guess_struct = (ALittleGuessStruct)guess;
 
         // 判断是否一致
-        if (guess_struct.getValueWithoutConst() == parent)
+        if (guess_struct.getValueWithoutConst().equals(parent))
             return true;
 
         return isStructSuper(guess_struct.struct_dec, parent);
     }
 
     // 判断ValueStat
-    public static Tuple2<Integer, List<ALittleGuess>> CalcReturnCount(ALittleValueStat value_stat) throws ALittleGuessException
+    public static Tuple2<Integer, List<ALittleGuess>> calcReturnCount(ALittleValueStat value_stat) throws ALittleGuessException
     {
         int count = 0;
         // 获取右边表达式的

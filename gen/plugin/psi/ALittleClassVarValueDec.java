@@ -8,16 +8,13 @@ import com.intellij.psi.PsiReference;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 
-public interface ALittleClassVarDec extends PsiElement {
-
-  @NotNull
-  ALittleAllType getAllType();
+public interface ALittleClassVarValueDec extends PsiElement {
 
   @Nullable
-  ALittleClassVarNameDec getClassVarNameDec();
+  ALittleConstValue getConstValue();
 
   @Nullable
-  ALittleClassVarValueDec getClassVarValueDec();
+  ALittleOpNewStat getOpNewStat();
 
   @NotNull
   ALittleGuess guessType() throws ALittleGuessException;

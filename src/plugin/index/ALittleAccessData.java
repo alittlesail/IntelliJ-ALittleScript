@@ -15,7 +15,7 @@ public class ALittleAccessData {
     }
 
     // 添加元素
-    public void addALittleNameDec(@NotNull PsiElement nameDec) {
+    public void addNameDec(@NotNull PsiElement nameDec) {
         // 获取名称
         String name = nameDec.getText();
 
@@ -44,7 +44,7 @@ public class ALittleAccessData {
     }
 
     // 查找元素
-    public void findALittleNameDecList(PsiHelper.PsiElementType type, @NotNull String name, @NotNull List<PsiElement> result) {
+    public void findNameDecList(PsiHelper.PsiElementType type, @NotNull String name, @NotNull List<PsiElement> result) {
         Map<String, Set<PsiElement>> map = elementMap.get(type);
         if (map == null) return;
 
@@ -61,7 +61,7 @@ public class ALittleAccessData {
     }
 
     // 移除元素
-    public void removeALittleNameDec(@NotNull PsiElement nameDec) {
+    public void removeNameDec(@NotNull PsiElement nameDec) {
         // 获取名称
         String name = nameDec.getText();
 

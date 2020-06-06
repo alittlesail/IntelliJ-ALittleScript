@@ -17,7 +17,7 @@ public class ALittleEnumData {
     }
 
     public void addVarDec(@NotNull ALittleEnumVarDec dec) {
-        PsiElement nameDec = dec.getIdContent();
+        PsiElement nameDec = dec.getEnumVarNameDec();
         if (nameDec == null) return;
         dataMap.put(nameDec.getText(), dec);
     }

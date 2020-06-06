@@ -17,9 +17,9 @@ public class ALittleGuessClass extends ALittleGuess {
     public String class_name = "";
 
     // 类本身定义的模板列表
-    public ArrayList<ALittleGuess> template_list = new ArrayList<>();
+    public List<ALittleGuess> template_list = new ArrayList<>();
     // 填充后的模板实例
-    public HashMap<String, ALittleGuess> template_map = new HashMap<>();
+    public Map<String, ALittleGuess> template_map = new HashMap<>();
 
     // 如果是using定义出来的，那么就有这个值
     public String using_name;

@@ -5,9 +5,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class ALittleGuessException extends Exception {
     private @NotNull String mError;
-    private @NotNull PsiElement mElement;
+    private PsiElement mElement;
 
-    public ALittleGuessException(@NotNull PsiElement element, @NotNull String error) {
+    public ALittleGuessException(PsiElement element, @NotNull String error) {
         mElement = element;
         mError = error;
     }
@@ -15,6 +15,5 @@ public class ALittleGuessException extends Exception {
     @NotNull
     public String getError() { return mError; }
 
-    @NotNull
     public PsiElement getElement() { return mElement; }
 }

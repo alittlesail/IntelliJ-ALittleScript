@@ -16,13 +16,13 @@ public class ALittleClassData {
     }
 
     // 添加类元素
-    public void addALittleClassChildDec(@NotNull PsiElement dec) {
+    public void addClassChildDec(@NotNull PsiElement dec) {
         // 模板定义特殊处理
         if (dec instanceof ALittleTemplateDec) {
             ALittleTemplateDec templateDec = (ALittleTemplateDec)dec;
             List<ALittleTemplatePairDec> pairDecList = templateDec.getTemplatePairDecList();
             for (ALittleTemplatePairDec pairDec : pairDecList) {
-                addALittleClassChildDec(pairDec);
+                addClassChildDec(pairDec);
             }
             return;
         }
@@ -33,55 +33,60 @@ public class ALittleClassData {
 
         // 处理模板参数
         if (dec instanceof ALittleTemplatePairDec) {
-            ALittleTemplatePairDec pairDec = (ALittleTemplatePairDec)dec;
-            name = pairDec.getIdContent().getText();
+            ALittleTemplatePairDec pairDec = (ALittleTemplatePairDec) dec;
+            name = pairDec.getTemplateNameDec().getText();
             accessType = PsiHelper.ClassAccessType.PUBLIC;
             attrType = PsiHelper.ClassAttrType.TEMPLATE;
-        // 处理成员变量
-        } else if (dec instanceof ALittleClassVarDec) {
-            ALittleClassVarDec varDec = (ALittleClassVarDec) dec;
-            PsiElement nameDec = varDec.getIdContent();
-            if (nameDec == null) return;
-            name = nameDec.getText();
-            accessType = PsiHelper.calcAccessType(varDec.getAccessModifier());
-            attrType = PsiHelper.ClassAttrType.VAR;
-        // 处理成员函数
-        } else if (dec instanceof ALittleClassMethodDec) {
-            ALittleClassMethodDec methodDec = (ALittleClassMethodDec)dec;
-            ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
-            if (nameDec == null) return;
-            dec = nameDec;
-            name = nameDec.getText();
-            accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
-            attrType = PsiHelper.ClassAttrType.FUN;
-        // 处理getter函数
-        } else if (dec instanceof ALittleClassGetterDec) {
-            ALittleClassGetterDec methodDec = (ALittleClassGetterDec)dec;
-            ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
-            if (nameDec == null) return;
-            dec = nameDec;
-            name = nameDec.getText();
-            accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
-            attrType = PsiHelper.ClassAttrType.GETTER;
-        // 处理setter函数
-        } else if (dec instanceof ALittleClassSetterDec) {
-            ALittleClassSetterDec methodDec = (ALittleClassSetterDec)dec;
-            ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
-            if (nameDec == null) return;
-            dec = nameDec;
-            name = nameDec.getText();
-            accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
-            attrType = PsiHelper.ClassAttrType.SETTER;
-        // 处理静态函数
-        } else if (dec instanceof ALittleClassStaticDec) {
-            ALittleClassStaticDec methodDec = (ALittleClassStaticDec)dec;
-            ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
-            if (nameDec == null) return;
-            dec = nameDec;
-            name = nameDec.getText();
-            accessType = PsiHelper.calcAccessType(methodDec.getAccessModifier());
-            attrType = PsiHelper.ClassAttrType.STATIC;
-        } else {
+        } else if (dec instanceof ALittleClassElementDec) {
+            ALittleClassElementDec elementDec = (ALittleClassElementDec) dec;
+            accessType = PsiHelper.calcAccessType(elementDec.getModifierList());
+            // 处理成员变量
+            if (elementDec.getClassVarDec() != null) {
+                ALittleClassVarDec varDec = elementDec.getClassVarDec();
+                PsiElement nameDec = varDec.getClassVarNameDec();
+                if (nameDec == null) return;
+                name = nameDec.getText();
+                attrType = PsiHelper.ClassAttrType.VAR;
+                dec = varDec;
+                // 处理成员函数
+            } else if (elementDec.getClassMethodDec() != null) {
+                ALittleClassMethodDec methodDec = elementDec.getClassMethodDec();
+                ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
+                if (nameDec == null) return;
+                dec = nameDec;
+                name = nameDec.getText();
+                accessType = PsiHelper.calcAccessType(elementDec.getModifierList());
+                attrType = PsiHelper.ClassAttrType.FUN;
+                // 处理getter函数
+            } else if (elementDec.getClassGetterDec() != null) {
+                ALittleClassGetterDec methodDec = elementDec.getClassGetterDec();
+                ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
+                if (nameDec == null) return;
+                dec = nameDec;
+                name = nameDec.getText();
+                attrType = PsiHelper.ClassAttrType.GETTER;
+                // 处理setter函数
+            } else if (elementDec.getClassSetterDec() != null) {
+                ALittleClassSetterDec methodDec = elementDec.getClassSetterDec();
+                ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
+                if (nameDec == null) return;
+                dec = nameDec;
+                name = nameDec.getText();
+                attrType = PsiHelper.ClassAttrType.SETTER;
+                // 处理静态函数
+            } else if (elementDec.getClassStaticDec() != null) {
+                ALittleClassStaticDec methodDec = elementDec.getClassStaticDec();
+                ALittleMethodNameDec nameDec = methodDec.getMethodNameDec();
+                if (nameDec == null) return;
+                dec = nameDec;
+                name = nameDec.getText();
+                attrType = PsiHelper.ClassAttrType.STATIC;
+            } else {
+                return;
+            }
+        }
+        else
+        {
             return;
         }
 

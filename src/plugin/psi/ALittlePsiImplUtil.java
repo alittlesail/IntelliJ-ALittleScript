@@ -25,34 +25,34 @@ public class ALittlePsiImplUtil {
 
     @NotNull
     public static List<ALittleGuess> guessTypes(PsiElement element) throws ALittleGuessException {
-        List<ALittleGuess> guessTypeInfoList = ALittleTreeChangeListener.getGuessTypeList(element);
-        if (guessTypeInfoList != null && !guessTypeInfoList.isEmpty()) {
+        List<ALittleGuess> guessList = ALittleTreeChangeListener.getGuessTypeList(element);
+        if (guessList != null && !guessList.isEmpty()) {
             boolean isChanged = false;
-            for (ALittleGuess info : guessTypeInfoList) {
-                if (info.isChanged()) {
+            for (ALittleGuess guess : guessList) {
+                if (guess.isChanged()) {
                     isChanged = true;
                     break;
                 }
             }
-            if (!isChanged) return  guessTypeInfoList;
+            if (!isChanged) return  guessList;
         }
 
         ALittleReferenceInterface ref = ALittleReferenceUtil.create(element);
         if (ref == null) {
             throw new ALittleGuessException(element, "ALittleReference对象创建失败 element:" + element);
         }
-        guessTypeInfoList = ref.guessTypes();
+        guessList = ref.guessTypes();
 
         // 如果是两个，并且一个是register，一个不是。那么就要把register那个删掉
-        if (!ref.multiGuessTypes() && guessTypeInfoList.size() == 2 && guessTypeInfoList.get(0).value.equals(guessTypeInfoList.get(1).value)) {
-            if (guessTypeInfoList.get(0).isRegister && !guessTypeInfoList.get(1).isRegister) {
-                guessTypeInfoList.remove(0);
-            } else if (!guessTypeInfoList.get(0).isRegister && guessTypeInfoList.get(1).isRegister) {
-                guessTypeInfoList.remove(1);
+        if (!ref.multiGuessTypes() && guessList.size() == 2 && guessList.get(0).getValue().equals(guessList.get(1).getValue())) {
+            if (guessList.get(0).is_register && !guessList.get(1).is_register) {
+                guessList.remove(0);
+            } else if (!guessList.get(0).is_register && guessList.get(1).is_register) {
+                guessList.remove(1);
             }
         }
 
-        ALittleTreeChangeListener.putGuessTypeList(element, guessTypeInfoList);
-        return guessTypeInfoList;
+        ALittleTreeChangeListener.putGuessTypeList(element, guessList);
+        return guessList;
     }
 }

@@ -11,18 +11,18 @@ import plugin.psi.*;
 public class ALittleCompletionContributor extends CompletionContributor {
 
     static String[] KEYWORD_LIST = new String[] {
-            "int","I64","double","bool","string","auto","List","Map"
+            "int","long","double","bool","string","var","List","Map"
             ,"namespace","class","struct","enum"
-            ,"for","do","while","break","return","cast","reflect"
+            ,"for","do","while","break","return","cast","reflect","continue"
             ,"get","set","fun","static","Ctor","Functor","this","using"
-            ,"public","protected","private","instance","pcall","ncall","nsend"
-            ,"async","await","yield","bind","Http","HttpDownload","HttpUpload","Msg","Cmd","Csv","Mysql"
+            ,"public","protected","private","instance","tcall"
+            ,"async","await","yield","bind","Http","HttpDownload","HttpUpload","Msg","Cmd"
     };
 
     public ALittleCompletionContributor() {
 
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement(ALittleTypes.ID).withLanguage(ALittleLanguage.INSTANCE),
+                PlatformPatterns.psiElement(ALittleTypes.ID_CONTENT).withLanguage(ALittleLanguage.INSTANCE),
                 new CompletionProvider<CompletionParameters>() {
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                ProcessingContext context,

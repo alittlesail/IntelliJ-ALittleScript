@@ -51,11 +51,11 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<PsiElem
                     return null;
                 }
                 ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
-                if (preTypeFunctor.functorParamNameList.isEmpty()) {
+                if (preTypeFunctor.param_name_list.isEmpty()) {
                     return null;
                 }
                 List<String> list = new ArrayList<>();
-                list.add(String.join(", ", preTypeFunctor.functorParamNameList));
+                list.add(String.join(", ", preTypeFunctor.param_name_list));
                 context.setItemsToShow(list.toArray());
             } catch (ALittleGuessException e) {
                 return null;
@@ -73,38 +73,42 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<PsiElem
 
                 if (guess instanceof ALittleGuessClassTemplate) {
                     ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
-                    if (guessClassTemplate.templateExtends != null) {
-                        guess = guessClassTemplate.templateExtends;
+                    if (guessClassTemplate.template_extends != null) {
+                        guess = guessClassTemplate.template_extends;
                     }
                 }
 
                 if (guess instanceof ALittleGuessClass) {
-                    ALittleClassDec classDec = ((ALittleGuessClass) guess).element;
-                    List<ALittleClassCtorDec> ctorDecList = classDec.getClassCtorDecList();
-                    if (ctorDecList.size() < 1) {
-                        return null;
-                    }
+                    ALittleClassDec classDec = ((ALittleGuessClass) guess).class_dec;
+                    ALittleClassBodyDec bodyDec = classDec.getClassBodyDec();
+                    if (bodyDec == null) return null;
+                    List<ALittleClassElementDec> elementDecList = bodyDec.getClassElementDecList();
+                    for (ALittleClassElementDec elementDec : elementDecList)
+                    {
+                        ALittleClassCtorDec ctorDec = elementDec.getClassCtorDec();
+                        if (ctorDec == null) continue;
 
-                    ALittleMethodParamDec param_dec = ctorDecList.get(0).getMethodParamDec();
-                    if (param_dec == null) {
-                        return null;
-                    }
-
-                    List<ALittleMethodParamOneDec> param_oneDecList = param_dec.getMethodParamOneDecList();
-                    if (param_oneDecList.isEmpty()) {
-                        return null;
-                    }
-                    List<String> param_name_list = new ArrayList<>();
-                    for (ALittleMethodParamOneDec param_one_dec : param_oneDecList) {
-                        if (param_one_dec.getMethodParamNameDec() == null) {
+                        ALittleMethodParamDec param_dec = ctorDec.getMethodParamDec();
+                        if (param_dec == null) {
                             return null;
                         }
-                        param_name_list.add(param_one_dec.getMethodParamNameDec().getText());
-                    }
 
-                    List<String> list = new ArrayList<>();
-                    list.add(String.join(", ", param_name_list));
-                    context.setItemsToShow(list.toArray());
+                        List<ALittleMethodParamOneDec> param_oneDecList = param_dec.getMethodParamOneDecList();
+                        if (param_oneDecList.isEmpty()) {
+                            return null;
+                        }
+                        List<String> param_name_list = new ArrayList<>();
+                        for (ALittleMethodParamOneDec param_one_dec : param_oneDecList) {
+                            if (param_one_dec.getMethodParamNameDec() == null) {
+                                return null;
+                            }
+                            param_name_list.add(param_one_dec.getMethodParamNameDec().getText());
+                        }
+
+                        List<String> list = new ArrayList<>();
+                        list.add(String.join(", ", param_name_list));
+                        context.setItemsToShow(list.toArray());
+                    }
                 }
             } catch (ALittleGuessException ignored) {
                 return null;

@@ -16,16 +16,16 @@ public class ALittleParserDefinition implements ParserDefinition {
     public static final IFileElementType FILE = new IFileElementType(ALittleLanguage.INSTANCE);
 
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-    public static final TokenSet COMMENT_SET = TokenSet.create(ALittleTypes.COMMENT);
-    public static final TokenSet STRING_CONTENT_SET = TokenSet.create(ALittleTypes.STRING_CONTENT);
-    public static final TokenSet NUMBER_CONTENT_SET = TokenSet.create(ALittleTypes.DIGIT_CONTENT);
+    public static final TokenSet COMMENT_SET = TokenSet.create(ALittleTypes.LINE_COMMENT, ALittleTypes.BLOCK_COMMENT);
+    public static final TokenSet STRING_CONTENT_SET = TokenSet.create(ALittleTypes.TEXT_CONTENT);
+    public static final TokenSet NUMBER_CONTENT_SET = TokenSet.create(ALittleTypes.NUMBER_CONTENT);
     public static final TokenSet BAD_CHARACTER_SET = TokenSet.create(TokenType.BAD_CHARACTER);
 
-    public static final TokenSet KEYWORD_SET = TokenSet.create(ALittleTypes.CAST, ALittleTypes.REFLECT, ALittleTypes.AUTO,
-            ALittleTypes.ANY, ALittleTypes.INT, ALittleTypes.I64, ALittleTypes.DOUBLE, ALittleTypes.STRING, ALittleTypes.BOOL,
+    public static final TokenSet KEYWORD_SET = TokenSet.create(ALittleTypes.CAST, ALittleTypes.REFLECT, ALittleTypes.VAR,
+            ALittleTypes.ANY, ALittleTypes.INT, ALittleTypes.LONG, ALittleTypes.DOUBLE, ALittleTypes.STRING, ALittleTypes.BOOL,
             ALittleTypes.CLASS, ALittleTypes.ENUM, ALittleTypes.STRUCT, ALittleTypes.ASSERT, ALittleTypes.THROW, ALittleTypes.TCALL,
             ALittleTypes.PUBLIC, ALittleTypes.PRIVATE, ALittleTypes.PROTECTED, ALittleTypes.STATIC, ALittleTypes.USING,
-            ALittleTypes.BREAK, ALittleTypes.CTOR, ALittleTypes.YIELD, ALittleTypes.ASYNC, ALittleTypes.AWAIT, ALittleTypes.BIND,
+            ALittleTypes.BREAK, ALittleTypes.CONTINUE, ALittleTypes.CTOR, ALittleTypes.YIELD, ALittleTypes.ASYNC, ALittleTypes.AWAIT, ALittleTypes.BIND,
             ALittleTypes.IF, ALittleTypes.ELSE, ALittleTypes.ELSEIF, ALittleTypes.DO, ALittleTypes.WHILE, ALittleTypes.FOR,
             ALittleTypes.IN, ALittleTypes.LIST, ALittleTypes.MAP, ALittleTypes.TYPE_TAIL, ALittleTypes.CONCAT,
             ALittleTypes.NEW, ALittleTypes.RETURN, ALittleTypes.REGISTER, ALittleTypes.NAMESPACE, ALittleTypes.THIS, ALittleTypes.FUNCTOR,
@@ -40,8 +40,8 @@ public class ALittleParserDefinition implements ParserDefinition {
             ALittleTypes.QUOTIENT_ASSIGN, ALittleTypes.RBRACE, ALittleTypes.RBRACK, ALittleTypes.REMAINDER, ALittleTypes.REMAINDER_ASSIGN, ALittleTypes.RPAREN,
             ALittleTypes.SEMI);
 
-    public static final TokenSet ANNO_SET = TokenSet.create(ALittleTypes.CSV, ALittleTypes.MYSQL, ALittleTypes.CMD, ALittleTypes.MSG
-            , ALittleTypes.HTTP, ALittleTypes.HTTP_DOWNLOAD, ALittleTypes.HTTP_UPLOAD);
+    public static final TokenSet ANNO_SET = TokenSet.create(ALittleTypes.CMD, ALittleTypes.MSG
+            , ALittleTypes.HTTP, ALittleTypes.HTTPDOWNLOAD, ALittleTypes.HTTPUPLOAD);
 
     @NotNull
     @Override
@@ -76,10 +76,6 @@ public class ALittleParserDefinition implements ParserDefinition {
 
     public PsiFile createFile(FileViewProvider viewProvider) {
         return new ALittleFile(viewProvider);
-    }
-
-    public SpaceRequirements spaceExistenceTypeBetweenTokens(ASTNode left, ASTNode right) {
-        return SpaceRequirements.MAY;
     }
 
     @NotNull

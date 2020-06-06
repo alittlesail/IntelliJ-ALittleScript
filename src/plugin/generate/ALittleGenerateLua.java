@@ -37,26 +37,6 @@ public class ALittleGenerateLua {
     // 当前文件需要处理的反射信息
     private Map<String, String> mReflectMap;
 
-    // 复制标准库
-    private void copyStdLibrary(String moduleBasePath) throws Exception {
-        File file = new File(moduleBasePath + "/std");
-        if (file.exists()) return;
-        if (!file.mkdirs())
-            throw new Exception("文件夹创建失败:" + file.getPath());
-
-        // 适配代码
-        String jarPath = PathUtil.getJarPathForClass(StdLibraryProvider.class);
-        VirtualFile dir;
-        if (jarPath.endsWith(".jar"))
-            dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(new File(jarPath), "adapter"));
-        else
-            dir = VfsUtil.findFileByIoFile(new File(jarPath +"/adapter"), true);
-
-        if (dir != null) {
-            FileHelper.deepCopyPath(dir, moduleBasePath + "/std");
-        }
-    }
-
     // 检查语法错误
     private void checkErrorElement(PsiElement element, boolean fullCheck) throws ALittleGuessException {
         for(PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
@@ -119,11 +99,6 @@ public class ALittleGenerateLua {
         // 生成代码
         String content = GenerateNamespace(namespaceDec);
         FileHelper.writeFile(luaFullPath, content);
-
-        // 复制标准库
-        if (!StdLibraryProvider.isPluginSelf(module.getProject())) {
-            copyStdLibrary(FileHelper.calcScriptPath(module));
-        }
     }
 
     // 生成bind命令

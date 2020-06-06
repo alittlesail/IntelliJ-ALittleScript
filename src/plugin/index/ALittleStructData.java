@@ -17,7 +17,7 @@ public class ALittleStructData {
     }
 
     public void addVarDec(@NotNull ALittleStructVarDec dec) {
-        PsiElement nameDec = dec.getIdContent();
+        PsiElement nameDec = dec.getStructVarNameDec();
         if (nameDec == null) return;
         dataMap.put(nameDec.getText(), dec);
     }
