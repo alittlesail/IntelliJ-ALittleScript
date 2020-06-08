@@ -17,42 +17,43 @@ public class ALittleUsingDecReference extends ALittleReference<ALittleUsingDec> 
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        ALittleUsingNameDec nameDec = myElement.getUsingNameDec();
-        if (nameDec == null) throw new ALittleGuessException(myElement, "没有定义using的名称");
+        List<ALittleGuess> guess_list = new ArrayList<>();
+        ALittleUsingNameDec name_dec = myElement.getUsingNameDec();
+        if (name_dec == null) throw new ALittleGuessException(myElement, "没有定义using的名称");
 
         if (myElement.getAllType() != null) {
-            List<ALittleGuess> guessList = myElement.getAllType().guessTypes();
+            guess_list = myElement.getAllType().guessTypes();
 
-            boolean hasTemplate = false;
-            for (ALittleGuess guess : guessList) {
+            boolean has_template = false;
+            for (ALittleGuess guess : guess_list) {
                 if (guess instanceof ALittleGuessClass) {
-                    ALittleGuessClass guessClass = (ALittleGuessClass) guess;
-                    if (!guessClass.templateList.isEmpty()) {
-                        hasTemplate = true;
+                    ALittleGuessClass guess_class = (ALittleGuessClass) guess;
+                    if (guess_class.template_list.size() > 0) {
+                        has_template = true;
                         break;
                     }
                 }
             }
-            if (!hasTemplate) return guessList;
+            if (!has_template) return guess_list;
 
-            List<ALittleGuess> newGuessList = new ArrayList<>();
-            for (ALittleGuess guess : guessList) {
+            List<ALittleGuess> new_guess_list = new ArrayList<>();
+            for (ALittleGuess guess : guess_list) {
                 if (guess instanceof ALittleGuessClass) {
-                    ALittleGuessClass guessClass = (ALittleGuessClass) guess;
-                    if (guessClass.templateList.isEmpty()) {
-                        newGuessList.add(guess);
+                    ALittleGuessClass guess_class = (ALittleGuessClass) guess;
+                    if (guess_class.template_list.size() == 0) {
+                        new_guess_list.add(guess);
                     } else {
-                        guessClass = (ALittleGuessClass)guessClass.Clone();
-                        guessClass.usingName = mNamespace + "." + nameDec.getText();
-                        newGuessList.add(guessClass);
+                        guess_class = (ALittleGuessClass) guess_class.clone();
+                        guess_class.using_name = mNamespace + "." + name_dec.getText();
+                        new_guess_list.add(guess_class);
                     }
                 } else {
-                    newGuessList.add(guess);
+                    new_guess_list.add(guess);
                 }
             }
 
-            return newGuessList;
+            guess_list = new_guess_list;
         }
-        return new ArrayList<>();
+        return guess_list;
     }
 }

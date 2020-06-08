@@ -109,8 +109,8 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
 
     private void checkCmdError() throws ALittleGuessException {
         ALittleNamespaceElementDec parent = (ALittleNamespaceElementDec) myElement.getParent();
-        String command_type = PsiHelper.getCommandDetail(parent.getModifierList());
-        if (command_type == null) return;
+        PsiHelper.CommandInfo command_info = PsiHelper.getCommandDetail(parent.getModifierList());
+        if (command_info.type == null) return;
 
         if (myElement.getTemplateDec() != null)
             throw new ALittleGuessException(myElement, "带Cmd的全局函数，不能使用模板");

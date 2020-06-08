@@ -1,8 +1,11 @@
 package plugin.alittle;
 
+import com.intellij.ide.ui.EditorOptionsTopHitProvider;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.vfs.VirtualFile;
-import plugin.component.StdLibraryProvider;
+import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -129,5 +132,59 @@ public class FileHelper {
         String out_pre = "";
         if (ext.equals("js")) out_pre = "JS";
         return module_path + out_pre + "Script\\";
+    }
+
+    // 改变路径
+    public static String changeExtension(String path, String ext)
+    {
+        int index = path.lastIndexOf('.');
+        if (index < 0) return path;
+        return path.substring(0, index - 1) + "." + ext;
+    }
+
+    // 获取路径名
+    public static String getDirectoryName(String path)
+    {
+        int index1 = path.lastIndexOf('/');
+        int index2 = path.lastIndexOf('\\');
+
+        if (index1 < 0)
+        {
+            if (index2 < 0) return path;
+            return path.substring(0, index2 - 1);
+        }
+
+        if (index2 < 0) return path.substring(0, index1 - 1);
+        return path.substring(0, Math.max(index1, index2) - 1);
+    }
+
+    // 获取目标文件路径
+    public static String calcTargetFullPath(String module_path, String ali_full_path, String ext) throws Exception
+    {
+        String ali_rel_path = changeExtension(ali_full_path.substring(module_path.length()), ext);
+        if (!ali_rel_path.startsWith("src\\"))
+        {
+            throw new Exception("请把代码文件工程目录下的src文件夹中:" + module_path + "src\\");
+        }
+
+        return calcRootFullPath(module_path, ext) + ali_rel_path.substring("src\\".length());
+    }
+
+    // 根据元素来说去模块路径
+    @NotNull
+    public static String calcModulePath(PsiElement element)
+    {
+        // 保存到文件
+        FileIndexFacade facade = FileIndexFacade.getInstance(element.getProject());
+        Module module = facade.getModuleForFile(element.getContainingFile().getOriginalFile().getVirtualFile());
+        if (module == null) {
+            return "";
+        }
+
+        try {
+            return calcModulePath(module);
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

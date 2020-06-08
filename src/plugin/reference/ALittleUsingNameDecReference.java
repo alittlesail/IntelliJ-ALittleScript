@@ -20,9 +20,20 @@ public class ALittleUsingNameDecReference extends ALittleReference<ALittleUsingN
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
-        if (parent instanceof ALittleUsingDec) {
-            return ((ALittleUsingDec)parent).guessTypes();
-        }
+        if (parent instanceof ALittleUsingDec)
+        return ((ALittleUsingDec)parent).guessTypes();
         return new ArrayList<>();
+    }
+
+    @Override
+    public void checkError() throws ALittleGuessException {
+        if (myElement.getText().startsWith("___"))
+            throw new ALittleGuessException(myElement, "using名不能以3个下划线开头");
+
+        List<ALittleGuess> guess_list = myElement.guessTypes();
+        if (guess_list.size() == 0)
+            throw new ALittleGuessException(myElement, "未知类型");
+        else if (guess_list.size() != 1)
+            throw new ALittleGuessException(myElement, "重复定义");
     }
 }

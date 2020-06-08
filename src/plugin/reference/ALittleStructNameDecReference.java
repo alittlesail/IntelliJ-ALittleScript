@@ -23,32 +23,38 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
 
         // 如果父节点是extends，那么就获取指定的命名域
         PsiElement parent = element.getParent();
-        if (parent instanceof ALittleStructExtendsDec) {
-            ALittleNamespaceNameDec namespaceNameDec = ((ALittleStructExtendsDec)parent).getNamespaceNameDec();
-            if (namespaceNameDec != null) {
-                mNamespace = namespaceNameDec.getText();
-            }
+        if (parent instanceof ALittleStructExtendsDec)
+        {
+            ALittleNamespaceNameDec namespace_name_dec = ((ALittleStructExtendsDec)parent).getNamespaceNameDec();
+            if (namespace_name_dec != null)
+                mNamespace = namespace_name_dec.getText();
         }
     }
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        List<ALittleGuess> guessList = new ArrayList<>();
+        List<ALittleGuess> guess_list = new ArrayList<>();
         PsiElement parent = myElement.getParent();
 
         // 如果直接就是定义，那么直接获取
-        if (parent instanceof ALittleStructDec) {
-            guessList.add(((ALittleStructDec)parent).guessType());
+        if (parent instanceof ALittleStructDec)
+        {
+            ALittleGuess guess = ((ALittleStructDec)parent).guessType();
+            guess_list.add(guess);
             // 如果是继承那么就从继承那边获取
-        } else if (parent instanceof ALittleStructExtendsDec) {
-            List<PsiElement> structNameDecList = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(),
-                    PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
-            for (PsiElement structNameDec : structNameDecList) {
-                guessList.add(((ALittleStructNameDec)structNameDec).guessType());
+        }
+            else if (parent instanceof ALittleStructExtendsDec)
+        {
+            if (mKey.length() == 0) return new ArrayList<>();
+            List<PsiElement> struct_name_dec_list = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject()
+                    , PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
+            for (PsiElement struct_name_dec : struct_name_dec_list)
+            {
+                ALittleGuess guess = ((ALittleStructNameDec)struct_name_dec).guessType();
+                guess_list.add(guess);
             }
         }
-
-        return guessList;
+        return guess_list;
     }
 
     @NotNull

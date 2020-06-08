@@ -14,8 +14,50 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVarAssignNameDec> {
+    private PsiElement mMethodDec;
+    private ALittleMethodBodyDec mMethodBodyDec;
+
     public ALittleVarAssignNameDecReference(@NotNull ALittleVarAssignNameDec element, TextRange textRange) {
         super(element, textRange);
+    }
+
+    private void ReloadInfo() {
+        mMethodDec = null;
+        PsiElement parent = myElement;
+        while (parent != null) {
+            if (parent instanceof ALittleNamespaceDec) {
+                break;
+            } else if (parent instanceof ALittleClassDec) {
+                break;
+            } else if (parent instanceof ALittleClassCtorDec) {
+                mMethodDec = parent;
+                mMethodBodyDec = ((ALittleClassCtorDec) parent).getMethodBodyDec();
+                break;
+            } else if (parent instanceof ALittleClassSetterDec) {
+                mMethodDec = parent;
+                mMethodBodyDec = ((ALittleClassSetterDec) parent).getMethodBodyDec();
+                break;
+            } else if (parent instanceof ALittleClassGetterDec) {
+                mMethodDec = parent;
+                mMethodBodyDec = ((ALittleClassGetterDec) parent).getMethodBodyDec();
+                break;
+            } else if (parent instanceof ALittleClassMethodDec) {
+                mMethodDec = parent;
+                mMethodBodyDec = ((ALittleClassMethodDec) parent).getMethodBodyDec();
+                break;
+
+            } else if (parent instanceof ALittleClassStaticDec) {
+                mMethodDec = parent;
+                mMethodBodyDec = ((ALittleClassStaticDec) parent).getMethodBodyDec();
+                break;
+            } else if (parent instanceof ALittleGlobalMethodDec) {
+                mMethodDec = parent;
+                mMethodBodyDec = ((ALittleGlobalMethodDec) parent).getMethodBodyDec();
+                break;
+            }
+
+            parent = parent.getParent();
+        }
     }
 
     @NotNull

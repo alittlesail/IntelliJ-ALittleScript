@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessBool;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 
@@ -17,46 +18,22 @@ public class ALittleValueStatReference extends ALittleReference<ALittleValueStat
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        if (myElement.getOpNewStat() != null) {
+        if (myElement.getOpNewStat() != null)
             return myElement.getOpNewStat().guessTypes();
-        } else if (myElement.getOpNewListStat() != null) {
+        else if (myElement.getOpNewListStat() != null)
             return myElement.getOpNewListStat().guessTypes();
-        } else if (myElement.getValueFactorStat() != null) {
-            return myElement.getValueFactorStat().guessTypes();
-        } else if (myElement.getBindStat() != null) {
+        else if (myElement.getValueOpStat() != null)
+            return ALittleReferenceOpUtil.guessTypes(myElement.getValueOpStat());
+        else if (myElement.getBindStat() != null)
             return myElement.getBindStat().guessTypes();
-        } else if (myElement.getMethodParamTailDec() != null) {
-            return myElement.getMethodParamTailDec().guessTypes();
-        } else if (myElement.getTcallStat() != null) {
+        else if (myElement.getTcallStat() != null)
             return myElement.getTcallStat().guessTypes();
-        } else if (myElement.getOp2Stat() != null) {
-            List<ALittleGuess> guessList = new ArrayList<>();
-            guessList.add(ALittleReferenceOpUtil.guessType(myElement.getOp2Stat()));
-            return guessList;
-        } else if (myElement.getOp3Stat() != null) {
-            List<ALittleGuess> guessList = new ArrayList<>();
-            guessList.add(ALittleReferenceOpUtil.guessType(myElement.getOp3Stat()));
-            return guessList;
-        } else if (myElement.getOp4Stat() != null) {
-            List<ALittleGuess> guessList = new ArrayList<>();
-            guessList.add(ALittleReferenceOpUtil.guessType(myElement.getOp4Stat()));
-            return guessList;
-        } else if (myElement.getOp5Stat() != null) {
-            List<ALittleGuess> guessList = new ArrayList<>();
-            guessList.add(ALittleReferenceOpUtil.guessType(myElement.getOp5Stat()));
-            return guessList;
-        } else if (myElement.getOp6Stat() != null) {
-            List<ALittleGuess> guessList = new ArrayList<>();
-            guessList.add(ALittleReferenceOpUtil.guessType(myElement.getOp6Stat()));
-            return guessList;
-        } else if (myElement.getOp7Stat() != null) {
-            List<ALittleGuess> guessList = new ArrayList<>();
-            guessList.add(ALittleReferenceOpUtil.guessType(myElement.getOp7Stat()));
-            return guessList;
-        } else if (myElement.getOp8Stat() != null) {
-            List<ALittleGuess> guessList = new ArrayList<>();
-            guessList.add(ALittleReferenceOpUtil.guessType(myElement.getOp8Stat()));
-            return guessList;
+        else if (myElement.getOp2Stat() != null)
+        {
+            List<ALittleGuess> guess_list = new ArrayList<>();
+            ALittleGuess guess = ALittleReferenceOpUtil.guessType(myElement.getOp2Stat());
+            guess_list.add(guess);
+            return guess_list;
         }
 
         return new ArrayList<>();
@@ -67,13 +44,13 @@ public class ALittleValueStatReference extends ALittleReference<ALittleValueStat
         if (parent instanceof ALittleIfExpr
                 || parent instanceof ALittleElseIfExpr
                 || parent instanceof ALittleWhileExpr
-                || parent instanceof ALittleDoWhileExpr) {
-            List<ALittleGuess> guessTypeList = myElement.guessTypes();
-            if (guessTypeList.isEmpty()) return;
+                || parent instanceof ALittleDoWhileExpr)
+        {
+            List<ALittleGuess> guess_list = myElement.guessTypes();
+            if (guess_list.size() == 0) return;
 
-            if (!guessTypeList.get(0).value.equals("bool") && !guessTypeList.get(0).value.equals("null")) {
-                throw new ALittleGuessException(myElement, "条件语句中的表达式的类型必须是bool或者null");
-            }
+            if (!(guess_list.get(0) instanceof ALittleGuessBool) && !guess_list.get(0).getValue().equals("null"))
+            throw new ALittleGuessException(myElement, "条件语句中的表达式的类型必须是bool或者null");
         }
     }
 }

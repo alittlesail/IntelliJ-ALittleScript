@@ -16,63 +16,54 @@ public class ALittleVarAssignExprReference extends ALittleReference<ALittleVarAs
         super(element, textRange);
     }
 
-    @NotNull
-    public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        return new ArrayList<>();
-    }
-
     public void checkError() throws ALittleGuessException {
-        ALittleValueStat valueStat = myElement.getValueStat();
-        if (valueStat == null) return;
+        ALittleValueStat value_stat = myElement.getValueStat();
+        if (value_stat == null) return;
 
-        List<ALittleVarAssignDec> pairDecList = myElement.getVarAssignDecList();
-        if (pairDecList.isEmpty()) {
-            return;
-        }
+        List<ALittleVarAssignDec> pair_dec_list = myElement.getVarAssignDecList();
+        if (pair_dec_list.size() == 0) return;
 
         // 如果返回值只有一个函数调用
-        if (pairDecList.size() > 1) {
+        if (pair_dec_list.size() > 1)
+        {
             // 获取右边表达式的
-            List<ALittleGuess> methodCallGuessList = valueStat.guessTypes();
-            if (methodCallGuessList.isEmpty()) {
-                throw new ALittleGuessException(valueStat, "调用的函数没有返回值");
-            }
-            boolean hasTail = methodCallGuessList.get(methodCallGuessList.size() - 1) instanceof ALittleGuessReturnTail;
-            if (hasTail) {
+            List<ALittleGuess> method_call_guess_list = value_stat.guessTypes();
+            if (method_call_guess_list.size() == 0)
+                throw new ALittleGuessException(value_stat, "调用的函数没有返回值");
+            boolean has_tail = method_call_guess_list.get(method_call_guess_list.size() - 1) instanceof ALittleGuessReturnTail;
+            if (has_tail)
+            {
                 // 不需要检查
-            } else {
-                if (methodCallGuessList.size() < pairDecList.size()) {
-                    throw new ALittleGuessException(valueStat, "调用的函数返回值数量少于定义的变量数量");
-                }
+            }
+            else
+            {
+                if (method_call_guess_list.size() < pair_dec_list.size())
+                    throw new ALittleGuessException(value_stat, "调用的函数返回值数量少于定义的变量数量");
             }
 
-            for (int i = 0; i < pairDecList.size(); ++i) {
-                ALittleVarAssignDec pairDec = pairDecList.get(i);
-                if (i >= methodCallGuessList.size()) break;
-                if (methodCallGuessList.get(i) instanceof ALittleGuessReturnTail) break;
+            for (int i = 0; i < pair_dec_list.size(); ++i)
+            {
+                ALittleVarAssignDec pair_dec = pair_dec_list.get(i);
+                if (i >= method_call_guess_list.size()) break;
+                if (method_call_guess_list.get(i) instanceof ALittleGuessReturnTail) break;
+
+                ALittleGuess pair_dec_guess = pair_dec.guessType();
                 try {
-                    ALittleReferenceOpUtil.guessTypeEqual(pairDec.guessType(), valueStat, methodCallGuessList.get(i));
-                } catch (ALittleGuessException e) {
-                    throw new ALittleGuessException(valueStat, "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等:" + e.getError());
+                    ALittleReferenceOpUtil.guessTypeEqual(pair_dec_guess, value_stat, method_call_guess_list.get(i), true, false);
+                } catch (ALittleGuessException guess_error) {
+                    throw new ALittleGuessException(value_stat, "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等:" + guess_error.getError());
                 }
             }
-
             return;
         }
 
-        ALittleGuess pairGuess = pairDecList.get(0).guessType();
-        ALittleGuess valueGuess = valueStat.guessType();
-
-        if (pairGuess instanceof ALittleGuessClassTemplate) {
-            if (!pairGuess.value.equals(valueGuess.value) && !valueGuess.value.equals("null")) {
-                throw new ALittleGuessException(valueStat, "等号左边的变量和表达式的类型不同");
-            }
-        }
+        ALittleGuess pair_guess = pair_dec_list.get(0).guessType();
+        ALittleGuess value_guess = value_stat.guessType();
 
         try {
-            ALittleReferenceOpUtil.guessTypeEqual(pairGuess, valueStat, valueGuess);
-        } catch (ALittleGuessException e) {
-            throw new ALittleGuessException(e.getElement(), "等号左边的变量和表达式的类型不同:" + e.getError());
+            ALittleReferenceOpUtil.guessTypeEqual(pair_guess, value_stat, value_guess, true, false);
+        } catch (ALittleGuessException error) {
+            throw new ALittleGuessException(error.getElement(), "等号左边的变量和表达式的类型不同:" + error.getError());
         }
     }
 }

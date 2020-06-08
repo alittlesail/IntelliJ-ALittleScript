@@ -4,7 +4,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import groovy.lang.Tuple2;
-import org.freedesktop.dbus.Tuple;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.*;
 import plugin.index.ALittleClassData;
@@ -13,14 +12,11 @@ import plugin.index.ALittleStructData;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 import plugin.reference.ALittleLanguageModifierReference;
-import plugin.reference.ALittleReferenceInterface;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static plugin.reference.ALittleReferenceUtil.IsPairsFunction;
 
 public class PsiHelper {
     // 判断字符串是不是整型值
@@ -407,11 +403,11 @@ public class PsiHelper {
 
     public static class CommandInfo
     {
-        String name;
-        String desc;
+        public String type;
+        public String desc;
     }
     // 获取命令类型
-    public static String getCommandDetail(List<ALittleModifier> element_list)
+    public static CommandInfo getCommandDetail(List<ALittleModifier> element_list)
     {
         CommandInfo info = new CommandInfo();
         for (ALittleModifier element : element_list)
@@ -424,10 +420,10 @@ public class PsiHelper {
                     info.desc = body_dec.getTextContent().getText();
                     info.desc = info.desc.substring(1, info.desc.length() - 2);
                 }
-                info.name = "Cmd";
+                info.type = "Cmd";
             }
         }
-        return null;
+        return info;
     }
 
     // 获取访问权限类型
@@ -1093,7 +1089,7 @@ public class PsiHelper {
         }
 
         // 已经是迭代函数了，就不需要包围修饰
-        if (IsPairsFunction(guess_list)) return "";
+        if (isPairsFunction(guess_list)) return "";
 
         throw new ALittleGuessException(value_stat, "该表达式不能遍历");
     }
@@ -1121,7 +1117,7 @@ public class PsiHelper {
         }
 
         // 已经是迭代函数了，就不需要包围修饰
-        if (IsPairsFunction(guess_list)) return new Tuple2<>(result, is_native);
+        if (isPairsFunction(guess_list)) return new Tuple2<>(result, is_native);
 
         throw new ALittleGuessException(value_stat, "该表达式不能遍历");
     }

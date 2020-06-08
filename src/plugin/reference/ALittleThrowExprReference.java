@@ -2,9 +2,12 @@ package plugin.reference;
 
 import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
+import groovy.lang.Tuple2;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessString;
 import plugin.psi.ALittleThrowExpr;
 import plugin.psi.ALittleValueStat;
 
@@ -18,37 +21,38 @@ public class ALittleThrowExprReference extends ALittleReference<ALittleThrowExpr
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        List<ALittleValueStat> valueStatList = myElement.getValueStatList();
-        if (valueStatList.isEmpty()) {
+        List<ALittleGuess> guess_list = new ArrayList<>();
+        List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
+        if (value_stat_list.size() == 0)
             throw new ALittleGuessException(myElement, "throw表达式不能没有参数");
-        }
 
-        if (valueStatList.size() != 1)
+        if (value_stat_list.size() != 1)
             throw new ALittleGuessException(myElement, "throw只有string一个参数");
 
-        ALittleValueStat valueStat = valueStatList.get(0);
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (!guessInfo.value.equals("string")) {
-            throw new ALittleGuessException(valueStat, "throw表达式第一个参数必须是string类型");
-        }
+        ALittleValueStat value_stat = value_stat_list.get(0);
+        ALittleGuess guess = value_stat.guessType();
+        if (!(guess instanceof ALittleGuessString))
+            throw new ALittleGuessException(value_stat, "throw表达式第一个参数必须是string类型");
 
-        return new ArrayList<>();
+        return guess_list;
     }
 
     public void checkError() throws ALittleGuessException {
-        List<ALittleValueStat> valueStatList = myElement.getValueStatList();
-        if (valueStatList.isEmpty()) {
+        List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
+        if (value_stat_list.size() == 0)
             throw new ALittleGuessException(myElement, "throw表达式不能没有参数");
-        }
 
-        if (valueStatList.size() != 1)
+        if (value_stat_list.size() != 1)
             throw new ALittleGuessException(myElement, "throw只有string一个参数");
 
-        ALittleValueStat valueStat = valueStatList.get(0);
-        ALittleGuess guessInfo = valueStat.guessType();
-        if (!guessInfo.value.equals("string")) {
-            throw new ALittleGuessException(valueStat, "throw表达式第一个参数必须是string类型");
-        }
+        ALittleValueStat value_stat = value_stat_list.get(0);
+
+        Tuple2<Integer, List<ALittleGuess>> result = PsiHelper.calcReturnCount(value_stat);
+        if (result.getFirst() != 1) throw new ALittleGuessException(value_stat, "表达式必须只能是一个返回值");
+
+        ALittleGuess guess = value_stat.guessType();
+        if (!(guess instanceof ALittleGuessString))
+            throw new ALittleGuessException(value_stat, "throw表达式第一个参数必须是string类型");
     }
 
     @NotNull

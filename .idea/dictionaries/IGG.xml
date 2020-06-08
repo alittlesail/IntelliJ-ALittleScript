@@ -3,7 +3,9 @@
     <words>
       <w>alittle</w>
       <w>ctor</w>
+      <w>rawset</w>
       <w>tcall</w>
+      <w>usecount</w>
     </words>
   </dictionary>
 </component>

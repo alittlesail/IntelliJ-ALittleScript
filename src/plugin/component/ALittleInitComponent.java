@@ -20,9 +20,12 @@ import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.SendLogRunnable;
-import plugin.generate.ALittleGenerateLua;
+import plugin.generate.ALittleTranslation;
+import plugin.generate.ALittleTranslationJavaScript;
+import plugin.generate.ALittleTranslationLua;
 import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleTreeChangeListener;
+import plugin.module.ALittleConfig;
 import plugin.psi.ALittleFile;
 
 import java.util.List;
@@ -96,9 +99,15 @@ public class ALittleInitComponent implements BaseComponent {
                                 SendLogRunnable.SendLog("fist use gen a single lua file");
                                 USED = true;
                             }
-                            ALittleGenerateLua lua = new ALittleGenerateLua();
+                            ALittleTranslation translation = null;
+                            String language = ALittleConfig.getConfig(project).getTargetLanguage();
+                            if (language.equals("Lua"))
+                                translation = new ALittleTranslationLua();
+                            else if (language.equals("JavaScript"))
+                                translation = new ALittleTranslationJavaScript();
                             try {
-                                lua.GenerateLua((ALittleFile) psiFile, true,false);
+                                if (translation != null)
+                                    translation.generate((ALittleFile) psiFile,false);
                             } catch (ALittleGuessException e) {
                                 System.out.println(psiFile.getName() + ":生成lua代码失败:" + e.getError());
                             } catch (Exception e) {

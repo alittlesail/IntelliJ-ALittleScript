@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ALittlePsiImplUtil {
     public static PsiReference getReference(PsiElement element) {
-        return ALittleReferenceUtil.create(element);
+        return ALittleReferenceOpUtil.create(element);
     }
 
     @NotNull
@@ -37,7 +37,7 @@ public class ALittlePsiImplUtil {
             if (!isChanged) return  guessList;
         }
 
-        ALittleReferenceInterface ref = ALittleReferenceUtil.create(element);
+        ALittleReferenceInterface ref = ALittleReferenceOpUtil.create(element);
         if (ref == null) {
             throw new ALittleGuessException(element, "ALittleReference对象创建失败 element:" + element);
         }

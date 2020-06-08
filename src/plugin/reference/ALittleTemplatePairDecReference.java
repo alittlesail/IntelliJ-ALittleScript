@@ -1,12 +1,10 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.*;
-import plugin.psi.ALittleAllType;
-import plugin.psi.ALittleTemplateExtendsClassDec;
-import plugin.psi.ALittleTemplateExtendsStructDec;
-import plugin.psi.ALittleTemplatePairDec;
+import plugin.psi.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,34 +16,54 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        List<ALittleGuess> guessList = new ArrayList<>();
+        List<ALittleGuess> guess_list = new ArrayList<>();
 
-        ALittleAllType allType = myElement.getAllType();
-        ALittleTemplateExtendsClassDec extendsClassDec = myElement.getTemplateExtendsClassDec();
-        ALittleTemplateExtendsStructDec extendsStructDec = myElement.getTemplateExtendsStructDec();
+        ALittleAllType all_type = null;
+        ALittleTemplateExtendsClassDec extends_class_dec = null;
+        ALittleTemplateExtendsStructDec extends_struct_dec = null;
 
-        ALittleGuess templateExtends = null;
-        boolean isClass = false;
-        boolean isStruct = false;
-        if (allType != null) {
-            ALittleGuess guess = allType.guessType();
-            if (!(guess instanceof ALittleGuessClass) && !(guess instanceof ALittleGuessStruct)) {
-                throw new ALittleGuessException(allType, "继承的对象必须是一个类或者结构体");
-            }
-            templateExtends = guess;
-        } else if (extendsClassDec != null) {
-            isClass = true;
-        } else if (extendsStructDec != null) {
-            isStruct = true;
+        ALittleTemplateExtendsDec extends_dec = myElement.getTemplateExtendsDec();
+        if (extends_dec != null) {
+            all_type = extends_dec.getAllType();
+            extends_class_dec = extends_dec.getTemplateExtendsClassDec();
+            extends_struct_dec = extends_dec.getTemplateExtendsStructDec();
         }
-        ALittleGuessClassTemplate info = new ALittleGuessClassTemplate(myElement, templateExtends, isClass, isStruct);
-        info.UpdateValue();
-        guessList.add(info);
-        return guessList;
+
+        ALittleGuess template_extends = null;
+        boolean is_class = false;
+        boolean is_struct = false;
+        if (all_type != null) {
+            ALittleGuess guess = all_type.guessType();
+            if (!(guess instanceof ALittleGuessClass) && !(guess instanceof ALittleGuessStruct)) {
+                throw new ALittleGuessException(all_type, "继承的对象必须是一个类或者结构体");
+            }
+            template_extends = guess;
+        } else if (extends_class_dec != null) {
+            is_class = true;
+        } else if (extends_struct_dec != null) {
+            is_struct = true;
+        }
+
+        if (myElement.getParent() == null) throw new ALittleGuessException(myElement, "没有父节点");
+        PsiElement parent = myElement.getParent();
+        if (parent.getParent() == null) throw new ALittleGuessException(parent, "没有父节点");
+        parent = parent.getParent();
+
+        // 根据定义区分类模板还是函数模板
+        if (parent instanceof ALittleClassDec) {
+            ALittleGuessClassTemplate info = new ALittleGuessClassTemplate(myElement, template_extends, is_class, is_struct);
+            info.updateValue();
+            guess_list.add(info);
+        } else {
+            ALittleGuessMethodTemplate info = new ALittleGuessMethodTemplate(myElement, template_extends, is_class, is_struct);
+            info.updateValue();
+            guess_list.add(info);
+        }
+        return guess_list;
     }
 
     public void checkError() throws ALittleGuessException {
-        if (myElement.getIdContent().getText().startsWith("___")) {
+        if (myElement.getTemplateNameDec().getText().startsWith("___")) {
             throw new ALittleGuessException(myElement, "局部变量名不能以3个下划线开头");
         }
 

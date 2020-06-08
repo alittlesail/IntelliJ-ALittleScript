@@ -16,15 +16,18 @@ public class ALittleValueFactorStatReference extends ALittleReference<ALittleVal
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        if (myElement.getPropertyValue() != null) {
+        if (myElement.getPropertyValue() != null)
             return myElement.getPropertyValue().guessTypes();
-        } else if (myElement.getReflectValue() != null) {
+        else if (myElement.getReflectValue() != null)
             return myElement.getReflectValue().guessTypes();
-        } else if (myElement.getConstValue() != null) {
+        else if (myElement.getConstValue() != null)
             return myElement.getConstValue().guessTypes();
-        } else if (myElement.getWrapValueStat() != null) {
+        else if (myElement.getWrapValueStat() != null)
             return myElement.getWrapValueStat().guessTypes();
-        }
+        else if (myElement.getMethodParamTailDec() != null)
+            return myElement.getMethodParamTailDec().guessTypes();
+        else if (myElement.getCoroutineStat() != null)
+            return myElement.getCoroutineStat().guessTypes();
 
         return new ArrayList<>();
     }

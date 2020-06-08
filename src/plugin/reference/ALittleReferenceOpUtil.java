@@ -15,42 +15,52 @@ public class ALittleReferenceOpUtil {
     public static ALittleReference create(PsiElement element) {
         TextRange range = new TextRange(0, element.getText().length());
 
+        if (element instanceof ALittleAllExpr) return new ALittleAllExprReference((ALittleAllExpr)element, range);
         if (element instanceof ALittleAllType) return new ALittleAllTypeReference((ALittleAllType)element, range);
-        if (element instanceof ALittleAutoType) return new ALittleAutoTypeReference((ALittleAutoType)element, range);
+        if (element instanceof ALittleAssertExpr) return new ALittleAssertExprReference((ALittleAssertExpr)element, range);
         if (element instanceof ALittleBindStat) return new ALittleBindStatReference((ALittleBindStat)element, range);
-
         if (element instanceof ALittleClassCtorDec) return new ALittleClassCtorDecReference((ALittleClassCtorDec)element, range);
+        if (element instanceof ALittleClassGetterDec) return new ALittleClassGetterDecReference((ALittleClassGetterDec)element, range);
+        if (element instanceof ALittleClassSetterDec) return new ALittleClassSetterDecReference((ALittleClassSetterDec)element, range);
+        if (element instanceof ALittleClassMethodDec) return new ALittleClassMethodDecReference((ALittleClassMethodDec)element, range);
+        if (element instanceof ALittleClassStaticDec) return new ALittleClassStaticDecReference((ALittleClassStaticDec)element, range);
         if (element instanceof ALittleClassDec) return new ALittleClassDecReference((ALittleClassDec)element, range);
+        if (element instanceof ALittleClassExtendsDec) return new ALittleClassExtendsDecReference((ALittleClassExtendsDec)element, range);
+        if (element instanceof ALittleClassElementDec) return new ALittleClassElementDecReference((ALittleClassElementDec)element, range);
         if (element instanceof ALittleClassNameDec) return new ALittleClassNameDecReference((ALittleClassNameDec)element, range);
         if (element instanceof ALittleClassVarDec) return new ALittleClassVarDecReference((ALittleClassVarDec)element, range);
-
         if (element instanceof ALittleConstValue) return new ALittleConstValueReference((ALittleConstValue)element, range);
-        if (element instanceof ALittleCustomType) return new ALittleCustomTypeReference((ALittleCustomType)element, range);
+        if (element instanceof ALittleCoroutineStat) return new ALittleCoroutineStatReference((ALittleCoroutineStat)element, range);
         if (element instanceof ALittleCustomTypeDotIdName) return new ALittleCustomTypeDotIdNameReference((ALittleCustomTypeDotIdName)element, range);
-
+        if (element instanceof ALittleCustomTypeDotId) return new ALittleCustomTypeDotIdReference((ALittleCustomTypeDotId)element, range);
+        if (element instanceof ALittleCustomType) return new ALittleCustomTypeReference((ALittleCustomType)element, range);
         if (element instanceof ALittleEnumDec) return new ALittleEnumDecReference((ALittleEnumDec)element, range);
         if (element instanceof ALittleEnumNameDec) return new ALittleEnumNameDecReference((ALittleEnumNameDec)element, range);
         if (element instanceof ALittleEnumVarDec) return new ALittleEnumVarDecReference((ALittleEnumVarDec)element, range);
-
+        if (element instanceof ALittleFlowExpr) return new ALittleFlowExprReference((ALittleFlowExpr)element, range);
         if (element instanceof ALittleForExpr) return new ALittleForExprReference((ALittleForExpr)element, range);
         if (element instanceof ALittleForPairDec) return new ALittleForPairDecReference((ALittleForPairDec)element, range);
         if (element instanceof ALittleGenericType) return new ALittleGenericTypeReference((ALittleGenericType)element, range);
         if (element instanceof ALittleGlobalMethodDec) return new ALittleGlobalMethodDecReference((ALittleGlobalMethodDec)element, range);
+        if (element instanceof ALittleIfCondition) return new ALittleIfConditionReference((ALittleIfCondition)element, range);
+        if (element instanceof ALittleElseIfCondition) return new ALittleElseIfConditionReference((ALittleElseIfCondition)element, range);
+        if (element instanceof ALittleWhileCondition) return new ALittleWhileConditionReference((ALittleWhileCondition)element, range);
+        if (element instanceof ALittleDoWhileCondition) return new ALittleDoWhileConditionReference((ALittleDoWhileCondition)element, range);
         if (element instanceof ALittleMethodBodyDec) return new ALittleMethodBodyDecReference((ALittleMethodBodyDec)element, range);
         if (element instanceof ALittleMethodNameDec) return new ALittleMethodNameDecReference((ALittleMethodNameDec)element, range);
+        if (element instanceof ALittleMethodParamOneDec) return new ALittleMethodParamOneDecReference((ALittleMethodParamOneDec)element, range);
         if (element instanceof ALittleMethodParamNameDec) return new ALittleMethodParamNameDecReference((ALittleMethodParamNameDec)element, range);
         if (element instanceof ALittleMethodParamTailDec) return new ALittleMethodParamTailDecReference((ALittleMethodParamTailDec)element, range);
+        if (element instanceof ALittleMethodReturnDec) return new ALittleMethodReturnDecReference((ALittleMethodReturnDec)element, range);
         if (element instanceof ALittleMethodReturnTailDec) return new ALittleMethodReturnTailDecReference((ALittleMethodReturnTailDec)element, range);
-
         if (element instanceof ALittleNamespaceDec) return new ALittleNamespaceDecReference((ALittleNamespaceDec)element, range);
+        if (element instanceof ALittleNamespaceElementDec) return new ALittleNamespaceElementDecReference((ALittleNamespaceElementDec)element, range);
         if (element instanceof ALittleNamespaceNameDec) return new ALittleNamespaceNameDecReference((ALittleNamespaceNameDec)element, range);
-
+        if (element instanceof ALittleOp1Expr) return new ALittleOp1ExprReference((ALittleOp1Expr)element, range);
         if (element instanceof ALittleOpAssignExpr) return new ALittleOpAssignExprReference((ALittleOpAssignExpr)element, range);
         if (element instanceof ALittleOpNewListStat) return new ALittleOpNewListStatReference((ALittleOpNewListStat)element, range);
         if (element instanceof ALittleOpNewStat) return new ALittleOpNewStatReference((ALittleOpNewStat)element, range);
-        if (element instanceof ALittleTcallStat) return new ALittleTcallStatReference((ALittleTcallStat)element, range);
         if (element instanceof ALittlePrimitiveType) return new ALittlePrimitiveTypeReference((ALittlePrimitiveType)element, range);
-
         if (element instanceof ALittlePropertyValueBracketValue) return new ALittlePropertyValueBracketValueReference((ALittlePropertyValueBracketValue)element, range);
         if (element instanceof ALittlePropertyValueCastType) return new ALittlePropertyValueCastTypeReference((ALittlePropertyValueCastType)element, range);
         if (element instanceof ALittlePropertyValueCustomType) return new ALittlePropertyValueCustomTypeReference((ALittlePropertyValueCustomType)element, range);
@@ -61,28 +71,25 @@ public class ALittleReferenceOpUtil {
         if (element instanceof ALittlePropertyValue) return new ALittlePropertyValueReference((ALittlePropertyValue)element, range);
         if (element instanceof ALittlePropertyValueSuffix) return new ALittlePropertyValueSuffixReference((ALittlePropertyValueSuffix)element, range);
         if (element instanceof ALittlePropertyValueThisType) return new ALittlePropertyValueThisTypeReference((ALittlePropertyValueThisType)element, range);
-
         if (element instanceof ALittleReflectValue) return new ALittleReflectValueReference((ALittleReflectValue)element, range);
         if (element instanceof ALittleReturnExpr) return new ALittleReturnExprReference((ALittleReturnExpr)element, range);
-
         if (element instanceof ALittleStructDec) return new ALittleStructDecReference((ALittleStructDec)element, range);
         if (element instanceof ALittleStructNameDec) return new ALittleStructNameDecReference((ALittleStructNameDec)element, range);
         if (element instanceof ALittleStructVarDec) return new ALittleStructVarDecReference((ALittleStructVarDec)element, range);
-
+        if (element instanceof ALittleTcallStat) return new ALittleTcallStatReference((ALittleTcallStat)element, range);
         if (element instanceof ALittleTemplateDec) return new ALittleTemplateDecReference((ALittleTemplateDec)element, range);
         if (element instanceof ALittleTemplatePairDec) return new ALittleTemplatePairDecReference((ALittleTemplatePairDec)element, range);
+        if (element instanceof ALittleThrowExpr) return new ALittleThrowExprReference((ALittleThrowExpr)element, range);
         if (element instanceof ALittleUsingDec) return new ALittleUsingDecReference((ALittleUsingDec)element, range);
         if (element instanceof ALittleUsingNameDec) return new ALittleUsingNameDecReference((ALittleUsingNameDec)element, range);
         if (element instanceof ALittleValueFactorStat) return new ALittleValueFactorStatReference((ALittleValueFactorStat)element, range);
         if (element instanceof ALittleValueStat) return new ALittleValueStatReference((ALittleValueStat)element, range);
-
         if (element instanceof ALittleVarAssignDec) return new ALittleVarAssignDecReference((ALittleVarAssignDec)element, range);
         if (element instanceof ALittleVarAssignExpr) return new ALittleVarAssignExprReference((ALittleVarAssignExpr)element, range);
         if (element instanceof ALittleVarAssignNameDec) return new ALittleVarAssignNameDecReference((ALittleVarAssignNameDec)element, range);
         if (element instanceof ALittleWrapValueStat) return new ALittleWrapValueStatReference((ALittleWrapValueStat)element, range);
-
-        if (element instanceof ALittleThrowExpr) return new ALittleThrowExprReference((ALittleThrowExpr)element, range);
-        if (element instanceof ALittleAssertExpr) return new ALittleAssertExprReference((ALittleAssertExpr)element, range);
+        if (element instanceof ALittleLanguageModifier) return new ALittleLanguageModifierReference((ALittleLanguageModifier)element, range);
+        if (element instanceof ALittleLanguageNameDec) return new ALittleLanguageNameDecReference((ALittleLanguageNameDec)element, range);
 
         return null;
     }
