@@ -2,6 +2,7 @@ package plugin.module;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleConfigurationEditor;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectBundle;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ui.configuration.ModuleConfigurationState;
@@ -121,8 +122,8 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
     public void apply() throws ConfigurationException {
         mModified = false;
 
-        Module module = mState.getRootModel().getModule();
-        ALittleConfig config = ALittleConfig.getConfig(module);
+        Project project = mState.getProject();
+        ALittleConfig config = ALittleConfig.getConfig(project);
 
         Object item = myTargetLanguageTextField.getSelectedItem();
         if (item != null)

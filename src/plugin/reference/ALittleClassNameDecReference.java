@@ -29,9 +29,8 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
 
         // 如果父节点是extends，那么就获取指定的命名域
         PsiElement parent = element.getParent();
-        if (parent instanceof ALittleClassExtendsDec)
-        {
-            ALittleNamespaceNameDec namespace_name_dec = ((ALittleClassExtendsDec)parent).getNamespaceNameDec();
+        if (parent instanceof ALittleClassExtendsDec) {
+            ALittleNamespaceNameDec namespace_name_dec = ((ALittleClassExtendsDec) parent).getNamespaceNameDec();
             if (namespace_name_dec != null)
                 mNamespace = namespace_name_dec.getText();
         }
@@ -45,14 +44,12 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
         PsiElement parent = myElement.getParent();
 
         // 如果直接就是定义，那么直接获取
-        if (parent instanceof ALittleClassDec)
-        {
-            ALittleGuess guess = ((ALittleClassDec)parent).guessType();
+        if (parent instanceof ALittleClassDec) {
+            ALittleGuess guess = ((ALittleClassDec) parent).guessType();
             guess_list.add(guess);
         }
         // 如果是继承那么就从继承那边获取
-            else if (parent instanceof ALittleClassExtendsDec)
-        {
+        else if (parent instanceof ALittleClassExtendsDec) {
             if (mKey.length() == 0)
                 throw new ALittleGuessException(myElement, "找不到类, namespace:" + mNamespace + ", key:" + mKey);
 
@@ -62,16 +59,14 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
             if (class_name_dec_list.size() == 0)
                 throw new ALittleGuessException(myElement, "找不到类, namespace:" + mNamespace + ", key:" + mKey);
 
-            for (PsiElement class_name_dec : class_name_dec_list)
-            {
-                ALittleGuess guess = ((ALittleClassNameDec)class_name_dec).guessType();
+            for (PsiElement class_name_dec : class_name_dec_list) {
+                ALittleGuess guess = ((ALittleClassNameDec) class_name_dec).guessType();
                 if (!(guess instanceof ALittleGuessClass))
-                throw new ALittleGuessException(myElement, "继承的不是一个类, namespace:" + mNamespace + ", key:" + mKey);
+                    throw new ALittleGuessException(myElement, "继承的不是一个类, namespace:" + mNamespace + ", key:" + mKey);
 
-                ALittleGuessClass guess_class = (ALittleGuessClass)guess;
-                if (guess_class.template_list.size() > 0)
-                {
-                    ALittleClassDec sub_class = (ALittleClassDec)parent.getParent();
+                ALittleGuessClass guess_class = (ALittleGuessClass) guess;
+                if (guess_class.template_list.size() > 0) {
+                    ALittleClassDec sub_class = (ALittleClassDec) parent.getParent();
                     if (sub_class == null)
                         throw new ALittleGuessException(parent, "定义不完整");
 
@@ -83,8 +78,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
                     if (sub_template_pair_list.size() < guess_class.template_list.size())
                         throw new ALittleGuessException(parent, "子类的模板参数列表必须涵盖父类的模板参数列表");
 
-                    for (int i = 0; i < guess_class.template_list.size(); ++i)
-                    {
+                    for (int i = 0; i < guess_class.template_list.size(); ++i) {
                         ALittleGuess sub_template = sub_template_pair_list.get(i).guessType();
                         try {
                             ALittleReferenceOpUtil.guessTypeEqual(guess_class.template_list.get(i), sub_template_pair_list.get(i), sub_template, false, false);
@@ -95,9 +89,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
                 }
                 guess_list.add(guess);
             }
-        }
-            else
-        {
+        } else {
             throw new ALittleGuessException(myElement, "ALittleClassNameDec出现未知的父节点");
         }
 
@@ -130,11 +122,9 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
             );
         }
 
-        if (myElement.getParent() instanceof ALittleClassExtendsDec)
-        {
+        if (myElement.getParent() instanceof ALittleClassExtendsDec) {
             Map<String, ALittleNamespaceNameDec> dec_list = ALittleTreeChangeListener.findNamespaceNameDecList(project, "");
-            for (Map.Entry<String, ALittleNamespaceNameDec> entry : dec_list.entrySet())
-            {
+            for (Map.Entry<String, ALittleNamespaceNameDec> entry : dec_list.entrySet()) {
                 variants.add(LookupElementBuilder.create(entry.getKey()).
                         withIcon(ALittleIcons.NAMESPACE).
                         withTypeText(entry.getValue().getContainingFile().getName())

@@ -20,9 +20,9 @@ public class ALittleMethodReturnTailDecReference extends ALittleReference<ALittl
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleGuessReturnTail info = new ALittleGuessReturnTail(myElement.getText());
-        info.UpdateValue();
-        List<ALittleGuess> guessList = new ArrayList<>();
-        guessList.add(info);
-        return guessList;
+        info.updateValue();
+        List<ALittleGuess> guess_list = new ArrayList<>();
+        guess_list.add(info);
+        return guess_list;
     }
 }

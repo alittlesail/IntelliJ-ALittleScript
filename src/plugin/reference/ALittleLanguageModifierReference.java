@@ -1,11 +1,7 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import groovy.lang.Tuple2;
 import org.jetbrains.annotations.NotNull;
-import plugin.alittle.PsiHelper;
-import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessBool;
 import plugin.guess.ALittleGuessException;
 import plugin.module.ALittleConfig;
 import plugin.psi.*;
@@ -46,6 +42,6 @@ public class ALittleLanguageModifierReference extends ALittleReference<ALittleLa
             }
         }
 
-        return m_name_set.contains(ALittleConfig.getConfig(myElement.getContainingFile().getOriginalFile().));
+        return m_name_set.contains(ALittleConfig.getConfig(myElement.getProject()).getTargetLanguage());
     }
 }

@@ -16,6 +16,7 @@ import plugin.psi.ALittleNamespaceNameDec;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNamespaceNameDec> {
     public ALittleNamespaceNameDecReference(@NotNull ALittleNamespaceNameDec element, TextRange textRange) {
@@ -26,8 +27,8 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guessList = new ArrayList<>();
 
-        List<ALittleNamespaceNameDec> nameDecList = ALittleTreeChangeListener.findNamespaceNameDecList(myElement.getProject(), mKey);
-        for (ALittleNamespaceNameDec nameDec : nameDecList) {
+        Map<String, ALittleNamespaceNameDec> nameDecMap = ALittleTreeChangeListener.findNamespaceNameDecList(myElement.getProject(), mKey);
+        for (ALittleNamespaceNameDec nameDec : nameDecMap.values()) {
             guessList.add(((ALittleNamespaceDec)nameDec.getParent()).guessType());
         }
 
@@ -49,9 +50,9 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        final List<ALittleNamespaceNameDec> decList = ALittleTreeChangeListener.findNamespaceNameDecList(project, mKey);
+        final Map<String, ALittleNamespaceNameDec> decMap = ALittleTreeChangeListener.findNamespaceNameDecList(project, mKey);
         List<ResolveResult> results = new ArrayList<>();
-        for (ALittleNamespaceNameDec dec : decList) {
+        for (ALittleNamespaceNameDec dec : decMap.values()) {
             results.add(new PsiElementResolveResult(dec));
         }
         return results.toArray(new ResolveResult[results.size()]);
@@ -61,9 +62,9 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        final List<ALittleNamespaceNameDec> decList = ALittleTreeChangeListener.findNamespaceNameDecList(project, "");
+        final Map<String, ALittleNamespaceNameDec> decMap = ALittleTreeChangeListener.findNamespaceNameDecList(project, "");
         List<LookupElement> variants = new ArrayList<>();
-        for (final ALittleNamespaceNameDec dec : decList) {
+        for (final ALittleNamespaceNameDec dec : decMap.values()) {
             variants.add(LookupElementBuilder.create(dec.getText()).
                     withIcon(ALittleIcons.NAMESPACE).
                     withTypeText(dec.getContainingFile().getName())

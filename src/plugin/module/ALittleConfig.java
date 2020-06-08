@@ -1,28 +1,33 @@
 package plugin.module;
 
-import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
-import plugin.alittle.FileHelper;
 
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ALittleConfig {
-    private static Key<ALittleConfig> sALittleConfigKey = new Key<>("ALittleConfig");
+    private static final Key<ALittleConfig> sALittleConfigKey = new Key<>("ALittleConfig");
 
-    private Module mModule;
+    private final Project mProject;
+    private final Set<String> mLanguageNameSet;
 
     private @NotNull String mTargetLanguage = "";
 
-    public ALittleConfig(Module module) {
-        mModule = module;
-        module.putUserData(sALittleConfigKey, this);
+    public ALittleConfig(Project project) {
+        mProject = project;
+        mProject.putUserData(sALittleConfigKey, this);
+        mLanguageNameSet = new HashSet<>();
+        mLanguageNameSet.add("Lua");
+        mLanguageNameSet.add("JavaScript");
         load();
     }
 
     public void load() {
         try {
-            String path = FileHelper.calcModulePath(mModule) + "config.ini";
+            String path = mProject.getBasePath() + "config.ini";
             FileReader reader = new FileReader(path);
             BufferedReader br = new BufferedReader(reader); // 建立一个对象，它把文件内容转成计算机能读懂的语言
 
@@ -46,7 +51,7 @@ public class ALittleConfig {
 
     public void save() {
         try {
-            String path = FileHelper.calcModulePath(mModule) + "config.ini";
+            String path = mProject.getBasePath() + "config.ini";
             FileWriter writer = new FileWriter(path);
             BufferedWriter wr = new BufferedWriter(writer); // 建立一个对象，它把文件内容转成计算机能读懂的语言
             wr.write("output_path=" + mTargetLanguage + "\n");
@@ -66,11 +71,16 @@ public class ALittleConfig {
     }
 
     @NotNull
-    public static ALittleConfig getConfig(Module module) {
-        ALittleConfig config = module.getUserData(sALittleConfigKey);
+    public Set<String> getTargetLanguageNameSet() {
+        return mLanguageNameSet;
+    }
+
+    @NotNull
+    public static ALittleConfig getConfig(Project project) {
+        ALittleConfig config = project.getUserData(sALittleConfigKey);
         if (config != null) return config;
-        config = new ALittleConfig(module);
-        module.putUserData(sALittleConfigKey, config);
+        config = new ALittleConfig(project);
+        project.putUserData(sALittleConfigKey, config);
         return config;
     }
 }

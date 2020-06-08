@@ -21,21 +21,30 @@
   <component name="ChangeListManager">
     <list default="true" id="0fa83c02-5800-4982-b0b2-fb9c6fa549c9" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleClassMethodDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleClassMethodDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleClassStaticDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleClassStaticDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleClassVarDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleClassVarDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleConstValueReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleConstValueReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeCommonReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeCommonReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeDotIdNameReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeDotIdNameReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleEnumDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleEnumDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleEnumNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleEnumNameDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleEnumVarDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleEnumVarDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleForExprReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleForExprReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleForPairDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleForPairDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleGenericTypeReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleGenericTypeReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleGlobalMethodDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleGlobalMethodDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleGenerateLua.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleGenerateLua.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/module/ALittleConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/module/ALittleConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/module/ALittleModuleConfigurationEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/module/ALittleModuleConfigurationEditor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleClassNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleClassNameDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleLanguageModifierReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleLanguageModifierReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodBodyDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodBodyDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodNameDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamNameDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamTailDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamTailDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodReturnTailDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodReturnTailDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleNamespaceDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleNamespaceDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleNamespaceNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleNamespaceNameDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleOpAssignExprReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleOpAssignExprReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleOpNewListStatReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleOpNewListStatReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleOpNewStatReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleOpNewStatReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePrimitiveTypeReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePrimitiveTypeReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueBracketValueReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueBracketValueReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCustomTypeReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCustomTypeReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueDotIdNameReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueDotIdNameReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueMethodCallReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueMethodCallReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueThisTypeReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueThisTypeReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceOpUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceOpUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleReflectValueReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleReflectValueReference.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,12 +115,8 @@
     <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
-      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="plugin.parser" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="plugin.psi" />
@@ -132,8 +137,12 @@
       <recent name="plugin.link" />
       <recent name="plugin.csv" />
     </key>
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="plugin.parser" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
+      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
     </key>
   </component>
   <component name="RunManager">
@@ -194,16 +203,16 @@
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="414" y="154" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1590116336985" />
-    <state x="765" y="216" key="#com.intellij.ide.util.MemberChooser" timestamp="1591422180651">
+    <state x="765" y="216" key="#com.intellij.ide.util.MemberChooser" timestamp="1591583142756">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="-1155" y="225" key="#com.intellij.ide.util.MemberChooser/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591074243502" />
-    <state x="765" y="216" key="#com.intellij.ide.util.MemberChooser/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591422180651" />
-    <state x="690" y="256" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1591414558354">
+    <state x="765" y="216" key="#com.intellij.ide.util.MemberChooser/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591583142756" />
+    <state x="690" y="256" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1591584232596">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="-1230" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591011123062" />
-    <state x="690" y="256" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591414558354" />
+    <state x="690" y="256" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591584232596" />
     <state x="-1159" y="336" key="FileChooserDialogImpl" timestamp="1591412625701">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
@@ -246,7 +255,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamNameDecReference.java</url>
-          <line>37</line>
+          <line>42</line>
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

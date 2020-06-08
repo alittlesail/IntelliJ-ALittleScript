@@ -2,6 +2,7 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessNamespace;
@@ -18,16 +19,21 @@ public class ALittleNamespaceDecReference extends ALittleReference<ALittleNamesp
 
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        ALittleNamespaceNameDec namespaceNameDec = myElement.getNamespaceNameDec();
-        if (namespaceNameDec == null) {
+        List<ALittleGuess> guess_list = null;
+        ALittleNamespaceNameDec name_dec = myElement.getNamespaceNameDec();
+        if (name_dec == null)
             throw new ALittleGuessException(myElement, "没有定义命名域");
-        }
 
-        ALittleGuessNamespace info = new ALittleGuessNamespace(namespaceNameDec.getIdContent().getText(), myElement);
-        info.UpdateValue();
+        ALittleGuessNamespace info = new ALittleGuessNamespace(name_dec.getText(), myElement);
+        info.updateValue();
 
-        List<ALittleGuess> guessList = new ArrayList<>();
-        guessList.add(info);
-        return guessList;
+        guess_list = new ArrayList<>();
+        guess_list.add(info);
+        return guess_list;
+    }
+
+    @Override
+    public void checkError() throws ALittleGuessException {
+        PsiHelper.checkError(myElement, myElement.getModifierList());
     }
 }

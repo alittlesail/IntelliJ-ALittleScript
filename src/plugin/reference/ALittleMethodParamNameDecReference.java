@@ -21,9 +21,14 @@ public class ALittleMethodParamNameDecReference extends ALittleReference<ALittle
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
-        if (parent instanceof ALittleMethodParamOneDec) {
-            return ((ALittleMethodParamOneDec) parent).getAllType().guessTypes();
+        ALittleMethodParamOneDec one_dec = (ALittleMethodParamOneDec)parent;
+        if (one_dec != null)
+        {
+            ALittleAllType all_type = one_dec.getAllType();
+            if (all_type != null)
+                return all_type.guessTypes();
         }
+
         return new ArrayList<>();
     }
 

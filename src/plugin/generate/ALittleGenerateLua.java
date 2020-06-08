@@ -2,20 +2,14 @@ package plugin.generate;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.FileIndexFacade;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.util.PathUtil;
-import com.intellij.util.io.URLUtil;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
-import plugin.component.StdLibraryProvider;
 import plugin.alittle.FileHelper;
 import plugin.guess.*;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
 import plugin.reference.ALittleReferenceInterface;
-import plugin.reference.ALittleReferenceUtil;
 
 import java.io.File;
 import java.util.ArrayList;

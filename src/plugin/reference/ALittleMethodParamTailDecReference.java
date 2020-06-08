@@ -19,38 +19,37 @@ public class ALittleMethodParamTailDecReference extends ALittleReference<ALittle
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleGuessParamTail info = new ALittleGuessParamTail(myElement.getText());
-        info.UpdateValue();
-        List<ALittleGuess> guessList = new ArrayList<>();
-        guessList.add(info);
-        return guessList;
+        info.updateValue();
+        List<ALittleGuess> guess_list = new ArrayList<>();
+        guess_list.add(info);
+        return guess_list;
     }
 
     public void checkError() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
-        if (parent instanceof ALittleMethodParamDec) {
-            return;
+        if (parent instanceof ALittleMethodParamDec) return;
+
+        while (parent != null)
+        {
+            ALittleMethodParamDec param_dec = null;
+            if (parent instanceof ALittleClassMethodDec) {
+            param_dec = ((ALittleClassMethodDec)parent).getMethodParamDec();
+        } else if (parent instanceof ALittleClassStaticDec) {
+            param_dec = ((ALittleClassStaticDec)parent).getMethodParamDec();
+        } else if (parent instanceof ALittleClassCtorDec) {
+            param_dec = ((ALittleClassCtorDec)parent).getMethodParamDec();
+        } else if (parent instanceof ALittleGlobalMethodDec) {
+            param_dec = ((ALittleGlobalMethodDec)parent).getMethodParamDec();
         }
 
-        while (parent != null) {
-            if (parent instanceof ALittleNamespaceDec) {
-                throw new ALittleGuessException(myElement, "参数占位符未定义");
-            }
-
-            ALittleMethodParamDec paramDec = null;
-            if (parent instanceof ALittleClassMethodDec) {
-                paramDec = ((ALittleClassMethodDec) parent).getMethodParamDec();
-            } else if (parent instanceof ALittleClassStaticDec) {
-                paramDec = ((ALittleClassStaticDec) parent).getMethodParamDec();
-            } else if (parent instanceof ALittleClassCtorDec) {
-                paramDec = ((ALittleClassCtorDec) parent).getMethodParamDec();
-            } else if (parent instanceof ALittleGlobalMethodDec) {
-                paramDec = ((ALittleGlobalMethodDec) parent).getMethodParamDec();
-            }
-
-            if (paramDec != null) {
-                if (paramDec.getMethodParamTailDec() == null) {
+            if (param_dec != null)
+            {
+                List<ALittleMethodParamOneDec> param_one_list = param_dec.getMethodParamOneDecList();
+                if (param_one_list.size() == 0)
                     throw new ALittleGuessException(myElement, "参数占位符未定义");
-                }
+                ALittleMethodParamTailDec param_tail = param_one_list.get(param_one_list.size() - 1).getMethodParamTailDec();
+                if (param_tail == null)
+                    throw new ALittleGuessException(myElement, "参数占位符未定义");
                 break;
             }
 
