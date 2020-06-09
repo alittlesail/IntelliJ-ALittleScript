@@ -32,6 +32,7 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
         PsiElement parent = myElement.getParent();
@@ -84,6 +85,7 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
         return variants.toArray();
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         if (myElement.getText().startsWith("___")) {
             throw new ALittleGuessException(myElement, "结构体名不能以3个下划线开头");

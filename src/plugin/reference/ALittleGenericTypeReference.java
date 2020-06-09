@@ -14,6 +14,7 @@ public class ALittleGenericTypeReference extends ALittleReference<ALittleGeneric
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
 
@@ -35,7 +36,7 @@ public class ALittleGenericTypeReference extends ALittleReference<ALittleGeneric
         {
             ALittleGenericMapType dec = myElement.getGenericMapType();
             List<ALittleAllType> all_type_list = dec.getAllTypeList();
-            if (all_type_list.size() != 2) return null;
+            if (all_type_list.size() != 2) return guess_list;
 
             ALittleGuess key_guess = all_type_list.get(0).guessType();
             ALittleGuess value_guess = all_type_list.get(1).guessType();
@@ -54,7 +55,7 @@ public class ALittleGenericTypeReference extends ALittleReference<ALittleGeneric
                 // 处理是不是const
                 info.const_modifier = dec.getAllTypeConst() != null;
                 // 处理是不是await
-                info.await_modifier = (dec.getCoroutineModifier() != null && dec.getCoroutineModifier().getText() == "await");
+                info.await_modifier = (dec.getCoroutineModifier() != null && dec.getCoroutineModifier().getText().equals("await"));
 
                 // 处理参数
                 ALittleGenericFunctorParamType param_type = dec.getGenericFunctorParamType();

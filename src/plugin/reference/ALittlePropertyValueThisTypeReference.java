@@ -75,6 +75,7 @@ public class ALittlePropertyValueThisTypeReference extends ALittleReference<ALit
 
     // 获取返回值类型
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
 

@@ -16,6 +16,7 @@ public class ALittleClassCtorDecReference extends ALittleReference<ALittleClassC
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         ALittleClassDec class_dec = PsiHelper.findClassDecFromParent(myElement);
         if (class_dec == null) return;
@@ -49,7 +50,7 @@ public class ALittleClassCtorDecReference extends ALittleReference<ALittleClassC
 
             ALittleGuess extends_name_dec_guess = extends_name_dec.guessType();
             ALittleGuess my_name_dec_guess = my_name_dec.guessType();
-            if (extends_name_dec_guess.getValue().equals(my_name_dec_guess.getValue()))
+            if (!extends_name_dec_guess.getValue().equals(my_name_dec_guess.getValue()))
                 throw new ALittleGuessException(my_method_param_dec, "该函数是从父类继承下来，但是子类参数和父类参数类型不一致");
         }
     }

@@ -15,6 +15,7 @@ public class ALittleValueFactorStatReference extends ALittleReference<ALittleVal
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getPropertyValue() != null)
             return myElement.getPropertyValue().guessTypes();

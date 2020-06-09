@@ -17,6 +17,7 @@ public class ALittleFlowExprReference extends ALittleReference<ALittleFlowExpr> 
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         // 获取对应的函数对象
         PsiElement parent = myElement;

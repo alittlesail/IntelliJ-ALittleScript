@@ -30,7 +30,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
 
         // 获取所在位置
         int index = suffix_list.indexOf(property_value_suffix);
-        if (index == -1) return null;
+        if (index == -1) return guess;
 
         // 获取前一个类型
         ALittleGuess pre_type = null;
@@ -86,17 +86,18 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         }
 
         guess = pre_type;
-        return null;
+        return guess;
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
 
         Map<String, ALittleGuessTemplate> src_map = new HashMap<>();
         Map<String, ALittleGuess> fill_map = new HashMap<String, ALittleGuess>();
         ALittleGuessFunctor pre_type_functor = checkTemplateMap(src_map, fill_map);
-        if (pre_type_functor == null) return null;
+        if (pre_type_functor == null) return guess_list;
 
         for (ALittleGuess guess : pre_type_functor.return_list)
         {
@@ -113,7 +114,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         if (pre_type_functor.return_tail != null)
             guess_list.add(pre_type_functor.return_tail);
 
-        return null;
+        return guess_list;
     }
 
     @Override
@@ -133,7 +134,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         else
         {
             // 如果不是基本变量类型（排除any），基本都是值传递，函数调用时就不用检查const
-            if (!(left_guess instanceof ALittleGuessPrimitive) || left_guess.getValueWithoutConst() == "any")
+            if (!(left_guess instanceof ALittleGuessPrimitive) || left_guess.getValueWithoutConst().equals("any"))
             {
                 if (!left_guess.is_const && right_guess.is_const)
                     throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ", 不能是:" + right_guess.getValue());
@@ -309,10 +310,10 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
     private ALittleGuessFunctor checkTemplateMap(@NotNull Map<String, ALittleGuessTemplate> src_map, @NotNull Map<String, ALittleGuess> fill_map) throws ALittleGuessException {
         ALittleGuessFunctor guess = null;
         ALittleGuess pre_type = guessPreType();
-        if (pre_type == null) return null;
+        if (pre_type == null) return guess;
 
         // 如果需要处理
-        if (!(pre_type instanceof ALittleGuessFunctor)) return null;
+        if (!(pre_type instanceof ALittleGuessFunctor)) return guess;
         ALittleGuessFunctor pre_type_functor = (ALittleGuessFunctor)pre_type;
 
         List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
@@ -365,7 +366,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         }
 
         guess = pre_type_functor;
-        return null;
+        return guess;
     }
 
     public @NotNull List<ALittleGuess> generateTemplateParamList() throws ALittleGuessException {
@@ -390,6 +391,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         return param_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         Map<String, ALittleGuessTemplate> src_map = new HashMap<>();
         Map<String, ALittleGuess> fill_map = new HashMap<>();
@@ -457,6 +459,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
     }
 
     @NotNull
+    @Override
     public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         List<InlayInfo> result = new ArrayList<>();
         // 获取函数对象

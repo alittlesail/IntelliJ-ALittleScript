@@ -18,6 +18,7 @@ public class ALittleElseIfConditionReference extends ALittleReference<ALittleEls
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         ALittleValueStat value_stat = myElement.getValueStat();
         if (value_stat == null)

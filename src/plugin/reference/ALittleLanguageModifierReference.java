@@ -16,6 +16,7 @@ public class ALittleLanguageModifierReference extends ALittleReference<ALittleLa
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         ALittleLanguageBodyDec body_dec = myElement.getLanguageBodyDec();
         if (body_dec == null)

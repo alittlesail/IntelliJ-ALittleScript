@@ -24,6 +24,7 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guessList = new ArrayList<>();
 
@@ -35,6 +36,7 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
         return guessList;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         if (myElement.getText().startsWith("___")) {
             throw new ALittleGuessException(myElement, "命名域不能以3个下划线开头");

@@ -19,6 +19,7 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = null;
         ALittleStructNameDec struct_name_dec = myElement.getStructNameDec();
@@ -32,6 +33,7 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
         return guess_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         ALittleStructNameDec struct_name_dec = myElement.getStructNameDec();
         if (struct_name_dec == null)

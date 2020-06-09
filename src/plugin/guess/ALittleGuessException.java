@@ -16,4 +16,7 @@ public class ALittleGuessException extends Exception {
     public String getError() { return mError; }
 
     public PsiElement getElement() { return mElement; }
+
+    @Override
+    public String getMessage() { return mError; }
 }

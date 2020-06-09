@@ -24,6 +24,7 @@ public class ALittleCustomTypeDotIdNameReference extends ALittleCustomTypeCommon
        mKey = myElement.getText();
     }
 
+    @Override
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         Annotation anno = holder.createInfoAnnotation(myElement, null);
         anno.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_REFERENCE);

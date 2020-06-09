@@ -15,6 +15,7 @@ public class ALittlePropertyValueFirstTypeReference extends ALittleReference<ALi
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getPropertyValueCastType() != null) {
             return myElement.getPropertyValueCastType().guessTypes();

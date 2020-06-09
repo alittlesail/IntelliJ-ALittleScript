@@ -16,6 +16,7 @@ public class ALittleForPairDecReference extends ALittleReference<ALittleForPairD
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {// 如果有定义类型
         ALittleAllType all_type = myElement.getAllType();
         if (all_type != null) return all_type.guessTypes();

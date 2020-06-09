@@ -16,6 +16,7 @@ public class ALittleUsingDecReference extends ALittleReference<ALittleUsingDec> 
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
         ALittleUsingNameDec name_dec = myElement.getUsingNameDec();

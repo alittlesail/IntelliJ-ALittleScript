@@ -16,6 +16,7 @@ public class ALittlePropertyValueBracketValueReference extends ALittleReference<
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
 
@@ -58,6 +59,7 @@ public class ALittlePropertyValueBracketValueReference extends ALittleReference<
         return guess_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         ALittleValueStat value_stat = myElement.getValueStat();
         if (value_stat == null) return;

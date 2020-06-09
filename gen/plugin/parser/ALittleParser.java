@@ -2151,13 +2151,15 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ID_CONTENT | 'async'
+  // ID_CONTENT | 'async' | 'get' | 'set'
   public static boolean MethodNameDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodNameDec")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, METHOD_NAME_DEC, "<method name dec>");
     r = consumeToken(b, ID_CONTENT);
     if (!r) r = consumeToken(b, "async");
+    if (!r) r = consumeToken(b, "get");
+    if (!r) r = consumeToken(b, "set");
     exit_section_(b, l, m, r, false, null);
     return r;
   }

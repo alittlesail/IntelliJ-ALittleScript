@@ -32,11 +32,13 @@ public class ALittleCustomTypeReference extends ALittleCustomTypeCommonReference
         }
     }
 
+    @Override
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         Annotation anno = holder.createInfoAnnotation(myElement.getCustomTypeName(), null);
         anno.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_REFERENCE);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {

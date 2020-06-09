@@ -15,6 +15,7 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
 
@@ -62,6 +63,7 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
         return guess_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         if (myElement.getTemplateNameDec().getText().startsWith("___")) {
             throw new ALittleGuessException(myElement, "局部变量名不能以3个下划线开头");

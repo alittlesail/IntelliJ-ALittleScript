@@ -14,10 +14,12 @@ public class ALittleStructVarDecReference extends ALittleReference<ALittleStruct
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         return myElement.getAllType().guessTypes();
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {

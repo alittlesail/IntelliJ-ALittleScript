@@ -18,6 +18,7 @@ public class ALittleLanguageNameDecReference extends ALittleReference<ALittleLan
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         String text = myElement.getText();
         if (!ALittleConfig.getConfig(myElement.getProject()).getTargetLanguageNameSet().contains(text))

@@ -9,10 +9,8 @@ import plugin.alittle.FileHelper;
 import plugin.guess.*;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public class ALittleTranslationLua extends ALittleTranslation {
     // 命名域生成前缀
@@ -1164,11 +1162,12 @@ public class ALittleTranslationLua extends ALittleTranslation {
     }
 
     // 对其他工程的枚举值进行优化处理，直接生成对应的值
-    private boolean GenerateEnumValue(ALittlePropertyValue prop_value) throws ALittleGuessException {
+    @NotNull
+    private String GenerateEnumValue(ALittlePropertyValue prop_value) throws ALittleGuessException {
         String content = "";
 
         ALittlePropertyValueFirstType first_type = prop_value.getPropertyValueFirstType();
-        if (first_type == null) return false;
+        if (first_type == null) return content;
 
         ALittleGuess custom_guess = first_type.guessType();
 
@@ -1178,35 +1177,38 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         List<ALittlePropertyValueSuffix> suffix_list = prop_value.getPropertyValueSuffixList();
         if (custom_guess instanceof ALittleGuessNamespaceName) {
-            if (suffix_list.size() != 2) return false;
+            if (suffix_list.size() != 2) return content;
             suffix = suffix_list.get(1);
 
             ALittleGuess guess = suffix_list.get(0).guessType();
 
-            enum_name_guess = (ALittleGuessEnumName) guess;
+            if (guess instanceof ALittleGuessEnumName)
+                enum_name_guess = (ALittleGuessEnumName) guess;
+            else
+                enum_name_guess = null;
         } else if (custom_guess instanceof ALittleGuessEnumName) {
-            if (suffix_list.size() != 1) return false;
+            if (suffix_list.size() != 1) return content;
             suffix = suffix_list.get(0);
 
             enum_name_guess = (ALittleGuessEnumName) custom_guess;
         }
 
-        if (enum_name_guess == null) return false;
-        if (suffix == null) return false;
+        if (enum_name_guess == null) return content;
+        if (suffix == null) return content;
 
-        if (FileHelper.calcModulePath(enum_name_guess.enum_name_dec, true).equals(m_project_path)) return false;
+        if (FileHelper.calcModulePath(enum_name_guess.enum_name_dec, true).equals(m_project_path)) return content;
 
         ALittlePropertyValueDotId dot_id = suffix.getPropertyValueDotId();
-        if (dot_id == null) return false;
+        if (dot_id == null) return content;
         ALittlePropertyValueDotIdName dot_id_name = dot_id.getPropertyValueDotIdName();
-        if (dot_id_name == null) return false;
+        if (dot_id_name == null) return content;
 
         if (!(enum_name_guess.enum_name_dec.getParent() instanceof ALittleEnumDec))
-            return false;
+            return content;
         ALittleEnumDec enum_dec = (ALittleEnumDec) enum_name_guess.enum_name_dec.getParent();
 
         ALittleEnumBodyDec body_dec = enum_dec.getEnumBodyDec();
-        if (body_dec == null) return false;
+        if (body_dec == null) return content;
 
         List<ALittleEnumVarDec> var_dec_list = body_dec.getEnumVarDecList();
         for (ALittleEnumVarDec var_dec : var_dec_list) {
@@ -1220,22 +1222,18 @@ public class ALittleTranslationLua extends ALittleTranslation {
             else if (var_dec.getNumberContent() != null)
                 content = var_dec.getNumberContent().getText();
 
-            return content.length() != 0;
+            return content;
         }
 
-        return false;
+        return content;
     }
 
     // 生成属性值表达式
     @NotNull
     private String GeneratePropertyValue(ALittlePropertyValue prop_value) throws ALittleGuessException {
         // 对于枚举值进行特殊处理
-        boolean handle = GenerateEnumValue(prop_value);
-
-        String content = "";
-
-        if (handle) return content;
-
+        String content = GenerateEnumValue(prop_value);
+        if (content.length() > 0) return content;
 
         // 用来标记第一个变量是不是lua命名域
         boolean is_lua_namespace = false;
@@ -1899,13 +1897,14 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
             String value_stat_result = GenerateValueStat(value_stat);
 
-            List<ALittleForPairDec> pair_list = for_in_condition.getForPairDecList();
+            List<ALittleForPairDec> src_pair_list = for_in_condition.getForPairDecList();
+            List<ALittleForPairDec> pair_list = new ArrayList<>(src_pair_list);
             pair_list.add(0, for_pair_dec);
             List<String> pair_string_list = new ArrayList<>();
             for (ALittleForPairDec pair : pair_list) {
                 ALittleVarAssignNameDec name_dec = pair.getVarAssignNameDec();
                 if (name_dec == null)
-                    throw new ALittleGuessException(null, "for : 没有变量名");
+                    throw new ALittleGuessException(null, "for in 没有变量名");
                 pair_string_list.add(name_dec.getText());
             }
 
@@ -1914,9 +1913,9 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
             // 如果for : 遇到迭代函数，那么就不用pair_type
             if (pair_type.length() == 0)
-                content += "for " + StringUtil.join(pair_string_list, ", ") + " : " + value_stat_result + " do\n";
+                content += "for " + StringUtil.join(pair_string_list, ", ") + " in " + value_stat_result + " do\n";
             else
-                content += "for " + StringUtil.join(pair_string_list, ", ") + " : " + pair_type + "(" + value_stat_result + ") do\n";
+                content += "for " + StringUtil.join(pair_string_list, ", ") + " in " + pair_type + "(" + value_stat_result + ") do\n";
         } else {
             throw new ALittleGuessException(null, "for(?) 无效的for语句:" + root.getText());
         }
@@ -2185,7 +2184,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     }
                 } else {
                     try {
-                        enum_value = Integer.parseInt(value.substring(2));
+                        enum_value = Integer.parseInt(value);
                     } catch (Exception e) {
                         throw new ALittleGuessException(null, "枚举值的十进制数解析失败");
                     }
@@ -2237,7 +2236,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
         if (extends_name.equals(""))
             extends_name = "nil";
         else
-            content += pre_tab + "assert(" + extends_name + ", \" extends class:" + extends_name + " instanceof nil\")\n";
+            content += pre_tab + "assert(" + extends_name + ", \" extends class:" + extends_name + " is nil\")\n";
 
         content += pre_tab + class_name + " = "
                 + "Lua.Class(" + extends_name + ", \""
@@ -2770,6 +2769,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
     // 生成根节点
     @NotNull
+    @Override
     protected String generateRoot(List<ALittleNamespaceElementDec> element_dec_list) throws ALittleGuessException {
         String content = "-- ALittle Generate Lua And Do Not Edit This Line!";
 
@@ -2848,11 +2848,15 @@ public class ALittleTranslationLua extends ALittleTranslation {
             content += "local ___all_struct = " + m_alittle_gen_namespace_pre + "GetAllStruct()\n";
         content += "\n";
 
+        List<StructReflectInfo> info_list = new ArrayList<>();
         for (Map.Entry<String, StructReflectInfo> pair : m_reflect_map.entrySet()) {
-            if (!pair.getValue().generate) continue;
-
+            info_list.add(pair.getValue());
+        }
+        info_list.sort((a, b) -> a.hash_code - b.hash_code);
+        for (StructReflectInfo info : info_list) {
+            if (!info.generate) continue;
             content += m_alittle_gen_namespace_pre
-                    + "RegStruct(" + pair.getValue().hash_code + ", \"" + pair.getKey() + "\", " + pair.getValue().content + ")\n";
+                    + "RegStruct(" + info.hash_code + ", \"" + info.name + "\", " + info.content + ")\n";
         }
         content += "\n";
 

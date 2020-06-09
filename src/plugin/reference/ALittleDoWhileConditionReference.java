@@ -16,6 +16,7 @@ public class ALittleDoWhileConditionReference extends ALittleReference<ALittleDo
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         ALittleValueStat value_stat = myElement.getValueStat();
         if (value_stat == null)

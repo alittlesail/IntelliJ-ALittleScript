@@ -15,6 +15,7 @@ public class ALittlePropertyValueCastTypeReference extends ALittleReference<ALit
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getAllType() != null) {
             return myElement.getAllType().guessTypes();
@@ -22,6 +23,7 @@ public class ALittlePropertyValueCastTypeReference extends ALittleReference<ALit
         throw new ALittleGuessException(myElement, "ALittlePropertyValueCastType出现未知的子节点");
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {

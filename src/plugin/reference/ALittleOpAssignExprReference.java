@@ -15,6 +15,7 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittlePropertyValue> property_value_list = myElement.getPropertyValueList();
         ALittleValueStat value_stat = myElement.getValueStat();
@@ -29,6 +30,7 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
             ALittlePropertyValueSuffix suffix = suffix_list.get(suffix_list.size() - 1);
             if (suffix.getPropertyValueMethodCall() == null)
                 throw new ALittleGuessException(myElement, "没有赋值表达式时，只能是一个函数调用");
+            return;
         }
 
         if (property_value_list.size() == 0) return;
@@ -66,6 +68,8 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
                     throw new ALittleGuessException(value_stat, "等号左边的第" + (i + 1) + "个变量数量和函数定义的返回值类型不相等:" + guess_error.getError());
                 }
             }
+
+            return;
         }
 
         ALittleOpAssign op_assign = myElement.getOpAssign();

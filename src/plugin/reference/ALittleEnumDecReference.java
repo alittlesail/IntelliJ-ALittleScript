@@ -19,6 +19,7 @@ public class ALittleEnumDecReference extends ALittleReference<ALittleEnumDec> {
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleEnumNameDec name_dec = myElement.getEnumNameDec();
         if (name_dec == null)
@@ -31,6 +32,7 @@ public class ALittleEnumDecReference extends ALittleReference<ALittleEnumDec> {
         return guess_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         ALittleEnumNameDec enum_name_dec = myElement.getEnumNameDec();
         if (enum_name_dec == null)

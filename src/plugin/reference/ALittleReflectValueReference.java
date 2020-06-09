@@ -19,6 +19,7 @@ public class ALittleReflectValueReference extends ALittleReference<ALittleReflec
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
 
@@ -49,6 +50,7 @@ public class ALittleReflectValueReference extends ALittleReference<ALittleReflec
         return guess_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         ALittleGuess guess = null;
         if (myElement.getReflectCustomType() != null) {

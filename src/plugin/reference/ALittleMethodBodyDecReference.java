@@ -81,7 +81,7 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
             else if (for_body != null)
                 return checkAllExprList(return_list, for_body.getAllExprList(), out result);
             else
-                return null;
+                return guess_list;
         }
 
         if (all_expr.getWhileExpr() != null)
@@ -94,7 +94,7 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
             else if (while_body != null)
                 return checkAllExprList(return_list, while_body.getAllExprList(), out result);
             else
-                return null;
+                return guess_list;
         }
 */
         if (all_expr.getDoWhileExpr() != null)
@@ -171,6 +171,7 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
         }
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         

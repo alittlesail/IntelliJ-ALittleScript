@@ -17,6 +17,7 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getCustomType() != null) {
             return myElement.getCustomType().guessTypes();
@@ -26,6 +27,7 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
         throw new ALittleGuessException(myElement, "ALittleOpNewStat出现未知的子节点");
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
 
@@ -181,6 +183,7 @@ public class ALittleOpNewStatReference extends ALittleReference<ALittleOpNewStat
     }
 
     @NotNull
+    @Override
     public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         List<InlayInfo> result = new ArrayList<>();
 

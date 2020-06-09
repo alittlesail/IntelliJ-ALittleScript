@@ -19,6 +19,7 @@ public class ALittleOpNewListStatReference extends ALittleReference<ALittleOpNew
         super(element, textRange);
     }
 
+    @Override
     @NotNull
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list;
@@ -34,6 +35,7 @@ public class ALittleOpNewListStatReference extends ALittleReference<ALittleOpNew
         return guess_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
         if (value_stat_list.size() == 0)

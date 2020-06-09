@@ -21,11 +21,8 @@ import java.util.Map;
 public class PsiHelper {
     // 判断字符串是不是整型值
     public static boolean isInt(@NotNull String content) {
-        // 不论值如何，只要包含小数点，那么就不是整数
-        if (content.contains(".")) {
-            return false;
-        }
-        return content.startsWith("0x");
+        if (content.startsWith("0x")) return true;
+        return !content.contains(".");
     }
 
     // 计算哈希值

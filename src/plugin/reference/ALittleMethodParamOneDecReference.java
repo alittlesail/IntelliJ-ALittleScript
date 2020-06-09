@@ -11,6 +11,7 @@ public class ALittleMethodParamOneDecReference extends ALittleReference<ALittleM
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         PsiHelper.checkError(myElement, myElement.getModifierList());
     }

@@ -241,6 +241,7 @@ public class ALittleGlobalMethodDecReference extends ALittleReference<ALittleGlo
         }
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         if (myElement.getMethodNameDec() == null)
             throw new ALittleGuessException(myElement, "没有函数名");

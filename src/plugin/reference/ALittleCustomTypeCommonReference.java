@@ -43,6 +43,7 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         Project project = myElement.getProject();
         PsiFile psiFile = myElement.getContainingFile().getOriginalFile();

@@ -28,7 +28,7 @@ public class ALittleConfig {
 
     public void load() {
         try {
-            String path = mProject.getBasePath() + "config.ini";
+            String path = mProject.getBasePath() + "/" + mProject.getName() + ".iml.user";
             FileReader reader = new FileReader(path);
             BufferedReader br = new BufferedReader(reader); // 建立一个对象，它把文件内容转成计算机能读懂的语言
 
@@ -46,16 +46,17 @@ public class ALittleConfig {
             br.close();
             reader.close();
         } catch (Exception ignored) {
-            mTargetLanguage = "Lua";
         }
+        if (mTargetLanguage.length() == 0)
+            mTargetLanguage = "Lua";
     }
 
     public void save() {
         try {
-            String path = mProject.getBasePath() + "config.ini";
+            String path = mProject.getBasePath() + "/" + mProject.getName() + ".iml.user";
             FileWriter writer = new FileWriter(path);
             BufferedWriter wr = new BufferedWriter(writer); // 建立一个对象，它把文件内容转成计算机能读懂的语言
-            wr.write("output_path=" + mTargetLanguage + "\n");
+            wr.write("target_language=" + mTargetLanguage + "\n");
             wr.close();
             writer.close();
         } catch (Exception ignored) {

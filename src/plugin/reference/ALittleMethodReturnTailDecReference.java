@@ -18,6 +18,7 @@ public class ALittleMethodReturnTailDecReference extends ALittleReference<ALittl
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleGuessReturnTail info = new ALittleGuessReturnTail(myElement.getText());
         info.updateValue();

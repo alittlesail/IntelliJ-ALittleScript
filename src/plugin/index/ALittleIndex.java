@@ -150,9 +150,16 @@ public class ALittleIndex {
         ALittleClassData classData = new ALittleClassData();
         map.put(nameDec.getText(), classData);
 
-        for (PsiElement child = classDec.getFirstChild(); child != null; child = child.getNextSibling()) {
-            classData.addClassChildDec(child);
-        }
+        ALittleTemplateDec template_dec = classDec.getTemplateDec();
+        if (template_dec != null)
+            classData.addClassChildDec(template_dec);
+
+        ALittleClassBodyDec body_dec = classDec.getClassBodyDec();
+        if (body_dec == null) return;
+
+        List<ALittleClassElementDec> element_dec_list = body_dec.getClassElementDecList();
+        for (ALittleClassElementDec element_dec : element_dec_list)
+            classData.addClassChildDec(element_dec);
     }
 
     // 获取类索引数据
@@ -173,11 +180,12 @@ public class ALittleIndex {
         ALittleStructData structData = new ALittleStructData();
         map.put(nameDec.getText(), structData);
 
-        for (PsiElement child = structDec.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child instanceof ALittleStructVarDec) {
-                structData.addVarDec((ALittleStructVarDec)child);
-            }
-        }
+        ALittleStructBodyDec body_dec = structDec.getStructBodyDec();
+        if (body_dec == null) return;
+
+        List<ALittleStructVarDec> var_dec_list = body_dec.getStructVarDecList();
+        for (ALittleStructVarDec var_dec : var_dec_list)
+            structData.addVarDec(var_dec);
     }
 
     // 获取结构体数据
@@ -198,11 +206,12 @@ public class ALittleIndex {
         ALittleEnumData enumData = new ALittleEnumData();
         map.put(nameDec.getText(), enumData);
 
-        for (PsiElement child = enumDec.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child instanceof ALittleEnumVarDec) {
-                enumData.addVarDec((ALittleEnumVarDec)child);
-            }
-        }
+        ALittleEnumBodyDec body_dec = enumDec.getEnumBodyDec();
+        if (body_dec == null) return;
+
+        List<ALittleEnumVarDec> var_dec_list = body_dec.getEnumVarDecList();
+        for (ALittleEnumVarDec var_dec : var_dec_list)
+            enumData.addVarDec(var_dec);
     }
 
     // 获取枚举数据

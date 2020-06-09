@@ -18,6 +18,7 @@ public class ALittleNamespaceDecReference extends ALittleReference<ALittleNamesp
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = null;
         ALittleNamespaceNameDec name_dec = myElement.getNamespaceNameDec();

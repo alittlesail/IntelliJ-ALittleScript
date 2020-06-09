@@ -31,6 +31,7 @@ public class ALittleClassDecReference extends ALittleReference<ALittleClassDec> 
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleClassNameDec name_dec = myElement.getClassNameDec();
         if (name_dec == null)

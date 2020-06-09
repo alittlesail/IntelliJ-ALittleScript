@@ -20,6 +20,7 @@ public class ALittleThrowExprReference extends ALittleReference<ALittleThrowExpr
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
         List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
@@ -37,6 +38,7 @@ public class ALittleThrowExprReference extends ALittleReference<ALittleThrowExpr
         return guess_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
         if (value_stat_list.size() == 0)
@@ -56,6 +58,7 @@ public class ALittleThrowExprReference extends ALittleReference<ALittleThrowExpr
     }
 
     @NotNull
+    @Override
     public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         List<InlayInfo> result = new ArrayList<>();
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();

@@ -18,6 +18,7 @@ public class ALittleClassVarDecReference extends ALittleReference<ALittleClassVa
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleAllType all_type = myElement.getAllType();
         if (all_type != null)
@@ -29,18 +30,23 @@ public class ALittleClassVarDecReference extends ALittleReference<ALittleClassVa
             boolean is_native = PsiHelper.isNative(class_element_dec.getModifierList());
             for (int i = 0; i < guess_list.size(); ++i)
             {
-                ALittleGuessList guess = (ALittleGuessList)guess_list.get(i);
-                if (guess != null && guess.is_native != is_native)
+                ALittleGuess guess = guess_list.get(i);
+                if (!(guess instanceof ALittleGuessList)) continue;
+                ALittleGuessList new_guess = (ALittleGuessList)guess;
+                if (new_guess.is_native != is_native)
                 {
-                    guess.is_native = is_native;
-                    guess.updateValue();
+                    new_guess.is_native = is_native;
+                    new_guess.updateValue();
                 }
             }
+
+            return guess_list;
         }
 
         return new ArrayList<>();
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittleGuess> guess_list = myElement.guessTypes();
         if (guess_list.size() == 0)

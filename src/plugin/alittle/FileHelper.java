@@ -47,29 +47,6 @@ public class FileHelper {
             throw new Exception("文件夹删除失败 path:" + root.getPath());
     }
 
-    // 计算文件路径
-    public static String calcALittleRelPath(Module module, VirtualFile file) throws Exception {
-        String module_base_path = getDirectoryName(module.getModuleFilePath(), true);
-
-        String file_path = file.getPath();
-        if (!file_path.startsWith(module_base_path)) {
-            throw new Exception("当前文件不在模块路径下:" + file_path);
-        }
-
-        String alittle_rel_path = file_path.substring(module_base_path.length());
-        // 如果是插件项目本身就特殊处理
-        if (!alittle_rel_path.startsWith("src")) {
-            throw new Exception("不支持该目录下的文件生成:" + file_path);
-        }
-        alittle_rel_path = alittle_rel_path.substring("src/".length());
-
-        String ext = "alittle";
-        if (!alittle_rel_path.endsWith(ext)) {
-            throw new Exception("要生成的代码文件后缀名必须是alittle:" + file_path);
-        }
-        return alittle_rel_path.substring(0, alittle_rel_path.length() - ext.length());
-    }
-
     // 创建文件并写入
     public static void writeFile(String path, String content) throws Exception {
         File file = new File(path);
@@ -85,7 +62,7 @@ public class FileHelper {
     {
         String out_pre = "";
         if (ext.equals("js")) out_pre = "JS";
-        return module_path + out_pre + "Script\\";
+        return module_path + out_pre + "Script/";
     }
 
     // 改变路径
@@ -93,7 +70,7 @@ public class FileHelper {
     {
         int index = path.lastIndexOf('.');
         if (index < 0) return path;
-        return path.substring(0, index - 1) + "." + ext;
+        return path.substring(0, index + 1) + ext;
     }
 
     // 获取路径名
@@ -105,28 +82,28 @@ public class FileHelper {
         if (index1 < 0)
         {
             if (index2 < 0) return path;
-            if (include_split) return path.substring(0, index2);
-            return path.substring(0, index2 - 1);
+            if (include_split) return path.substring(0, index2 + 1);
+            return path.substring(0, index2);
         }
 
         if (index2 < 0)
         {
-            if (include_split) return path.substring(0, index1);
-            return path.substring(0, index1 - 1);
+            if (include_split) return path.substring(0, index1 + 1);
+            return path.substring(0, index1);
         }
 
-        if (include_split) return path.substring(0, Math.max(index1, index2));
-        return path.substring(0, Math.max(index1, index2) - 1);
+        if (include_split) return path.substring(0, Math.max(index1, index2) + 1);
+        return path.substring(0, Math.max(index1, index2));
     }
 
     // 获取目标文件路径
     public static String calcTargetFullPath(String module_path, String ali_full_path, String ext) throws Exception
     {
         String ali_rel_path = changeExtension(ali_full_path.substring(module_path.length()), ext);
-        if (!ali_rel_path.startsWith("src\\"))
-            throw new Exception("请把代码文件工程目录下的src文件夹中:" + module_path + "src\\");
+        if (!ali_rel_path.startsWith("src/"))
+            throw new Exception("请把代码文件工程目录下的src文件夹中:" + module_path + "src/");
 
-        return calcRootFullPath(module_path, ext) + ali_rel_path.substring("src\\".length());
+        return calcRootFullPath(module_path, ext) + ali_rel_path.substring("src/".length());
     }
 
     // 根据元素来说去模块路径

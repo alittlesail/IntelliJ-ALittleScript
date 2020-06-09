@@ -30,6 +30,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
     // 记录是否有调用带await的函数
     private boolean m_has_call_await = false;
 
+    @Override
     protected String getExt() {
         return "js";
     }
@@ -1233,7 +1234,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
             if (guess_struct.struct_dec.getContainingFile().getOriginalFile().getVirtualFile().getPath().equals(m_file_path))
                 generate = true;
             // 如果不在同一个工程，那么就生成
-            if (FileHelper.calcModulePath(guess_struct.struct_dec, true).equals(m_project_path))
+            if (!FileHelper.calcModulePath(guess_struct.struct_dec, true).equals(m_project_path))
                 generate = true;
                 //  如果是同一个工程，并且是register，那么也要生成
             else if (guess_struct.is_register)
@@ -1323,12 +1324,11 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
     // 对其他工程的枚举值进行优化处理，直接生成对应的值
     @NotNull
-    private Tuple2<String, Boolean> GenerateEnumValue(ALittlePropertyValue prop_value) throws ALittleGuessException {
-        boolean handle = false;
+    private String GenerateEnumValue(ALittlePropertyValue prop_value) throws ALittleGuessException {
         String content = "";
 
         ALittlePropertyValueFirstType first_type = prop_value.getPropertyValueFirstType();
-        if (first_type == null) return new Tuple2<>(content, false);
+        if (first_type == null) return content;
 
         ALittleGuess custom_guess = first_type.guessType();
 
@@ -1338,34 +1338,37 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
         List<ALittlePropertyValueSuffix> suffix_list = prop_value.getPropertyValueSuffixList();
         if (custom_guess instanceof ALittleGuessNamespaceName) {
-            if (suffix_list.size() != 2) return new Tuple2<>(content, false);
+            if (suffix_list.size() != 2) return content;
             suffix = suffix_list.get(1);
 
             ALittleGuess guess = suffix_list.get(0).guessType();
 
-            enum_name_guess = (ALittleGuessEnumName) guess;
+            if (guess instanceof ALittleGuessEnumName)
+                enum_name_guess = (ALittleGuessEnumName) guess;
+            else
+                enum_name_guess = null;
         } else if (custom_guess instanceof ALittleGuessEnumName) {
-            if (suffix_list.size() != 1) return new Tuple2<>(content, false);
+            if (suffix_list.size() != 1) return content;
             suffix = suffix_list.get(0);
 
             enum_name_guess = (ALittleGuessEnumName) custom_guess;
         }
 
-        if (enum_name_guess == null) return new Tuple2<>(content, false);
-        if (suffix == null) return new Tuple2<>(content, false);
+        if (enum_name_guess == null) return content;
+        if (suffix == null) return content;
 
-        if (FileHelper.calcModulePath(enum_name_guess.enum_name_dec, true).equals(m_project_path)) return new Tuple2<>(content, false);
+        if (FileHelper.calcModulePath(enum_name_guess.enum_name_dec, true).equals(m_project_path)) return content;
 
         ALittlePropertyValueDotId dot_id = suffix.getPropertyValueDotId();
-        if (dot_id == null) return new Tuple2<>(content, false);
+        if (dot_id == null) return content;
         ALittlePropertyValueDotIdName dot_id_name = dot_id.getPropertyValueDotIdName();
-        if (dot_id_name == null) return new Tuple2<>(content, false);
+        if (dot_id_name == null) return content;
 
         ALittleEnumDec enum_dec = (ALittleEnumDec) enum_name_guess.enum_name_dec.getParent();
-        if (enum_dec == null) return new Tuple2<>(content, false);
+        if (enum_dec == null) return content;
 
         ALittleEnumBodyDec body_dec = enum_dec.getEnumBodyDec();
-        if (body_dec == null) return new Tuple2<>(content, false);
+        if (body_dec == null) return content;
 
         List<ALittleEnumVarDec> var_dec_list = body_dec.getEnumVarDecList();
         for (ALittleEnumVarDec var_dec : var_dec_list) {
@@ -1379,10 +1382,10 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
             else if (var_dec.getNumberContent() != null)
                 content = var_dec.getNumberContent().getText();
 
-            handle = content.length() != 0;
+            return content;
         }
 
-        return new Tuple2<>(content, handle);
+        return content;
     }
 
     // 生成属性值表达式
@@ -1392,12 +1395,8 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         String map_del = null;
 
         // 对于枚举值进行特殊处理
-        Tuple2<String, Boolean> result = GenerateEnumValue(prop_value);
-        boolean handle = result.getSecond();
-
-
-        String content = "";
-        if (handle) return new Tuple2<>(content, new Tuple2<>(map_set, map_del));
+        String content = GenerateEnumValue(prop_value);
+        if (content.length() > 0) return new Tuple2<>(content, new Tuple2<>(map_set, map_del));
 
         // 用来标记第一个变量是不是lua命名域
         boolean is_js_namespace = false;
@@ -2121,7 +2120,8 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
             String value_stat_result = GenerateValueStat(value_stat);
 
 
-            List<ALittleForPairDec> pair_list = for_in_condition.getForPairDecList();
+            List<ALittleForPairDec> src_pair_list = for_in_condition.getForPairDecList();
+            List<ALittleForPairDec> pair_list = new ArrayList<>(src_pair_list);
             pair_list.add(0, for_pair_dec);
             List<String> pair_string_list = new ArrayList<>();
             for (ALittleForPairDec pair : pair_list) {
@@ -2156,7 +2156,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                 ++m_object_id;
                 String object_name = "___OBJECT_" + m_object_id;
                 content += "let " + object_name + " = " + value_stat_result + ";\n";
-                content += pre_tab + "for (let " + pair_string_list.get(0) + " : " + object_name + ") {\n";
+                content += pre_tab + "for (let " + pair_string_list.get(0) + " in " + object_name + ") {\n";
 
                 if (is_native) {
                     content += pre_tab + "\t// 因为for使用了Native修饰，不做undefined处理\n";
@@ -2515,7 +2515,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                     }
                 } else {
                     try {
-                        enum_value = Integer.parseInt(value.substring(2));
+                        enum_value = Integer.parseInt(value);
                     } catch (Exception e) {
                         throw new ALittleGuessException(null, "枚举值的十进制数解析失败");
                     }
@@ -2566,7 +2566,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         if (extends_name.equals(""))
             extends_name = "undefined";
         else
-            content += pre_tab + "if (" + extends_name + " === undefined) throw new Error(\" extends class:" + extends_name + " instanceof undefined\");\n";
+            content += pre_tab + "if (" + extends_name + " === undefined) throw new Error(\" extends class:" + extends_name + " is undefined\");\n";
 
         content += pre_tab + m_alittle_gen_namespace_pre + class_name + " = JavaScript.Class(" + extends_name + ", {\n";
 
@@ -3140,6 +3140,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
     // 生成根节点
     @NotNull
+    @Override
     protected String generateRoot(List<ALittleNamespaceElementDec> element_dec_list) throws ALittleGuessException {
         String content = "";
         m_reflect_map = new HashMap<>();
@@ -3214,13 +3215,17 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
             content += "{\nif (typeof " + m_namespace_name + " === \"undefined\") window." + m_namespace_name + " = {};\n";
         }
 
-        if (m_need_all_struct) content += "let ___all_struct = ALittle.getAllStruct();\n";
+        if (m_need_all_struct) content += "let ___all_struct = ALittle.GetAllStruct();\n";
         content += "\n";
 
+        List<StructReflectInfo> info_list = new ArrayList<>();
         for (Map.Entry<String, StructReflectInfo> pair : m_reflect_map.entrySet()) {
-            if (!pair.getValue().generate) continue;
-
-            content += "ALittle.RegStruct(" + pair.getValue().hash_code + ", \"" + pair.getKey() + "\", " + pair.getValue().content + ")\n";
+            info_list.add(pair.getValue());
+        }
+        info_list.sort((a, b) -> a.hash_code - b.hash_code);
+        for (StructReflectInfo info : info_list) {
+            if (!info.generate) continue;
+            content += "ALittle.RegStruct(" + info.hash_code + ", \"" + info.name + "\", " + info.content + ")\n";
         }
         content += "\n";
 

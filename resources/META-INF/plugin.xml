@@ -77,18 +77,18 @@
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
     </action>
     <action class="plugin.action.ShowTargetFileAction"
-            text="ShowLuaFile"
-            id="ShowLuaFile">
+            text="ShowTargetFile"
+            id="ShowTargetFile">
       <add-to-group group-id="RefactoringMenu" anchor="first"/>
     </action>
     <action class="plugin.action.ReBuildTargetAction"
-            text="ReBuildLua"
-            id="ReBuildLua">
+            text="ReBuildTarget"
+            id="ReBuildTarget">
       <add-to-group group-id="RefactoringMenu" anchor="first"/>
     </action>
     <action class="plugin.action.BuildTargetAction"
-            text="BuildLua"
-            id="BuildLua">
+            text="BuildTarget"
+            id="BuildTarget">
       <add-to-group group-id="RefactoringMenu" anchor="first"/>
     </action>
   </actions>

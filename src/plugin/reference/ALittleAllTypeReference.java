@@ -16,6 +16,7 @@ public class ALittleAllTypeReference extends ALittleReference<ALittleAllType> {
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
         boolean is_const = myElement.getAllTypeConst() != null;
@@ -29,7 +30,7 @@ public class ALittleAllTypeReference extends ALittleReference<ALittleAllType> {
 
         if (guess_list.size() > 0)
         {
-            if (!is_const) return new ArrayList<>();
+            if (!is_const) return guess_list;
 
             for (int i = 0; i < guess_list.size(); ++i)
             {
@@ -51,7 +52,7 @@ public class ALittleAllTypeReference extends ALittleReference<ALittleAllType> {
 
                 guess_list.set(i, guess);
             }
-            return new ArrayList<>();
+            return guess_list;
         }
 
         throw new ALittleGuessException(myElement, "AllType出现未知的子节点");

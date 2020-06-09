@@ -71,6 +71,7 @@ public class ALittleCoroutineStatReference extends ALittleReference<ALittleCorou
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         return ALittleTreeChangeListener.findALittleStructGuessList(myElement.getProject(), "ALittle", "Thread");
     }

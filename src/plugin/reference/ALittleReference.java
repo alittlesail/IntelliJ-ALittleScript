@@ -32,6 +32,7 @@ public abstract class ALittleReference<T extends PsiElement> extends PsiReferenc
     }
 
     @NotNull
+    @Override
     public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         return new ArrayList<>();
     }

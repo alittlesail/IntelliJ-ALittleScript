@@ -21,7 +21,7 @@ public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVa
         super(element, textRange);
     }
 
-    private void ReloadInfo() {
+    private void reloadInfo() {
         mMethodDec = null;
         PsiElement parent = myElement;
         while (parent != null) {
@@ -61,6 +61,7 @@ public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVa
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleVarAssignDec) {
@@ -71,6 +72,7 @@ public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVa
         return new ArrayList<>();
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         if (myElement.getText().startsWith("___")) {
             throw new ALittleGuessException(myElement, "局部变量名不能以3个下划线开头");
@@ -84,6 +86,7 @@ public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVa
         }
     }
 
+    @Override
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleForPairDec) {

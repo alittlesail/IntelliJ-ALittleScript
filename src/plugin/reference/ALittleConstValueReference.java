@@ -22,6 +22,7 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         String text = myElement.getText();
 
@@ -32,7 +33,7 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
             else
                 return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("double");
         }
-        else if (myElement.getText() != null)
+        else if (myElement.getTextContent() != null)
         {
             return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("string");
         }
@@ -50,6 +51,7 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
         }
     }
 
+    @Override
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         if (myElement.getNumberContent() != null) {
             Annotation anno = holder.createInfoAnnotation(myElement, null);

@@ -39,6 +39,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
         PsiElement parent = myElement.getParent();
@@ -134,6 +135,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
         return variants.toArray();
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         if (myElement.getText().startsWith("___"))
             throw new ALittleGuessException(myElement, "类名不能以3个下划线开头");
@@ -145,6 +147,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
             throw new ALittleGuessException(myElement, "重复定义");
     }
 
+    @Override
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         Annotation anno = holder.createInfoAnnotation(myElement, null);
         anno.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_NAME);

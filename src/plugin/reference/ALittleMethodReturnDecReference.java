@@ -17,6 +17,7 @@ public class ALittleMethodReturnDecReference extends ALittleReference<ALittleMet
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getMethodReturnOneDecList().size() == 0)
             throw  new ALittleGuessException(myElement, "没有定义返回值类型");

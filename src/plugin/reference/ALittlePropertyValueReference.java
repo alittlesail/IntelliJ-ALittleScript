@@ -15,6 +15,7 @@ public class ALittlePropertyValueReference extends ALittleReference<ALittlePrope
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittlePropertyValueSuffix> suffixList = myElement.getPropertyValueSuffixList();
         if (suffixList.isEmpty()) {

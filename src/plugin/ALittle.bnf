@@ -54,7 +54,7 @@
 
       WHITE_SPACE           = 'regexp:\s+'
       LINE_COMMENT          = 'regexp://.*'
-      BLOCK_COMMENT         = 'regexp:/\*(.|\n)*\*/'
+      BLOCK_COMMENT         = 'regexp:/\*([^*/]|[^*]/|\*[^/])*\*/'
       NUMBER_CONTENT        = 'regexp:0x[0-9a-fA-F]+|\d+(\.\d*)?'
       TEXT_CONTENT          = 'regexp:"([^"\\]|\\.)*"'
       ID_CONTENT            = 'regexp:[_a-zA-Z][_a-zA-Z0-9]*'
@@ -166,7 +166,7 @@ MethodSetterParamDec ::= '(' MethodParamOneDec ')' {pin=1}
 // 函数体部分
 MethodBodyDec ::= '{' AllExpr* '}' {pin=1}
 // 函数名部分
-MethodNameDec ::= ID_CONTENT | 'async'
+MethodNameDec ::= ID_CONTENT | 'async' | 'get' | 'set'
 // 函数返回值类型
 MethodReturnTailDec ::= '...'
 MethodReturnOneDec ::= MethodReturnTailDec | AllType

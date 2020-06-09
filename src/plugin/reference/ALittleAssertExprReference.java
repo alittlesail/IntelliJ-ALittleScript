@@ -19,6 +19,7 @@ public class ALittleAssertExprReference extends ALittleReference<ALittleAssertEx
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
         if (value_stat_list.size() == 0)
@@ -45,6 +46,7 @@ public class ALittleAssertExprReference extends ALittleReference<ALittleAssertEx
     }
 
     @NotNull
+    @Override
     public List<InlayInfo> getParameterHints() throws ALittleGuessException {
         List<InlayInfo> result = new ArrayList<>();
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();

@@ -17,10 +17,12 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         return new ArrayList<>();
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         PsiElement parent = null;
         if (myElement.getReturnYield() != null)

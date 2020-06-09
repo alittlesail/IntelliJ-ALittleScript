@@ -15,6 +15,7 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
         super(element, textRange);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         ALittleForCondition for_condition = myElement.getForCondition();
         if (for_condition == null) return;
@@ -73,7 +74,8 @@ public class ALittleForExprReference extends ALittleReference<ALittleForExpr> {
                 return_count = 1;
             if (return_count != 1) throw new ALittleGuessException(value_stat, "for的遍历对象必须只能是一个返回值");
 
-            List<ALittleForPairDec> pair_dec_list = in_condition.getForPairDecList();
+            List<ALittleForPairDec> src_pair_dec_list = in_condition.getForPairDecList();
+            List<ALittleForPairDec> pair_dec_list = new ArrayList<>(src_pair_dec_list);
             pair_dec_list.add(0, for_pair_dec);
             List<ALittleGuess> guess_list = value_stat.guessTypes();
 

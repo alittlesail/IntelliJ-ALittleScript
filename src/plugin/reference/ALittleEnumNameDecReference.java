@@ -24,6 +24,7 @@ public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNam
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         return ((ALittleEnumDec)myElement.getParent()).guessTypes();
     }
@@ -57,6 +58,7 @@ public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNam
         return variants.toArray();
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         if (myElement.getText().startsWith("___")) {
             throw new ALittleGuessException(myElement, "枚举名不能以3个下划线开头");

@@ -19,6 +19,7 @@ public class ALittleMethodParamNameDecReference extends ALittleReference<ALittle
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         ALittleMethodParamOneDec one_dec = (ALittleMethodParamOneDec)parent;
@@ -32,11 +33,13 @@ public class ALittleMethodParamNameDecReference extends ALittleReference<ALittle
         return new ArrayList<>();
     }
 
+    @Override
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         Annotation anno = holder.createInfoAnnotation(myElement, null);
         anno.setTextAttributes(CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         List<ALittleGuess> guessList = myElement.guessTypes();
         if (guessList.isEmpty()) {

@@ -107,17 +107,24 @@ public class ALittleTranslation {
 
         m_namespace_name = name_dec.getText();
 
+        m_project_path = FileHelper.getDirectoryName(module.getModuleFilePath(), true);
+        m_file_path = file.getVirtualFile().getPath();
+        String full_path = "";
         try {
-            m_project_path = FileHelper.getDirectoryName(module.getModuleFilePath(), true);
-            m_file_path = file.getVirtualFile().getPath();
-            String full_path = FileHelper.calcTargetFullPath(m_project_path, m_file_path, getExt());
+            full_path = FileHelper.calcTargetFullPath(m_project_path, m_file_path, getExt());
             String full_dir = FileHelper.getDirectoryName(full_path, false);
             new File(full_dir).mkdirs();
-            // 生成代码
-            String content = generateRoot(namespace_dec.getNamespaceElementDecList());
-            FileHelper.writeFile(full_path, content);
         } catch (Exception e) {
             throw new ALittleGuessException(null, "模块路径获取失败:" + e.getMessage());
+        }
+
+        // 生成代码
+        String content = generateRoot(namespace_dec.getNamespaceElementDecList());
+
+        try {
+            FileHelper.writeFile(full_path, content);
+        } catch (Exception e) {
+            throw new ALittleGuessException(null, "代码写入失败:" + e.getMessage());
         }
     }
 

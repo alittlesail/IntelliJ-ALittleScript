@@ -35,13 +35,14 @@ public class ALittleVarAssignDecReference extends ALittleReference<ALittleVarAss
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleAllType all_type = myElement.getAllType();
         if (all_type != null) return all_type.guessTypes();
 
         List<ALittleGuess> guess_list = new ArrayList<>();
         ALittleVarAssignNameDec name_dec = myElement.getVarAssignNameDec();
-        if (name_dec == null) return null;
+        if (name_dec == null) return guess_list;
 
         ALittleVarAssignExpr parent = (ALittleVarAssignExpr)myElement.getParent();
         ALittleValueStat value_stat = parent.getValueStat();

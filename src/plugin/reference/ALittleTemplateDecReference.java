@@ -16,6 +16,7 @@ public class ALittleTemplateDecReference extends ALittleReference<ALittleTemplat
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guessList = new ArrayList<>();
 

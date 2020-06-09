@@ -17,6 +17,7 @@ public class ALittleValueStatReference extends ALittleReference<ALittleValueStat
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getOpNewStat() != null)
             return myElement.getOpNewStat().guessTypes();
@@ -39,6 +40,7 @@ public class ALittleValueStatReference extends ALittleReference<ALittleValueStat
         return new ArrayList<>();
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleIfExpr

@@ -17,6 +17,7 @@ public class ALittleMethodParamTailDecReference extends ALittleReference<ALittle
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleGuessParamTail info = new ALittleGuessParamTail(myElement.getText());
         info.updateValue();
@@ -25,6 +26,7 @@ public class ALittleMethodParamTailDecReference extends ALittleReference<ALittle
         return guess_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleMethodParamDec) return;

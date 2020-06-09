@@ -16,6 +16,7 @@ public class ALittleEnumVarDecReference extends ALittleReference<ALittleEnumVarD
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         if (myElement.getTextContent() != null) {
             return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("string");
@@ -24,6 +25,7 @@ public class ALittleEnumVarDecReference extends ALittleReference<ALittleEnumVarD
         }
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         if (myElement.getNumberContent() == null) return;
 

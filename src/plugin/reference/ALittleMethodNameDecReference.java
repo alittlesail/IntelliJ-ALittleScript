@@ -23,6 +23,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
     }
 
     @NotNull
+    @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         List<ALittleGuess> guess_list = new ArrayList<>();
         PsiElement parent = myElement.getParent();
@@ -99,7 +100,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             ALittleGuessFunctor info = new ALittleGuessFunctor(class_method_dec);
             List<ALittleModifier> modifier = class_element_dec.getModifierList();
             info.const_modifier = PsiHelper.isConst(class_element_dec.getModifierList());
-            info.await_modifier = PsiHelper.getCoroutineType(modifier) == "await";
+            info.await_modifier = PsiHelper.getCoroutineType(modifier).equals("await");
 
             // 第一个参数是类
             ALittleGuess class_guess = class_dec.guessType();
@@ -181,7 +182,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             ALittleClassElementDec class_element_dec = (ALittleClassElementDec)class_static_dec.getParent();
 
             ALittleGuessFunctor info = new ALittleGuessFunctor(class_static_dec);
-            info.await_modifier = PsiHelper.getCoroutineType(class_element_dec.getModifierList()) == "await";
+            info.await_modifier = PsiHelper.getCoroutineType(class_element_dec.getModifierList()).equals("await");
 
             // 添加模板参数列表
             ALittleTemplateDec template_dec = class_static_dec.getTemplateDec();
@@ -257,7 +258,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec)global_method_dec.getParent();
 
             ALittleGuessFunctor info = new ALittleGuessFunctor(global_method_dec);
-            info.await_modifier = PsiHelper.getCoroutineType(namespace_element_dec.getModifierList()) == "await";
+            info.await_modifier = PsiHelper.getCoroutineType(namespace_element_dec.getModifierList()).equals("await");
 
             String protocol_type = PsiHelper.getProtocolType(namespace_element_dec.getModifierList());
             if (protocol_type != null)
@@ -449,6 +450,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             return guess_list;
     }
 
+    @Override
     public void checkError() throws ALittleGuessException {
         PsiElement method_dec = myElement.getParent();
         if (method_dec == null) return;
