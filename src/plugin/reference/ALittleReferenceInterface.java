@@ -12,8 +12,10 @@ public interface ALittleReferenceInterface {
     void checkError() throws ALittleGuessException;
 
     void colorAnnotator(@NotNull AnnotationHolder holder);
+
     @NotNull
     List<InlayInfo> getParameterHints() throws ALittleGuessException;
+
     @NotNull
     List<ALittleGuess> guessTypes() throws ALittleGuessException;
 

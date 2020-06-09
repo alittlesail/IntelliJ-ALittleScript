@@ -2,17 +2,20 @@ package plugin.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementResolveResult;
+import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
-import plugin.psi.*;
+import plugin.psi.ALittleNamespaceNameDec;
+import plugin.psi.ALittleStructDec;
+import plugin.psi.ALittleStructExtendsDec;
+import plugin.psi.ALittleStructNameDec;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +26,8 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
 
         // 如果父节点是extends，那么就获取指定的命名域
         PsiElement parent = element.getParent();
-        if (parent instanceof ALittleStructExtendsDec)
-        {
-            ALittleNamespaceNameDec namespace_name_dec = ((ALittleStructExtendsDec)parent).getNamespaceNameDec();
+        if (parent instanceof ALittleStructExtendsDec) {
+            ALittleNamespaceNameDec namespace_name_dec = ((ALittleStructExtendsDec) parent).getNamespaceNameDec();
             if (namespace_name_dec != null)
                 mNamespace = namespace_name_dec.getText();
         }
@@ -38,20 +40,16 @@ public class ALittleStructNameDecReference extends ALittleReference<ALittleStruc
         PsiElement parent = myElement.getParent();
 
         // 如果直接就是定义，那么直接获取
-        if (parent instanceof ALittleStructDec)
-        {
-            ALittleGuess guess = ((ALittleStructDec)parent).guessType();
+        if (parent instanceof ALittleStructDec) {
+            ALittleGuess guess = ((ALittleStructDec) parent).guessType();
             guess_list.add(guess);
             // 如果是继承那么就从继承那边获取
-        }
-            else if (parent instanceof ALittleStructExtendsDec)
-        {
+        } else if (parent instanceof ALittleStructExtendsDec) {
             if (mKey.length() == 0) return new ArrayList<>();
             List<PsiElement> struct_name_dec_list = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject()
                     , PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
-            for (PsiElement struct_name_dec : struct_name_dec_list)
-            {
-                ALittleGuess guess = ((ALittleStructNameDec)struct_name_dec).guessType();
+            for (PsiElement struct_name_dec : struct_name_dec_list) {
+                ALittleGuess guess = ((ALittleStructNameDec) struct_name_dec).guessType();
                 guess_list.add(guess);
             }
         }

@@ -31,7 +31,7 @@ public class ALittleAssertExprReference extends ALittleReference<ALittleAssertEx
         ALittleValueStat value_stat = value_stat_list.get(0);
 
         Tuple2<Integer, List<ALittleGuess>> result = PsiHelper.calcReturnCount(value_stat);
-        if (result.getFirst() != 1) throw  new ALittleGuessException(value_stat, "表达式必须只能是一个返回值");
+        if (result.getFirst() != 1) throw new ALittleGuessException(value_stat, "表达式必须只能是一个返回值");
 
         ALittleGuess guess = value_stat.guessType();
 

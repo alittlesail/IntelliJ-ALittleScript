@@ -6,17 +6,18 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
-import plugin.psi.*;
+import plugin.psi.ALittlePropertyValueDotIdName;
+import plugin.psi.ALittleTypes;
 
 public class ALittleCompletionContributor extends CompletionContributor {
 
-    static String[] KEYWORD_LIST = new String[] {
-            "int","long","double","bool","string","var","List","Map"
-            ,"namespace","class","struct","enum","const"
-            ,"for","do","while","break","return","cast","reflect","continue"
-            ,"get","set","fun","static","Ctor","Functor","this","using"
-            ,"public","protected","private","instance","tcall"
-            ,"async","await","yield","bind","Http","HttpDownload","HttpUpload","Msg","Cmd","Constant"
+    static String[] KEYWORD_LIST = new String[]{
+            "int", "long", "double", "bool", "string", "var", "List", "Map"
+            , "namespace", "class", "struct", "enum", "const"
+            , "for", "do", "while", "break", "return", "cast", "reflect", "continue"
+            , "get", "set", "fun", "static", "Ctor", "Functor", "this", "using"
+            , "public", "protected", "private", "instance", "tcall"
+            , "async", "await", "yield", "bind", "Http", "HttpDownload", "HttpUpload", "Msg", "Cmd", "Constant"
     };
 
     public ALittleCompletionContributor() {

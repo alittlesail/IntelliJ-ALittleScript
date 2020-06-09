@@ -1,7 +1,6 @@
 package plugin.guess;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleClassDec;
@@ -29,8 +28,7 @@ public class ALittleGuessClass extends ALittleGuess {
     public boolean is_native = false;
 
     public ALittleGuessClass(String p_namespace_name, String p_class_name
-            , ALittleClassDec p_class_dec, String p_using_name, boolean p_is_const, boolean p_is_native)
-    {
+            , ALittleClassDec p_class_dec, String p_using_name, boolean p_is_const, boolean p_is_native) {
         is_register = PsiHelper.isRegister(p_class_dec);
         namespace_name = p_namespace_name;
         class_name = p_class_name;
@@ -41,17 +39,14 @@ public class ALittleGuessClass extends ALittleGuess {
     }
 
     @Override
-    public PsiElement getElement()
-    {
+    public PsiElement getElement() {
         return class_dec;
     }
 
     @Override
-    public boolean needReplace()
-    {
+    public boolean needReplace() {
         if (template_list.size() == 0) return false;
-        for (Map.Entry<String, ALittleGuess> pair : template_map.entrySet())
-        {
+        for (Map.Entry<String, ALittleGuess> pair : template_map.entrySet()) {
             if (pair.getValue().needReplace())
                 return true;
         }
@@ -59,15 +54,12 @@ public class ALittleGuessClass extends ALittleGuess {
     }
 
     @Override
-    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
-    {
-        ALittleGuessClass new_guess = (ALittleGuessClass)clone();
-        for (Map.Entry<String, ALittleGuess> pair : template_map.entrySet())
-        {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map) {
+        ALittleGuessClass new_guess = (ALittleGuessClass) clone();
+        for (Map.Entry<String, ALittleGuess> pair : template_map.entrySet()) {
             ALittleGuess guess = pair.getValue().replaceTemplate(fill_map);
             if (guess == null) return null;
-            if (guess != pair.getValue())
-            {
+            if (guess != pair.getValue()) {
                 ALittleGuess replace = pair.getValue().replaceTemplate(fill_map);
                 if (replace == null) return null;
                 new_guess.template_map.put(pair.getKey(), replace);
@@ -77,8 +69,7 @@ public class ALittleGuessClass extends ALittleGuess {
     }
 
     @Override
-    public ALittleGuess clone()
-    {
+    public ALittleGuess clone() {
         ALittleGuessClass guess = new ALittleGuessClass(namespace_name, class_name, class_dec, using_name, is_const, is_native);
         guess.template_list.addAll(template_list);
         for (Map.Entry<String, ALittleGuess> pair : template_map.entrySet())
@@ -88,27 +79,22 @@ public class ALittleGuessClass extends ALittleGuess {
     }
 
     @Override
-    public void updateValue()
-    {
+    public void updateValue() {
         value = "";
         if (is_const) value += "const ";
         if (is_native) value += "native ";
         value += namespace_name + "." + class_name;
         ArrayList<String> name_list = new ArrayList<String>();
-        for (ALittleGuess template : template_list)
-        {
+        for (ALittleGuess template : template_list) {
             ALittleGuess impl = template_map.get(template.getValueWithoutConst());
-            if (impl != null)
-            {
-                if (template.is_const && !impl.is_const)
-                {
+            if (impl != null) {
+                if (template.is_const && !impl.is_const) {
                     impl = impl.clone();
                     impl.is_const = true;
                     impl.updateValue();
                 }
                 name_list.add(impl.getValue());
-            }
-            else
+            } else
                 name_list.add(template.getValue());
         }
         if (name_list.size() > 0)
@@ -116,15 +102,12 @@ public class ALittleGuessClass extends ALittleGuess {
     }
 
     @Override
-    public boolean isChanged()
-    {
-        for (ALittleGuess guess : template_list)
-        {
+    public boolean isChanged() {
+        for (ALittleGuess guess : template_list) {
             if (guess.isChanged())
                 return true;
         }
-        for (Map.Entry<String, ALittleGuess> pair : template_map.entrySet())
-        {
+        for (Map.Entry<String, ALittleGuess> pair : template_map.entrySet()) {
             if (pair.getValue().isChanged())
                 return true;
         }

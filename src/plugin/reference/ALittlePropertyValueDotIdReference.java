@@ -4,7 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.*;
+import plugin.psi.ALittlePropertyValueDotId;
 
 import java.util.ArrayList;
 import java.util.List;

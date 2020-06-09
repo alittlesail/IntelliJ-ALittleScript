@@ -8,7 +8,10 @@ import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.*;
+import plugin.psi.ALittleCustomType;
+import plugin.psi.ALittleCustomTypeDotId;
+import plugin.psi.ALittleCustomTypeDotIdName;
+import plugin.psi.ALittleCustomTypeName;
 
 import java.util.List;
 
@@ -21,11 +24,9 @@ public class ALittleCustomTypeReference extends ALittleCustomTypeCommonReference
         if (name_dec != null) mKey = name_dec.getText();
 
         ALittleCustomTypeDotId dot_id = myElement.getCustomTypeDotId();
-        if (dot_id != null)
-        {
+        if (dot_id != null) {
             ALittleCustomTypeDotIdName dot_id_name = dot_id.getCustomTypeDotIdName();
-            if (dot_id_name != null)
-            {
+            if (dot_id_name != null) {
                 mNamespace = mKey;
                 mKey = dot_id_name.getText();
             }

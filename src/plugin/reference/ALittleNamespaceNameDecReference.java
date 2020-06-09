@@ -4,12 +4,12 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElementResolveResult;
+import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
 import plugin.component.ALittleIcons;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleNamespaceDec;
 import plugin.psi.ALittleNamespaceNameDec;
@@ -30,7 +30,7 @@ public class ALittleNamespaceNameDecReference extends ALittleReference<ALittleNa
 
         Map<String, ALittleNamespaceNameDec> nameDecMap = ALittleTreeChangeListener.findNamespaceNameDecList(myElement.getProject(), mKey);
         for (ALittleNamespaceNameDec nameDec : nameDecMap.values()) {
-            guessList.add(((ALittleNamespaceDec)nameDec.getParent()).guessType());
+            guessList.add(((ALittleNamespaceDec) nameDec.getParent()).guessType());
         }
 
         return guessList;

@@ -6,7 +6,7 @@ import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessPrimitive;
-import plugin.psi.*;
+import plugin.psi.ALittleEnumVarDec;
 
 import java.util.List;
 

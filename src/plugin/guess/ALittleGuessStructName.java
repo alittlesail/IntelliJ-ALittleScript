@@ -1,7 +1,6 @@
 package plugin.guess;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleStructNameDec;
@@ -17,8 +16,7 @@ public class ALittleGuessStructName extends ALittleGuess {
     public ALittleStructNameDec struct_name_dec;
 
     public ALittleGuessStructName(String p_namespace_name, String p_struct_name
-            , ALittleStructNameDec p_struct_name_dec)
-    {
+            , ALittleStructNameDec p_struct_name_dec) {
         is_register = PsiHelper.isRegister(p_struct_name_dec);
         namespace_name = p_namespace_name;
         struct_name = p_struct_name;
@@ -26,40 +24,34 @@ public class ALittleGuessStructName extends ALittleGuess {
     }
 
     @Override
-    public PsiElement getElement()
-    {
+    public PsiElement getElement() {
         return struct_name_dec;
     }
 
     @Override
-    public boolean needReplace()
-    {
+    public boolean needReplace() {
         return false;
     }
 
     @Override
-    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
-    {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map) {
         return this;
     }
 
     @Override
-    public ALittleGuess clone()
-    {
+    public ALittleGuess clone() {
         ALittleGuessStructName guess = new ALittleGuessStructName(namespace_name, struct_name, struct_name_dec);
         guess.updateValue();
         return guess;
     }
 
     @Override
-    public void updateValue()
-    {
+    public void updateValue() {
         value = namespace_name + "." + struct_name;
     }
 
     @Override
-    public boolean isChanged()
-    {
+    public boolean isChanged() {
         return ALittleTreeChangeListener.getGuessTypeList(struct_name_dec) == null;
     }
 }

@@ -20,15 +20,13 @@ public class ALittleVarAssignDecReference extends ALittleReference<ALittleVarAss
         super(element, textRange);
     }
 
-    public ALittleClassDec getClassDec()
-    {
+    public ALittleClassDec getClassDec() {
         if (mClassDec != null) return mClassDec;
         mClassDec = PsiHelper.findClassDecFromParent(myElement);
         return mClassDec;
     }
 
-    public ALittleTemplateDec getTemplateDec()
-    {
+    public ALittleTemplateDec getTemplateDec() {
         if (mTemplateParamDec != null) return mTemplateParamDec;
         mTemplateParamDec = PsiHelper.findMethodTemplateDecFromParent(myElement);
         return mTemplateParamDec;
@@ -44,7 +42,7 @@ public class ALittleVarAssignDecReference extends ALittleReference<ALittleVarAss
         ALittleVarAssignNameDec name_dec = myElement.getVarAssignNameDec();
         if (name_dec == null) return guess_list;
 
-        ALittleVarAssignExpr parent = (ALittleVarAssignExpr)myElement.getParent();
+        ALittleVarAssignExpr parent = (ALittleVarAssignExpr) myElement.getParent();
         ALittleValueStat value_stat = parent.getValueStat();
         if (value_stat == null)
             throw new ALittleGuessException(name_dec, "没有赋值对象，无法推导类型");
@@ -57,15 +55,12 @@ public class ALittleVarAssignDecReference extends ALittleReference<ALittleVarAss
         List<ALittleGuess> method_call_guess_list = value_stat.guessTypes();
         // 如果有"..."作为返回值结尾
         boolean hasTail = method_call_guess_list.size() > 0 && method_call_guess_list.get(method_call_guess_list.size() - 1) instanceof ALittleGuessReturnTail;
-        if (hasTail)
-        {
+        if (hasTail) {
             if (index >= method_call_guess_list.size() - 1)
                 guess_list.add(ALittleGuessPrimitive.sAnyGuess);
             else
                 guess_list.add(method_call_guess_list.get(index));
-        }
-        else
-        {
+        } else {
             if (index >= method_call_guess_list.size())
                 throw new ALittleGuessException(myElement, "没有赋值对象，无法推导类型");
             guess_list.add(method_call_guess_list.get(index));

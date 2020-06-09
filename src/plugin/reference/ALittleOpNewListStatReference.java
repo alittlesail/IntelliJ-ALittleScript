@@ -1,7 +1,6 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import groovy.lang.Tuple2;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
@@ -43,8 +42,7 @@ public class ALittleOpNewListStatReference extends ALittleReference<ALittleOpNew
 
         // 列表里面的所有元素的类型必须和第一个元素一致
         ALittleGuess value_stat_first = value_stat_list.get(0).guessType();
-        for (int i = 1; i < value_stat_list.size(); ++i)
-        {
+        for (int i = 1; i < value_stat_list.size(); ++i) {
             ALittleValueStat value_stat = value_stat_list.get(i);
             Tuple2<Integer, List<ALittleGuess>> result = PsiHelper.calcReturnCount(value_stat);
             if (result.getFirst() != 1) throw new ALittleGuessException(value_stat, "表达式必须只能是一个返回值");

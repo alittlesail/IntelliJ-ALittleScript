@@ -5,7 +5,6 @@ import groovy.lang.Tuple2;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessClassTemplate;
 import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessFunctor;
 import plugin.psi.ALittleBindStat;
@@ -33,7 +32,7 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
 
         if (!(guess instanceof ALittleGuessFunctor))
             throw new ALittleGuessException(myElement, "bind表达式第一个参数必须是一个函数");
-        ALittleGuessFunctor guess_functor = (ALittleGuessFunctor)guess;
+        ALittleGuessFunctor guess_functor = (ALittleGuessFunctor) guess;
 
         if (guess_functor.template_param_list.size() > 0)
             throw new ALittleGuessException(myElement, "bind表达式要绑定的函数不能有模板定义");
@@ -55,8 +54,7 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
         while (param_count > 0
                 && info.param_list.size() > 0
                 && info.param_nullable_list.size() > 0
-                && info.param_name_list.size() > 0)
-        {
+                && info.param_name_list.size() > 0) {
             info.param_list.remove(0);
             info.param_nullable_list.remove(0);
             info.param_name_list.remove(0);
@@ -79,21 +77,19 @@ public class ALittleBindStatReference extends ALittleReference<ALittleBindStat> 
 
         if (!(guess instanceof ALittleGuessFunctor))
             throw new ALittleGuessException(myElement, "bind表达式第一个参数必须是一个函数");
-        ALittleGuessFunctor guess_functor = (ALittleGuessFunctor)guess;
+        ALittleGuessFunctor guess_functor = (ALittleGuessFunctor) guess;
 
         if (guess_functor.template_param_list.size() > 0)
             throw new ALittleGuessException(myElement, "bind表达式要绑定的函数不能有模板定义");
 
         // 后面跟的参数数量不能超过这个函数的参数个数
-        if (value_stat_list.size() - 1 > guess_functor.param_list.size())
-        {
+        if (value_stat_list.size() - 1 > guess_functor.param_list.size()) {
             if (guess_functor.param_tail == null)
-                throw  new ALittleGuessException(myElement, "bind表达式参数太多了");
+                throw new ALittleGuessException(myElement, "bind表达式参数太多了");
         }
 
         // 遍历所有的表达式，看下是否符合
-        for (int i = 1; i < value_stat_list.size(); ++i)
-        {
+        for (int i = 1; i < value_stat_list.size(); ++i) {
             if (i - 1 >= guess_functor.param_list.size()) break;
 
             ALittleGuess param_guess = guess_functor.param_list.get(i - 1);

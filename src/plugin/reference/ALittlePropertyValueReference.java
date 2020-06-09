@@ -21,7 +21,7 @@ public class ALittlePropertyValueReference extends ALittleReference<ALittlePrope
         if (suffixList.isEmpty()) {
             return myElement.getPropertyValueFirstType().guessTypes();
         } else {
-            return suffixList.get(suffixList.size() -1).guessTypes();
+            return suffixList.get(suffixList.size() - 1).guessTypes();
         }
     }
 }

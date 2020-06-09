@@ -5,14 +5,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import groovy.util.MapEntry;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeChangeListener {
     public ALittleTreeChangeListener(@NotNull Project project) {
@@ -70,8 +72,7 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
             }
         } else {
             Map<ALittleNamespaceNameDec, ALittleAccessData> map = listener.mAllDataMap.get(namespaceName);
-            if (map != null)
-            {
+            if (map != null) {
                 for (ALittleNamespaceNameDec dec : map.keySet())
                     result.put(dec.getText(), dec);
             }
@@ -150,8 +151,8 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
     }
 
     public static List<ALittleGuess> findALittleClassGuessList(Project project,
-                                                                String namespaceName,
-                                                                String name) throws ALittleGuessException {
+                                                               String namespaceName,
+                                                               String name) throws ALittleGuessException {
         PsiElement element = ALittleTreeChangeListener.findALittleNameDec(project,
                 PsiHelper.PsiElementType.CLASS_NAME, null, namespaceName, name, true);
         if (element instanceof ALittleClassNameDec) {
@@ -199,7 +200,7 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
                     handleDirDelete(project, file);
                 }
             }
-        // 如果是文件
+            // 如果是文件
         } else {
             PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
             if (file instanceof ALittleFile) {
@@ -273,24 +274,19 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
     /// 静态通用函数结束
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void beforeChildAddition(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void beforeChildAddition(@NotNull PsiTreeChangeEvent var1) {
     }
 
-    public void beforeChildRemoval(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void beforeChildRemoval(@NotNull PsiTreeChangeEvent var1) {
     }
 
-    public void beforeChildReplacement(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void beforeChildReplacement(@NotNull PsiTreeChangeEvent var1) {
     }
 
-    public void beforeChildMovement(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void beforeChildMovement(@NotNull PsiTreeChangeEvent var1) {
     }
 
-    public void beforeChildrenChange(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void beforeChildrenChange(@NotNull PsiTreeChangeEvent var1) {
         PsiFile file = var1.getFile();
         if (!(file instanceof ALittleFile)) return;
         ALittleNamespaceNameDec namespaceNameDec = PsiHelper.getNamespaceNameDec(file);
@@ -298,24 +294,19 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         removeNamespaceName(namespaceNameDec);
     }
 
-    public void beforePropertyChange(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void beforePropertyChange(@NotNull PsiTreeChangeEvent var1) {
     }
 
-    public void childAdded(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void childAdded(@NotNull PsiTreeChangeEvent var1) {
     }
 
-    public void childRemoved(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void childRemoved(@NotNull PsiTreeChangeEvent var1) {
     }
 
-    public void childReplaced(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void childReplaced(@NotNull PsiTreeChangeEvent var1) {
     }
 
-    public void childrenChanged(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void childrenChanged(@NotNull PsiTreeChangeEvent var1) {
         PsiFile file = var1.getFile();
         if (!(file instanceof ALittleFile)) return;
         ALittleNamespaceNameDec namespaceNameDec = PsiHelper.getNamespaceNameDec(file);
@@ -323,11 +314,9 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         addNamespaceName(namespaceNameDec);
     }
 
-    public void childMoved(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void childMoved(@NotNull PsiTreeChangeEvent var1) {
     }
 
-    public void propertyChanged(@NotNull PsiTreeChangeEvent var1)
-    {
+    public void propertyChanged(@NotNull PsiTreeChangeEvent var1) {
     }
 }

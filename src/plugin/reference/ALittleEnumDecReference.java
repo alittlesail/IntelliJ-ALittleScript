@@ -1,7 +1,6 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessEnum;
@@ -44,8 +43,7 @@ public class ALittleEnumDecReference extends ALittleReference<ALittleEnumDec> {
 
         List<ALittleEnumVarDec> var_dec_list = body_dec.getEnumVarDecList();
         Set<String> name_set = new HashSet<>();
-        for (ALittleEnumVarDec var_dec : var_dec_list)
-        {
+        for (ALittleEnumVarDec var_dec : var_dec_list) {
             ALittleEnumVarNameDec name_dec = var_dec.getEnumVarNameDec();
             if (name_dec == null) continue;
 

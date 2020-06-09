@@ -4,12 +4,12 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
 import plugin.guess.*;
-import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
@@ -28,12 +28,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         List<ALittleGuess> guess_list = new ArrayList<>();
         PsiElement parent = myElement.getParent();
         // 处理getter
-        if (parent instanceof ALittleClassGetterDec)
-        {
-            ALittleClassGetterDec class_getter_dec = (ALittleClassGetterDec)parent;
-            ALittleClassElementDec class_element_dec = (ALittleClassElementDec)class_getter_dec.getParent();
+        if (parent instanceof ALittleClassGetterDec) {
+            ALittleClassGetterDec class_getter_dec = (ALittleClassGetterDec) parent;
+            ALittleClassElementDec class_element_dec = (ALittleClassElementDec) class_getter_dec.getParent();
             PsiElement class_body_dec = class_element_dec.getParent();
-            ALittleClassDec class_dec = (ALittleClassDec)class_body_dec.getParent();
+            ALittleClassDec class_dec = (ALittleClassDec) class_body_dec.getParent();
 
             ALittleGuessFunctor info = new ALittleGuessFunctor(class_getter_dec);
             info.const_modifier = PsiHelper.isConst(class_element_dec.getModifierList());
@@ -52,13 +51,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
             info.updateValue();
             guess_list.add(info);
-        }
-            else if (parent instanceof ALittleClassSetterDec)
-        {
-            ALittleClassSetterDec class_setter_dec = (ALittleClassSetterDec)parent;
-            ALittleClassElementDec class_element_dec = (ALittleClassElementDec)class_setter_dec.getParent();
+        } else if (parent instanceof ALittleClassSetterDec) {
+            ALittleClassSetterDec class_setter_dec = (ALittleClassSetterDec) parent;
+            ALittleClassElementDec class_element_dec = (ALittleClassElementDec) class_setter_dec.getParent();
             PsiElement class_body_dec = class_element_dec.getParent();
-            ALittleClassDec class_dec = (ALittleClassDec)class_body_dec.getParent();
+            ALittleClassDec class_dec = (ALittleClassDec) class_body_dec.getParent();
 
             ALittleGuessFunctor info = new ALittleGuessFunctor(class_setter_dec);
             info.const_modifier = PsiHelper.isConst(class_element_dec.getModifierList());
@@ -92,10 +89,10 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             info.updateValue();
             guess_list.add(info);
         } else if (parent instanceof ALittleClassMethodDec) {
-            ALittleClassMethodDec class_method_dec = (ALittleClassMethodDec)parent;
-            ALittleClassElementDec class_element_dec = (ALittleClassElementDec)class_method_dec.getParent();
+            ALittleClassMethodDec class_method_dec = (ALittleClassMethodDec) parent;
+            ALittleClassElementDec class_element_dec = (ALittleClassElementDec) class_method_dec.getParent();
             PsiElement class_body_dec = class_element_dec.getParent();
-            ALittleClassDec class_dec = (ALittleClassDec)class_body_dec.getParent();
+            ALittleClassDec class_dec = (ALittleClassDec) class_body_dec.getParent();
 
             ALittleGuessFunctor info = new ALittleGuessFunctor(class_method_dec);
             List<ALittleModifier> modifier = class_element_dec.getModifierList();
@@ -110,29 +107,24 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
             // 添加模板参数列表
             ALittleTemplateDec template_dec = class_method_dec.getTemplateDec();
-            if (template_dec != null)
-            {
+            if (template_dec != null) {
                 List<ALittleGuess> template_guess_list = template_dec.guessTypes();
-                for (ALittleGuess guess : template_guess_list)
-                {
+                for (ALittleGuess guess : template_guess_list) {
                     if (!(guess instanceof ALittleGuessTemplate))
-                    throw new ALittleGuessException(myElement, "template_dec.guessTypes()取到的不是ALittleGuessTemplate");
-                    info.template_param_list.add((ALittleGuessTemplate)guess);
+                        throw new ALittleGuessException(myElement, "template_dec.guessTypes()取到的不是ALittleGuessTemplate");
+                    info.template_param_list.add((ALittleGuessTemplate) guess);
                 }
             }
 
             // 添加参数列表
             ALittleMethodParamDec param_dec = class_method_dec.getMethodParamDec();
-            if (param_dec != null)
-            {
+            if (param_dec != null) {
                 List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                for (int i = 0; i < one_dec_list.size(); ++i)
-                {
+                for (int i = 0; i < one_dec_list.size(); ++i) {
                     ALittleMethodParamOneDec one_dec = one_dec_list.get(i);
                     ALittleAllType all_type = one_dec.getAllType();
                     ALittleMethodParamTailDec param_tail = one_dec.getMethodParamTailDec();
-                    if (all_type != null)
-                    {
+                    if (all_type != null) {
                         ALittleGuess all_type_guess = all_type.guessType();
                         info.param_list.add(all_type_guess);
                         info.param_nullable_list.add(PsiHelper.isNullable(one_dec.getModifierList()));
@@ -140,9 +132,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                             info.param_name_list.add(one_dec.getMethodParamNameDec().getText());
                         else
                             info.param_name_list.add("");
-                    }
-                    else if (param_tail != null)
-                    {
+                    } else if (param_tail != null) {
                         if (i + 1 != one_dec_list.size())
                             throw new ALittleGuessException(one_dec, "参数占位符必须定义在最后");
                         info.param_tail = param_tail.guessType();
@@ -152,21 +142,16 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
             // 添加返回值列表
             ALittleMethodReturnDec return_dec = class_method_dec.getMethodReturnDec();
-            if (return_dec != null)
-            {
+            if (return_dec != null) {
                 List<ALittleMethodReturnOneDec> one_dec_list = return_dec.getMethodReturnOneDecList();
-                for (int i = 0; i < one_dec_list.size(); ++i)
-                {
+                for (int i = 0; i < one_dec_list.size(); ++i) {
                     ALittleMethodReturnOneDec one_dec = one_dec_list.get(i);
                     ALittleAllType all_type = one_dec.getAllType();
                     ALittleMethodReturnTailDec return_tail = one_dec.getMethodReturnTailDec();
-                    if (all_type != null)
-                    {
+                    if (all_type != null) {
                         ALittleGuess all_type_guess = all_type.guessType();
                         info.return_list.add(all_type_guess);
-                    }
-                    else if (return_tail != null)
-                    {
+                    } else if (return_tail != null) {
                         if (i + 1 != one_dec_list.size())
                             throw new ALittleGuessException(one_dec, "返回值占位符必须定义在最后");
                         info.return_tail = return_tail.guessType();
@@ -175,40 +160,33 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             }
             info.updateValue();
             guess_list.add(info);
-        }
-            else if (parent instanceof ALittleClassStaticDec)
-        {
-            ALittleClassStaticDec class_static_dec = (ALittleClassStaticDec)parent;
-            ALittleClassElementDec class_element_dec = (ALittleClassElementDec)class_static_dec.getParent();
+        } else if (parent instanceof ALittleClassStaticDec) {
+            ALittleClassStaticDec class_static_dec = (ALittleClassStaticDec) parent;
+            ALittleClassElementDec class_element_dec = (ALittleClassElementDec) class_static_dec.getParent();
 
             ALittleGuessFunctor info = new ALittleGuessFunctor(class_static_dec);
             info.await_modifier = PsiHelper.getCoroutineType(class_element_dec.getModifierList()).equals("await");
 
             // 添加模板参数列表
             ALittleTemplateDec template_dec = class_static_dec.getTemplateDec();
-            if (template_dec != null)
-            {
+            if (template_dec != null) {
                 List<ALittleGuess> template_guess_list = template_dec.guessTypes();
-                for (ALittleGuess guess : template_guess_list)
-                {
+                for (ALittleGuess guess : template_guess_list) {
                     if (!(guess instanceof ALittleGuessTemplate))
-                    throw new ALittleGuessException(myElement, "template_dec.guessTypes()取到的不是ALittleGuessTemplate");
-                    info.template_param_list.add((ALittleGuessTemplate)guess);
+                        throw new ALittleGuessException(myElement, "template_dec.guessTypes()取到的不是ALittleGuessTemplate");
+                    info.template_param_list.add((ALittleGuessTemplate) guess);
                 }
             }
 
             // 添加参数列表
             ALittleMethodParamDec param_dec = class_static_dec.getMethodParamDec();
-            if (param_dec != null)
-            {
+            if (param_dec != null) {
                 List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                for (int i = 0; i < one_dec_list.size(); ++i)
-                {
+                for (int i = 0; i < one_dec_list.size(); ++i) {
                     ALittleMethodParamOneDec one_dec = one_dec_list.get(i);
                     ALittleAllType all_type = one_dec.getAllType();
                     ALittleMethodParamTailDec param_tail = one_dec.getMethodParamTailDec();
-                    if (all_type != null)
-                    {
+                    if (all_type != null) {
                         ALittleGuess all_type_guess = all_type.guessType();
                         info.param_list.add(all_type_guess);
                         info.param_nullable_list.add(PsiHelper.isNullable(one_dec.getModifierList()));
@@ -216,9 +194,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                             info.param_name_list.add(one_dec.getMethodParamNameDec().getText());
                         else
                             info.param_name_list.add("");
-                    }
-                    else if (param_tail != null)
-                    {
+                    } else if (param_tail != null) {
                         if (i + 1 != one_dec_list.size())
                             throw new ALittleGuessException(one_dec, "参数占位符必须定义在最后");
                         info.param_tail = param_tail.guessType();
@@ -228,21 +204,16 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
             // 添加返回值列表
             ALittleMethodReturnDec return_dec = class_static_dec.getMethodReturnDec();
-            if (return_dec != null)
-            {
+            if (return_dec != null) {
                 List<ALittleMethodReturnOneDec> one_dec_list = return_dec.getMethodReturnOneDecList();
-                for (int i = 0; i < one_dec_list.size(); ++i)
-                {
+                for (int i = 0; i < one_dec_list.size(); ++i) {
                     ALittleMethodReturnOneDec one_dec = one_dec_list.get(i);
                     ALittleAllType all_type = one_dec.getAllType();
                     ALittleMethodReturnTailDec return_tail = one_dec.getMethodReturnTailDec();
-                    if (all_type != null)
-                    {
+                    if (all_type != null) {
                         ALittleGuess all_type_guess = all_type.guessType();
                         info.return_list.add(all_type_guess);
-                    }
-                    else if (return_tail != null)
-                    {
+                    } else if (return_tail != null) {
                         if (i + 1 != one_dec_list.size())
                             throw new ALittleGuessException(one_dec, "返回值占位符必须定义在最后");
                         info.return_tail = return_tail.guessType();
@@ -251,18 +222,15 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             }
             info.updateValue();
             guess_list.add(info);
-        }
-            else if (parent instanceof ALittleGlobalMethodDec)
-        {
-            ALittleGlobalMethodDec global_method_dec = (ALittleGlobalMethodDec)parent;
-            ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec)global_method_dec.getParent();
+        } else if (parent instanceof ALittleGlobalMethodDec) {
+            ALittleGlobalMethodDec global_method_dec = (ALittleGlobalMethodDec) parent;
+            ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec) global_method_dec.getParent();
 
             ALittleGuessFunctor info = new ALittleGuessFunctor(global_method_dec);
             info.await_modifier = PsiHelper.getCoroutineType(namespace_element_dec.getModifierList()).equals("await");
 
             String protocol_type = PsiHelper.getProtocolType(namespace_element_dec.getModifierList());
-            if (protocol_type != null)
-            {
+            if (protocol_type != null) {
                 PsiElement error_element = global_method_dec.getMethodNameDec();
                 if (error_element == null) error_element = global_method_dec;
 
@@ -274,21 +242,25 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                 info.proto = protocol_type;
 
                 ALittleMethodParamDec param_dec = global_method_dec.getMethodParamDec();
-                if (param_dec == null) throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数必须是两个参数");
+                if (param_dec == null)
+                    throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数必须是两个参数");
                 List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                if (one_dec_list.size() != 2) throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数必须是两个参数");
+                if (one_dec_list.size() != 2)
+                    throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数必须是两个参数");
                 if (PsiHelper.isNullable(one_dec_list.get(0).getModifierList()) || PsiHelper.isNullable(one_dec_list.get(1).getModifierList()))
                     throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数参数不能使用Nullable修饰");
                 ALittleAllType all_type = one_dec_list.get(1).getAllType();
-                if (all_type == null) throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数，第二个参数没有定义类型");
+                if (all_type == null)
+                    throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数，第二个参数没有定义类型");
                 ALittleGuess guess = all_type.guessType();
-                if (!(guess instanceof ALittleGuessStruct)) throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数第二个参数必须是struct");
+                if (!(guess instanceof ALittleGuessStruct))
+                    throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数第二个参数必须是struct");
 
-                if (info.proto.equals("Http"))
-                {
+                if (info.proto.equals("Http")) {
                     PsiElement element = ALittleTreeChangeListener.findALittleNameDec(myElement.getProject(), PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), "ALittle", "IHttpSender", true);
-                    if (!(element instanceof ALittleClassNameDec)) throw new ALittleGuessException(error_element, "语言框架中找不到ALittle.IHttpSender");
-                    ALittleClassNameDec class_name_dec = (ALittleClassNameDec)element;
+                    if (!(element instanceof ALittleClassNameDec))
+                        throw new ALittleGuessException(error_element, "语言框架中找不到ALittle.IHttpSender");
+                    ALittleClassNameDec class_name_dec = (ALittleClassNameDec) element;
                     ALittleGuess class_name_dec_guess = class_name_dec.guessType();
                     info.param_list.add(class_name_dec_guess);
                     info.param_nullable_list.add(false);
@@ -298,21 +270,24 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                     info.param_name_list.add("param");
 
                     ALittleMethodReturnDec return_dec = global_method_dec.getMethodReturnDec();
-                    if (return_dec == null) throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值必须是struct");
+                    if (return_dec == null)
+                        throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值必须是struct");
                     List<ALittleMethodReturnOneDec> return_one_list = return_dec.getMethodReturnOneDecList();
-                    if (return_one_list.size() != 1) throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值有且仅有一个struct");
+                    if (return_one_list.size() != 1)
+                        throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值有且仅有一个struct");
                     ALittleAllType return_one_all_type = return_one_list.get(0).getAllType();
-                    if (return_one_all_type == null) throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值有且仅有一个struct");
+                    if (return_one_all_type == null)
+                        throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值有且仅有一个struct");
                     ALittleGuess return_guess = return_one_all_type.guessType();
-                    if (!(return_guess instanceof ALittleGuessStruct)) throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值必须是struct");
+                    if (!(return_guess instanceof ALittleGuessStruct))
+                        throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值必须是struct");
                     info.return_list.add(ALittleGuessPrimitive.sStringGuess);
                     info.return_list.add(return_guess);
-                }
-                else if (info.proto.equals("HttpDownload"))
-                {
+                } else if (info.proto.equals("HttpDownload")) {
                     PsiElement element = ALittleTreeChangeListener.findALittleNameDec(myElement.getProject(), PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), "ALittle", "IHttpFileSender", true);
-                    if (!(element instanceof ALittleClassNameDec)) throw new ALittleGuessException(error_element, "语言框架中找不到ALittle.IHttpFileSender");
-                    ALittleClassNameDec class_name_dec = (ALittleClassNameDec)element;
+                    if (!(element instanceof ALittleClassNameDec))
+                        throw new ALittleGuessException(error_element, "语言框架中找不到ALittle.IHttpFileSender");
+                    ALittleClassNameDec class_name_dec = (ALittleClassNameDec) element;
                     ALittleGuess class_name_dec_guess = class_name_dec.guessType();
                     info.param_list.add(class_name_dec_guess);
                     info.param_nullable_list.add(false);
@@ -324,12 +299,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                     info.return_list.add(ALittleGuessPrimitive.sStringGuess);
                     ALittleGuess sender_guess = class_name_dec.guessType();
                     info.return_list.add(sender_guess);
-                }
-                else if (info.proto.equals("HttpUpload"))
-                {
+                } else if (info.proto.equals("HttpUpload")) {
                     PsiElement element = ALittleTreeChangeListener.findALittleNameDec(myElement.getProject(), PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), "ALittle", "IHttpFileSender", true);
-                    if (!(element instanceof ALittleClassNameDec)) throw new ALittleGuessException(error_element, "语言框架中找不到ALittle.IHttpFileSender");
-                    ALittleClassNameDec class_name_dec = (ALittleClassNameDec)element;
+                    if (!(element instanceof ALittleClassNameDec))
+                        throw new ALittleGuessException(error_element, "语言框架中找不到ALittle.IHttpFileSender");
+                    ALittleClassNameDec class_name_dec = (ALittleClassNameDec) element;
                     ALittleGuess class_name_dec_guess = class_name_dec.guessType();
                     info.param_list.add(class_name_dec_guess);
                     info.param_nullable_list.add(false);
@@ -339,12 +313,11 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                     info.param_name_list.add("param");
 
                     info.return_list.add(ALittleGuessPrimitive.sStringGuess);
-                }
-                else if (info.proto.equals("Msg"))
-                {
+                } else if (info.proto.equals("Msg")) {
                     PsiElement element = ALittleTreeChangeListener.findALittleNameDec(myElement.getProject(), PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), "ALittle", "IMsgCommon", true);
-                    if (!(element instanceof ALittleClassNameDec)) throw new ALittleGuessException(error_element, "语言框架中找不到ALittle.IMsgCommon");
-                    ALittleClassNameDec class_name_dec = (ALittleClassNameDec)element;
+                    if (!(element instanceof ALittleClassNameDec))
+                        throw new ALittleGuessException(error_element, "语言框架中找不到ALittle.IMsgCommon");
+                    ALittleClassNameDec class_name_dec = (ALittleClassNameDec) element;
                     ALittleGuess class_name_dec_guess = class_name_dec.guessType();
                     info.param_list.add(class_name_dec_guess);
                     info.param_nullable_list.add(false);
@@ -354,54 +327,43 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                     info.param_name_list.add("param");
 
                     ALittleMethodReturnDec return_dec = global_method_dec.getMethodReturnDec();
-                    if (return_dec != null)
-                    {
+                    if (return_dec != null) {
                         List<ALittleMethodReturnOneDec> return_one_list = return_dec.getMethodReturnOneDecList();
-                        if (return_one_list.size() > 0)
-                        {
+                        if (return_one_list.size() > 0) {
                             ALittleAllType return_one_all_type = return_one_list.get(0).getAllType();
                             if (return_one_all_type == null)
                                 throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值必须是struct");
                             ALittleGuess return_guess = return_one_all_type.guessType();
                             if (!(return_guess instanceof ALittleGuessStruct))
-                            throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值必须是struct");
+                                throw new ALittleGuessException(error_element, "带" + info.proto + "注解的函数返回值必须是struct");
                             info.return_list.add(ALittleGuessPrimitive.sStringGuess);
                             info.return_list.add(return_guess);
                         }
                     }
-                }
-                else
-                {
+                } else {
                     throw new ALittleGuessException(error_element, "未知的注解类型:" + info.proto);
                 }
-            }
-            else
-            {
+            } else {
                 // 添加模板参数列表
                 ALittleTemplateDec template_dec = global_method_dec.getTemplateDec();
-                if (template_dec != null)
-                {
+                if (template_dec != null) {
                     List<ALittleGuess> template_guess_list = template_dec.guessTypes();
-                    for (ALittleGuess guess : template_guess_list)
-                    {
+                    for (ALittleGuess guess : template_guess_list) {
                         if (!(guess instanceof ALittleGuessTemplate))
-                        throw new ALittleGuessException(myElement, "template_dec.guessTypes()取到的不是ALittleGuessTemplate");
-                        info.template_param_list.add((ALittleGuessTemplate)guess);
+                            throw new ALittleGuessException(myElement, "template_dec.guessTypes()取到的不是ALittleGuessTemplate");
+                        info.template_param_list.add((ALittleGuessTemplate) guess);
                     }
                 }
 
                 // 添加参数列表
                 ALittleMethodParamDec param_dec = global_method_dec.getMethodParamDec();
-                if (param_dec != null)
-                {
+                if (param_dec != null) {
                     List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-                    for (int i = 0; i < one_dec_list.size(); ++i)
-                    {
+                    for (int i = 0; i < one_dec_list.size(); ++i) {
                         ALittleMethodParamOneDec one_dec = one_dec_list.get(i);
                         ALittleAllType all_type = one_dec.getAllType();
                         ALittleMethodParamTailDec param_tail = one_dec.getMethodParamTailDec();
-                        if (all_type != null)
-                        {
+                        if (all_type != null) {
                             ALittleGuess all_type_guess = all_type.guessType();
                             info.param_list.add(all_type_guess);
                             info.param_nullable_list.add(PsiHelper.isNullable(one_dec.getModifierList()));
@@ -409,9 +371,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                                 info.param_name_list.add(one_dec.getMethodParamNameDec().getText());
                             else
                                 info.param_name_list.add("");
-                        }
-                        else if (param_tail != null)
-                        {
+                        } else if (param_tail != null) {
                             if (i + 1 != one_dec_list.size())
                                 throw new ALittleGuessException(one_dec, "参数占位符必须定义在最后");
                             info.param_tail = param_tail.guessType();
@@ -421,21 +381,16 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
                 // 添加返回值列表
                 ALittleMethodReturnDec return_dec = global_method_dec.getMethodReturnDec();
-                if (return_dec != null)
-                {
+                if (return_dec != null) {
                     List<ALittleMethodReturnOneDec> one_dec_list = return_dec.getMethodReturnOneDecList();
-                    for (int i = 0; i < one_dec_list.size(); ++i)
-                    {
+                    for (int i = 0; i < one_dec_list.size(); ++i) {
                         ALittleMethodReturnOneDec one_dec = one_dec_list.get(i);
                         ALittleAllType all_type = one_dec.getAllType();
                         ALittleMethodReturnTailDec return_tail = one_dec.getMethodReturnTailDec();
-                        if (all_type != null)
-                        {
+                        if (all_type != null) {
                             ALittleGuess all_type_guess = all_type.guessType();
                             info.return_list.add(all_type_guess);
-                        }
-                        else if (return_tail != null)
-                        {
+                        } else if (return_tail != null) {
                             if (i + 1 != one_dec_list.size())
                                 throw new ALittleGuessException(one_dec, "返回值占位符必须定义在最后");
                             info.return_tail = return_tail.guessType();
@@ -447,7 +402,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
             guess_list.add(info);
         }
 
-            return guess_list;
+        return guess_list;
     }
 
     @Override
@@ -459,7 +414,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         PsiElement class_body = class_element_dec.getParent();
         if (class_body == null) return;
         if (!(class_body.getParent() instanceof ALittleClassDec)) return;
-        ALittleClassDec class_dec = (ALittleClassDec)class_body.getParent();
+        ALittleClassDec class_dec = (ALittleClassDec) class_body.getParent();
 
         // 计算父类
         ALittleClassDec class_extends_dec = PsiHelper.findClassExtends(class_dec);
@@ -467,19 +422,19 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
 
         PsiHelper.ClassAttrType attrType;
         if (method_dec instanceof ALittleClassMethodDec)
-        attrType = PsiHelper.ClassAttrType.FUN;
-            else if (method_dec instanceof ALittleClassStaticDec)
-        attrType = PsiHelper.ClassAttrType.STATIC;
-            else if (method_dec instanceof ALittleClassGetterDec)
-        attrType = PsiHelper.ClassAttrType.GETTER;
-            else if (method_dec instanceof ALittleClassSetterDec)
-        attrType = PsiHelper.ClassAttrType.SETTER;
-            else
-        return;
+            attrType = PsiHelper.ClassAttrType.FUN;
+        else if (method_dec instanceof ALittleClassStaticDec)
+            attrType = PsiHelper.ClassAttrType.STATIC;
+        else if (method_dec instanceof ALittleClassGetterDec)
+            attrType = PsiHelper.ClassAttrType.GETTER;
+        else if (method_dec instanceof ALittleClassSetterDec)
+            attrType = PsiHelper.ClassAttrType.SETTER;
+        else
+            return;
 
         PsiElement result = PsiHelper.findFirstClassAttrFromExtends(class_extends_dec, attrType, mKey, 100);
         if (!(result instanceof ALittleMethodNameDec)) return;
-        ALittleMethodNameDec method_name_dec = (ALittleMethodNameDec)result;
+        ALittleMethodNameDec method_name_dec = (ALittleMethodNameDec) result;
 
         ALittleGuess guess = myElement.guessType();
         ALittleGuess extends_guess = method_name_dec.guessType();
@@ -520,7 +475,7 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
                         withTypeText(dec.getContainingFile().getName())
                 );
             }
-        // 全局函数
+            // 全局函数
         } else if (methodDec.getParent() instanceof ALittleNamespaceDec) {
             List<PsiElement> decList = ALittleTreeChangeListener.findALittleNameDecList(project,
                     PsiHelper.PsiElementType.GLOBAL_METHOD, psiFile, mNamespace, "", true);

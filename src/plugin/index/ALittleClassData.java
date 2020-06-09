@@ -5,7 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.psi.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ALittleClassData {
     // Key1:访问权限，Key2:属性类型，Key3:名称，Value:元素
@@ -19,7 +21,7 @@ public class ALittleClassData {
     public void addClassChildDec(@NotNull PsiElement dec) {
         // 模板定义特殊处理
         if (dec instanceof ALittleTemplateDec) {
-            ALittleTemplateDec templateDec = (ALittleTemplateDec)dec;
+            ALittleTemplateDec templateDec = (ALittleTemplateDec) dec;
             List<ALittleTemplatePairDec> pairDecList = templateDec.getTemplatePairDecList();
             for (ALittleTemplatePairDec pairDec : pairDecList) {
                 addClassChildDec(pairDec);
@@ -84,9 +86,7 @@ public class ALittleClassData {
             } else {
                 return;
             }
-        }
-        else
-        {
+        } else {
             return;
         }
 

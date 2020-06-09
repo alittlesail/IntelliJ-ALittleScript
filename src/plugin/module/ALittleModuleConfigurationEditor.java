@@ -1,5 +1,5 @@
 package plugin.module;
-import com.intellij.openapi.module.Module;
+
 import com.intellij.openapi.module.ModuleConfigurationEditor;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
@@ -50,6 +50,7 @@ public class ALittleModuleConfigurationEditor implements ModuleConfigurationEdit
     private void listenChange(JTextField item) {
         item.addPropertyChangeListener(new PropertyChangeListener() {
             final String mTmp = item.getText();
+
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (mModified) return;

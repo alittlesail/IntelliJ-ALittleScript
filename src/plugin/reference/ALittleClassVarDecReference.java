@@ -21,20 +21,18 @@ public class ALittleClassVarDecReference extends ALittleReference<ALittleClassVa
     @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleAllType all_type = myElement.getAllType();
-        if (all_type != null)
-        {
+        if (all_type != null) {
             List<ALittleGuess> guess_list = all_type.guessTypes();
-            ALittleClassElementDec class_element_dec = (ALittleClassElementDec)myElement.getParent();
-            if (class_element_dec == null) throw new ALittleGuessException(myElement, "父节点不是ALittleScriptClassElementDecElement类型");
+            ALittleClassElementDec class_element_dec = (ALittleClassElementDec) myElement.getParent();
+            if (class_element_dec == null)
+                throw new ALittleGuessException(myElement, "父节点不是ALittleScriptClassElementDecElement类型");
 
             boolean is_native = PsiHelper.isNative(class_element_dec.getModifierList());
-            for (int i = 0; i < guess_list.size(); ++i)
-            {
+            for (int i = 0; i < guess_list.size(); ++i) {
                 ALittleGuess guess = guess_list.get(i);
                 if (!(guess instanceof ALittleGuessList)) continue;
-                ALittleGuessList new_guess = (ALittleGuessList)guess;
-                if (new_guess.is_native != is_native)
-                {
+                ALittleGuessList new_guess = (ALittleGuessList) guess;
+                if (new_guess.is_native != is_native) {
                     new_guess.is_native = is_native;
                     new_guess.updateValue();
                 }
@@ -56,11 +54,9 @@ public class ALittleClassVarDecReference extends ALittleReference<ALittleClassVa
 
         // 检查赋值表达式
         ALittleClassVarValueDec value_dec = myElement.getClassVarValueDec();
-        if (value_dec != null)
-        {
+        if (value_dec != null) {
             ALittleConstValue const_value = value_dec.getConstValue();
-            if (const_value != null)
-            {
+            if (const_value != null) {
                 ALittleGuess guess = const_value.guessType();
 
                 try {
@@ -72,8 +68,7 @@ public class ALittleClassVarDecReference extends ALittleReference<ALittleClassVa
             }
 
             ALittleOpNewStat op_new_stat = value_dec.getOpNewStat();
-            if (op_new_stat != null)
-            {
+            if (op_new_stat != null) {
                 ALittleGuess guess = op_new_stat.guessType();
                 if (!(guess instanceof ALittleGuessList) && !(guess instanceof ALittleGuessMap))
                     throw new ALittleGuessException(op_new_stat, "成员变量初始化只能赋值List或者Map或者常量");

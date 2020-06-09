@@ -1,14 +1,15 @@
 <idea-plugin>
   <id>as.alittleide.com</id>
   <name>ALittleScript</name>
-  <version>2.4</version>
-  <vendor email="757609414@qq.com" url="https://github.com/alittlesail/ALittleScript">ALittle</vendor>
+  <version>2.5</version>
+  <vendor email="757609414@qq.com" url="https://github.com/alittlesail/ALittleScript-IntelliJ.git">ALittle</vendor>
 
   <description><![CDATA[
     Both typed and dynamic languages<br>
     Auto Generate:
     <ul>
-        <li> LuaJIT 5.1 </li>
+        <li> Lua </li>
+        <li> JavaScript </li>
     </ul>
     Features:
     <ul>

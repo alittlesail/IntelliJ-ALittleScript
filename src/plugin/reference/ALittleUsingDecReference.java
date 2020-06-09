@@ -5,7 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessClass;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.*;
+import plugin.psi.ALittleUsingDec;
+import plugin.psi.ALittleUsingNameDec;
 
 import java.util.ArrayList;
 import java.util.List;

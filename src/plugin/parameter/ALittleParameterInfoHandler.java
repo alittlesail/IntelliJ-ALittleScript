@@ -34,7 +34,7 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<PsiElem
         ALittleOpNewStat newStat = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), ALittleOpNewStat.class, false);
         if (callStat != null && newStat != null) {
             if (Math.abs(callStat.getNode().getStartOffset() - context.getOffset())
-                > Math.abs(newStat.getNode().getStartOffset() - context.getOffset()))
+                    > Math.abs(newStat.getNode().getStartOffset() - context.getOffset()))
                 callStat = null;
             else
                 newStat = null;
@@ -43,14 +43,14 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<PsiElem
         if (callStat != null) {
             PsiReference ref = callStat.getReference();
             if (!(ref instanceof ALittlePropertyValueMethodCallReference)) return null;
-            ALittlePropertyValueMethodCallReference reference = (ALittlePropertyValueMethodCallReference)ref;
+            ALittlePropertyValueMethodCallReference reference = (ALittlePropertyValueMethodCallReference) ref;
 
             try {
                 ALittleGuess preType = reference.guessPreType();
                 if (!(preType instanceof ALittleGuessFunctor)) {
                     return null;
                 }
-                ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
+                ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor) preType;
                 if (preTypeFunctor.param_name_list.isEmpty()) {
                     return null;
                 }
@@ -72,7 +72,7 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<PsiElem
                 ALittleGuess guess = customType.guessType();
 
                 if (guess instanceof ALittleGuessClassTemplate) {
-                    ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate)guess;
+                    ALittleGuessClassTemplate guessClassTemplate = (ALittleGuessClassTemplate) guess;
                     if (guessClassTemplate.template_extends != null) {
                         guess = guessClassTemplate.template_extends;
                     }
@@ -83,8 +83,7 @@ public class ALittleParameterInfoHandler implements ParameterInfoHandler<PsiElem
                     ALittleClassBodyDec bodyDec = classDec.getClassBodyDec();
                     if (bodyDec == null) return null;
                     List<ALittleClassElementDec> elementDecList = bodyDec.getClassElementDecList();
-                    for (ALittleClassElementDec elementDec : elementDecList)
-                    {
+                    for (ALittleClassElementDec elementDec : elementDecList) {
                         ALittleClassCtorDec ctorDec = elementDec.getClassCtorDec();
                         if (ctorDec == null) continue;
 

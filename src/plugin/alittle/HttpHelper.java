@@ -15,8 +15,7 @@ public class HttpHelper {
 
     public static String Get(@NotNull String urlContent) {
         List<String> resultList = null;
-        try
-        {
+        try {
             URL url = new URL(urlContent);
             URLConnection urlConnection = url.openConnection();
             if (!(urlConnection instanceof HttpURLConnection)) {
@@ -27,10 +26,9 @@ public class HttpHelper {
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             resultList = new ArrayList<>();
             String current;
-            while((current = in.readLine()) != null)
+            while ((current = in.readLine()) != null)
                 resultList.add(current);
-        }
-        catch(Exception ignored) {
+        } catch (Exception ignored) {
         }
 
         if (resultList == null) return null;
@@ -40,8 +38,7 @@ public class HttpHelper {
     public static String Post(@NotNull String urlContent, @NotNull String content) {
 
         List<String> resultList = null;
-        try
-        {
+        try {
             URL url = new URL(urlContent);
             URLConnection urlConnection = url.openConnection();
             if (!(urlConnection instanceof HttpURLConnection)) {
@@ -57,11 +54,9 @@ public class HttpHelper {
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             resultList = new ArrayList<>();
             String current;
-            while((current = in.readLine()) != null)
+            while ((current = in.readLine()) != null)
                 resultList.add(current);
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -69,8 +64,7 @@ public class HttpHelper {
         return String.join("\n", resultList);
     }
 
-    public static String GetID()
-    {
+    public static String GetID() {
         if (ID != null) return ID;
 
         List<String> mac_list = new ArrayList<>();

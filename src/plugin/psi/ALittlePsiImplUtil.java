@@ -1,11 +1,13 @@
 package plugin.psi;
 
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleTreeChangeListener;
-import plugin.reference.*;
+import plugin.reference.ALittleReferenceInterface;
+import plugin.reference.ALittleReferenceOpUtil;
 
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class ALittlePsiImplUtil {
                     break;
                 }
             }
-            if (!isChanged) return  guessList;
+            if (!isChanged) return guessList;
         }
 
         ALittleReferenceInterface ref = ALittleReferenceOpUtil.create(element);

@@ -4,7 +4,8 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 
 public class ALittleGuessException extends Exception {
-    private @NotNull String mError;
+    private @NotNull
+    String mError;
     private PsiElement mElement;
 
     public ALittleGuessException(PsiElement element, @NotNull String error) {
@@ -13,10 +14,16 @@ public class ALittleGuessException extends Exception {
     }
 
     @NotNull
-    public String getError() { return mError; }
+    public String getError() {
+        return mError;
+    }
 
-    public PsiElement getElement() { return mElement; }
+    public PsiElement getElement() {
+        return mElement;
+    }
 
     @Override
-    public String getMessage() { return mError; }
+    public String getMessage() {
+        return mError;
+    }
 }

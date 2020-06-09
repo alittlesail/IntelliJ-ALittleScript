@@ -3,7 +3,6 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.ALittleClassGetterDec;
 import plugin.psi.ALittleClassSetterDec;
 
 public class ALittleClassSetterDecReference extends ALittleReference<ALittleClassSetterDec> {

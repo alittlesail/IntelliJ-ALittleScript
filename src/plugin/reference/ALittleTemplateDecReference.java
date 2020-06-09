@@ -28,5 +28,7 @@ public class ALittleTemplateDecReference extends ALittleReference<ALittleTemplat
     }
 
     @Override
-    public boolean multiGuessTypes() { return true; }
+    public boolean multiGuessTypes() {
+        return true;
+    }
 }

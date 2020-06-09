@@ -7,7 +7,8 @@ import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessBool;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.*;
+import plugin.psi.ALittleDoWhileCondition;
+import plugin.psi.ALittleValueStat;
 
 import java.util.List;
 

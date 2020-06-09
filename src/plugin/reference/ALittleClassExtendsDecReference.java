@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.ALittleClassElementDec;
 import plugin.psi.ALittleClassExtendsDec;
 import plugin.psi.ALittleClassNameDec;
 
@@ -30,8 +29,7 @@ public class ALittleClassExtendsDecReference extends ALittleReference<ALittleCla
     @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         ALittleClassNameDec class_name_dec = myElement.getClassNameDec();
-        if (class_name_dec == null)
-        {
+        if (class_name_dec == null) {
             return new ArrayList<>();
         }
 

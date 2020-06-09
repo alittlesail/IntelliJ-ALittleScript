@@ -4,13 +4,15 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPolyVariantReference;
+import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +54,9 @@ public abstract class ALittleReference<T extends PsiElement> extends PsiReferenc
     }
 
     @Override
-    public boolean multiGuessTypes() { return false; }
+    public boolean multiGuessTypes() {
+        return false;
+    }
 
     @NotNull
     @Override

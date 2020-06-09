@@ -1,7 +1,6 @@
 package plugin.guess;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 
@@ -32,42 +31,35 @@ public class ALittleGuessFunctor extends ALittleGuess {
     public boolean const_modifier = false;
     // 产生当前Functor的节点对象
     public PsiElement element;
-    public ALittleGuessFunctor(PsiElement p_element)
-    {
+
+    public ALittleGuessFunctor(PsiElement p_element) {
         is_register = PsiHelper.isRegister(p_element);
         element = p_element;
     }
 
     @Override
-    public boolean hasAny()
-    {
-        for (ALittleGuess guess : param_list)
-        {
+    public boolean hasAny() {
+        for (ALittleGuess guess : param_list) {
             if (guess.hasAny()) return true;
         }
-        for (ALittleGuess guess : return_list)
-        {
+        for (ALittleGuess guess : return_list) {
             if (guess.hasAny()) return true;
         }
         return false;
     }
 
     @Override
-    public PsiElement getElement()
-    {
+    public PsiElement getElement() {
         return element;
     }
 
     @Override
-    public boolean needReplace()
-    {
-        for (ALittleGuess guess : param_list)
-        {
+    public boolean needReplace() {
+        for (ALittleGuess guess : param_list) {
             if (guess.needReplace())
                 return true;
         }
-        for (ALittleGuess guess : return_list)
-        {
+        for (ALittleGuess guess : return_list) {
             if (guess.needReplace())
                 return true;
         }
@@ -75,15 +67,13 @@ public class ALittleGuessFunctor extends ALittleGuess {
     }
 
     @Override
-    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
-    {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map) {
         // 克隆一份
-        ALittleGuessFunctor new_guess = (ALittleGuessFunctor)clone();
+        ALittleGuessFunctor new_guess = (ALittleGuessFunctor) clone();
         // 清理参数列表，重新按模板替换
         new_guess.param_list.clear();
         new_guess.param_nullable_list.clear();
-        for (int i = 0; i < param_list.size(); ++i)
-        {
+        for (int i = 0; i < param_list.size(); ++i) {
             ALittleGuess guess = param_list.get(i);
             ALittleGuess replace = guess.replaceTemplate(fill_map);
             if (replace == null) return null;
@@ -95,8 +85,7 @@ public class ALittleGuessFunctor extends ALittleGuess {
         }
         // 清理返回值列表，重新按模板替换
         new_guess.return_list.clear();
-        for (ALittleGuess guess : return_list)
-        {
+        for (ALittleGuess guess : return_list) {
             ALittleGuess replace = guess.replaceTemplate(fill_map);
             if (replace == null) return null;
             new_guess.return_list.add(replace);
@@ -106,8 +95,7 @@ public class ALittleGuessFunctor extends ALittleGuess {
     }
 
     @Override
-    public ALittleGuess clone()
-    {
+    public ALittleGuess clone() {
         ALittleGuessFunctor guess = new ALittleGuessFunctor(element);
         guess.template_param_list.addAll(template_param_list);
         guess.param_list.addAll(param_list);
@@ -124,8 +112,7 @@ public class ALittleGuessFunctor extends ALittleGuess {
     }
 
     @Override
-    public void updateValue()
-    {
+    public void updateValue() {
         value = "Functor<";
 
         // proto和await修饰
@@ -136,18 +123,16 @@ public class ALittleGuessFunctor extends ALittleGuess {
         value += String.join(",", pre_list);
 
         // 模板参数列表
-        if (template_param_list.size() > 0)
-        {
+        if (template_param_list.size() > 0) {
             List<String> template_String_list = new ArrayList<>();
             for (ALittleGuess guess : template_param_list)
-            template_String_list.add(guess.getTotalValue());
+                template_String_list.add(guess.getTotalValue());
             value += "<" + String.join(",", template_String_list) + ">";
         }
 
         // 参数类型列表
         List<String> param_String_list = new ArrayList<>();
-        for (int i = 0; i < param_list.size(); ++i)
-        {
+        for (int i = 0; i < param_list.size(); ++i) {
             if (i < param_nullable_list.size() && param_nullable_list.get(i))
                 param_String_list.add("[Nullable] " + param_list.get(i).getValue());
             else
@@ -160,7 +145,7 @@ public class ALittleGuessFunctor extends ALittleGuess {
         // 返回值类型列表
         List<String> return_String_list = new ArrayList<>();
         for (ALittleGuess guess : return_list)
-        return_String_list.add(guess.getValue());
+            return_String_list.add(guess.getValue());
         if (return_tail != null)
             return_String_list.add(return_tail.getValue());
         if (return_String_list.size() > 0) value += ":";
@@ -170,15 +155,12 @@ public class ALittleGuessFunctor extends ALittleGuess {
     }
 
     @Override
-    public boolean isChanged()
-    {
-        for (ALittleGuess guess : param_list)
-        {
+    public boolean isChanged() {
+        for (ALittleGuess guess : param_list) {
             if (guess.isChanged())
                 return true;
         }
-        for (ALittleGuess guess : return_list)
-        {
+        for (ALittleGuess guess : return_list) {
             if (guess.isChanged())
                 return true;
         }

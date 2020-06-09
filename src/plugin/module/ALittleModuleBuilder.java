@@ -20,6 +20,7 @@ import java.util.List;
 
 public class ALittleModuleBuilder extends ModuleBuilder {
     private List<Pair<String, String>> mSourcePaths = null;
+
     @Override
     public void setupRootModel(@NotNull ModifiableRootModel model) throws ConfigurationException {
         ContentEntry contentEntry = this.doAddContentEntry(model);

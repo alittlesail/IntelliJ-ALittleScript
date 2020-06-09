@@ -1,16 +1,11 @@
 package plugin.reference;
 
-import com.intellij.execution.process.ConsoleHighlighter;
-import com.intellij.lang.annotation.Annotation;
-import com.intellij.lang.annotation.AnnotationHolder;
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.guess.ALittleGuessPrimitive;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
@@ -25,41 +20,27 @@ public class ALittleCoroutineStatReference extends ALittleReference<ALittleCorou
     public void checkError() throws ALittleGuessException {
         // 检查这次所在的函数必须要有await或者async修饰
         PsiElement parent = myElement;
-        while (parent != null)
-        {
-            if (parent instanceof ALittleNamespaceDec)
-            {
+        while (parent != null) {
+            if (parent instanceof ALittleNamespaceDec) {
                 break;
-            }
-                else if (parent instanceof ALittleClassCtorDec)
-            {
+            } else if (parent instanceof ALittleClassCtorDec) {
                 break;
-            }
-                else if (parent instanceof ALittleClassGetterDec)
-            {
+            } else if (parent instanceof ALittleClassGetterDec) {
                 break;
-            }
-                else if (parent instanceof ALittleClassSetterDec)
-            {
+            } else if (parent instanceof ALittleClassSetterDec) {
                 break;
-            }
-                else if (parent instanceof ALittleClassMethodDec)
-            {
-                List<ALittleModifier> modifier = ((ALittleClassElementDec)parent.getParent()).getModifierList();
+            } else if (parent instanceof ALittleClassMethodDec) {
+                List<ALittleModifier> modifier = ((ALittleClassElementDec) parent.getParent()).getModifierList();
                 if (PsiHelper.getCoroutineType(modifier).equals("await"))
                     return;
                 break;
-            }
-                else if (parent instanceof ALittleClassStaticDec)
-            {
-                List<ALittleModifier> modifier = ((ALittleClassElementDec)parent.getParent()).getModifierList();
+            } else if (parent instanceof ALittleClassStaticDec) {
+                List<ALittleModifier> modifier = ((ALittleClassElementDec) parent.getParent()).getModifierList();
                 if (PsiHelper.getCoroutineType(modifier).equals("await"))
                     return;
                 break;
-            }
-                else if (parent instanceof ALittleGlobalMethodDec)
-            {
-                List<ALittleModifier> modifier = ((ALittleNamespaceElementDec)parent.getParent()).getModifierList();
+            } else if (parent instanceof ALittleGlobalMethodDec) {
+                List<ALittleModifier> modifier = ((ALittleNamespaceElementDec) parent.getParent()).getModifierList();
                 if (PsiHelper.getCoroutineType(modifier).equals("await"))
                     return;
                 break;
@@ -67,7 +48,7 @@ public class ALittleCoroutineStatReference extends ALittleReference<ALittleCorou
             parent = parent.getParent();
         }
 
-        throw  new ALittleGuessException(myElement, "co关键字只能在await修饰的函数中使用");
+        throw new ALittleGuessException(myElement, "co关键字只能在await修饰的函数中使用");
     }
 
     @NotNull

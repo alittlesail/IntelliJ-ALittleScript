@@ -4,15 +4,17 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementResolveResult;
+import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.index.ALittleIndex;
 import plugin.index.ALittleTreeChangeListener;
-import plugin.psi.*;
+import plugin.psi.ALittleEnumDec;
+import plugin.psi.ALittleEnumNameDec;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ public class ALittleEnumNameDecReference extends ALittleReference<ALittleEnumNam
     @NotNull
     @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
-        return ((ALittleEnumDec)myElement.getParent()).guessTypes();
+        return ((ALittleEnumDec) myElement.getParent()).guessTypes();
     }
 
     @NotNull

@@ -4,6 +4,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.psi.*;
+
 import java.util.*;
 
 public class ALittleAccessData {
@@ -27,7 +28,7 @@ public class ALittleAccessData {
             type = PsiHelper.PsiElementType.ENUM_NAME;
         } else if (nameDec instanceof ALittleStructNameDec) {
             type = PsiHelper.PsiElementType.STRUCT_NAME;
-        } else if (nameDec instanceof  ALittleVarAssignNameDec) {
+        } else if (nameDec instanceof ALittleVarAssignNameDec) {
             type = PsiHelper.PsiElementType.INSTANCE_NAME;
         } else if (nameDec instanceof ALittleMethodNameDec) {
             type = PsiHelper.PsiElementType.GLOBAL_METHOD;
@@ -73,7 +74,7 @@ public class ALittleAccessData {
             type = PsiHelper.PsiElementType.ENUM_NAME;
         } else if (nameDec instanceof ALittleStructNameDec) {
             type = PsiHelper.PsiElementType.STRUCT_NAME;
-        } else if (nameDec instanceof  ALittleVarAssignNameDec) {
+        } else if (nameDec instanceof ALittleVarAssignNameDec) {
             type = PsiHelper.PsiElementType.INSTANCE_NAME;
         } else if (nameDec instanceof ALittleMethodNameDec) {
             type = PsiHelper.PsiElementType.GLOBAL_METHOD;

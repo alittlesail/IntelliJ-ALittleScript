@@ -9,13 +9,18 @@ import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.FileHelper;
 import plugin.alittle.PsiHelper;
-import plugin.guess.*;
+import plugin.guess.ALittleGuessException;
 import plugin.module.ALittleConfig;
-import plugin.psi.*;
+import plugin.psi.ALittleFile;
+import plugin.psi.ALittleNamespaceDec;
+import plugin.psi.ALittleNamespaceElementDec;
+import plugin.psi.ALittleNamespaceNameDec;
 import plugin.reference.ALittleReferenceInterface;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ALittleTranslation {
     // 当前文件命名域
@@ -33,8 +38,7 @@ public class ALittleTranslation {
     protected boolean m_is_define_relay = false;
 
     @NotNull
-    public static ALittleTranslation createTranslation(Project project)
-    {
+    public static ALittleTranslation createTranslation(Project project) {
         if (ALittleConfig.getConfig(project).getTargetLanguage().equals("Lua"))
             return new ALittleTranslationLua();
         else if (ALittleConfig.getConfig(project).getTargetLanguage().equals("JavaScript"))
@@ -42,8 +46,7 @@ public class ALittleTranslation {
         return new ALittleTranslation();
     }
 
-    protected void addRelay(PsiElement element)
-    {
+    protected void addRelay(PsiElement element) {
         if (element == null) return;
 
         String full_path = element.getContainingFile().getOriginalFile().getVirtualFile().getPath();
@@ -51,8 +54,7 @@ public class ALittleTranslation {
 
         if (PsiHelper.isRegister(element)) return;
 
-        if (m_is_define_relay)
-        {
+        if (m_is_define_relay) {
             m_define_rely.add(full_path);
             return;
         }
@@ -61,7 +63,7 @@ public class ALittleTranslation {
 
     // 检查语法错误
     private void checkErrorElement(PsiElement element, boolean fullCheck) throws ALittleGuessException {
-        for(PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
+        for (PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof PsiErrorElement) {
                 throw new ALittleGuessException(child, ((PsiErrorElement) child).getErrorDescription());
             }
@@ -78,8 +80,7 @@ public class ALittleTranslation {
         }
     }
 
-    public void generate(ALittleFile file, boolean full_check) throws ALittleGuessException
-    {
+    public void generate(ALittleFile file, boolean full_check) throws ALittleGuessException {
         // 获取命名域
         ALittleNamespaceDec namespace_dec = PsiHelper.getNamespaceDec(file);
         if (namespace_dec == null) throw new ALittleGuessException(null, "没有定义命名域 namespace");
@@ -128,13 +129,11 @@ public class ALittleTranslation {
         }
     }
 
-    protected String generateRoot(List<ALittleNamespaceElementDec> element_list) throws ALittleGuessException
-    {
-        throw  new ALittleGuessException(null, "未实现生成代码");
+    protected String generateRoot(List<ALittleNamespaceElementDec> element_list) throws ALittleGuessException {
+        throw new ALittleGuessException(null, "未实现生成代码");
     }
 
-    protected String getExt()
-    {
+    protected String getExt() {
         return "";
     }
 }

@@ -29,8 +29,7 @@ public class ALittleValueStatReference extends ALittleReference<ALittleValueStat
             return myElement.getBindStat().guessTypes();
         else if (myElement.getTcallStat() != null)
             return myElement.getTcallStat().guessTypes();
-        else if (myElement.getOp2Stat() != null)
-        {
+        else if (myElement.getOp2Stat() != null) {
             List<ALittleGuess> guess_list = new ArrayList<>();
             ALittleGuess guess = ALittleReferenceOpUtil.guessType(myElement.getOp2Stat());
             guess_list.add(guess);
@@ -46,13 +45,12 @@ public class ALittleValueStatReference extends ALittleReference<ALittleValueStat
         if (parent instanceof ALittleIfExpr
                 || parent instanceof ALittleElseIfExpr
                 || parent instanceof ALittleWhileExpr
-                || parent instanceof ALittleDoWhileExpr)
-        {
+                || parent instanceof ALittleDoWhileExpr) {
             List<ALittleGuess> guess_list = myElement.guessTypes();
             if (guess_list.size() == 0) return;
 
             if (!(guess_list.get(0) instanceof ALittleGuessBool) && !guess_list.get(0).getValue().equals("null"))
-            throw new ALittleGuessException(myElement, "条件语句中的表达式的类型必须是bool或者null");
+                throw new ALittleGuessException(myElement, "条件语句中的表达式的类型必须是bool或者null");
         }
     }
 }

@@ -5,7 +5,10 @@ import com.intellij.psi.PsiElement;
 import groovy.lang.Tuple2;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
-import plugin.guess.*;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
+import plugin.guess.ALittleGuessParamTail;
+import plugin.guess.ALittleGuessReturnTail;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -25,44 +28,34 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
     @Override
     public void checkError() throws ALittleGuessException {
         PsiElement parent = null;
-        if (myElement.getReturnYield() != null)
-        {
+        if (myElement.getReturnYield() != null) {
             // 对于ReturnYield就不需要做返回值检查
             // 对所在函数进行检查，必须要有async和await表示
             // 获取对应的函数对象
             PsiElement element = null;
 
             parent = myElement;
-            while (parent != null)
-            {
-                if (parent instanceof ALittleClassMethodDec)
-                {
-                    ALittleClassMethodDec method_dec = (ALittleClassMethodDec)parent;
-                    List<ALittleModifier> modifier = ((ALittleClassElementDec)method_dec.getParent()).getModifierList();
-                    if (PsiHelper.getCoroutineType(modifier) == null)
-                    {
+            while (parent != null) {
+                if (parent instanceof ALittleClassMethodDec) {
+                    ALittleClassMethodDec method_dec = (ALittleClassMethodDec) parent;
+                    List<ALittleModifier> modifier = ((ALittleClassElementDec) method_dec.getParent()).getModifierList();
+                    if (PsiHelper.getCoroutineType(modifier) == null) {
                         element = method_dec.getMethodNameDec();
                         if (element == null) element = method_dec;
                     }
                     break;
-                }
-                    else if (parent instanceof ALittleClassStaticDec)
-                {
-                    ALittleClassStaticDec method_dec = (ALittleClassStaticDec)parent;
-                    List<ALittleModifier> modifier = ((ALittleClassElementDec)method_dec.getParent()).getModifierList();
-                    if (PsiHelper.getCoroutineType(modifier) == null)
-                    {
+                } else if (parent instanceof ALittleClassStaticDec) {
+                    ALittleClassStaticDec method_dec = (ALittleClassStaticDec) parent;
+                    List<ALittleModifier> modifier = ((ALittleClassElementDec) method_dec.getParent()).getModifierList();
+                    if (PsiHelper.getCoroutineType(modifier) == null) {
                         element = method_dec.getMethodNameDec();
                         if (element == null) element = method_dec;
                     }
                     break;
-                }
-                    else if (parent instanceof ALittleGlobalMethodDec)
-                {
-                    ALittleGlobalMethodDec method_dec = (ALittleGlobalMethodDec)parent;
-                    List<ALittleModifier> modifier = ((ALittleNamespaceElementDec)method_dec.getParent()).getModifierList();
-                    if (PsiHelper.getCoroutineType(modifier) == null)
-                    {
+                } else if (parent instanceof ALittleGlobalMethodDec) {
+                    ALittleGlobalMethodDec method_dec = (ALittleGlobalMethodDec) parent;
+                    List<ALittleModifier> modifier = ((ALittleNamespaceElementDec) method_dec.getParent()).getModifierList();
+                    if (PsiHelper.getCoroutineType(modifier) == null) {
                         element = method_dec.getMethodNameDec();
                         if (element == null) element = method_dec;
                     }
@@ -83,30 +76,22 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
 
         // 获取对应的函数对象
         parent = myElement;
-        while (parent != null)
-        {
-            if (parent instanceof ALittleClassGetterDec)
-            {
-                ALittleClassGetterDec getterDec = (ALittleClassGetterDec)parent;
+        while (parent != null) {
+            if (parent instanceof ALittleClassGetterDec) {
+                ALittleClassGetterDec getterDec = (ALittleClassGetterDec) parent;
                 return_type_list.clear();
                 ALittleAllType return_type_dec = getterDec.getAllType();
                 if (return_type_dec != null)
                     return_type_list.add(return_type_dec);
                 break;
-            }
-                else if (parent instanceof ALittleClassSetterDec)
-            {
+            } else if (parent instanceof ALittleClassSetterDec) {
                 break;
-            }
-                else if (parent instanceof ALittleClassMethodDec)
-            {
-                ALittleClassMethodDec method_dec = (ALittleClassMethodDec)parent;
+            } else if (parent instanceof ALittleClassMethodDec) {
+                ALittleClassMethodDec method_dec = (ALittleClassMethodDec) parent;
                 ALittleMethodReturnDec return_dec = method_dec.getMethodReturnDec();
-                if (return_dec != null)
-                {
+                if (return_dec != null) {
                     List<ALittleMethodReturnOneDec> return_one_list = return_dec.getMethodReturnOneDecList();
-                    for (ALittleMethodReturnOneDec return_one : return_one_list)
-                    {
+                    for (ALittleMethodReturnOneDec return_one : return_one_list) {
                         ALittleAllType all_type = return_one.getAllType();
                         if (all_type != null) return_type_list.add(all_type);
 
@@ -115,16 +100,12 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
                     }
                 }
                 break;
-            }
-                else if (parent instanceof ALittleClassStaticDec)
-            {
-                ALittleClassStaticDec method_dec = (ALittleClassStaticDec)parent;
+            } else if (parent instanceof ALittleClassStaticDec) {
+                ALittleClassStaticDec method_dec = (ALittleClassStaticDec) parent;
                 ALittleMethodReturnDec return_dec = method_dec.getMethodReturnDec();
-                if (return_dec != null)
-                {
+                if (return_dec != null) {
                     List<ALittleMethodReturnOneDec> return_one_list = return_dec.getMethodReturnOneDecList();
-                    for (ALittleMethodReturnOneDec return_one : return_one_list)
-                    {
+                    for (ALittleMethodReturnOneDec return_one : return_one_list) {
                         ALittleAllType all_type = return_one.getAllType();
                         if (all_type != null) return_type_list.add(all_type);
 
@@ -133,16 +114,12 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
                     }
                 }
                 break;
-            }
-                else if (parent instanceof ALittleGlobalMethodDec)
-            {
-                ALittleGlobalMethodDec method_dec = (ALittleGlobalMethodDec)parent;
+            } else if (parent instanceof ALittleGlobalMethodDec) {
+                ALittleGlobalMethodDec method_dec = (ALittleGlobalMethodDec) parent;
                 ALittleMethodReturnDec return_dec = method_dec.getMethodReturnDec();
-                if (return_dec != null)
-                {
+                if (return_dec != null) {
                     List<ALittleMethodReturnOneDec> return_one_list = return_dec.getMethodReturnOneDecList();
-                    for (ALittleMethodReturnOneDec return_one : return_one_list)
-                    {
+                    for (ALittleMethodReturnOneDec return_one : return_one_list) {
                         ALittleAllType all_type = return_one.getAllType();
                         if (all_type != null) return_type_list.add(all_type);
 
@@ -159,68 +136,51 @@ public class ALittleReturnExprReference extends ALittleReference<ALittleReturnEx
         // 参数的类型
         List<ALittleGuess> guess_list = null;
         // 如果返回值只有一个函数调用
-        if (value_stat_list.size() == 1 && (return_type_list.size() > 1 || return_tail_dec != null))
-        {
+        if (value_stat_list.size() == 1 && (return_type_list.size() > 1 || return_tail_dec != null)) {
             ALittleValueStat value_stat = value_stat_list.get(0);
             guess_list = value_stat.guessTypes();
             boolean has_value_tail = guess_list.size() > 0
                     && guess_list.get(guess_list.size() - 1) instanceof ALittleGuessReturnTail;
 
-            if (return_tail_dec == null)
-            {
-                if (has_value_tail)
-                {
+            if (return_tail_dec == null) {
+                if (has_value_tail) {
                     if (guess_list.size() < return_type_list.size() - 1)
                         throw new ALittleGuessException(myElement, "return的函数调用的返回值数量超过函数定义的返回值数量");
-                }
-                else
-                {
+                } else {
                     if (guess_list.size() != return_type_list.size())
                         throw new ALittleGuessException(myElement, "return的函数调用的返回值数量和函数定义的返回值数量不相等");
                 }
-            }
-            else
-            {
-                if (has_value_tail)
-                {
+            } else {
+                if (has_value_tail) {
                     // 不用检查
-                }
-                else
-                {
+                } else {
                     if (guess_list.size() < return_type_list.size())
                         throw new ALittleGuessException(myElement, "return的函数调用的返回值数量少于函数定义的返回值数量");
                 }
             }
-        }
-        else
-        {
-            if (return_tail_dec == null)
-            {
+        } else {
+            if (return_tail_dec == null) {
                 if (value_stat_list.size() != return_type_list.size())
                     throw new ALittleGuessException(myElement, "return的返回值数量和函数定义的返回值数量不相等");
-            }
-            else
-            {
+            } else {
                 if (value_stat_list.size() < return_type_list.size())
                     throw new ALittleGuessException(myElement, "return的返回值数量少于函数定义的返回值数量");
             }
             guess_list = new ArrayList<>();
-            for (ALittleValueStat value_stat : value_stat_list)
-            {
+            for (ALittleValueStat value_stat : value_stat_list) {
                 Tuple2<Integer, List<ALittleGuess>> result = PsiHelper.calcReturnCount(value_stat);
                 if (result.getFirst() != 1) throw new ALittleGuessException(value_stat, "表达式必须只能是一个返回值");
 
                 ALittleGuess guess = value_stat.guessType();
                 if (guess instanceof ALittleGuessParamTail)
-                throw new ALittleGuessException(value_stat, "return表达式不能返回\"...\"");
+                    throw new ALittleGuessException(value_stat, "return表达式不能返回\"...\"");
                 ALittleGuess value_stat_guess = value_stat.guessType();
                 guess_list.add(value_stat_guess);
             }
         }
 
         // 每个类型依次检查
-        for (int i = 0; i < guess_list.size(); ++i)
-        {
+        for (int i = 0; i < guess_list.size(); ++i) {
             ALittleValueStat target_value_stat = null;
             if (i < value_stat_list.size())
                 target_value_stat = value_stat_list.get(i);

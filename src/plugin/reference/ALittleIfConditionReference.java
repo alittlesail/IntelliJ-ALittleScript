@@ -7,7 +7,6 @@ import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessBool;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.ALittleElseIfCondition;
 import plugin.psi.ALittleIfCondition;
 import plugin.psi.ALittleValueStat;
 

@@ -39,7 +39,7 @@ public class BuildTargetAction extends AnAction {
             return;
         try {
             ALittleTranslation translation = ALittleTranslation.createTranslation(project);
-            translation.generate((ALittleFile)psi_file, true);
+            translation.generate((ALittleFile) psi_file, true);
         } catch (Exception e) {
             FileEditorManager.getInstance(psi_file.getProject()).openFile(psi_file.getVirtualFile(), true);
             throw e;

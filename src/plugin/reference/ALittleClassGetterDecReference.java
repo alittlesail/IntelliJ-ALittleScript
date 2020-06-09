@@ -2,15 +2,8 @@ package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
-import plugin.alittle.PsiHelper;
-import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.ALittleClassExtendsDec;
 import plugin.psi.ALittleClassGetterDec;
-import plugin.psi.ALittleClassNameDec;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ALittleClassGetterDecReference extends ALittleReference<ALittleClassGetterDec> {
     public ALittleClassGetterDecReference(@NotNull ALittleClassGetterDec element, TextRange textRange) {

@@ -3,9 +3,11 @@ package plugin.module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +17,8 @@ public class ALittleConfig {
     private final Project mProject;
     private final Set<String> mLanguageNameSet;
 
-    private @NotNull String mTargetLanguage = "";
+    private @NotNull
+    String mTargetLanguage = "";
 
     public ALittleConfig(Project project) {
         mProject = project;
@@ -67,6 +70,7 @@ public class ALittleConfig {
     public String getTargetLanguage() {
         return mTargetLanguage;
     }
+
     public void setTargetLanguage(@NotNull String value) {
         if (mTargetLanguage.equals(value)) return;
         mTargetLanguage = value;

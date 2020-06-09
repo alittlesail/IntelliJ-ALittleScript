@@ -4,13 +4,14 @@ import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementResolveResult;
+import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessPrimitive;
-import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -40,34 +41,33 @@ public class ALittlePropertyValueThisTypeReference extends ALittleReference<ALit
         mClassStaticDec = null;
 
         PsiElement parent = myElement;
-        while (true)
-        {
+        while (true) {
             if (parent == null) break;
 
             if (parent instanceof ALittleNamespaceDec) {
-            break;
-        } else if (parent instanceof ALittleClassDec) {
-            mClassDec = (ALittleClassDec)parent;
-            break;
-        } else if (parent instanceof ALittleClassCtorDec) {
-            mClassCtorDec = (ALittleClassCtorDec)parent;
-        } else if (parent instanceof ALittleClassGetterDec) {
-                mClassGetterDec = (ALittleClassGetterDec)parent;
-            List<ALittleModifier> modifier = ((ALittleClassElementDec)mClassGetterDec.getParent()).getModifierList();
-            mIsConst = PsiHelper.isConst(modifier);
-        } else if (parent instanceof ALittleClassSetterDec) {
-            mClassSetterDec = (ALittleClassSetterDec)parent;
-                List<ALittleModifier> modifier = ((ALittleClassElementDec)mClassSetterDec.getParent()).getModifierList();
-            mIsConst = PsiHelper.isConst(modifier);
-        } else if (parent instanceof ALittleClassMethodDec) {
-            mClassMethodDec = (ALittleClassMethodDec)parent;
-                List<ALittleModifier> modifier = ((ALittleClassElementDec)mClassMethodDec.getParent()).getModifierList();
-            mIsConst = PsiHelper.isConst(modifier);
-        } else if (parent instanceof ALittleClassStaticDec) {
-            mClassStaticDec = (ALittleClassStaticDec)parent;
-        } else if (parent instanceof ALittleGlobalMethodDec) {
-            mGlobalMethodDec = (ALittleGlobalMethodDec)parent;
-        }
+                break;
+            } else if (parent instanceof ALittleClassDec) {
+                mClassDec = (ALittleClassDec) parent;
+                break;
+            } else if (parent instanceof ALittleClassCtorDec) {
+                mClassCtorDec = (ALittleClassCtorDec) parent;
+            } else if (parent instanceof ALittleClassGetterDec) {
+                mClassGetterDec = (ALittleClassGetterDec) parent;
+                List<ALittleModifier> modifier = ((ALittleClassElementDec) mClassGetterDec.getParent()).getModifierList();
+                mIsConst = PsiHelper.isConst(modifier);
+            } else if (parent instanceof ALittleClassSetterDec) {
+                mClassSetterDec = (ALittleClassSetterDec) parent;
+                List<ALittleModifier> modifier = ((ALittleClassElementDec) mClassSetterDec.getParent()).getModifierList();
+                mIsConst = PsiHelper.isConst(modifier);
+            } else if (parent instanceof ALittleClassMethodDec) {
+                mClassMethodDec = (ALittleClassMethodDec) parent;
+                List<ALittleModifier> modifier = ((ALittleClassElementDec) mClassMethodDec.getParent()).getModifierList();
+                mIsConst = PsiHelper.isConst(modifier);
+            } else if (parent instanceof ALittleClassStaticDec) {
+                mClassStaticDec = (ALittleClassStaticDec) parent;
+            } else if (parent instanceof ALittleGlobalMethodDec) {
+                mGlobalMethodDec = (ALittleGlobalMethodDec) parent;
+            }
 
             parent = parent.getParent();
         }
@@ -80,21 +80,15 @@ public class ALittlePropertyValueThisTypeReference extends ALittleReference<ALit
         List<ALittleGuess> guess_list = new ArrayList<>();
 
         ResolveResult[] result_list = multiResolve(true);
-        for (ResolveResult resolve : result_list)
-        {
+        for (ResolveResult resolve : result_list) {
             PsiElement result = resolve.getElement();
-            if (result instanceof ALittleClassDec)
-            {
-                ALittleGuess guess = ((ALittleClassDec)result).guessType();
-                if (mIsConst && !guess.is_const)
-                {
-                    if (guess instanceof ALittleGuessPrimitive)
-                    {
+            if (result instanceof ALittleClassDec) {
+                ALittleGuess guess = ((ALittleClassDec) result).guessType();
+                if (mIsConst && !guess.is_const) {
+                    if (guess instanceof ALittleGuessPrimitive) {
                         guess = ALittleGuessPrimitive.sPrimitiveGuessMap.get("const " + guess.getValue());
                         if (guess == null) throw new ALittleGuessException(myElement, "找不到const " + guess.getValue());
-                    }
-                        else
-                    {
+                    } else {
                         guess = guess.clone();
                         guess.is_const = true;
                         guess.updateValue();

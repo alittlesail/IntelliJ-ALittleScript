@@ -2,7 +2,7 @@ package plugin.index;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import plugin.psi.*;
+import plugin.psi.ALittleStructVarDec;
 
 import java.util.HashMap;
 import java.util.List;

@@ -1,14 +1,12 @@
 package plugin.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleClassCtorDecReference extends ALittleReference<ALittleClassCtorDec> {
@@ -39,8 +37,7 @@ public class ALittleClassCtorDecReference extends ALittleReference<ALittleClassC
         if (extends_param_one_dec_list.size() > my_param_one_dec_list.size())
             throw new ALittleGuessException(my_method_param_dec, "该函数是从父类继承下来，但是子类的参数数量少于父类的构造函数");
 
-        for (int i = 0; i < extends_param_one_dec_list.size(); ++i)
-        {
+        for (int i = 0; i < extends_param_one_dec_list.size(); ++i) {
             ALittleMethodParamOneDec extends_one_dec = extends_param_one_dec_list.get(i);
             ALittleMethodParamNameDec extends_name_dec = extends_one_dec.getMethodParamNameDec();
             if (extends_name_dec == null) throw new ALittleGuessException(my_method_param_dec, "该函数是从父类继承下来，但是定义不一致");

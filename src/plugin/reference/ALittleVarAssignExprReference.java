@@ -3,12 +3,12 @@ package plugin.reference;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessClassTemplate;
 import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessReturnTail;
-import plugin.psi.*;
+import plugin.psi.ALittleValueStat;
+import plugin.psi.ALittleVarAssignDec;
+import plugin.psi.ALittleVarAssignExpr;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleVarAssignExprReference extends ALittleReference<ALittleVarAssignExpr> {
@@ -25,25 +25,20 @@ public class ALittleVarAssignExprReference extends ALittleReference<ALittleVarAs
         if (pair_dec_list.size() == 0) return;
 
         // 如果返回值只有一个函数调用
-        if (pair_dec_list.size() > 1)
-        {
+        if (pair_dec_list.size() > 1) {
             // 获取右边表达式的
             List<ALittleGuess> method_call_guess_list = value_stat.guessTypes();
             if (method_call_guess_list.size() == 0)
                 throw new ALittleGuessException(value_stat, "调用的函数没有返回值");
             boolean has_tail = method_call_guess_list.get(method_call_guess_list.size() - 1) instanceof ALittleGuessReturnTail;
-            if (has_tail)
-            {
+            if (has_tail) {
                 // 不需要检查
-            }
-            else
-            {
+            } else {
                 if (method_call_guess_list.size() < pair_dec_list.size())
                     throw new ALittleGuessException(value_stat, "调用的函数返回值数量少于定义的变量数量");
             }
 
-            for (int i = 0; i < pair_dec_list.size(); ++i)
-            {
+            for (int i = 0; i < pair_dec_list.size(); ++i) {
                 ALittleVarAssignDec pair_dec = pair_dec_list.get(i);
                 if (i >= method_call_guess_list.size()) break;
                 if (method_call_guess_list.get(i) instanceof ALittleGuessReturnTail) break;

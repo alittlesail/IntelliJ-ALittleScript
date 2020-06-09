@@ -1,7 +1,6 @@
 package plugin.guess;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.ALittleEnumNameDec;
@@ -17,8 +16,7 @@ public class ALittleGuessEnumName extends ALittleGuess {
     public ALittleEnumNameDec enum_name_dec;
 
     public ALittleGuessEnumName(String p_namespace_name, String p_enum_name
-            , ALittleEnumNameDec p_enum_name_dec)
-    {
+            , ALittleEnumNameDec p_enum_name_dec) {
         is_register = PsiHelper.isRegister(p_enum_name_dec);
         namespace_name = p_namespace_name;
         enum_name = p_enum_name;
@@ -26,40 +24,34 @@ public class ALittleGuessEnumName extends ALittleGuess {
     }
 
     @Override
-    public PsiElement getElement()
-    {
+    public PsiElement getElement() {
         return enum_name_dec;
     }
 
     @Override
-    public boolean needReplace()
-    {
+    public boolean needReplace() {
         return false;
     }
 
     @Override
-    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
-    {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map) {
         return this;
     }
 
     @Override
-    public ALittleGuess clone()
-    {
+    public ALittleGuess clone() {
         ALittleGuessEnumName guess = new ALittleGuessEnumName(namespace_name, enum_name, enum_name_dec);
         guess.updateValue();
         return guess;
     }
 
     @Override
-    public void updateValue()
-    {
+    public void updateValue() {
         value = namespace_name + "." + enum_name;
     }
 
     @Override
-    public boolean isChanged()
-    {
+    public boolean isChanged() {
         return ALittleTreeChangeListener.getGuessTypeList(enum_name_dec) == null;
     }
 }

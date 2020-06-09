@@ -8,12 +8,10 @@ import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessConst;
 import plugin.guess.ALittleGuessException;
 import plugin.guess.ALittleGuessPrimitive;
 import plugin.psi.ALittleConstValue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleConstValueReference extends ALittleReference<ALittleConstValue> {
@@ -26,27 +24,18 @@ public class ALittleConstValueReference extends ALittleReference<ALittleConstVal
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         String text = myElement.getText();
 
-        if (myElement.getNumberContent() != null)
-        {
+        if (myElement.getNumberContent() != null) {
             if (PsiHelper.isInt(myElement.getNumberContent().getText()))
                 return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("int");
             else
                 return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("double");
-        }
-        else if (myElement.getTextContent() != null)
-        {
+        } else if (myElement.getTextContent() != null) {
             return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("string");
-        }
-        else if (text.equals("true") || text.equals("false"))
-        {
+        } else if (text.equals("true") || text.equals("false")) {
             return ALittleGuessPrimitive.sPrimitiveGuessListMap.get("bool");
-        }
-        else if (text.equals("null"))
-        {
+        } else if (text.equals("null")) {
             return ALittleGuessPrimitive.sConstNullGuess;
-        }
-        else
-        {
+        } else {
             throw new ALittleGuessException(myElement, "未知的常量类型:" + text);
         }
     }

@@ -31,21 +31,19 @@ public class ALittleMethodParamTailDecReference extends ALittleReference<ALittle
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleMethodParamDec) return;
 
-        while (parent != null)
-        {
+        while (parent != null) {
             ALittleMethodParamDec param_dec = null;
             if (parent instanceof ALittleClassMethodDec) {
-            param_dec = ((ALittleClassMethodDec)parent).getMethodParamDec();
-        } else if (parent instanceof ALittleClassStaticDec) {
-            param_dec = ((ALittleClassStaticDec)parent).getMethodParamDec();
-        } else if (parent instanceof ALittleClassCtorDec) {
-            param_dec = ((ALittleClassCtorDec)parent).getMethodParamDec();
-        } else if (parent instanceof ALittleGlobalMethodDec) {
-            param_dec = ((ALittleGlobalMethodDec)parent).getMethodParamDec();
-        }
+                param_dec = ((ALittleClassMethodDec) parent).getMethodParamDec();
+            } else if (parent instanceof ALittleClassStaticDec) {
+                param_dec = ((ALittleClassStaticDec) parent).getMethodParamDec();
+            } else if (parent instanceof ALittleClassCtorDec) {
+                param_dec = ((ALittleClassCtorDec) parent).getMethodParamDec();
+            } else if (parent instanceof ALittleGlobalMethodDec) {
+                param_dec = ((ALittleGlobalMethodDec) parent).getMethodParamDec();
+            }
 
-            if (param_dec != null)
-            {
+            if (param_dec != null) {
                 List<ALittleMethodParamOneDec> param_one_list = param_dec.getMethodParamOneDecList();
                 if (param_one_list.size() == 0)
                     throw new ALittleGuessException(myElement, "参数占位符未定义");

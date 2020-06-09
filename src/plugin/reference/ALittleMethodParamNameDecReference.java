@@ -8,7 +8,9 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.*;
+import plugin.psi.ALittleAllType;
+import plugin.psi.ALittleMethodParamNameDec;
+import plugin.psi.ALittleMethodParamOneDec;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +24,8 @@ public class ALittleMethodParamNameDecReference extends ALittleReference<ALittle
     @Override
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
-        ALittleMethodParamOneDec one_dec = (ALittleMethodParamOneDec)parent;
-        if (one_dec != null)
-        {
+        ALittleMethodParamOneDec one_dec = (ALittleMethodParamOneDec) parent;
+        if (one_dec != null) {
             ALittleAllType all_type = one_dec.getAllType();
             if (all_type != null)
                 return all_type.guessTypes();

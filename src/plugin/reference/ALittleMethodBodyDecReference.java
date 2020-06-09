@@ -4,7 +4,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
-import plugin.guess.*;
+import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 
 import java.util.ArrayList;
@@ -17,43 +18,31 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
 
     // 检查表达式是否有return
     public static boolean checkAllExpr(@NotNull List<ALittleGuess> return_list, @NotNull ALittleAllExpr all_expr) throws ALittleGuessException {
-        if (all_expr.getIfExpr() != null)
-        {
-                ALittleIfExpr if_expr = all_expr.getIfExpr();
+        if (all_expr.getIfExpr() != null) {
+            ALittleIfExpr if_expr = all_expr.getIfExpr();
             ALittleAllExpr sub_all_expr = if_expr.getAllExpr();
             ALittleIfBody if_body = if_expr.getIfBody();
-            if (sub_all_expr != null)
-            {
+            if (sub_all_expr != null) {
                 boolean sub_result = checkAllExpr(return_list, sub_all_expr);
                 if (!sub_result) return false;
-            }
-            else if (if_body != null)
-            {
+            } else if (if_body != null) {
                 boolean sub_result = checkAllExprList(return_list, if_body.getAllExprList());
                 if (!sub_result) return false;
-            }
-            else
-            {
+            } else {
                 return false;
             }
 
             List<ALittleElseIfExpr> else_if_expr_list = if_expr.getElseIfExprList();
-            for (ALittleElseIfExpr else_if_expr : else_if_expr_list)
-            {
+            for (ALittleElseIfExpr else_if_expr : else_if_expr_list) {
                 sub_all_expr = else_if_expr.getAllExpr();
                 ALittleElseIfBody else_if_body = else_if_expr.getElseIfBody();
-                if (sub_all_expr != null)
-                {
+                if (sub_all_expr != null) {
                     boolean sub_result = checkAllExpr(return_list, sub_all_expr);
                     if (!sub_result) return false;
-                }
-                else if (else_if_body != null)
-                {
+                } else if (else_if_body != null) {
                     boolean sub_result = checkAllExprList(return_list, else_if_body.getAllExprList());
                     if (!sub_result) return false;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
             }
@@ -97,8 +86,7 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
                 return guess_list;
         }
 */
-        if (all_expr.getDoWhileExpr() != null)
-        {
+        if (all_expr.getDoWhileExpr() != null) {
             ALittleDoWhileExpr do_while_expr = all_expr.getDoWhileExpr();
             ALittleDoWhileBody do_while_body = do_while_expr.getDoWhileBody();
             if (do_while_body != null)
@@ -107,19 +95,16 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
                 return false;
         }
 
-        if (all_expr.getReturnExpr() != null)
-        {
+        if (all_expr.getReturnExpr() != null) {
             return true;
         }
 
-        if (all_expr.getWrapExpr() != null)
-        {
+        if (all_expr.getWrapExpr() != null) {
             ALittleWrapExpr wrap_expr = all_expr.getWrapExpr();
             return checkAllExprList(return_list, wrap_expr.getAllExprList());
         }
 
-        if (all_expr.getThrowExpr() != null)
-        {
+        if (all_expr.getThrowExpr() != null) {
             return true;
         }
 
@@ -130,15 +115,13 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
     public static boolean checkAllExprList(@NotNull List<ALittleGuess> return_list, @NotNull List<ALittleAllExpr> all_expr_list) throws ALittleGuessException {
         // 如果没有就检查子表达式
         int index = -1;
-        for (int i = 0; i < all_expr_list.size(); ++i)
-        {
+        for (int i = 0; i < all_expr_list.size(); ++i) {
             ALittleAllExpr all_expr = all_expr_list.get(i);
             if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
 
             boolean sub_result = checkAllExpr(return_list, all_expr_list.get(i));
-            if (sub_result)
-            {
+            if (sub_result) {
                 index = i;
                 break;
             }
@@ -146,8 +129,7 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
         if (index == -1)
             return false;
 
-        for (int i = index + 1; i < all_expr_list.size(); ++i)
-        {
+        for (int i = index + 1; i < all_expr_list.size(); ++i) {
             ALittleAllExpr all_expr = all_expr_list.get(i);
             if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
@@ -162,8 +144,7 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
             , @NotNull ALittleMethodNameDec method_name_dec
             , @NotNull ALittleMethodBodyDec method_body_dec) throws ALittleGuessException {
         // 检查return
-        if (return_list.size() > 0 && !PsiHelper.isRegister(method_name_dec))
-        {
+        if (return_list.size() > 0 && !PsiHelper.isRegister(method_name_dec)) {
             List<ALittleAllExpr> all_expr_list = method_body_dec.getAllExprList();
             boolean result = checkAllExprList(return_list, all_expr_list);
             if (!result)
@@ -174,7 +155,7 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
     @Override
     public void checkError() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
-        
+
         if (parent instanceof ALittleClassCtorDec) return;
         if (parent instanceof ALittleClassSetterDec) return;
 
@@ -182,9 +163,8 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
         ALittleMethodReturnDec return_dec = null;
         ALittleMethodNameDec name_dec = null;
 
-        if (parent instanceof ALittleClassGetterDec)
-        {
-            ALittleClassGetterDec getter_dec = (ALittleClassGetterDec)parent;
+        if (parent instanceof ALittleClassGetterDec) {
+            ALittleClassGetterDec getter_dec = (ALittleClassGetterDec) parent;
             name_dec = getter_dec.getMethodNameDec();
             if (name_dec == null) return;
 
@@ -196,24 +176,22 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
             return;
         }
 
-        if (parent instanceof ALittleClassMethodDec)
-        {
-            ALittleClassMethodDec method_dec = (ALittleClassMethodDec)parent;
+        if (parent instanceof ALittleClassMethodDec) {
+            ALittleClassMethodDec method_dec = (ALittleClassMethodDec) parent;
             name_dec = method_dec.getMethodNameDec();
             if (name_dec == null) return;
             return_dec = method_dec.getMethodReturnDec();
         }
 
-        if (parent instanceof ALittleClassStaticDec)
-        {
-            ALittleClassStaticDec static_dec = (ALittleClassStaticDec)parent;
+        if (parent instanceof ALittleClassStaticDec) {
+            ALittleClassStaticDec static_dec = (ALittleClassStaticDec) parent;
             name_dec = static_dec.getMethodNameDec();
             if (name_dec == null) return;
             return_dec = static_dec.getMethodReturnDec();
         }
 
         if (parent instanceof ALittleGlobalMethodDec) {
-            ALittleGlobalMethodDec global_method_dec = (ALittleGlobalMethodDec)parent;
+            ALittleGlobalMethodDec global_method_dec = (ALittleGlobalMethodDec) parent;
             name_dec = global_method_dec.getMethodNameDec();
             if (name_dec == null) return;
             return_dec = global_method_dec.getMethodReturnDec();
@@ -221,21 +199,16 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
 
         if (name_dec == null) return;
 
-        if (return_dec != null)
-        {
+        if (return_dec != null) {
             List<ALittleMethodReturnOneDec> return_one_list = return_dec.getMethodReturnOneDecList();
-            for (int i = 0; i < return_one_list.size(); ++i)
-            {
+            for (int i = 0; i < return_one_list.size(); ++i) {
                 ALittleMethodReturnOneDec return_one = return_one_list.get(i);
                 ALittleAllType all_type = return_one.getAllType();
                 ALittleMethodReturnTailDec return_tail = return_one.getMethodReturnTailDec();
-                if (all_type != null)
-                {
+                if (all_type != null) {
                     ALittleGuess all_type_guess = all_type.guessType();
                     return_list.add(all_type_guess);
-                }
-                else if (return_tail != null)
-                {
+                } else if (return_tail != null) {
                     if (i + 1 != return_one_list.size())
                         throw new ALittleGuessException(return_one, "返回值占位符必须定义在最后");
                     ALittleGuess return_tail_guess = return_tail.guessType();

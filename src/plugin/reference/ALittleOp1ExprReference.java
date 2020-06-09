@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
-import plugin.psi.ALittleNamespaceElementDec;
 import plugin.psi.ALittleOp1Expr;
 import plugin.psi.ALittleValueStat;
 

@@ -8,7 +8,7 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuessException;
 import plugin.module.ALittleConfig;
-import plugin.psi.*;
+import plugin.psi.ALittleLanguageNameDec;
 
 import java.util.ArrayList;
 import java.util.List;

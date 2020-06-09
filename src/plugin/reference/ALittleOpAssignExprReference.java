@@ -7,7 +7,6 @@ import plugin.alittle.PsiHelper;
 import plugin.guess.*;
 import plugin.psi.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssignExpr> {
@@ -19,8 +18,7 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
     public void checkError() throws ALittleGuessException {
         List<ALittlePropertyValue> property_value_list = myElement.getPropertyValueList();
         ALittleValueStat value_stat = myElement.getValueStat();
-        if (value_stat == null)
-        {
+        if (value_stat == null) {
             if (property_value_list.size() != 1)
                 throw new ALittleGuessException(myElement, "没有赋值表达式时，只能是一个函数调用");
             ALittlePropertyValue property_value = property_value_list.get(0);
@@ -36,8 +34,7 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
         if (property_value_list.size() == 0) return;
 
         // 如果返回值只有一个函数调用
-        if (property_value_list.size() > 1)
-        {
+        if (property_value_list.size() > 1) {
             if (value_stat == null)
                 throw new ALittleGuessException(myElement, "调用的函数没有返回值");
             // 获取右边表达式的
@@ -46,18 +43,14 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
                 throw new ALittleGuessException(value_stat, "调用的函数没有返回值");
 
             boolean hasTail = method_call_guess_list.get(method_call_guess_list.size() - 1) instanceof ALittleGuessReturnTail;
-            if (hasTail)
-            {
+            if (hasTail) {
                 // 不做检查
-            }
-            else
-            {
+            } else {
                 if (method_call_guess_list.size() < property_value_list.size())
                     throw new ALittleGuessException(value_stat, "调用的函数返回值数量少于定义的变量数量");
             }
 
-            for (int i = 0; i < property_value_list.size(); ++i)
-            {
+            for (int i = 0; i < property_value_list.size(); ++i) {
                 ALittlePropertyValue pair_dec = property_value_list.get(i);
                 if (i >= method_call_guess_list.size()) break;
                 if (method_call_guess_list.get(i) instanceof ALittleGuessReturnTail) break;
@@ -79,22 +72,18 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
 
         ALittleGuess pair_guess = property_value_list.get(0).guessType();
         ALittleGuess value_guess = value_stat.guessType();
-        if (pair_guess instanceof ALittleGuessTemplate)
-        {
+        if (pair_guess instanceof ALittleGuessTemplate) {
             if (!pair_guess.getValue().equals(value_guess.getValue()) && !value_guess.getValue().equals("null"))
                 throw new ALittleGuessException(value_stat, "等号左边的变量和表达式的类型不同");
         }
 
-        if (op_string.equals("="))
-        {
+        if (op_string.equals("=")) {
             try {
                 ALittleReferenceOpUtil.guessTypeEqual(pair_guess, value_stat, value_guess, true, false);
             } catch (ALittleGuessException error) {
                 throw new ALittleGuessException(error.getElement(), "等号左边的变量和表达式的类型不同:" + error.getError());
             }
-        }
-        else
-        {
+        } else {
             Tuple2<Integer, List<ALittleGuess>> result = PsiHelper.calcReturnCount(value_stat);
 
             if (result.getFirst() != 1)
@@ -104,10 +93,10 @@ public class ALittleOpAssignExprReference extends ALittleReference<ALittleOpAssi
                 throw new ALittleGuessException(property_value_list.get(0), "const类型不能使用" + op_string + "运算符");
 
             if (!(pair_guess instanceof ALittleGuessInt) && !(pair_guess instanceof ALittleGuessDouble) && !(pair_guess instanceof ALittleGuessLong))
-            throw new ALittleGuessException(property_value_list.get(0), op_string + "左边必须是int, double, long");
+                throw new ALittleGuessException(property_value_list.get(0), op_string + "左边必须是int, double, long");
 
             if (!(value_guess instanceof ALittleGuessInt) && !(value_guess instanceof ALittleGuessDouble) && !(value_guess instanceof ALittleGuessLong))
-            throw new ALittleGuessException(value_stat, op_string + "右边必须是int, double, long");
+                throw new ALittleGuessException(value_stat, op_string + "右边必须是int, double, long");
         }
     }
 }

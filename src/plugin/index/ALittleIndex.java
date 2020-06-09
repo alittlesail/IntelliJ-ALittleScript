@@ -6,7 +6,9 @@ import com.intellij.openapi.project.ModuleListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
@@ -40,9 +42,9 @@ public class ALittleIndex {
     boolean mReloaded = false;          // 是否加载完成
 
     // Csv数据联动
-    protected Map<String, HashSet<ALittleStructDec>>  mCsvStructSet; // 收集csv路径对应的struct集合
+    protected Map<String, HashSet<ALittleStructDec>> mCsvStructSet; // 收集csv路径对应的struct集合
     // Mysql数据联动
-    protected Map<String, HashSet<ALittleStructDec>>  mMysqlStructSet; // 收集mysql路径对应的struct集合
+    protected Map<String, HashSet<ALittleStructDec>> mMysqlStructSet; // 收集mysql路径对应的struct集合
 
     public ALittleIndex(Project project) {
         mProject = project;
@@ -72,9 +74,9 @@ public class ALittleIndex {
             PsiFile psi_file = psi_mgr.findFile(root);
             if (psi_file instanceof ALittleFile) {
                 List<ALittleNamespaceDec> namespaceDecList = new ArrayList<>();
-                for(PsiElement child = psi_file.getFirstChild(); child != null; child = child.getNextSibling()) {
+                for (PsiElement child = psi_file.getFirstChild(); child != null; child = child.getNextSibling()) {
                     if (child instanceof ALittleNamespaceDec) {
-                        namespaceDecList.add((ALittleNamespaceDec)child);
+                        namespaceDecList.add((ALittleNamespaceDec) child);
                     }
                 }
                 for (ALittleNamespaceDec namespaceDec : namespaceDecList) {
@@ -242,7 +244,7 @@ public class ALittleIndex {
         ALittleAccessData namespaceAccessData = mNamespaceAccessMap.computeIfAbsent(namespaceName, k -> new ALittleAccessData());
         ALittleAccessData fileAccessData = mFileAccessMap.computeIfAbsent(element.getContainingFile().getOriginalFile(), k -> new ALittleAccessData());
 
-        ALittleNamespaceDec namespaceDec = (ALittleNamespaceDec)element.getParent();
+        ALittleNamespaceDec namespaceDec = (ALittleNamespaceDec) element.getParent();
         List<ALittleNamespaceElementDec> elementDecList = namespaceDec.getNamespaceElementDecList();
         for (ALittleNamespaceElementDec elementDec : elementDecList) {
             // 添加类
@@ -264,7 +266,7 @@ public class ALittleIndex {
                 } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
                     fileAccessData.addNameDec(nameDec);
                 }
-            // 添加枚举
+                // 添加枚举
             } else if (elementDec.getEnumDec() != null) {
                 ALittleEnumDec dec = elementDec.getEnumDec();
                 ALittleEnumNameDec nameDec = dec.getEnumNameDec();
@@ -283,7 +285,7 @@ public class ALittleIndex {
                 } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
                     fileAccessData.addNameDec(nameDec);
                 }
-            // 添加结构体
+                // 添加结构体
             } else if (elementDec.getStructDec() != null) {
                 ALittleStructDec dec = elementDec.getStructDec();
                 ALittleStructNameDec nameDec = dec.getStructNameDec();
@@ -301,7 +303,7 @@ public class ALittleIndex {
                 } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
                     fileAccessData.addNameDec(nameDec);
                 }
-            // 添加全局函数
+                // 添加全局函数
             } else if (elementDec.getGlobalMethodDec() != null) {
                 ALittleGlobalMethodDec dec = elementDec.getGlobalMethodDec();
                 ALittleMethodNameDec nameDec = dec.getMethodNameDec();
@@ -318,7 +320,7 @@ public class ALittleIndex {
                 } else if (accessType == PsiHelper.ClassAccessType.PRIVATE) {
                     fileAccessData.addNameDec(nameDec);
                 }
-            // 添加单例
+                // 添加单例
             } else if (elementDec.getInstanceDec() != null) {
                 ALittleInstanceDec dec = elementDec.getInstanceDec();
                 PsiHelper.ClassAccessType accessType = PsiHelper.calcAccessType(elementDec.getModifierList());
@@ -338,7 +340,7 @@ public class ALittleIndex {
                         fileAccessData.addNameDec(nameDec);
                     }
                 }
-            // 添加using
+                // 添加using
             } else if (elementDec.getUsingDec() != null) {
                 ALittleUsingDec dec = elementDec.getUsingDec();
                 ALittleUsingNameDec nameDec = dec.getUsingNameDec();

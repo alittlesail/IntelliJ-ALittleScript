@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.ALittleClassElementDec;
-import plugin.psi.ALittleClassGetterDec;
 import plugin.psi.ALittleClassMethodDec;
 import plugin.psi.ALittleMethodReturnDec;
 
@@ -22,7 +21,7 @@ public class ALittleClassMethodDecReference extends ALittleReference<ALittleClas
         if (myElement.getMethodBodyDec() == null)
             throw new ALittleGuessException(myElement, "没有函数体");
 
-        ALittleClassElementDec parent = (ALittleClassElementDec)myElement.getParent();
+        ALittleClassElementDec parent = (ALittleClassElementDec) myElement.getParent();
         if (parent == null)
             throw new ALittleGuessException(myElement, "ALittleScriptClassMethodDecElement的父节点不是ALittleScriptClassElementDecElement");
 

@@ -4,7 +4,9 @@ import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import plugin.guess.ALittleGuessException;
 import plugin.module.ALittleConfig;
-import plugin.psi.*;
+import plugin.psi.ALittleLanguageBodyDec;
+import plugin.psi.ALittleLanguageModifier;
+import plugin.psi.ALittleLanguageNameDec;
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,18 +28,15 @@ public class ALittleLanguageModifierReference extends ALittleReference<ALittleLa
             throw new ALittleGuessException(myElement, "请定义你限定的语言范围");
     }
 
-    public boolean isLanguageEnable()
-    {
-        if (m_name_set == null)
-        {
+    public boolean isLanguageEnable() {
+        if (m_name_set == null) {
             m_name_set = new HashSet<>();
 
             ALittleLanguageBodyDec body_dec = myElement.getLanguageBodyDec();
             if (body_dec == null) return false;
 
             List<ALittleLanguageNameDec> name_list = body_dec.getLanguageNameDecList();
-            for (ALittleLanguageNameDec name : name_list)
-            {
+            for (ALittleLanguageNameDec name : name_list) {
                 String text = name.getText();
                 m_name_set.add(text);
             }

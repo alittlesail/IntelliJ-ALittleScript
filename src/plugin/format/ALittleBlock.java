@@ -46,15 +46,15 @@ public class ALittleBlock extends AbstractBlock {
         IElementType type = myNode.getElementType();
 
         if (element instanceof ALittleClassCtorDec
-            || element instanceof ALittleClassMethodDec
-            || element instanceof ALittleClassStaticDec
-            || element instanceof ALittleClassSetterDec
-            || element instanceof ALittleClassGetterDec
-            || element instanceof ALittleClassVarDec)
+                || element instanceof ALittleClassMethodDec
+                || element instanceof ALittleClassStaticDec
+                || element instanceof ALittleClassSetterDec
+                || element instanceof ALittleClassGetterDec
+                || element instanceof ALittleClassVarDec)
             return Indent.getNormalIndent();
 
         if (element instanceof ALittleStructVarDec
-            || element instanceof ALittleEnumVarDec)
+                || element instanceof ALittleEnumVarDec)
             return Indent.getNormalIndent();
 
         if (element instanceof ALittleAllExpr)
@@ -75,15 +75,15 @@ public class ALittleBlock extends AbstractBlock {
         PsiElement element = myNode.getPsi();
 
         if (element instanceof ALittleStructDec
-            || element instanceof ALittleEnumDec
-            || element instanceof ALittleClassDec
-            || element instanceof ALittleMethodBodyDec
-            || element instanceof ALittleIfExpr
-            || element instanceof ALittleElseIfExpr
-            || element instanceof ALittleElseExpr
-            || element instanceof ALittleForExpr
-            || element instanceof ALittleWhileExpr
-            || element instanceof ALittleWrapExpr)
+                || element instanceof ALittleEnumDec
+                || element instanceof ALittleClassDec
+                || element instanceof ALittleMethodBodyDec
+                || element instanceof ALittleIfExpr
+                || element instanceof ALittleElseIfExpr
+                || element instanceof ALittleElseExpr
+                || element instanceof ALittleForExpr
+                || element instanceof ALittleWhileExpr
+                || element instanceof ALittleWrapExpr)
             return new ChildAttributes(Indent.getNormalIndent(), null);
 
         return new ChildAttributes(Indent.getNoneIndent(), null);

@@ -1,35 +1,29 @@
 package plugin.guess;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
 
 public class ALittleGuessList extends ALittleGuess {
     public ALittleGuess sub_type;
     public boolean is_native;
 
-    public ALittleGuessList(ALittleGuess p_sub_type, boolean p_is_const, boolean p_is_native)
-    {
+    public ALittleGuessList(ALittleGuess p_sub_type, boolean p_is_const, boolean p_is_native) {
         sub_type = p_sub_type;
         is_const = p_is_const;
         is_native = p_is_native;
     }
 
     @Override
-    public boolean hasAny()
-    {
+    public boolean hasAny() {
         return sub_type.hasAny();
     }
 
     @Override
-    public boolean needReplace()
-    {
+    public boolean needReplace() {
         return sub_type.needReplace();
     }
 
     @Override
-    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map)
-    {
+    public ALittleGuess replaceTemplate(Map<String, ALittleGuess> fill_map) {
         ALittleGuess replace = sub_type.replaceTemplate(fill_map);
         if (replace == null) return null;
         ALittleGuessList guess = new ALittleGuessList(replace, is_const, is_native);
@@ -38,16 +32,14 @@ public class ALittleGuessList extends ALittleGuess {
     }
 
     @Override
-    public ALittleGuess clone()
-    {
+    public ALittleGuess clone() {
         ALittleGuessList guess = new ALittleGuessList(sub_type, is_const, is_native);
         guess.updateValue();
         return guess;
     }
 
     @Override
-    public void updateValue()
-    {
+    public void updateValue() {
         value = "";
         if (is_const) value += "const ";
         if (is_native) value += "native ";
@@ -55,8 +47,7 @@ public class ALittleGuessList extends ALittleGuess {
     }
 
     @Override
-    public boolean isChanged()
-    {
+    public boolean isChanged() {
         return sub_type.isChanged();
     }
 }

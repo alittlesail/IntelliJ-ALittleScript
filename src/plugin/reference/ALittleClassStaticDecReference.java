@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.ALittleClassElementDec;
-import plugin.psi.ALittleClassSetterDec;
 import plugin.psi.ALittleClassStaticDec;
 import plugin.psi.ALittleMethodReturnDec;
 
@@ -23,9 +22,9 @@ public class ALittleClassStaticDecReference extends ALittleReference<ALittleClas
             throw new ALittleGuessException(myElement, "没有函数体");
 
 
-        ALittleClassElementDec parent = (ALittleClassElementDec)myElement.getParent();
+        ALittleClassElementDec parent = (ALittleClassElementDec) myElement.getParent();
         if (parent == null)
-            throw  new ALittleGuessException(myElement, "ALittleScriptClassStaticDecElement的父节点不是ALittleScriptClassElementDecElement");
+            throw new ALittleGuessException(myElement, "ALittleScriptClassStaticDecElement的父节点不是ALittleScriptClassElementDecElement");
 
         String co_text = PsiHelper.getCoroutineType(parent.getModifierList());
 

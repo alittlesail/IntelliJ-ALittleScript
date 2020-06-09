@@ -1,6 +1,5 @@
 package plugin.reference;
 
-import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,7 @@ public class ALittleUsingNameDecReference extends ALittleReference<ALittleUsingN
     public List<ALittleGuess> guessTypes() throws ALittleGuessException {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleUsingDec)
-        return ((ALittleUsingDec)parent).guessTypes();
+            return ((ALittleUsingDec) parent).guessTypes();
         return new ArrayList<>();
     }
 

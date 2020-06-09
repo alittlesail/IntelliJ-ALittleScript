@@ -1,16 +1,20 @@
 package plugin.generate;
 
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import groovy.lang.Tuple2;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.internal.StringUtil;
-import plugin.alittle.PsiHelper;
 import plugin.alittle.FileHelper;
+import plugin.alittle.PsiHelper;
 import plugin.guess.*;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ALittleTranslationLua extends ALittleTranslation {
     // 命名域生成前缀
@@ -2223,7 +2227,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
             ALittleGuess guess = extends_dec.getClassNameDec().guessType();
 
 
-            ALittleGuessClass guess_class = (ALittleGuessClass)guess;
+            ALittleGuessClass guess_class = (ALittleGuessClass) guess;
             if (guess_class == null)
                 throw new ALittleGuessException(extends_dec, "extends_dec.getClassNameDec().guessType 得到的不是ALittleGuessClass");
             extends_name = guess_class.namespace_name + "." + guess_class.class_name;
@@ -2328,7 +2332,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     for (ALittleAllExpr all_expr : all_expr_list) {
                         if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                             continue;
-                        Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
+                        Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab + "\t");
 
                         all_expr_content += result.getFirst();
                     }
@@ -2356,7 +2360,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 for (ALittleAllExpr all_expr : all_expr_list) {
                     if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
-                    Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
+                    Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab + "\t");
 
                     content += result.getFirst();
                 }
@@ -2393,7 +2397,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 for (ALittleAllExpr all_expr : all_expr_list) {
                     if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
-                    Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
+                    Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab + "\t");
 
                     content += result.getFirst();
                 }
@@ -2416,7 +2420,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                         ALittleGuess guess = pair_dec.guessType();
 
                         if (guess instanceof ALittleGuessTemplate) {
-                            ALittleGuessTemplate guess_template = (ALittleGuessTemplate)guess;
+                            ALittleGuessTemplate guess_template = (ALittleGuessTemplate) guess;
                             if (guess_template.template_extends != null || guess_template.is_class || guess_template.is_struct)
                                 param_name_list.add(guess_template.getValue());
                         }
@@ -2453,7 +2457,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 for (ALittleAllExpr all_expr : all_expr_list) {
                     if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
-                    Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
+                    Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab + "\t");
 
                     content += result.getFirst();
                 }
@@ -2483,7 +2487,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                         ALittleGuess guess = pair_dec.guessType();
 
                         if (guess instanceof ALittleGuessTemplate) {
-                            ALittleGuessTemplate guess_template = (ALittleGuessTemplate)guess;
+                            ALittleGuessTemplate guess_template = (ALittleGuessTemplate) guess;
                             if (guess_template.template_extends != null || guess_template.is_class || guess_template.is_struct)
                                 param_name_list.add(guess_template.getValue());
                         }
@@ -2522,7 +2526,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 for (ALittleAllExpr all_expr : all_expr_list) {
                     if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
-                    Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
+                    Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab + "\t");
 
                     content += result.getFirst();
                 }
@@ -2562,7 +2566,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
         PsiHelper.ClassAccessType access_type = PsiHelper.calcAccessType(modifier);
         if (access_type == PsiHelper.ClassAccessType.PRIVATE) {
             content += "local ";
-            content += StringUtil.join(name_list,", ");
+            content += StringUtil.join(name_list, ", ");
         } else if (access_type == PsiHelper.ClassAccessType.PROTECTED) {
             content += StringUtil.join(name_list, ", ");
         } else if (access_type == PsiHelper.ClassAccessType.PUBLIC) {
@@ -2608,7 +2612,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
                 // 把模板名作为参数名
                 if (guess instanceof ALittleGuessTemplate) {
-                    ALittleGuessTemplate guess_template = (ALittleGuessTemplate)guess;
+                    ALittleGuessTemplate guess_template = (ALittleGuessTemplate) guess;
                     if (guess_template.template_extends != null || guess_template.is_class || guess_template.is_struct)
                         param_name_list.add(guess_template.getValue());
                 }
@@ -2654,8 +2658,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
         for (ALittleAllExpr all_expr : all_expr_list) {
             if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
-            Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t")
-            ;
+            Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab + "\t");
 
             content += result.getFirst();
         }
@@ -2677,14 +2680,15 @@ public class ALittleTranslationLua extends ALittleTranslation {
         if (proto_type != null) {
             if (param_dec == null) throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，必须有两个参数");
             List<ALittleMethodParamOneDec> one_dec_list = param_dec.getMethodParamOneDecList();
-            if (one_dec_list.size() != 2 || one_dec_list.get(1).getAllType() == null) throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，必须有两个参数");
+            if (one_dec_list.size() != 2 || one_dec_list.get(1).getAllType() == null)
+                throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，必须有两个参数");
 
             ALittleGuess guess_param = one_dec_list.get(1).getAllType().guessType();
 
 
             if (!(guess_param instanceof ALittleGuessStruct))
                 throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，第二个参数必须是struct");
-            ALittleGuessStruct guess_param_struct = (ALittleGuessStruct)guess_param;
+            ALittleGuessStruct guess_param_struct = (ALittleGuessStruct) guess_param;
 
             List<ALittleAllType> return_list = new ArrayList<>();
             ALittleMethodReturnDec return_dec = root.getMethodReturnDec();
@@ -2731,7 +2735,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 } else {
                     if (!(guess_return instanceof ALittleGuessStruct))
                         throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，返回值必须是struct");
-                    ALittleGuessStruct guess_return_struct = (ALittleGuessStruct)guess_return;
+                    ALittleGuessStruct guess_return_struct = (ALittleGuessStruct) guess_return;
 
                     content += pre_tab + m_alittle_gen_namespace_pre
                             + "RegMsgRpcCallback(" + PsiHelper.structHash(guess_param_struct)

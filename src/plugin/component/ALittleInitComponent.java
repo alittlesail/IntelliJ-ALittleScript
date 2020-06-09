@@ -8,7 +8,8 @@ import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileContentChangeEvent;
 import com.intellij.openapi.vfs.newvfs.events.VFileCreateEvent;
@@ -21,11 +22,8 @@ import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.SendLogRunnable;
 import plugin.generate.ALittleTranslation;
-import plugin.generate.ALittleTranslationJavaScript;
-import plugin.generate.ALittleTranslationLua;
 import plugin.guess.ALittleGuessException;
 import plugin.index.ALittleTreeChangeListener;
-import plugin.module.ALittleConfig;
 import plugin.psi.ALittleFile;
 
 import java.util.List;
@@ -35,6 +33,7 @@ public class ALittleInitComponent implements BaseComponent {
 
     public ALittleInitComponent() {
     }
+
     @NotNull
     public String getComponentName() {
         return "ALittleInit";
@@ -85,7 +84,7 @@ public class ALittleInitComponent implements BaseComponent {
                         for (Project project : myProject) {
                             ALittleTreeChangeListener.handleDirCreated(project, virtualFile);
                         }
-                    // 处理保存
+                        // 处理保存
                     } else if (event instanceof VFileContentChangeEvent) {
                         VirtualFile virtualFile = event.getFile();
                         if (virtualFile == null) continue;
@@ -101,7 +100,7 @@ public class ALittleInitComponent implements BaseComponent {
                             }
                             try {
                                 ALittleTranslation translation = ALittleTranslation.createTranslation(project);
-                                translation.generate((ALittleFile) psiFile,false);
+                                translation.generate((ALittleFile) psiFile, false);
                             } catch (ALittleGuessException e) {
                                 System.out.println(psiFile.getName() + ":生成目标代码失败:" + e.getError());
                             } catch (Exception e) {

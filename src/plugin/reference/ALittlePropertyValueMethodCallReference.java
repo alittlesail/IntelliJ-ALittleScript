@@ -2,7 +2,7 @@ package plugin.reference;
 
 import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
 import groovy.lang.Tuple2;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
@@ -23,8 +23,8 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         ALittleGuess guess = null;
 
         // 获取父节点
-        ALittlePropertyValueSuffix property_value_suffix = (ALittlePropertyValueSuffix)myElement.getParent();
-        ALittlePropertyValue property_value = (ALittlePropertyValue)property_value_suffix.getParent();
+        ALittlePropertyValueSuffix property_value_suffix = (ALittlePropertyValueSuffix) myElement.getParent();
+        ALittlePropertyValue property_value = (ALittlePropertyValue) property_value_suffix.getParent();
         ALittlePropertyValueFirstType property_value_first_type = property_value.getPropertyValueFirstType();
         List<ALittlePropertyValueSuffix> suffix_list = property_value.getPropertyValueSuffixList();
 
@@ -35,54 +35,48 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         // 获取前一个类型
         ALittleGuess pre_type = null;
         ALittleGuess pre_pre_type = null;
-        if (index == 0)
-        {
+        if (index == 0) {
             pre_type = property_value_first_type.guessType();
-        }
-        else if (index == 1)
-        {
+        } else if (index == 1) {
             pre_type = suffix_list.get(index - 1).guessType();
             pre_pre_type = property_value_first_type.guessType();
-        }
-        else
-        {
+        } else {
             pre_type = suffix_list.get(index - 1).guessType();
             pre_pre_type = suffix_list.get(index - 2).guessType();
         }
 
         // 如果是Functor
-        if (pre_type instanceof ALittleGuessFunctor)
-        {
-            ALittleGuessFunctor pre_type_functor = (ALittleGuessFunctor)pre_type;
+        if (pre_type instanceof ALittleGuessFunctor) {
+            ALittleGuessFunctor pre_type_functor = (ALittleGuessFunctor) pre_type;
             if (pre_pre_type instanceof ALittleGuessTemplate)
-            pre_pre_type = ((ALittleGuessTemplate)pre_pre_type).template_extends;
+                pre_pre_type = ((ALittleGuessTemplate) pre_pre_type).template_extends;
 
             // 如果再往前一个是一个Class实例对象，那么就要去掉第一个参数
             if (pre_pre_type instanceof ALittleGuessClass && pre_type_functor.param_list.size() > 0
-                && (pre_type_functor.element instanceof ALittleClassMethodDec
-                        || pre_type_functor.element instanceof ALittleClassGetterDec
-                || pre_type_functor.element instanceof ALittleClassSetterDec)) {
+                    && (pre_type_functor.element instanceof ALittleClassMethodDec
+                    || pre_type_functor.element instanceof ALittleClassGetterDec
+                    || pre_type_functor.element instanceof ALittleClassSetterDec)) {
                 ALittleGuessFunctor new_pre_type_functor = new ALittleGuessFunctor(pre_type_functor.element);
-            pre_type = new_pre_type_functor;
+                pre_type = new_pre_type_functor;
 
-            new_pre_type_functor.await_modifier = pre_type_functor.await_modifier;
-            new_pre_type_functor.const_modifier = pre_type_functor.const_modifier;
-            new_pre_type_functor.proto = pre_type_functor.proto;
-            new_pre_type_functor.template_param_list.addAll(pre_type_functor.template_param_list);
-            new_pre_type_functor.param_list.addAll(pre_type_functor.param_list);
-            new_pre_type_functor.param_nullable_list.addAll(pre_type_functor.param_nullable_list);
-            new_pre_type_functor.param_name_list.addAll(pre_type_functor.param_name_list);
-            new_pre_type_functor.param_tail = pre_type_functor.param_tail;
-            new_pre_type_functor.return_list.addAll(pre_type_functor.return_list);
-            new_pre_type_functor.return_tail = pre_type_functor.return_tail;
+                new_pre_type_functor.await_modifier = pre_type_functor.await_modifier;
+                new_pre_type_functor.const_modifier = pre_type_functor.const_modifier;
+                new_pre_type_functor.proto = pre_type_functor.proto;
+                new_pre_type_functor.template_param_list.addAll(pre_type_functor.template_param_list);
+                new_pre_type_functor.param_list.addAll(pre_type_functor.param_list);
+                new_pre_type_functor.param_nullable_list.addAll(pre_type_functor.param_nullable_list);
+                new_pre_type_functor.param_name_list.addAll(pre_type_functor.param_name_list);
+                new_pre_type_functor.param_tail = pre_type_functor.param_tail;
+                new_pre_type_functor.return_list.addAll(pre_type_functor.return_list);
+                new_pre_type_functor.return_tail = pre_type_functor.return_tail;
 
-            // 移除掉第一个参数
-            new_pre_type_functor.param_list.remove(0);
-            new_pre_type_functor.param_nullable_list.remove(0);
-            new_pre_type_functor.param_name_list.remove(0);
+                // 移除掉第一个参数
+                new_pre_type_functor.param_list.remove(0);
+                new_pre_type_functor.param_nullable_list.remove(0);
+                new_pre_type_functor.param_name_list.remove(0);
 
-            new_pre_type_functor.updateValue();
-        }
+                new_pre_type_functor.updateValue();
+            }
         }
 
         guess = pre_type;
@@ -99,15 +93,12 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         ALittleGuessFunctor pre_type_functor = checkTemplateMap(src_map, fill_map);
         if (pre_type_functor == null) return guess_list;
 
-        for (ALittleGuess guess : pre_type_functor.return_list)
-        {
-            if (guess.needReplace())
-            {
+        for (ALittleGuess guess : pre_type_functor.return_list) {
+            if (guess.needReplace()) {
                 ALittleGuess replace = guess.replaceTemplate(fill_map);
                 if (replace == null) throw new ALittleGuessException(myElement, "模板替换失败:" + guess.getValue());
                 guess_list.add(replace);
-            }
-            else
+            } else
                 guess_list.add(guess);
         }
 
@@ -118,7 +109,9 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
     }
 
     @Override
-    public boolean multiGuessTypes() { return true; }
+    public boolean multiGuessTypes() {
+        return true;
+    }
 
     private void analysisTemplate(@NotNull Map<String, ALittleGuess> fill_map,
                                   @NotNull ALittleGuess left_guess, @NotNull PsiElement right_src, @NotNull ALittleGuess right_guess, boolean assign_or_call) throws ALittleGuessException {
@@ -126,16 +119,12 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         if (right_guess.getValue().equals("null")) return;
 
         // const是否可以赋值给非const
-        if (assign_or_call)
-        {
+        if (assign_or_call) {
             if (left_guess.is_const && !right_guess.is_const)
                 throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ", 不能是:" + right_guess.getValue());
-        }
-        else
-        {
+        } else {
             // 如果不是基本变量类型（排除any），基本都是值传递，函数调用时就不用检查const
-            if (!(left_guess instanceof ALittleGuessPrimitive) || left_guess.getValueWithoutConst().equals("any"))
-            {
+            if (!(left_guess instanceof ALittleGuessPrimitive) || left_guess.getValueWithoutConst().equals("any")) {
                 if (!left_guess.is_const && right_guess.is_const)
                     throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ", 不能是:" + right_guess.getValue());
             }
@@ -145,16 +134,14 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         if (left_guess instanceof ALittleGuessAny) return;
 
         if (left_guess instanceof ALittleGuessPrimitive
-                || left_guess instanceof ALittleGuessStruct)
-        {
+                || left_guess instanceof ALittleGuessStruct) {
             ALittleReferenceOpUtil.guessTypeEqual(left_guess, right_src, right_guess, assign_or_call, false);
             return;
         }
 
-        if (left_guess instanceof ALittleGuessMap)
-        {
+        if (left_guess instanceof ALittleGuessMap) {
             if (!(right_guess instanceof ALittleGuessMap))
-            throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
+                throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
 
             try {
                 analysisTemplate(fill_map, ((ALittleGuessMap) left_guess).key_type, right_src, ((ALittleGuessMap) right_guess).key_type, false);
@@ -169,10 +156,9 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             return;
         }
 
-        if (left_guess instanceof ALittleGuessList)
-        {
+        if (left_guess instanceof ALittleGuessList) {
             if (!(right_guess instanceof ALittleGuessList))
-            throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
+                throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
             try {
                 analysisTemplate(fill_map, ((ALittleGuessList) left_guess).sub_type, right_src, ((ALittleGuessList) right_guess).sub_type, false);
             } catch (ALittleGuessException error) {
@@ -181,12 +167,11 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             return;
         }
 
-        if (left_guess instanceof ALittleGuessFunctor)
-        {
+        if (left_guess instanceof ALittleGuessFunctor) {
             if (!(right_guess instanceof ALittleGuessFunctor))
-            throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
-            ALittleGuessFunctor left_guess_functor = (ALittleGuessFunctor)left_guess;
-            ALittleGuessFunctor right_guess_functor = (ALittleGuessFunctor)right_guess;
+                throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
+            ALittleGuessFunctor left_guess_functor = (ALittleGuessFunctor) left_guess;
+            ALittleGuessFunctor right_guess_functor = (ALittleGuessFunctor) right_guess;
 
             if (left_guess_functor.param_list.size() != right_guess_functor.param_list.size()
                     || left_guess_functor.param_nullable_list.size() != right_guess_functor.param_nullable_list.size()
@@ -200,54 +185,48 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                     || left_guess_functor.param_tail != null && right_guess_functor.param_tail == null
                     || left_guess_functor.return_tail == null && right_guess_functor.return_tail != null
                     || left_guess_functor.return_tail != null && right_guess_functor.return_tail == null
-            )
-            {
+            ) {
                 throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
             }
 
-            for (int i = 0; i < left_guess_functor.template_param_list.size(); ++i)
-            {
+            for (int i = 0; i < left_guess_functor.template_param_list.size(); ++i) {
                 analysisTemplate(fill_map, left_guess_functor.template_param_list.get(i), right_src, right_guess_functor.template_param_list.get(i), false);
             }
 
-            for (int i = 0; i < left_guess_functor.param_list.size(); ++i)
-            {
+            for (int i = 0; i < left_guess_functor.param_list.size(); ++i) {
                 analysisTemplate(fill_map, left_guess_functor.param_list.get(i), right_src, right_guess_functor.param_list.get(i), false);
             }
 
-            for (int i = 0; i < left_guess_functor.param_nullable_list.size(); ++i)
-            {
+            for (int i = 0; i < left_guess_functor.param_nullable_list.size(); ++i) {
                 if (left_guess_functor.param_nullable_list.get(i) != right_guess_functor.param_nullable_list.get(i))
                     throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
             }
 
-            for (int i = 0; i < left_guess_functor.return_list.size(); ++i)
-            {
+            for (int i = 0; i < left_guess_functor.return_list.size(); ++i) {
                 analysisTemplate(fill_map, left_guess_functor.return_list.get(i), right_src, right_guess_functor.return_list.get(i), false);
             }
             return;
         }
 
-        if (left_guess instanceof ALittleGuessClass)
-        {
+        if (left_guess instanceof ALittleGuessClass) {
             if (right_guess instanceof ALittleGuessTemplate)
-            right_guess = ((ALittleGuessTemplate)right_guess).template_extends;
+                right_guess = ((ALittleGuessTemplate) right_guess).template_extends;
 
             if (!(right_guess instanceof ALittleGuessClass))
-            throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
+                throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
 
             if (left_guess.getValue() == right_guess.getValue()) return;
 
-            boolean result = PsiHelper.isClassSuper(((ALittleGuessClass)left_guess).class_dec, right_guess.getValue());
+            boolean result = PsiHelper.isClassSuper(((ALittleGuessClass) left_guess).class_dec, right_guess.getValue());
             if (result) return;
-            result = PsiHelper.isClassSuper(((ALittleGuessClass)right_guess).class_dec, left_guess.getValue());
+            result = PsiHelper.isClassSuper(((ALittleGuessClass) right_guess).class_dec, left_guess.getValue());
             if (result) return;
 
             throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
         }
 
         if (left_guess instanceof ALittleGuessTemplate) {
-            ALittleGuessTemplate left_guess_template = (ALittleGuessTemplate)left_guess;
+            ALittleGuessTemplate left_guess_template = (ALittleGuessTemplate) left_guess;
 
             // 查看模板是否已经被填充，那么就按填充的检查
             ALittleGuess fill_guess = fill_map.get(left_guess_template.getValue());
@@ -257,42 +236,29 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             }
 
             // 处理还未填充
-            if (left_guess_template.template_extends != null)
-            {
+            if (left_guess_template.template_extends != null) {
                 analysisTemplate(fill_map, left_guess_template.template_extends, right_src, right_guess, false);
                 fill_map.put(left_guess_template.getValue(), right_guess);
                 return;
-            }
-            else if (left_guess_template.is_class)
-            {
-                if (right_guess instanceof ALittleGuessClass)
-                {
+            } else if (left_guess_template.is_class) {
+                if (right_guess instanceof ALittleGuessClass) {
                     fill_map.put(left_guess_template.getValue(), right_guess);
                     return;
-                }
-                    else if (right_guess instanceof ALittleGuessTemplate)
-                {
-                    ALittleGuessTemplate right_guess_template = (ALittleGuessTemplate)right_guess;
-                    if (right_guess_template.template_extends instanceof ALittleGuessClass || right_guess_template.is_class)
-                    {
+                } else if (right_guess instanceof ALittleGuessTemplate) {
+                    ALittleGuessTemplate right_guess_template = (ALittleGuessTemplate) right_guess;
+                    if (right_guess_template.template_extends instanceof ALittleGuessClass || right_guess_template.is_class) {
                         fill_map.put(right_guess_template.getValue(), right_guess);
                         return;
                     }
                 }
                 throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
-            }
-            else if (left_guess_template.is_struct)
-            {
-                if (right_guess instanceof ALittleGuessStruct)
-                {
+            } else if (left_guess_template.is_struct) {
+                if (right_guess instanceof ALittleGuessStruct) {
                     fill_map.put(left_guess_template.getValue(), right_guess);
                     return;
-                }
-                    else if (right_guess instanceof ALittleGuessTemplate)
-                {
-                    ALittleGuessTemplate right_guess_template = (ALittleGuessTemplate)right_guess;
-                    if (right_guess_template.template_extends instanceof ALittleGuessStruct || right_guess_template.is_struct)
-                    {
+                } else if (right_guess instanceof ALittleGuessTemplate) {
+                    ALittleGuessTemplate right_guess_template = (ALittleGuessTemplate) right_guess;
+                    if (right_guess_template.template_extends instanceof ALittleGuessStruct || right_guess_template.is_struct) {
                         fill_map.put(left_guess_template.getValue(), right_guess);
                         return;
                     }
@@ -314,29 +280,25 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
 
         // 如果需要处理
         if (!(pre_type instanceof ALittleGuessFunctor)) return guess;
-        ALittleGuessFunctor pre_type_functor = (ALittleGuessFunctor)pre_type;
+        ALittleGuessFunctor pre_type_functor = (ALittleGuessFunctor) pre_type;
 
         List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
         if (pre_type_functor.param_list.size() < value_stat_list.size() && pre_type_functor.param_tail == null)
             throw new ALittleGuessException(myElement, "函数调用最多需要" + pre_type_functor.param_list.size() + "个参数,不能是:" + value_stat_list.size() + "个");
 
         // 检查模板参数
-        if (pre_type_functor.template_param_list.size() > 0)
-        {
-            for (ALittleGuessTemplate template_param : pre_type_functor.template_param_list)
-            {
+        if (pre_type_functor.template_param_list.size() > 0) {
+            for (ALittleGuessTemplate template_param : pre_type_functor.template_param_list) {
                 src_map.put(template_param.getValue(), template_param);
             }
 
             ALittlePropertyValueMethodTemplate method_template = myElement.getPropertyValueMethodTemplate();
-            if (method_template != null)
-            {
+            if (method_template != null) {
                 List<ALittleAllType> all_type_list = method_template.getAllTypeList();
                 if (all_type_list.size() > pre_type_functor.template_param_list.size())
                     throw new ALittleGuessException(myElement, "函数调用最多需要" + pre_type_functor.template_param_list.size() + "个模板参数,不能是:" + all_type_list.size() + "个");
 
-                for (int i = 0; i < all_type_list.size(); ++i)
-                {
+                for (int i = 0; i < all_type_list.size(); ++i) {
                     ALittleGuess all_type_guess = all_type_list.get(i).guessType();
                     ALittleReferenceOpUtil.guessTypeEqual(pre_type_functor.template_param_list.get(i), all_type_list.get(i), all_type_guess, false, false);
                     String key = pre_type_functor.template_param_list.get(i).getValue();
@@ -345,8 +307,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             }
 
             // 根据填充的参数来分析以及判断
-            for (int i = 0; i < value_stat_list.size(); ++i)
-            {
+            for (int i = 0; i < value_stat_list.size(); ++i) {
                 ALittleValueStat value_stat = value_stat_list.get(i);
                 ALittleGuess value_stat_guess = value_stat.guessType();
                 // 如果参数返回的类型是tail，那么就可以不用检查
@@ -358,8 +319,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             }
 
             // 判断如果还未有模板解析，就报错
-            for (String key : src_map.keySet())
-            {
+            for (String key : src_map.keySet()) {
                 if (!fill_map.containsKey(key))
                     throw new ALittleGuessException(myElement, key + "模板无法解析");
             }
@@ -369,7 +329,8 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         return guess;
     }
 
-    public @NotNull List<ALittleGuess> generateTemplateParamList() throws ALittleGuessException {
+    public @NotNull
+    List<ALittleGuess> generateTemplateParamList() throws ALittleGuessException {
         List<ALittleGuess> param_list = new ArrayList<>();
 
         Map<String, ALittleGuessTemplate> src_map = new HashMap<>();
@@ -377,11 +338,9 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         ALittleGuessFunctor pre_type_functor = checkTemplateMap(src_map, fill_map);
         if (pre_type_functor == null) return param_list;
 
-        for (int i = 0; i < pre_type_functor.template_param_list.size(); ++i)
-        {
+        for (int i = 0; i < pre_type_functor.template_param_list.size(); ++i) {
             ALittleGuessTemplate guess_template = pre_type_functor.template_param_list.get(i);
-            if (guess_template.template_extends != null || guess_template.is_class || guess_template.is_struct)
-            {
+            if (guess_template.template_extends != null || guess_template.is_class || guess_template.is_struct) {
                 ALittleGuess value = fill_map.get(guess_template.getValue());
                 if (value != null)
                     param_list.add(value);
@@ -400,8 +359,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
 
         // 检查填写的和函数定义的参数是否一致
         List<ALittleValueStat> value_stat_list = myElement.getValueStatList();
-        for (int i = 0; i < value_stat_list.size(); ++i)
-        {
+        for (int i = 0; i < value_stat_list.size(); ++i) {
             ALittleValueStat value_stat = value_stat_list.get(i);
 
             Tuple2<Integer, List<ALittleGuess>> result = PsiHelper.calcReturnCount(value_stat);
@@ -411,8 +369,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             // 如果参数返回的类型是tail，那么就可以不用检查
             if (guess instanceof ALittleGuessReturnTail) continue;
 
-            if (i >= pre_type_functor.param_list.size())
-            {
+            if (i >= pre_type_functor.param_list.size()) {
                 // 如果有参数占位符，那么就直接跳出，不检查了
                 // 如果没有，就表示超过参数数量了
                 if (pre_type_functor.param_tail != null)
@@ -429,17 +386,13 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         }
 
         // 如果参数数量不足以填充
-        if (value_stat_list.size() < pre_type_functor.param_list.size())
-        {
+        if (value_stat_list.size() < pre_type_functor.param_list.size()) {
             // 不足的部分，参数必须都是nullable
-            for (int i = value_stat_list.size(); i < pre_type_functor.param_nullable_list.size(); ++i)
-            {
-                if (!pre_type_functor.param_nullable_list.get(i))
-                {
+            for (int i = value_stat_list.size(); i < pre_type_functor.param_nullable_list.size(); ++i) {
+                if (!pre_type_functor.param_nullable_list.get(i)) {
                     // 计算至少需要的参数个数
                     int count = pre_type_functor.param_nullable_list.size();
-                    for (int j = pre_type_functor.param_nullable_list.size() - 1; j >= 0; --j)
-                    {
+                    for (int j = pre_type_functor.param_nullable_list.size() - 1; j >= 0; --j) {
                         if (pre_type_functor.param_nullable_list.get(j))
                             --count;
                         else
@@ -451,8 +404,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         }
 
         // 检查这个函数是不是await
-        if (pre_type_functor.await_modifier)
-        {
+        if (pre_type_functor.await_modifier) {
             // 检查这次所在的函数必须要有await或者async修饰
             PsiHelper.checkInvokeAwait(myElement);
         }
@@ -465,7 +417,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
         // 获取函数对象
         ALittleGuess preType = guessPreType();
         if (!(preType instanceof ALittleGuessFunctor)) return result;
-        ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor)preType;
+        ALittleGuessFunctor preTypeFunctor = (ALittleGuessFunctor) preType;
 
         // 构建对象
         List<ALittleValueStat> valueStatList = myElement.getValueStatList();

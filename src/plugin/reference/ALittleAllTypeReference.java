@@ -28,23 +28,18 @@ public class ALittleAllTypeReference extends ALittleReference<ALittleAllType> {
         else if (myElement.getPrimitiveType() != null)
             guess_list = myElement.getPrimitiveType().guessTypes();
 
-        if (guess_list.size() > 0)
-        {
+        if (guess_list.size() > 0) {
             if (!is_const) return guess_list;
 
-            for (int i = 0; i < guess_list.size(); ++i)
-            {
+            for (int i = 0; i < guess_list.size(); ++i) {
                 ALittleGuess guess = guess_list.get(i);
                 if (guess.is_const) continue;
 
-                if (guess instanceof ALittleGuessPrimitive)
-                {
+                if (guess instanceof ALittleGuessPrimitive) {
                     guess_list = ALittleGuessPrimitive.sPrimitiveGuessListMap.get("const " + guess.getValue());
                     if (guess_list == null) throw new ALittleGuessException(myElement, "找不到const " + guess.getValue());
                     break;
-                }
-                else
-                {
+                } else {
                     guess = guess.clone();
                     guess.is_const = true;
                     guess.updateValue();

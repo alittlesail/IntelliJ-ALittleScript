@@ -329,8 +329,8 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
     // 生成custom_type定义中的模板参数列表
     private void GenerateCustomTypeTemplateList(List<ALittleGuess> guess_list,
-                                                  List<String> template_param_list,
-                                                  List<String> template_param_name_list) throws ALittleGuessException {
+                                                List<String> template_param_list,
+                                                List<String> template_param_name_list) throws ALittleGuessException {
         for (int index = 0; index < guess_list.size(); ++index) {
             ALittleGuess guess = guess_list.get(index);
             if (guess instanceof ALittleGuessClass) {
@@ -3100,7 +3100,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                 } else {
                     if (!(guess_return instanceof ALittleGuessStruct))
                         throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，返回值必须是struct");
-                    ALittleGuessStruct guess_return_struct = (ALittleGuessStruct)guess_return;
+                    ALittleGuessStruct guess_return_struct = (ALittleGuessStruct) guess_return;
 
                     content += pre_tab
                             + "ALittle.RegMsgRpcCallback(" + PsiHelper.structHash(guess_param_struct)

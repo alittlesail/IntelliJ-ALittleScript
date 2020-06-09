@@ -45,8 +45,7 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
 
         List<ALittleStructVarDec> var_dec_list = body_dec.getStructVarDecList();
         Set<String> name_set = new HashSet<>();
-        for (ALittleStructVarDec var_dec : var_dec_list)
-        {
+        for (ALittleStructVarDec var_dec : var_dec_list) {
             ALittleStructVarNameDec var_name_dec = var_dec.getStructVarNameDec();
             if (var_name_dec == null) throw new ALittleGuessException(var_dec, "没有定义成员变量名");
 
@@ -58,8 +57,7 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
 
         List<ALittleStructOptionDec> option_dec_list = body_dec.getStructOptionDecList();
         Set<String> option_set = new HashSet<String>();
-        for (ALittleStructOptionDec option_dec : option_dec_list)
-        {
+        for (ALittleStructOptionDec option_dec : option_dec_list) {
             ALittleStructOptionNameDec option_name_dec = option_dec.getStructOptionNameDec();
             if (option_name_dec == null) throw new ALittleGuessException(option_dec, "没有定义附加信息名");
 
@@ -71,8 +69,7 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
             PsiElement option_value = option_dec.getTextContent();
             if (option_value == null) throw new ALittleGuessException(option_dec, text + "没有设置对应的值");
 
-            if (text.equals("primary"))
-            {
+            if (text.equals("primary")) {
                 text = option_value.getText().trim();
                 text = text.substring(1, text.length() - 2).trim();
                 if (!name_set.contains(text))
@@ -80,13 +77,11 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
                 continue;
             }
 
-            if (text.equals("unique") || text.equals("index"))
-            {
+            if (text.equals("unique") || text.equals("index")) {
                 text = option_value.getText().trim();
                 text = text.substring(1, text.length() - 2).trim();
                 String[] list = text.split(",");
-                for (String name : list)
-                {
+                for (String name : list) {
                     text = name.trim();
                     if (!name_set.contains(text))
                         throw new ALittleGuessException(option_value, "没有找到对应的字段名:" + text);
