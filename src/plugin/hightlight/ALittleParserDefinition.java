@@ -29,7 +29,7 @@ public class ALittleParserDefinition implements ParserDefinition {
             ALittleTypes.IF, ALittleTypes.ELSE, ALittleTypes.ELSEIF, ALittleTypes.DO, ALittleTypes.WHILE, ALittleTypes.FOR,
             ALittleTypes.IN, ALittleTypes.LIST, ALittleTypes.MAP, ALittleTypes.TYPE_TAIL, ALittleTypes.CONCAT,
             ALittleTypes.NEW, ALittleTypes.RETURN, ALittleTypes.REGISTER, ALittleTypes.NAMESPACE, ALittleTypes.THIS, ALittleTypes.FUNCTOR,
-            ALittleTypes.GET, ALittleTypes.SET, ALittleTypes.FUN, ALittleTypes.COMMA);
+            ALittleTypes.GET, ALittleTypes.SET, ALittleTypes.FUN, ALittleTypes.COMMA, ALittleTypes.CONST);
 
     public static final TokenSet SYMBOL_SET = TokenSet.create(ALittleTypes.APOS, ALittleTypes.ASSIGN, ALittleTypes.BACK,
             ALittleTypes.COLON, ALittleTypes.COND_AND, ALittleTypes.COND_OR,
@@ -41,7 +41,7 @@ public class ALittleParserDefinition implements ParserDefinition {
             ALittleTypes.SEMI);
 
     public static final TokenSet ANNO_SET = TokenSet.create(ALittleTypes.CMD, ALittleTypes.MSG
-            , ALittleTypes.HTTP, ALittleTypes.HTTPDOWNLOAD, ALittleTypes.HTTPUPLOAD);
+            , ALittleTypes.HTTP, ALittleTypes.HTTPDOWNLOAD, ALittleTypes.HTTPUPLOAD, ALittleTypes.CONSTANT);
 
     @NotNull
     @Override

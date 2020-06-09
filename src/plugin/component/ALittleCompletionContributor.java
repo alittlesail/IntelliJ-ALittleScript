@@ -12,11 +12,11 @@ public class ALittleCompletionContributor extends CompletionContributor {
 
     static String[] KEYWORD_LIST = new String[] {
             "int","long","double","bool","string","var","List","Map"
-            ,"namespace","class","struct","enum"
+            ,"namespace","class","struct","enum","const"
             ,"for","do","while","break","return","cast","reflect","continue"
             ,"get","set","fun","static","Ctor","Functor","this","using"
             ,"public","protected","private","instance","tcall"
-            ,"async","await","yield","bind","Http","HttpDownload","HttpUpload","Msg","Cmd"
+            ,"async","await","yield","bind","Http","HttpDownload","HttpUpload","Msg","Cmd","Constant"
     };
 
     public ALittleCompletionContributor() {

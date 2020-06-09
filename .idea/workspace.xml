@@ -21,75 +21,28 @@
   <component name="ChangeListManager">
     <list default="true" id="0fa83c02-5800-4982-b0b2-fb9c6fa549c9" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/fileTemplates/internal/NewALittle.alittle.ft" beforeDir="false" afterPath="$PROJECT_DIR$/resources/fileTemplates/internal/NewALittle.alittle.ft" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/fileTemplates/internal/NewTutorial.alittle.ft" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/Bind.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/CSVConfig.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/Class.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/ConfigSystem.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/EventDispatcher.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/File.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/Log.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/Native.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/SafeIDCreator.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Base/String.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopFunction.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopGroup.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopList.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopSystem.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopTimer.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Native/bit.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Native/coroutine.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Native/io.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Native/lib.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Native/math.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Native/os.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Native/package.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Native/string.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Native/table.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Net/HttpFileReceiver.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Net/HttpFileSender.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Net/HttpReceiver.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Net/HttpSender.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Net/MsgCommon.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Net/MsgReceiver.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Net/MsgSender.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Net/MsgSession.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Reflect/CSVProtocol.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Reflect/CmdProtocol.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Reflect/MessageProtocol.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Reflect/Reflect.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Register/MessageFactory.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Register/ScriptSystem.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Register/TimerSystem.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Register/json.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Register/lfs.alittle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/std/Register/sqlte3.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/_ALittleLexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/_ALittleLexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/parser/ALittleParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/parser/ALittleParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassNameDec.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassNameDec.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCustomTypeDotIdName.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/ALittleCustomTypeDotIdName.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodNameDec.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodNameDec.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueDotIdName.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueDotIdName.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/ALittleTypes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassNameDecImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassNameDecImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCustomTypeDotIdNameImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCustomTypeDotIdNameImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodNameDecImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodNameDecImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueDotIdNameImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueDotIdNameImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/ALittle.bnf" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/ALittle.bnf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/plugin/_ALittleLexer.flex" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/_ALittleLexer.flex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/action/BuildTargetAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/BuildTargetAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/action/CreateALittleFileAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/CreateALittleFileAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/action/CreateTutorialFileAction.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/action/ReBuildLuaAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/ReBuildTargetAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/action/ShowTargetFileAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/ShowTargetFileAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/FileHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/FileHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/HttpHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/HttpHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/SendLogRunnable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/SendLogRunnable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleAnnotator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleAnnotator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleInitComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleInitComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleLexerAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleLexerAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleCompletionContributor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleCompletionContributor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleLineMarkerProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleLineMarkerProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/filetype/ALittleFileType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/filetype/ALittleFileType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/format/ALittleBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/format/ALittleBlock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationJavaScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationJavaScript.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/module/ALittleConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/module/ALittleConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleClassNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleClassNameDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeDotIdReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeDotIdReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodBodyDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodBodyDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodNameDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/hightlight/ALittleParserDefinition.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/hightlight/ALittleParserDefinition.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeDotIdNameReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeDotIdNameReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodParamNameDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCustomTypeReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCustomTypeReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueDotIdNameReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueDotIdNameReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignNameDecReference.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -266,59 +219,63 @@
     </state>
     <state x="-1230" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591011123062" />
     <state x="690" y="256" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668454469" />
-    <state x="761" y="323" key="FileChooserDialogImpl" timestamp="1591668322350">
+    <state width="420" height="466" key="DebuggerActiveHint" timestamp="1591670819653">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="420" height="466" key="DebuggerActiveHint/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670819653" />
+    <state x="761" y="323" key="FileChooserDialogImpl" timestamp="1591670658014">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="-1159" y="336" key="FileChooserDialogImpl/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591412625701" />
-    <state x="761" y="323" key="FileChooserDialogImpl/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668322350" />
-    <state width="1877" height="331" key="GridCell.Tab.0.bottom" timestamp="1591668370122">
+    <state x="761" y="323" key="FileChooserDialogImpl/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670658014" />
+    <state width="1877" height="331" key="GridCell.Tab.0.bottom" timestamp="1591670753439">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.0.bottom/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
-    <state width="1877" height="331" key="GridCell.Tab.0.center" timestamp="1591668370122">
+    <state width="1877" height="331" key="GridCell.Tab.0.bottom/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670753439" />
+    <state width="1877" height="331" key="GridCell.Tab.0.center" timestamp="1591670753439">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.0.center/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
-    <state width="1877" height="331" key="GridCell.Tab.0.left" timestamp="1591668370122">
+    <state width="1877" height="331" key="GridCell.Tab.0.center/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670753439" />
+    <state width="1877" height="331" key="GridCell.Tab.0.left" timestamp="1591670753439">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.0.left/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
-    <state width="1877" height="331" key="GridCell.Tab.0.right" timestamp="1591668370122">
+    <state width="1877" height="331" key="GridCell.Tab.0.left/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670753439" />
+    <state width="1877" height="331" key="GridCell.Tab.0.right" timestamp="1591670753439">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.0.right/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
-    <state width="1877" height="331" key="GridCell.Tab.1.bottom" timestamp="1591668370122">
+    <state width="1877" height="331" key="GridCell.Tab.0.right/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670753439" />
+    <state width="1877" height="331" key="GridCell.Tab.1.bottom" timestamp="1591670774854">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.1.bottom/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
-    <state width="1877" height="331" key="GridCell.Tab.1.center" timestamp="1591668370122">
+    <state width="1877" height="331" key="GridCell.Tab.1.bottom/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670774854" />
+    <state width="1877" height="331" key="GridCell.Tab.1.center" timestamp="1591670774854">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.1.center/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
-    <state width="1877" height="331" key="GridCell.Tab.1.left" timestamp="1591668370122">
+    <state width="1877" height="331" key="GridCell.Tab.1.center/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670774854" />
+    <state width="1877" height="331" key="GridCell.Tab.1.left" timestamp="1591670774854">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.1.left/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
-    <state width="1877" height="331" key="GridCell.Tab.1.right" timestamp="1591668370122">
+    <state width="1877" height="331" key="GridCell.Tab.1.left/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670774854" />
+    <state width="1877" height="331" key="GridCell.Tab.1.right" timestamp="1591670774854">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.1.right/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
-    <state width="1877" height="331" key="GridCell.Tab.2.bottom" timestamp="1591668370123">
+    <state width="1877" height="331" key="GridCell.Tab.1.right/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670774854" />
+    <state width="1877" height="331" key="GridCell.Tab.2.bottom" timestamp="1591670753440">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.2.bottom/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370123" />
-    <state width="1877" height="331" key="GridCell.Tab.2.center" timestamp="1591668370123">
+    <state width="1877" height="331" key="GridCell.Tab.2.bottom/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670753440" />
+    <state width="1877" height="331" key="GridCell.Tab.2.center" timestamp="1591670753440">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.2.center/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370123" />
-    <state width="1877" height="331" key="GridCell.Tab.2.left" timestamp="1591668370123">
+    <state width="1877" height="331" key="GridCell.Tab.2.center/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670753440" />
+    <state width="1877" height="331" key="GridCell.Tab.2.left" timestamp="1591670753439">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.2.left/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370123" />
-    <state width="1877" height="331" key="GridCell.Tab.2.right" timestamp="1591668370123">
+    <state width="1877" height="331" key="GridCell.Tab.2.left/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670753439" />
+    <state width="1877" height="331" key="GridCell.Tab.2.right" timestamp="1591670753440">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
-    <state width="1877" height="331" key="GridCell.Tab.2.right/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370123" />
+    <state width="1877" height="331" key="GridCell.Tab.2.right/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591670753440" />
     <state x="-1196" y="221" key="RollbackChangesDialog" timestamp="1590128912537">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
@@ -336,11 +293,11 @@
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="753" y="412" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591423028544" />
-    <state x="662" y="113" width="596" height="773" key="find.popup" timestamp="1591665331404">
+    <state x="662" y="113" width="1071" height="773" key="find.popup" timestamp="1591669282783">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="-1258" y="118" width="596" height="804" key="find.popup/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590981146199" />
-    <state x="662" y="113" width="596" height="773" key="find.popup/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591665331404" />
+    <state x="662" y="113" width="1071" height="773" key="find.popup/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591669282783" />
     <state x="-1304" y="240" key="run.anything.popup" timestamp="1590995407000">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
@@ -359,11 +316,6 @@
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueCastTypeReference.java</url>
-          <line>27</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/plugin/reference/ALittleTemplatePairDecReference.java</url>
           <line>71</line>
           <option name="timeStamp" value="23" />
@@ -372,6 +324,21 @@
           <url>file://$PROJECT_DIR$/src/plugin/action/BuildTargetAction.java</url>
           <line>30</line>
           <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/plugin/component/ALittleInitComponent.java</url>
+          <line>97</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java</url>
+          <line>2773</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/plugin/generate/ALittleTranslation.java</url>
+          <line>83</line>
+          <option name="timeStamp" value="28" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

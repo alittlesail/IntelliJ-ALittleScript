@@ -261,7 +261,7 @@ public class ALittlePropertyValueCustomTypeReference extends ALittleReference<AL
             ALittleGuessFunctor guessFunctor = (ALittleGuessFunctor)guess;
             if (guessFunctor.element instanceof ALittleClassStaticDec
                 || guessFunctor.element instanceof ALittleGlobalMethodDec) {
-                Annotation anno = holder.createInfoAnnotation(myElement.getIdContent(), null);
+                Annotation anno = holder.createInfoAnnotation(myElement, null);
                 anno.setTextAttributes(DefaultLanguageHighlighterColors.STATIC_METHOD);
             }
         } catch (ALittleGuessException ignored) {

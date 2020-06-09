@@ -73,8 +73,6 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "\""                  { return QUOTE; }
   "\\"                  { return BACK; }
   "..."                 { return TYPE_TAIL; }
-  "Map"                 { return MAP; }
-  "List"                { return LIST; }
   "register"            { return REGISTER; }
   "public"              { return PUBLIC; }
   "private"             { return PRIVATE; }
@@ -88,7 +86,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "Cmd"                 { return CMD; }
   "Nullable"            { return NULLABLE; }
   "Language"            { return LANGUAGE; }
-  "Const"               { return CONST; }
+  "Constant"            { return CONSTANT; }
   "Native"              { return NATIVE; }
   "namespace"           { return NAMESPACE; }
   "class"               { return CLASS; }
@@ -115,6 +113,9 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "continue"            { return CONTINUE; }
   "throw"               { return THROW; }
   "assert"              { return ASSERT; }
+  "const"               { return CONST; }
+  "Map"                 { return MAP; }
+  "List"                { return LIST; }
   "Functor"             { return FUNCTOR; }
   "bool"                { return BOOL; }
   "double"              { return DOUBLE; }

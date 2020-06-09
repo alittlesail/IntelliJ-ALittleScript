@@ -10,7 +10,7 @@ import plugin.guess.ALittleGuessException;
 
 public interface ALittleClassNameDec extends PsiElement {
 
-  @NotNull
+  @Nullable
   PsiElement getIdContent();
 
   @NotNull

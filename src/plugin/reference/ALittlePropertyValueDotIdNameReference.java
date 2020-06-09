@@ -340,7 +340,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
     }
 
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
-        PsiElement element = myElement.getIdContent();
+        PsiElement element = myElement;
         if (element == null) return;
 
         PsiElement resolve = resolve();

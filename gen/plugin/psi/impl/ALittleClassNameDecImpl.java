@@ -30,9 +30,9 @@ public class ALittleClassNameDecImpl extends ASTWrapperPsiElement implements ALi
   }
 
   @Override
-  @NotNull
+  @Nullable
   public PsiElement getIdContent() {
-    return findNotNullChildByType(ID_CONTENT);
+    return findChildByType(ID_CONTENT);
   }
 
   @Override

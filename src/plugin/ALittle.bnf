@@ -90,7 +90,7 @@ LanguageBodyDec ::= '(' (LanguageNameDec LanguageNameDec_*)? ')' {pin=1}
 LanguageModifier ::= Language LanguageBodyDec? {pin=1}
 
 // 常量修饰符，用于修饰函数。表示这个函数不会对数据进行修改
-ConstModifier ::= Const
+ConstModifier ::= Constant
 
 // 原生修饰
 NativeModifier ::= Native
@@ -118,7 +118,7 @@ TemplateExtendsStructDec ::= struct
 
 // 类定义
 ClassDec ::= class (ClassNameDec TemplateDec? ClassExtendsDec? ClassBodyDec?)? {pin=1}
-ClassNameDec ::= ID_CONTENT
+ClassNameDec ::= ID_CONTENT | 'Map'
 ClassExtendsDec ::= ':' (NamespaceNameDec '.')? ClassNameDec {pin=1}
 ClassElementDec ::= Modifier* (ClassCtorDec | ClassGetterDec | ClassSetterDec | ClassStaticDec | ClassMethodDec | ClassVarDec)
 ClassBodyDec ::= '{' ClassElementDec* '}' {pin=1}
@@ -166,7 +166,7 @@ MethodSetterParamDec ::= '(' MethodParamOneDec ')' {pin=1}
 // 函数体部分
 MethodBodyDec ::= '{' AllExpr* '}' {pin=1}
 // 函数名部分
-MethodNameDec ::= ID_CONTENT
+MethodNameDec ::= ID_CONTENT | 'async'
 // 函数返回值类型
 MethodReturnTailDec ::= '...'
 MethodReturnOneDec ::= MethodReturnTailDec | AllType
@@ -287,7 +287,7 @@ AllTypeConst ::= const
 CustomType ::= CustomTypeName CustomTypeDotId? CustomTypeTemplate?
 CustomTypeName ::= ID_CONTENT
 CustomTypeDotId ::= '.' CustomTypeDotIdName {pin=1}
-CustomTypeDotIdName ::= ID_CONTENT
+CustomTypeDotIdName ::= ID_CONTENT | 'Map' | 'async'
 CustomTypeTemplate ::= '<' AllType (',' AllType)* '>' {pin=1}
 
 // 通用类型
@@ -350,7 +350,7 @@ PropertyValueThisType ::= this
 
 PropertyValueSuffix ::= PropertyValueDotId | PropertyValueBracketValue | PropertyValueMethodCall
 PropertyValueDotId ::= '.' PropertyValueDotIdName {pin=1}
-PropertyValueDotIdName ::= ID_CONTENT
+PropertyValueDotIdName ::= ID_CONTENT | 'Map' | 'async' | 'get'
 PropertyValueBracketValue ::= '[' ValueStat ']' {pin=1}
 private PropertyValueMethodCallValueStat_ ::= ',' ValueStat {pin=1}
 PropertyValueMethodCall ::= PropertyValueMethodTemplate? '(' (ValueStat PropertyValueMethodCallValueStat_*)? ')' {pin=2}

@@ -206,7 +206,8 @@ public interface ALittleTypes {
   IElementType CONCAT = new ALittleTokenType("..");
   IElementType COND_AND = new ALittleTokenType("&&");
   IElementType COND_OR = new ALittleTokenType("||");
-  IElementType CONST = new ALittleTokenType("Const");
+  IElementType CONST = new ALittleTokenType("const");
+  IElementType CONSTANT = new ALittleTokenType("Constant");
   IElementType CONTINUE = new ALittleTokenType("continue");
   IElementType CTOR = new ALittleTokenType("ctor");
   IElementType DO = new ALittleTokenType("do");
@@ -236,7 +237,7 @@ public interface ALittleTypes {
   IElementType LESS = new ALittleTokenType("<");
   IElementType LESS_OR_EQUAL = new ALittleTokenType("<=");
   IElementType LINE_COMMENT = new ALittleTokenType("LINE_COMMENT");
-  IElementType LIST = new ALittleTokenType("LIST");
+  IElementType LIST = new ALittleTokenType("List");
   IElementType LONG = new ALittleTokenType("long");
   IElementType LPAREN = new ALittleTokenType("(");
   IElementType MAP = new ALittleTokenType("Map");

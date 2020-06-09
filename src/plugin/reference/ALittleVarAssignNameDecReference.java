@@ -87,7 +87,7 @@ public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVa
     public void colorAnnotator(@NotNull AnnotationHolder holder) {
         PsiElement parent = myElement.getParent();
         if (parent instanceof ALittleForPairDec) {
-            Annotation anno = holder.createInfoAnnotation(myElement.getIdContent(), null);
+            Annotation anno = holder.createInfoAnnotation(myElement, null);
             anno.setTextAttributes(CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
         }
     }

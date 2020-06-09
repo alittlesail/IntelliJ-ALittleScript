@@ -627,14 +627,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ID_CONTENT
+  // ID_CONTENT | 'Map'
   public static boolean ClassNameDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ClassNameDec")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, CLASS_NAME_DEC, "<class name dec>");
     r = consumeToken(b, ID_CONTENT);
-    exit_section_(b, m, CLASS_NAME_DEC, r);
+    if (!r) r = consumeToken(b, "Map");
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -860,13 +860,13 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Const
+  // Constant
   public static boolean ConstModifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ConstModifier")) return false;
-    if (!nextTokenIs(b, CONST)) return false;
+    if (!nextTokenIs(b, CONSTANT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, CONST);
+    r = consumeToken(b, CONSTANT);
     exit_section_(b, m, CONST_MODIFIER, r);
     return r;
   }
@@ -954,14 +954,15 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ID_CONTENT
+  // ID_CONTENT | 'Map' | 'async'
   public static boolean CustomTypeDotIdName(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "CustomTypeDotIdName")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, CUSTOM_TYPE_DOT_ID_NAME, "<custom type dot id name>");
     r = consumeToken(b, ID_CONTENT);
-    exit_section_(b, m, CUSTOM_TYPE_DOT_ID_NAME, r);
+    if (!r) r = consumeToken(b, "Map");
+    if (!r) r = consumeToken(b, "async");
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -1746,7 +1747,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LIST '<' AllType '>'
+  // List '<' AllType '>'
   public static boolean GenericListType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "GenericListType")) return false;
     if (!nextTokenIs(b, LIST)) return false;
@@ -1761,7 +1762,7 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // MAP '<' AllType GenericMapTypeAllType_ '>'
+  // Map '<' AllType GenericMapTypeAllType_ '>'
   public static boolean GenericMapType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "GenericMapType")) return false;
     if (!nextTokenIs(b, MAP)) return false;
@@ -2150,14 +2151,14 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ID_CONTENT
+  // ID_CONTENT | 'async'
   public static boolean MethodNameDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodNameDec")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, METHOD_NAME_DEC, "<method name dec>");
     r = consumeToken(b, ID_CONTENT);
-    exit_section_(b, m, METHOD_NAME_DEC, r);
+    if (!r) r = consumeToken(b, "async");
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -3456,14 +3457,16 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ID_CONTENT
+  // ID_CONTENT | 'Map' | 'async' | 'get'
   public static boolean PropertyValueDotIdName(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "PropertyValueDotIdName")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, PROPERTY_VALUE_DOT_ID_NAME, "<property value dot id name>");
     r = consumeToken(b, ID_CONTENT);
-    exit_section_(b, m, PROPERTY_VALUE_DOT_ID_NAME, r);
+    if (!r) r = consumeToken(b, "Map");
+    if (!r) r = consumeToken(b, "async");
+    if (!r) r = consumeToken(b, "get");
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

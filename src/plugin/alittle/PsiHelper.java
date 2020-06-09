@@ -762,7 +762,7 @@ public class PsiHelper {
         for (ALittleMethodParamOneDec oneDec : paramOneDecList) {
             ALittleMethodParamNameDec nameDec = oneDec.getMethodParamNameDec();
             if (nameDec == null) continue;
-            if (name.isEmpty() || nameDec.getIdContent().getText().equals(name))
+            if (name.isEmpty() || nameDec.getText().equals(name))
                 result.add(nameDec);
         }
         return result;
@@ -822,7 +822,8 @@ public class PsiHelper {
             }
             // 迭代式的for有多个临时变量
             else if (for_condition.getForInCondition() != null) {
-                List<ALittleForPairDec> pair_dec_list = for_condition.getForInCondition().getForPairDecList();
+                List<ALittleForPairDec> src_pair_dec_list = for_condition.getForInCondition().getForPairDecList();
+                List<ALittleForPairDec> pair_dec_list = new ArrayList<>(src_pair_dec_list);
                 pair_dec_list.add(0, for_pair_dec);
                 for (ALittleForPairDec pair_dec : pair_dec_list) {
                     ALittleVarAssignNameDec var_assign_name_dec = pair_dec.getVarAssignNameDec();
@@ -936,7 +937,7 @@ public class PsiHelper {
             for (ALittleVarAssignDec varAssignDec : varAssignDecList) {
                 ALittleVarAssignNameDec varAssignNameDec = varAssignDec.getVarAssignNameDec();
                 if (varAssignNameDec == null) continue;
-                String varName = varAssignNameDec.getIdContent().getText();
+                String varName = varAssignNameDec.getText();
                 if (name.isEmpty() || name.equals(varName))
                     varDecList.add(varAssignNameDec);
             }
