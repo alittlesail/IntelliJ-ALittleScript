@@ -45,12 +45,7 @@ public class ALittleBlock extends AbstractBlock {
         PsiElement parent = element.getParent();
         IElementType type = myNode.getElementType();
 
-        if (element instanceof ALittleClassCtorDec
-                || element instanceof ALittleClassMethodDec
-                || element instanceof ALittleClassStaticDec
-                || element instanceof ALittleClassSetterDec
-                || element instanceof ALittleClassGetterDec
-                || element instanceof ALittleClassVarDec)
+        if (element instanceof ALittleClassElementDec)
             return Indent.getNormalIndent();
 
         if (element instanceof ALittleStructVarDec
@@ -74,15 +69,15 @@ public class ALittleBlock extends AbstractBlock {
     public ChildAttributes getChildAttributes(int newChildIndex) {
         PsiElement element = myNode.getPsi();
 
-        if (element instanceof ALittleStructDec
-                || element instanceof ALittleEnumDec
-                || element instanceof ALittleClassDec
+        if (element instanceof ALittleClassBodyDec
+                || element instanceof ALittleStructBodyDec
+                || element instanceof ALittleEnumBodyDec
                 || element instanceof ALittleMethodBodyDec
-                || element instanceof ALittleIfExpr
-                || element instanceof ALittleElseIfExpr
-                || element instanceof ALittleElseExpr
-                || element instanceof ALittleForExpr
-                || element instanceof ALittleWhileExpr
+                || element instanceof ALittleIfBody
+                || element instanceof ALittleElseIfBody
+                || element instanceof ALittleElseBody
+                || element instanceof ALittleForBody
+                || element instanceof ALittleWhileBody
                 || element instanceof ALittleWrapExpr)
             return new ChildAttributes(Indent.getNormalIndent(), null);
 
