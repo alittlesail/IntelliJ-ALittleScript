@@ -76,17 +76,12 @@
             id="CreateALittleFile">
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
     </action>
-    <action class="plugin.action.CreateTutorialFileAction"
-            text="ALittle Tutorial File"
-            id="CreateTutorialFile">
-      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
-    </action>
     <action class="plugin.action.ShowTargetFileAction"
             text="ShowLuaFile"
             id="ShowLuaFile">
       <add-to-group group-id="RefactoringMenu" anchor="first"/>
     </action>
-    <action class="plugin.action.ReBuildLuaAction"
+    <action class="plugin.action.ReBuildTargetAction"
             text="ReBuildLua"
             id="ReBuildLua">
       <add-to-group group-id="RefactoringMenu" anchor="first"/>

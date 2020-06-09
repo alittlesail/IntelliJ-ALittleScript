@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.FileHelper;
@@ -13,11 +12,9 @@ import plugin.alittle.PsiHelper;
 import plugin.guess.*;
 import plugin.module.ALittleConfig;
 import plugin.psi.*;
-import plugin.reference.ALittlePropertyValueMethodCallReference;
 import plugin.reference.ALittleReferenceInterface;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.*;
 
 public class ALittleTranslation {
@@ -29,12 +26,13 @@ public class ALittleTranslation {
     protected String m_file_path = "";
 
     // 定义依赖
-    private Set<String> m_define_rely = new HashSet<>();
+    protected final Set<String> m_define_rely = new HashSet<>();
     // 运行依赖
-    private Set<String> m_run_rely = new HashSet<>();
+    protected final Set<String> m_run_rely = new HashSet<>();
     // 当前是否是定义依赖
     protected boolean m_is_define_relay = false;
 
+    @NotNull
     public static ALittleTranslation createTranslation(Project project)
     {
         if (ALittleConfig.getConfig(project).getTargetLanguage().equals("Lua"))
@@ -98,7 +96,7 @@ public class ALittleTranslation {
 
         // 如果命名域有register标记，那么就不需要生成
         if (PsiHelper.isRegister(namespace_dec.getModifierList())) return;
-        if (!PsiHelper.isLanguageEnable(namespace_dec.getModifierList())) return;
+        if (PsiHelper.isLanguageEnable(namespace_dec.getModifierList())) return;
 
         // 保存到文件
         FileIndexFacade facade = FileIndexFacade.getInstance(file.getProject());
@@ -110,10 +108,10 @@ public class ALittleTranslation {
         m_namespace_name = name_dec.getText();
 
         try {
-            m_project_path = FileHelper.calcModulePath(module);
-            m_file_path = m_project_path + FileHelper.calcALittleRelPath(module, file.getVirtualFile());
-            String full_path = FileHelper.calcTargetFullPath(m_project_path, file.getVirtualFile().getPath(), getExt());
-            String full_dir = FileHelper.getDirectoryName(full_path);
+            m_project_path = FileHelper.getDirectoryName(module.getModuleFilePath(), true);
+            m_file_path = file.getVirtualFile().getPath();
+            String full_path = FileHelper.calcTargetFullPath(m_project_path, m_file_path, getExt());
+            String full_dir = FileHelper.getDirectoryName(full_path, false);
             new File(full_dir).mkdirs();
             // 生成代码
             String content = generateRoot(namespace_dec.getNamespaceElementDecList());

@@ -456,8 +456,8 @@ public class ALittleMethodNameDecReference extends ALittleReference<ALittleMetho
         if (class_element_dec == null) return;
         PsiElement class_body = class_element_dec.getParent();
         if (class_body == null) return;
+        if (!(class_body.getParent() instanceof ALittleClassDec)) return;
         ALittleClassDec class_dec = (ALittleClassDec)class_body.getParent();
-        if (class_dec == null) return;
 
         // 计算父类
         ALittleClassDec class_extends_dec = PsiHelper.findClassExtends(class_dec);

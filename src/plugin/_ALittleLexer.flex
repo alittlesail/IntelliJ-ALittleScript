@@ -73,6 +73,8 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "\""                  { return QUOTE; }
   "\\"                  { return BACK; }
   "..."                 { return TYPE_TAIL; }
+  "Map"                 { return MAP; }
+  "List"                { return LIST; }
   "register"            { return REGISTER; }
   "public"              { return PUBLIC; }
   "private"             { return PRIVATE; }
@@ -113,8 +115,6 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "continue"            { return CONTINUE; }
   "throw"               { return THROW; }
   "assert"              { return ASSERT; }
-  "Map"                 { return MAP; }
-  "List"                { return LIST; }
   "Functor"             { return FUNCTOR; }
   "bool"                { return BOOL; }
   "double"              { return DOUBLE; }

@@ -15,8 +15,6 @@ import plugin.alittle.FileHelper;
 import plugin.module.ALittleConfig;
 import plugin.psi.ALittleFile;
 
-import java.io.File;
-
 public class ShowTargetFileAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent event) {
@@ -28,20 +26,17 @@ public class ShowTargetFileAction extends AnAction {
         // 保存到文件
         FileIndexFacade facade = FileIndexFacade.getInstance(project);
         Module module = facade.getModuleForFile(file);
-        if (module == null) {
-            return;
-        }
+        if (module == null) return;
 
-        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-        if (psiFile instanceof ALittleFile) {
-            try {
-                String alittleRelPath = FileHelper.calcALittleRelPath(module, file);
-                String fullPath = FileHelper.calcTargetFullPath(FileHelper.calcModulePath(module), alittleRelPath, ALittleConfig.getConfig(project).getTargetLanguage());
-                VirtualFile newFile = VirtualFileManager.getInstance().findFileByUrl("file://" + fullPath);
-                if (newFile == null) return;
-                FileEditorManager.getInstance(project).openFile(newFile, true);
-            } catch (Exception ignored) {
-            }
+        PsiFile psi_file = PsiManager.getInstance(project).findFile(file);
+        if (!(psi_file instanceof ALittleFile)) return;
+        try {
+            String full_path = FileHelper.calcTargetFullPath(FileHelper.getDirectoryName(module.getModuleFilePath(), true)
+                    , file.getPath(), ALittleConfig.getConfig(project).getTargetExt());
+            VirtualFile new_file = VirtualFileManager.getInstance().findFileByUrl("file://" + full_path);
+            if (new_file == null) return;
+            FileEditorManager.getInstance(project).openFile(new_file, true);
+        } catch (Exception ignored) {
         }
     }
 }

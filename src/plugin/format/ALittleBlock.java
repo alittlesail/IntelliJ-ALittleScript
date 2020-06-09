@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ALittleBlock extends AbstractBlock {
-    private SpacingBuilder m_spacingBuilder;
+    private final SpacingBuilder m_spacingBuilder;
 
     protected ALittleBlock(@NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment,
                            SpacingBuilder spacingBuilder) {

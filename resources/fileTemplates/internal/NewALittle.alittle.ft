@@ -3,7 +3,7 @@ namespace ${PROJECT_NAME};
 
 class ${NAME}
 {
-    public Ctor()
+    public ctor()
     {
 
     }

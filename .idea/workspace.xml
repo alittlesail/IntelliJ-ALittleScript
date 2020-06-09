@@ -20,393 +20,76 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0fa83c02-5800-4982-b0b2-fb9c6fa549c9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/IGG.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/IGG.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/_ALittleLexer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/parser/ALittleParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleAccessModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleAllExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleAllType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleAllTypeConst.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleAssertExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleAttributeModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleBindStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassBodyDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassCtorDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassElementDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassExtendsDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassGetterDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassMethodDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassSetterDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassStaticDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassVarDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassVarNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleClassVarValueDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCommandBodyDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCommandModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleConstModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleConstValue.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCoroutineModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCoroutineStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCustomType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCustomTypeDotId.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCustomTypeDotIdName.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCustomTypeName.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleCustomTypeTemplate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleDoWhileBody.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleDoWhileCondition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleDoWhileExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleElseBody.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleElseExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleElseIfBody.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleElseIfCondition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleElseIfExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleEmptyExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleEnumBodyDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleEnumDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleEnumNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleEnumVarDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleEnumVarNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleFlowExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleForBody.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleForCondition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleForEndStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleForExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleForInCondition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleForPairDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleForStartStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleForStepCondition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleForStepStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericFunctorParamOneType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericFunctorParamTail.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericFunctorParamType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericFunctorReturnOneType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericFunctorReturnTail.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericFunctorReturnType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericFunctorType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericListType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericMapType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGenericType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleGlobalMethodDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleIfBody.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleIfCondition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleIfExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleInstanceDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleLanguageBodyDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleLanguageModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleLanguageNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodBodyDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodGetterParamDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodParamDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodParamNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodParamOneDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodParamTailDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodReturnDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodReturnOneDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodReturnTailDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleMethodSetterParamDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleNamespaceDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleNamespaceElementDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleNamespaceNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleNativeModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleNullableModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp1.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp1Expr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp2.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp2Stat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp2SuffixEx.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp2Value.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp3.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp3Stat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp3Suffix.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp3SuffixEx.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp4.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp4Stat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp4Suffix.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp4SuffixEe.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp4SuffixEx.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp5.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp5Stat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp5Suffix.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp5SuffixEe.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp5SuffixEx.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp6.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp6Stat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp6Suffix.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp6SuffixEe.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp6SuffixEx.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp7.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp7Stat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp7Suffix.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp7SuffixEe.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp7SuffixEx.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp8.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp8Stat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp8Suffix.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp8SuffixEe.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOp8SuffixEx.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOpAssign.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOpAssignExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOpNewListStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleOpNewStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePrimitiveType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValue.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueBracketValue.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueCastType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueCustomType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueDotId.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueDotIdName.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueFirstType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueMethodCall.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueMethodTemplate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueSuffix.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittlePropertyValueThisType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleProtocolModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleReflectCustomType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleReflectValue.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleReflectValueStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleRegisterModifier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleReturnExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleReturnYield.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleStructBodyDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleStructDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleStructExtendsDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleStructNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleStructOptionDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleStructOptionNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleStructVarDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleStructVarNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTcallStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTemplateDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTemplateExtendsClassDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTemplateExtendsDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTemplateExtendsStructDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTemplateNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTemplatePairDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleThrowExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTypes.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleUsingDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleUsingNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleValueFactorStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleValueOpStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleValueStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleVarAssignDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleVarAssignExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleVarAssignNameDec.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleVisitor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleWhileBody.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleWhileCondition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleWhileExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleWrapExpr.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleWrapValueStat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAccessModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAllExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAllTypeConstImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAllTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAssertExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleAttributeModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleBindStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassBodyDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassCtorDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassElementDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassExtendsDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassGetterDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassMethodDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassSetterDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassStaticDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassVarDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassVarNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleClassVarValueDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCommandBodyDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCommandModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleConstModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleConstValueImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCoroutineModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCoroutineStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCustomTypeDotIdImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCustomTypeDotIdNameImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCustomTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCustomTypeNameImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleCustomTypeTemplateImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleDoWhileBodyImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleDoWhileConditionImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleDoWhileExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleElseBodyImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleElseExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleElseIfBodyImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleElseIfConditionImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleElseIfExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleEmptyExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleEnumBodyDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleEnumDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleEnumNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleEnumVarDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleEnumVarNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleFlowExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleForBodyImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleForConditionImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleForEndStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleForExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleForInConditionImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleForPairDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleForStartStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleForStepConditionImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleForStepStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericFunctorParamOneTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericFunctorParamTailImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericFunctorParamTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericFunctorReturnOneTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericFunctorReturnTailImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericFunctorReturnTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericFunctorTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericListTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericMapTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGenericTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleGlobalMethodDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleIfBodyImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleIfConditionImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleIfExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleInstanceDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleLanguageBodyDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleLanguageModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleLanguageNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodBodyDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodGetterParamDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodParamDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodParamNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodParamOneDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodParamTailDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodReturnDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodReturnOneDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodReturnTailDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleMethodSetterParamDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleNamespaceDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleNamespaceElementDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleNamespaceNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleNativeModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleNullableModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp1ExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp1Impl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp2Impl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp2StatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp2SuffixExImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp2ValueImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp3Impl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp3StatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp3SuffixExImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp3SuffixImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp4Impl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp4StatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp4SuffixEeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp4SuffixExImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp4SuffixImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp5Impl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp5StatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp5SuffixEeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp5SuffixExImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp5SuffixImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp6Impl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp6StatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp6SuffixEeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp6SuffixExImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp6SuffixImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp7Impl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp7StatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp7SuffixEeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp7SuffixExImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp7SuffixImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp8Impl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp8StatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp8SuffixEeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp8SuffixExImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOp8SuffixImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOpAssignExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOpAssignImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOpNewListStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleOpNewStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePrimitiveTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueBracketValueImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueCastTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueCustomTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueDotIdImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueDotIdNameImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueFirstTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueMethodCallImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueMethodTemplateImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueSuffixImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittlePropertyValueThisTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleProtocolModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleReflectCustomTypeImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleReflectValueImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleReflectValueStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleRegisterModifierImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleReturnExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleReturnYieldImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleStructBodyDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleStructDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleStructExtendsDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleStructNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleStructOptionDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleStructOptionNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleStructVarDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleStructVarNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleTcallStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleTemplateDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleTemplateExtendsClassDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleTemplateExtendsDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleTemplateExtendsStructDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleTemplateNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleTemplatePairDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleThrowExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleUsingDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleUsingNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleValueFactorStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleValueOpStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleValueStatImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleVarAssignDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleVarAssignExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleVarAssignNameDecImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleWhileBodyImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleWhileConditionImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleWhileExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleWrapExprImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleWrapValueStatImpl.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/ALittle.bnf" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/ALittle.bnf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/action/BuildLuaAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/BuildTargetAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/action/ReBuildLuaAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/ReBuildLuaAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/action/ShowLuaFileAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/ShowTargetFileAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/fileTemplates/internal/NewALittle.alittle.ft" beforeDir="false" afterPath="$PROJECT_DIR$/resources/fileTemplates/internal/NewALittle.alittle.ft" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/fileTemplates/internal/NewTutorial.alittle.ft" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/Bind.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/CSVConfig.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/Class.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/ConfigSystem.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/EventDispatcher.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/File.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/Log.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/Native.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/SafeIDCreator.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Base/String.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopFunction.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopGroup.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopList.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopSystem.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Loop/LoopTimer.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Native/bit.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Native/coroutine.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Native/io.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Native/lib.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Native/math.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Native/os.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Native/package.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Native/string.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Native/table.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Net/HttpFileReceiver.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Net/HttpFileSender.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Net/HttpReceiver.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Net/HttpSender.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Net/MsgCommon.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Net/MsgReceiver.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Net/MsgSender.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Net/MsgSession.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Reflect/CSVProtocol.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Reflect/CmdProtocol.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Reflect/MessageProtocol.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Reflect/Reflect.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Register/MessageFactory.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Register/ScriptSystem.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Register/TimerSystem.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Register/json.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Register/lfs.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/std/Register/sqlte3.alittle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/_ALittleLexer.flex" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/_ALittleLexer.flex" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/action/BuildTargetAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/BuildTargetAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/action/CreateALittleFileAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/CreateALittleFileAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/action/CreateTutorialFileAction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/action/ReBuildLuaAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/ReBuildTargetAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/action/ShowTargetFileAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/action/ShowTargetFileAction.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/plugin/alittle/FileHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/FileHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/HttpHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/HttpHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/SendLogRunnable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/SendLogRunnable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleAnnotator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleAnnotator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleInitComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleInitComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/component/StdLibraryProvider.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleGenerateLua.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/psi/ALittlePsiImplUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleGlobalMethodDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleGlobalMethodDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceOpUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceOpUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleReturnExprReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleReturnExprReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleStructDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleStructDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleStructNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleStructNameDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleTcallStatReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleTcallStatReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleTemplatePairDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleTemplatePairDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleThrowExprReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleThrowExprReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleUsingDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleUsingDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleUsingNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleUsingNameDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleValueFactorStatReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleValueFactorStatReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleValueStatReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleValueStatReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignExprReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignExprReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleVarAssignNameDecReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleWrapValueStatReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleWrapValueStatReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleLexerAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleLexerAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/component/ALittleLineMarkerProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/component/ALittleLineMarkerProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/filetype/ALittleFileType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/filetype/ALittleFileType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/format/ALittleBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/format/ALittleBlock.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationJavaScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationJavaScript.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/module/ALittleConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/module/ALittleConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleClassNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleClassNameDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeDotIdReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeDotIdReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodBodyDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodBodyDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodNameDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleMethodNameDecReference.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -463,7 +146,7 @@
     <property name="jdk.selected.JAVA_MODULE" value="1.8" />
     <property name="last.edited.regexp" value="/*as/**/" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/plugin" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.33989638" />
     <property name="settings.editor.selected.configurable" value="preferences.customizations" />
@@ -477,12 +160,8 @@
     <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
-      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
-      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="plugin.parser" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="plugin.psi" />
@@ -503,8 +182,12 @@
       <recent name="plugin.action" />
       <recent name="plugin.link" />
     </key>
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="plugin.parser" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Reflect" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Net" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Base" />
+      <recent name="D:\Software\ALittleScript\trunk\resources\std\Native" />
+      <recent name="D:\ALittleScript\trunk\resources\std\ALittle" />
     </key>
   </component>
   <component name="RunManager">
@@ -557,6 +240,10 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="586" y="177" width="1100" height="669" key="#Inspections" timestamp="1591666139624">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state x="586" y="177" width="1100" height="669" key="#Inspections/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591666139624" />
     <state x="440" y="73" key="#Project_Structure" timestamp="1590118869506">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
@@ -574,25 +261,73 @@
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="735" y="309" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591621941355" />
-    <state x="690" y="256" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1591584232596">
+    <state x="690" y="256" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1591668454469">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="-1230" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591011123062" />
-    <state x="690" y="256" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591584232596" />
-    <state x="761" y="323" key="FileChooserDialogImpl" timestamp="1591622255019">
+    <state x="690" y="256" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668454469" />
+    <state x="761" y="323" key="FileChooserDialogImpl" timestamp="1591668322350">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="-1159" y="336" key="FileChooserDialogImpl/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591412625701" />
-    <state x="761" y="323" key="FileChooserDialogImpl/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591622255019" />
+    <state x="761" y="323" key="FileChooserDialogImpl/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668322350" />
+    <state width="1877" height="331" key="GridCell.Tab.0.bottom" timestamp="1591668370122">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.0.bottom/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
+    <state width="1877" height="331" key="GridCell.Tab.0.center" timestamp="1591668370122">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.0.center/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
+    <state width="1877" height="331" key="GridCell.Tab.0.left" timestamp="1591668370122">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.0.left/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
+    <state width="1877" height="331" key="GridCell.Tab.0.right" timestamp="1591668370122">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.0.right/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
+    <state width="1877" height="331" key="GridCell.Tab.1.bottom" timestamp="1591668370122">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.1.bottom/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
+    <state width="1877" height="331" key="GridCell.Tab.1.center" timestamp="1591668370122">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.1.center/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
+    <state width="1877" height="331" key="GridCell.Tab.1.left" timestamp="1591668370122">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.1.left/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
+    <state width="1877" height="331" key="GridCell.Tab.1.right" timestamp="1591668370122">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.1.right/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370122" />
+    <state width="1877" height="331" key="GridCell.Tab.2.bottom" timestamp="1591668370123">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.2.bottom/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370123" />
+    <state width="1877" height="331" key="GridCell.Tab.2.center" timestamp="1591668370123">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.2.center/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370123" />
+    <state width="1877" height="331" key="GridCell.Tab.2.left" timestamp="1591668370123">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.2.left/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370123" />
+    <state width="1877" height="331" key="GridCell.Tab.2.right" timestamp="1591668370123">
+      <screen x="0" y="0" width="1920" height="999" />
+    </state>
+    <state width="1877" height="331" key="GridCell.Tab.2.right/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591668370123" />
     <state x="-1196" y="221" key="RollbackChangesDialog" timestamp="1590128912537">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1196" y="221" key="RollbackChangesDialog/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590128912537" />
-    <state x="461" y="143" key="SettingsEditor" timestamp="1591412851144">
+    <state x="461" y="143" key="SettingsEditor" timestamp="1591666106928">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="-1459" y="149" key="SettingsEditor/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590129036789" />
-    <state x="461" y="143" key="SettingsEditor/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591412851144" />
+    <state x="461" y="143" key="SettingsEditor/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591666106928" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1591613063308">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
@@ -601,11 +336,11 @@
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="753" y="412" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591423028544" />
-    <state x="662" y="113" width="596" height="773" key="find.popup" timestamp="1591622355444">
+    <state x="662" y="113" width="596" height="773" key="find.popup" timestamp="1591665331404">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="-1258" y="118" width="596" height="804" key="find.popup/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590981146199" />
-    <state x="662" y="113" width="596" height="773" key="find.popup/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591622355444" />
+    <state x="662" y="113" width="596" height="773" key="find.popup/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591665331404" />
     <state x="-1304" y="240" key="run.anything.popup" timestamp="1590995407000">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
@@ -629,14 +364,14 @@
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/plugin/reference/ALittleStructVarDecReference.java</url>
-          <line>23</line>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/plugin/reference/ALittleTemplatePairDecReference.java</url>
           <line>71</line>
           <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/plugin/action/BuildTargetAction.java</url>
+          <line>30</line>
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

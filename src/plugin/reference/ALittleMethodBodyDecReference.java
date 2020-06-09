@@ -133,7 +133,7 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
         for (int i = 0; i < all_expr_list.size(); ++i)
         {
             ALittleAllExpr all_expr = all_expr_list.get(i);
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
 
             boolean sub_result = checkAllExpr(return_list, all_expr_list.get(i));
@@ -149,7 +149,7 @@ public class ALittleMethodBodyDecReference extends ALittleReference<ALittleMetho
         for (int i = index + 1; i < all_expr_list.size(); ++i)
         {
             ALittleAllExpr all_expr = all_expr_list.get(i);
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             throw new ALittleGuessException(all_expr, "当前分支内，从这里开始之后所有语句永远都不会执行到");
         }

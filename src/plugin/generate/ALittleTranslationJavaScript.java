@@ -718,7 +718,6 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         else if (suffix.getOp5Suffix() != null)
             return GenerateOp5Suffix(suffix.getOp5Suffix());
         else {
-            String content;
             throw new ALittleGuessException(null, "GenerateOp6SuffixEe出现未知的表达式");
         }
     }
@@ -767,7 +766,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
     private String GenerateOp5Suffix(ALittleOp5Suffix suffix) throws ALittleGuessException {
         String content;
         String op_string = suffix.getOp5().getText();
-        if (op_string == "..")
+        if (op_string.equals(".."))
             op_string = "+";
 
         String value_functor_result = null;
@@ -790,8 +789,8 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         if (suffix_content_list.size() > 0)
             value_functor_result += " " + StringUtil.join(suffix_content_list, " ");
 
-        if (value_functor_result.startsWith("\"") && value_functor_result.endsWith("\"")
-                || value_functor_result.indexOf("+") < 0)
+        if (value_functor_result != null && (value_functor_result.startsWith("\"") && value_functor_result.endsWith("\"")
+                || !value_functor_result.contains("+")))
             content = op_string + " " + value_functor_result;
         else
             content = op_string + " (" + value_functor_result + ")";
@@ -806,7 +805,6 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         else if (suffix.getOp4Suffix() != null)
             return GenerateOp4Suffix(suffix.getOp4Suffix());
         else {
-            String content;
             throw new ALittleGuessException(null, "GenerateOp5SuffixEe出现未知的表达式");
         }
     }
@@ -823,7 +821,6 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         else if (suffix.getOp8Suffix() != null)
             return GenerateOp8Suffix(suffix.getOp8Suffix());
         else {
-            String content;
             throw new ALittleGuessException(null, "GenerateOp5SuffixEx出现未知的表达式");
         }
     }
@@ -882,7 +879,6 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         if (suffix.getOp3Suffix() != null)
             return GenerateOp3Suffix(suffix.getOp3Suffix());
         else {
-            String content;
             throw new ALittleGuessException(null, "GenerateOp4SuffixEe出现未知的表达式");
         }
     }
@@ -901,7 +897,6 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         else if (suffix.getOp8Suffix() != null)
             return GenerateOp8Suffix(suffix.getOp8Suffix());
         else {
-            String content;
             throw new ALittleGuessException(null, "GenerateOp4SuffixEx出现未知的表达式");
         }
     }
@@ -964,7 +959,6 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         else if (suffix.getOp8Suffix() != null)
             return GenerateOp8Suffix(suffix.getOp8Suffix());
         else {
-            String content;
             throw new ALittleGuessException(null, "GenerateOp3SuffixEx出现未知的表达式");
         }
     }
@@ -1035,7 +1029,6 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         else if (suffix.getOp8Suffix() != null)
             return GenerateOp8Suffix(suffix.getOp8Suffix());
         else {
-            String content;
             throw new ALittleGuessException(null, "GenerateOp2SuffixEx出现未知的表达式");
         }
     }
@@ -1131,14 +1124,13 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
             return value_factor.getMethodParamTailDec().getText() + "___args";
         }
 
-        String content;
         throw new ALittleGuessException(null, "GenerateValueFactor出现未知类型");
     }
 
     // 生成常量
 
     @NotNull
-    private String GenerateConstValue(ALittleConstValue const_value) throws ALittleGuessException {
+    private String GenerateConstValue(ALittleConstValue const_value) {
         String content = "";
         String const_value_string = const_value.getText();
         if (const_value_string.equals("null"))
@@ -1219,7 +1211,6 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
     }
 
     // 生成struct的反射信息
-    @NotNull
     private void GenerateReflectStructInfo(ALittleGuess guess) throws ALittleGuessException {
         if (guess instanceof ALittleGuessList) {
             ALittleGuessList guess_list = (ALittleGuessList) guess;
@@ -1239,10 +1230,10 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
             boolean generate = false;
             // 如果是本文件的，那么就生成
-            if (FileHelper.calcModulePath(guess_struct.struct_dec) == m_file_path)
+            if (guess_struct.struct_dec.getContainingFile().getOriginalFile().getVirtualFile().getPath().equals(m_file_path))
                 generate = true;
             // 如果不在同一个工程，那么就生成
-            if (FileHelper.calcModulePath(guess_struct.struct_dec) != m_project_path)
+            if (FileHelper.calcModulePath(guess_struct.struct_dec, true).equals(m_project_path))
                 generate = true;
                 //  如果是同一个工程，并且是register，那么也要生成
             else if (guess_struct.is_register)
@@ -1337,7 +1328,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         String content = "";
 
         ALittlePropertyValueFirstType first_type = prop_value.getPropertyValueFirstType();
-        if (first_type == null) return new Tuple2<>(content, handle);
+        if (first_type == null) return new Tuple2<>(content, false);
 
         ALittleGuess custom_guess = first_type.guessType();
 
@@ -1347,40 +1338,40 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
         List<ALittlePropertyValueSuffix> suffix_list = prop_value.getPropertyValueSuffixList();
         if (custom_guess instanceof ALittleGuessNamespaceName) {
-            if (suffix_list.size() != 2) return new Tuple2<>(content, handle);
+            if (suffix_list.size() != 2) return new Tuple2<>(content, false);
             suffix = suffix_list.get(1);
 
             ALittleGuess guess = suffix_list.get(0).guessType();
 
             enum_name_guess = (ALittleGuessEnumName) guess;
         } else if (custom_guess instanceof ALittleGuessEnumName) {
-            if (suffix_list.size() != 1) return new Tuple2<>(content, handle);
+            if (suffix_list.size() != 1) return new Tuple2<>(content, false);
             suffix = suffix_list.get(0);
 
             enum_name_guess = (ALittleGuessEnumName) custom_guess;
         }
 
-        if (enum_name_guess == null) return new Tuple2<>(content, handle);
-        if (suffix == null) return new Tuple2<>(content, handle);
+        if (enum_name_guess == null) return new Tuple2<>(content, false);
+        if (suffix == null) return new Tuple2<>(content, false);
 
-        if (FileHelper.calcModulePath(enum_name_guess.enum_name_dec) == m_project_path) return new Tuple2<>(content, handle);
+        if (FileHelper.calcModulePath(enum_name_guess.enum_name_dec, true).equals(m_project_path)) return new Tuple2<>(content, false);
 
         ALittlePropertyValueDotId dot_id = suffix.getPropertyValueDotId();
-        if (dot_id == null) return new Tuple2<>(content, handle);
+        if (dot_id == null) return new Tuple2<>(content, false);
         ALittlePropertyValueDotIdName dot_id_name = dot_id.getPropertyValueDotIdName();
-        if (dot_id_name == null) return new Tuple2<>(content, handle);
+        if (dot_id_name == null) return new Tuple2<>(content, false);
 
         ALittleEnumDec enum_dec = (ALittleEnumDec) enum_name_guess.enum_name_dec.getParent();
-        if (enum_dec == null) return new Tuple2<>(content, handle);
+        if (enum_dec == null) return new Tuple2<>(content, false);
 
         ALittleEnumBodyDec body_dec = enum_dec.getEnumBodyDec();
-        if (body_dec == null) return new Tuple2<>(content, handle);
+        if (body_dec == null) return new Tuple2<>(content, false);
 
         List<ALittleEnumVarDec> var_dec_list = body_dec.getEnumVarDecList();
         for (ALittleEnumVarDec var_dec : var_dec_list) {
             ALittleEnumVarNameDec name_dec = var_dec.getEnumVarNameDec();
             if (name_dec == null) continue;
-            if (name_dec.getText() != dot_id_name.getText())
+            if (!name_dec.getText().equals(dot_id_name.getText()))
                 continue;
 
             if (var_dec.getTextContent() != null)
@@ -1436,7 +1427,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                     String pre_namespace_name = ((ALittlePropertyValueCustomTypeReference) custom_type.getReference()).calcNamespaceName();
 
 
-                    if (pre_namespace_name == "alittle") pre_namespace_name = "";
+                    if (pre_namespace_name.equals("alittle")) pre_namespace_name = "";
                     if (pre_namespace_name != null && pre_namespace_name.length() > 0)
                         content += pre_namespace_name + ".";
                 }
@@ -1905,7 +1896,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                 return_count = -1;
 
             if (return_count == 0 || return_count == 1) {
-                if (value_stat_result == "undefined" && map_del_list.get(0) != null)
+                if (value_stat_result.equals("undefined") && map_del_list.get(0) != null)
                     content = pre_tab + map_del_list.get(0) + ";\n";
                 else if (map_set_list.get(0) != null)
                     content = pre_tab + map_set_list.get(0) + value_stat_result + ");\n";
@@ -1977,7 +1968,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
             throw new ALittleGuessException(null, "表达式不完整");
         }
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t", is_await);
 
@@ -2010,7 +2001,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
             throw new ALittleGuessException(null, "表达式不完整");
         }
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t", is_await);
 
@@ -2044,7 +2035,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
             throw new ALittleGuessException(null, "表达式不完整");
         }
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t", is_await);
 
@@ -2214,7 +2205,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         }
 
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t", is_await);
 
@@ -2249,7 +2240,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         }
 
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t", is_await);
 
@@ -2281,7 +2272,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         }
 
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t", is_await);
 
@@ -2299,7 +2290,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
         List<ALittleAllExpr> all_expr_list = root.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t", is_await);
 
@@ -2622,7 +2613,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         int ctor_count = 0;
 
         for (ALittleClassElementDec class_element_dec : class_element_list) {
-            if (!PsiHelper.isLanguageEnable(class_element_dec.getModifierList()))
+            if (PsiHelper.isLanguageEnable(class_element_dec.getModifierList()))
                 continue;
 
             if (class_element_dec.getClassCtorDec() != null) {
@@ -2660,7 +2651,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                 if (body_dec != null) {
                     List<ALittleAllExpr> all_expr_list = body_dec.getAllExprList();
                     for (ALittleAllExpr all_expr : all_expr_list) {
-                        if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                        if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                             continue;
                         String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t\t", false);
 
@@ -2684,7 +2675,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                     throw new ALittleGuessException(null, "class " + class_name + " getter函数没有函数体");
                 List<ALittleAllExpr> all_expr_list = class_method_body_dec.getAllExprList();
                 for (ALittleAllExpr all_expr : all_expr_list) {
-                    if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                    if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
                     String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t\t", false);
 
@@ -2719,7 +2710,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
                 List<ALittleAllExpr> all_expr_list = class_method_body_dec.getAllExprList();
                 for (ALittleAllExpr all_expr : all_expr_list) {
-                    if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                    if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
                     String sub_content = GenerateAllExpr(all_expr, pre_tab + "\t\t", false);
 
@@ -2774,7 +2765,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                 content += "function(" + method_param_list + ") {\n";
 
                 String suffix_content = "";
-                if (coroutine_type == "await") {
+                if (coroutine_type.equals("await")) {
                     content += pre_tab + "\t\treturn new Promise((";
                     suffix_content = "function(___COROUTINE, ___) {\n";
                 }
@@ -2787,12 +2778,12 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                 List<ALittleAllExpr> all_expr_list = class_method_body_dec.getAllExprList();
 
                 for (ALittleAllExpr all_expr : all_expr_list) {
-                    if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                    if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
                     String new_pre_tab = pre_tab + "\t\t";
-                    if (coroutine_type == "await")
+                    if (coroutine_type.equals("await"))
                         new_pre_tab += "\t";
-                    String sub_content = GenerateAllExpr(all_expr, new_pre_tab, coroutine_type == "await");
+                    String sub_content = GenerateAllExpr(all_expr, new_pre_tab, coroutine_type.equals("await"));
 
                     suffix_content += sub_content;
                 }
@@ -2853,7 +2844,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
                 content += "function(" + method_param_list + ") {\n";
                 String suffix_content = "";
-                if (coroutine_type == "await") {
+                if (coroutine_type.equals("await")) {
                     content += pre_tab + "\t\treturn new Promise(";
                     suffix_content = "function(___COROUTINE, ___) {\n";
                 }
@@ -2866,12 +2857,12 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
                 List<ALittleAllExpr> all_expr_list = class_method_body_dec.getAllExprList();
                 for (ALittleAllExpr all_expr : all_expr_list) {
-                    if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                    if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
                     String new_pre_tab = pre_tab + "\t\t";
                     if (coroutine_type.equals("await"))
                         new_pre_tab += "\t";
-                    String sub_content = GenerateAllExpr(all_expr, new_pre_tab, coroutine_type == "await");
+                    String sub_content = GenerateAllExpr(all_expr, new_pre_tab, coroutine_type.equals("await"));
 
                     suffix_content += sub_content;
                 }
@@ -3025,12 +3016,12 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
         List<ALittleAllExpr> all_expr_list = method_body_dec.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             String new_pre_tab = pre_tab + "\t";
             if (coroutine_type.equals("await"))
                 new_pre_tab += "\t";
-            String sub_content = GenerateAllExpr(all_expr, new_pre_tab, coroutine_type == "await");
+            String sub_content = GenerateAllExpr(all_expr, new_pre_tab, coroutine_type.equals("await"));
 
             suffix_content += sub_content;
         }
@@ -3163,7 +3154,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
         String other_content = "";
         for (ALittleNamespaceElementDec child : element_dec_list) {
-            if (!PsiHelper.isLanguageEnable(child.getModifierList()))
+            if (PsiHelper.isLanguageEnable(child.getModifierList()))
                 continue;
 
             // 处理结构体

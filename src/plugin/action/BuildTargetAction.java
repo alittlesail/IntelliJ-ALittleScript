@@ -11,49 +11,38 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import plugin.generate.ALittleTranslation;
-import plugin.generate.ALittleTranslationJavaScript;
-import plugin.generate.ALittleTranslationLua;
 import plugin.alittle.FileHelper;
 import plugin.alittle.SendLogRunnable;
-import plugin.module.ALittleConfig;
+import plugin.generate.ALittleTranslation;
 import plugin.psi.ALittleFile;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class BuildTargetAction extends AnAction {
     protected boolean mRebuild = false;
 
-    private void generateDir(PsiManager psiMgr, VirtualFile root) throws Exception {
+    private void generateDir(Project project, PsiManager psi_mgr, VirtualFile root) throws Exception {
+        // 处理文件夹
         if (root.isDirectory()) {
             VirtualFile[] files = root.getChildren();
-            if (files != null) {
-                for (VirtualFile file : files) {
-                    generateDir(psiMgr, file);
-                }
-            }
-        } else {
-            PsiFile psiFile = psiMgr.findFile(root);
-            if (psiFile instanceof ALittleFile) {
-                try {
-                    String language = ALittleConfig.getConfig(psiMgr.getProject()).getTargetLanguage();
-                    ALittleTranslation translation = null;
-                    if (language.equals("Lua"))
-                    {
-                        translation = new ALittleTranslationLua();
-                    }
-                    else if (language.equals("JavaScript"))
-                    {
-                        translation = new ALittleTranslationJavaScript();
-                    }
-                    if (translation != null)
-                        translation.generate((ALittleFile) psiFile, true);
-                } catch (Exception e) {
-                    FileEditorManager.getInstance(psiFile.getProject()).openFile(psiFile.getVirtualFile(), true);
-                    throw e;
-                }
-            }
+            if (files == null) return;
+            for (VirtualFile file : files)
+                generateDir(project, psi_mgr, file);
+            return;
+        }
+        PsiFile psi_file = psi_mgr.findFile(root);
+        if (!(psi_file instanceof ALittleFile))
+            return;
+        try {
+            ALittleTranslation translation = ALittleTranslation.createTranslation(project);
+            translation.generate((ALittleFile)psi_file, true);
+        } catch (Exception e) {
+            FileEditorManager.getInstance(psi_file.getProject()).openFile(psi_file.getVirtualFile(), true);
+            throw e;
         }
     }
 
@@ -63,33 +52,32 @@ public class BuildTargetAction extends AnAction {
         Project project = event.getProject();
         if (project == null) return;
         // 获取选中的文件
-        VirtualFile[] targetFileArray = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
-        if (targetFileArray == null) return;
+        VirtualFile[] target_file_array = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
+        if (target_file_array == null) return;
         // 获取管理器
-        PsiManager psiMgr = PsiManager.getInstance(project);
+        PsiManager psi_mgr = PsiManager.getInstance(project);
         // 发送日志
-        SendLogRunnable.SendLog("gen all lua file");
+        SendLogRunnable.SendLog("gen all target file");
         // 提示消息框
-        Messages.showMessageDialog(project, "开始执行lua代码生成", "提示", Messages.getInformationIcon());
+        Messages.showMessageDialog(project, "开始执行目标代码生成", "提示", Messages.getInformationIcon());
 
         // 创建文件夹
         try {
             if (mRebuild) {
                 // 整理模块路径
-                HashMap<String, Module> map = new HashMap<>();
+                Map<String, Module> map = new HashMap<>();
                 // 获取当前所有模块
                 Module[] modules = ModuleManager.getInstance(project).getModules();
                 // 遍历模块
                 for (Module module : modules) {
-                    map.put(FileHelper.calcModulePath(module), module);
+                    map.put(FileHelper.getDirectoryName(module.getModuleFilePath(), true), module);
                 }
 
                 // 收集模块
-                HashSet<Module> set = new HashSet<>();
-                for (VirtualFile targetFile : targetFileArray) {
-                    String path = targetFile.getPath();
-                    if (!path.endsWith("/") && !path.endsWith("\\"))
-                        path += "/";
+                Set<Module> set = new HashSet<>();
+                for (VirtualFile target_file : target_file_array) {
+                    String path = target_file.getPath();
+                    if (!path.endsWith("/") && !path.endsWith("\\")) path += "/";
                     Module module = map.get(path);
                     if (module != null) {
                         set.add(module);
@@ -98,12 +86,16 @@ public class BuildTargetAction extends AnAction {
 
                 // 重构涉及到的模块
                 for (Module module : set) {
-                    FileHelper.rebuildPath(FileHelper.calcModulePath(module));
+                    String path = FileHelper.getDirectoryName(module.getModuleFilePath(), false);
+                    FileHelper.deepDeletePath(path);
+                    File root_file_path = new File(path);
+                    if (!root_file_path.exists() && !root_file_path.mkdirs())
+                        throw new Exception("路径创建失败 path:" + root_file_path.getPath());
                 }
             }
 
-            for (VirtualFile targetFile : targetFileArray) {
-                generateDir(psiMgr, targetFile);
+            for (VirtualFile targetFile : target_file_array) {
+                generateDir(project, psi_mgr, targetFile);
             }
         } catch (Exception e) {
             Messages.showMessageDialog(project, e.getMessage(), "提示", Messages.getInformationIcon());

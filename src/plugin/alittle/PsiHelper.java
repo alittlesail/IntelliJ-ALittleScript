@@ -35,21 +35,19 @@ public class PsiHelper {
         int h = l;
         int step = (l >> 5) + 1;
 
-        for (int i=l; i >= step; i-=step) {
-            h = h ^ ((h << 5) + bytes[i-1] + (h >> 2));
+        for (int i = l; i >= step; i -= step) {
+            h = h ^ ((h << 5) + bytes[i - 1] + (h >> 2));
         }
         return h;
     }
 
     // 计算结构体的哈希值
-    public static int structHash(ALittleGuessStruct guess)
-    {
+    public static int structHash(ALittleGuessStruct guess) {
         return JSHash(guess.namespace_name + "." + guess.struct_name) + JSHash(guess.namespace_name) + JSHash(guess.struct_name);
     }
 
     // 类的属性类型
-    public enum ClassAttrType
-    {
+    public enum ClassAttrType {
         VAR,            // 成员变量
         FUN,            // 成员函数
         GETTER,         // getter函数
@@ -59,16 +57,14 @@ public class PsiHelper {
     }
 
     // 访问权限类型
-    public enum ClassAccessType
-    {
+    public enum ClassAccessType {
         PUBLIC,         // 全局可访问
         PROTECTED,      // 本命名域可访问
         PRIVATE,        // 本类可访问
     }
 
     // 元素类型
-    public enum PsiElementType
-    {
+    public enum PsiElementType {
         CLASS_NAME,         // 类名
         ENUM_NAME,          // 枚举名
         STRUCT_NAME,        // 结构体名
@@ -78,34 +74,27 @@ public class PsiHelper {
     }
 
     // 语言判定
-    public static boolean isLanguageEnable(List<ALittleModifier> element_list)
-    {
-        for (ALittleModifier element : element_list)
-        {
-            if (element.getAttributeModifier() != null)
-            {
+    public static boolean isLanguageEnable(List<ALittleModifier> element_list) {
+        for (ALittleModifier element : element_list) {
+            if (element.getAttributeModifier() != null) {
                 ALittleLanguageModifier language = element.getAttributeModifier().getLanguageModifier();
-                if (language != null)
-                {
+                if (language != null) {
                     PsiReference ref = language.getReference();
-                    if (!(ref instanceof ALittleLanguageModifierReference)) return false;
-                    ALittleLanguageModifierReference modifier = (ALittleLanguageModifierReference)ref;
-                    return modifier.isLanguageEnable();
+                    if (!(ref instanceof ALittleLanguageModifierReference)) return true;
+                    ALittleLanguageModifierReference modifier = (ALittleLanguageModifierReference) ref;
+                    return !modifier.isLanguageEnable();
                 }
             }
         }
 
-        return true;
+        return false;
     }
 
 
     // 是否使用原生
-    public static boolean isNative(List<ALittleModifier> element_list)
-    {
-        for (ALittleModifier element : element_list)
-        {
-            if (element.getAttributeModifier() != null)
-            {
+    public static boolean isNative(List<ALittleModifier> element_list) {
+        for (ALittleModifier element : element_list) {
+            if (element.getAttributeModifier() != null) {
                 return element.getAttributeModifier().getNativeModifier() != null;
             }
         }
@@ -114,56 +103,41 @@ public class PsiHelper {
     }
 
     // 检查await
-    public static void checkInvokeAwait(PsiElement element) throws ALittleGuessException
-    {
+    public static void checkInvokeAwait(PsiElement element) throws ALittleGuessException {
         // 检查这次所在的函数必须要有await或者async修饰
         PsiElement parent = element;
-        while (parent != null)
-        {
-            if (parent instanceof ALittleNamespaceDec)
-            {
+        while (parent != null) {
+            if (parent instanceof ALittleNamespaceDec) {
                 throw new ALittleGuessException(element, "全局表达式不能调用带有await的函数");
-            }
-            else if (parent instanceof ALittleClassCtorDec)
-            {
+            } else if (parent instanceof ALittleClassCtorDec) {
                 throw new ALittleGuessException(element, "构造函数内不能调用带有await的函数");
-            }
-            else if (parent instanceof ALittleClassGetterDec)
-            {
+            } else if (parent instanceof ALittleClassGetterDec) {
                 throw new ALittleGuessException(element, "getter函数内不能调用带有await的函数");
-            }
-            else if (parent instanceof ALittleClassSetterDec)
-            {
+            } else if (parent instanceof ALittleClassSetterDec) {
                 throw new ALittleGuessException(element, "setter函数内不能调用带有await的函数");
-            }
-            else if (parent instanceof ALittleClassMethodDec)
-            {
+            } else if (parent instanceof ALittleClassMethodDec) {
                 PsiElement parentElement = parent.getParent();
                 if (!(parentElement instanceof ALittleClassElementDec))
                     throw new ALittleGuessException(element, "所在函数没有async或await修饰");
-                List<ALittleModifier> modifier = ((ALittleClassElementDec)parentElement).getModifierList();
+                List<ALittleModifier> modifier = ((ALittleClassElementDec) parentElement).getModifierList();
                 if (getCoroutineType(modifier) == null)
                     throw new ALittleGuessException(element, "所在函数没有async或await修饰");
                 break;
-            }
-            else if (parent instanceof ALittleClassStaticDec)
-            {
+            } else if (parent instanceof ALittleClassStaticDec) {
                 PsiElement parentElement = parent.getParent();
                 if (!(parentElement instanceof ALittleClassElementDec))
                     throw new ALittleGuessException(element, "所在函数没有async或await修饰");
 
-                List<ALittleModifier> modifier = ((ALittleClassElementDec)parentElement).getModifierList();
+                List<ALittleModifier> modifier = ((ALittleClassElementDec) parentElement).getModifierList();
                 if (getCoroutineType(modifier) == null)
                     throw new ALittleGuessException(element, "所在函数没有async或await修饰");
                 break;
-            }
-            else if (parent instanceof ALittleGlobalMethodDec)
-            {
+            } else if (parent instanceof ALittleGlobalMethodDec) {
                 PsiElement parentElement = parent.getParent();
                 if (!(parentElement instanceof ALittleNamespaceElementDec))
                     throw new ALittleGuessException(element, "所在函数没有async或await修饰");
 
-                List<ALittleModifier> modifier = ((ALittleNamespaceElementDec)parentElement).getModifierList();
+                List<ALittleModifier> modifier = ((ALittleNamespaceElementDec) parentElement).getModifierList();
                 if (getCoroutineType(modifier) == null)
                     throw new ALittleGuessException(element, "所在函数没有async或await修饰");
                 break;
@@ -174,8 +148,7 @@ public class PsiHelper {
 
 
     // 判断是否存在
-    public static void checkError(PsiElement parent, List<ALittleModifier> element_list) throws ALittleGuessException
-    {
+    public static void checkError(PsiElement parent, List<ALittleModifier> element_list) throws ALittleGuessException {
         int register_count = 0;
         int coroutine_count = 0;
         int access_count = 0;
@@ -186,10 +159,8 @@ public class PsiHelper {
         int proto_cmd_count = 0;
         int native_count = 0;
 
-        for (ALittleModifier element : element_list)
-        {
-            if (element.getRegisterModifier() != null)
-            {
+        for (ALittleModifier element : element_list) {
+            if (element.getRegisterModifier() != null) {
                 ++register_count;
                 if (register_count > 1)
                     throw new ALittleGuessException(element.getRegisterModifier(), "register修饰符只能定义一个");
@@ -197,31 +168,24 @@ public class PsiHelper {
                 // register只能修饰namespace
                 if (!(parent instanceof ALittleNamespaceDec))
                     throw new ALittleGuessException(element.getRegisterModifier(), "register只能修饰namespace");
-            }
-            else if (element.getCoroutineModifier() != null)
-            {
+            } else if (element.getCoroutineModifier() != null) {
                 ++coroutine_count;
                 if (coroutine_count > 1)
                     throw new ALittleGuessException(element.getCoroutineModifier(), "协程修饰符只能定义一个");
 
                 boolean has_error = true;
-                if (parent instanceof ALittleNamespaceElementDec)
-                {
-                    ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec)parent;
+                if (parent instanceof ALittleNamespaceElementDec) {
+                    ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec) parent;
                     has_error = namespace_element_dec.getGlobalMethodDec() == null;
-                }
-                else if (parent instanceof ALittleClassElementDec)
-                {
-                    ALittleClassElementDec class_element_dec = (ALittleClassElementDec)parent;
+                } else if (parent instanceof ALittleClassElementDec) {
+                    ALittleClassElementDec class_element_dec = (ALittleClassElementDec) parent;
                     has_error = class_element_dec.getClassMethodDec() == null
                             && class_element_dec.getClassStaticDec() == null;
                 }
 
                 if (has_error)
                     throw new ALittleGuessException(element.getCoroutineModifier(), "协程修饰符修饰全局函数，类成员函数，类静态函数");
-            }
-            else if (element.getAccessModifier() != null)
-            {
+            } else if (element.getAccessModifier() != null) {
                 ++access_count;
                 if (access_count > 1)
                     throw new ALittleGuessException(element.getAccessModifier(), "访问修饰符只能定义一个");
@@ -234,29 +198,23 @@ public class PsiHelper {
 
                 if (parent instanceof ALittleAllExpr)
                     throw new ALittleGuessException(element.getAccessModifier(), "访问修饰符不能修饰表达式列表");
-            }
-            else if (element.getAttributeModifier() != null)
-            {
+            } else if (element.getAttributeModifier() != null) {
                 ALittleAttributeModifier attribute = element.getAttributeModifier();
-                if (attribute.getLanguageModifier() != null)
-                {
+                if (attribute.getLanguageModifier() != null) {
                     ++language_count;
                     if (language_count > 1)
                         throw new ALittleGuessException(attribute.getLanguageModifier(), "Language修饰符最多只能有一个");
 
                     if (parent instanceof ALittleMethodParamOneDec)
                         throw new ALittleGuessException(attribute, "Language修饰符不能修饰函数形参");
-                }
-                else if (attribute.getConstModifier() != null)
-                {
+                } else if (attribute.getConstModifier() != null) {
                     ++const_count;
                     if (const_count > 1)
                         throw new ALittleGuessException(attribute.getConstModifier(), "Const修饰符最多只能有一个");
 
                     boolean has_error = true;
-                    if (parent instanceof ALittleClassElementDec)
-                    {
-                        ALittleClassElementDec class_element_dec = (ALittleClassElementDec)parent;
+                    if (parent instanceof ALittleClassElementDec) {
+                        ALittleClassElementDec class_element_dec = (ALittleClassElementDec) parent;
                         has_error = class_element_dec.getClassGetterDec() == null
                                 && class_element_dec.getClassSetterDec() == null
                                 && class_element_dec.getClassMethodDec() == null;
@@ -264,74 +222,58 @@ public class PsiHelper {
 
                     if (has_error)
                         throw new ALittleGuessException(attribute, "Const修饰符修饰类getter函数，类setter函数，类成员函数");
-                }
-                else if (attribute.getNullableModifier() != null)
-                {
+                } else if (attribute.getNullableModifier() != null) {
                     ++nullable_count;
                     if (nullable_count > 1)
                         throw new ALittleGuessException(attribute.getNullableModifier(), "Nullable修饰符最多只能有一个");
 
                     if (!(parent instanceof ALittleMethodParamOneDec))
                         throw new ALittleGuessException(attribute.getNullableModifier(), "Nullable只能修饰函数形参");
-                }
-                else if (attribute.getProtocolModifier() != null)
-                {
+                } else if (attribute.getProtocolModifier() != null) {
                     ++proto_cmd_count;
                     if (proto_cmd_count > 1)
                         throw new ALittleGuessException(attribute.getProtocolModifier(), "协议修饰符和命令修饰符最多只能有一个");
 
                     boolean has_error = true;
-                    if (parent instanceof ALittleNamespaceElementDec)
-                    {
-                        ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec)parent;
+                    if (parent instanceof ALittleNamespaceElementDec) {
+                        ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec) parent;
                         has_error = namespace_element_dec.getGlobalMethodDec() == null;
                     }
 
                     if (has_error)
                         throw new ALittleGuessException(attribute, "协议修饰符只能修饰全局函数");
-                }
-                else if (attribute.getCommandModifier() != null)
-                {
+                } else if (attribute.getCommandModifier() != null) {
                     ++proto_cmd_count;
                     if (proto_cmd_count > 1)
                         throw new ALittleGuessException(attribute.getCommandModifier(), "协议修饰符和命令修饰符最多只能有一个");
 
                     boolean has_error = true;
-                    if (parent instanceof ALittleNamespaceElementDec)
-                    {
-                        ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec)parent;
+                    if (parent instanceof ALittleNamespaceElementDec) {
+                        ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec) parent;
                         has_error = namespace_element_dec.getGlobalMethodDec() == null;
                     }
 
                     if (has_error)
                         throw new ALittleGuessException(attribute, "命令修饰符只能修饰全局函数");
-                }
-                else if (attribute.getNativeModifier() != null)
-                {
+                } else if (attribute.getNativeModifier() != null) {
                     ++native_count;
                     if (native_count > 1)
                         throw new ALittleGuessException(attribute.getCommandModifier(), "原生修饰符和命令修饰符最多只能有一个");
 
                     boolean has_error = true;
-                    if (parent instanceof ALittleClassElementDec)
-                    {
-                        ALittleClassElementDec class_element_dec = (ALittleClassElementDec)parent;
-                        if (class_element_dec.getClassVarDec() != null)
-                        {
+                    if (parent instanceof ALittleClassElementDec) {
+                        ALittleClassElementDec class_element_dec = (ALittleClassElementDec) parent;
+                        if (class_element_dec.getClassVarDec() != null) {
                             ALittleGuess guess = class_element_dec.getClassVarDec().guessType();
                             if (guess instanceof ALittleGuessList)
                                 has_error = false;
                         }
-                    }
-                    else if (parent instanceof ALittleAllExpr)
-                    {
-                        ALittleAllExpr all_expr = (ALittleAllExpr)parent;
+                    } else if (parent instanceof ALittleAllExpr) {
+                        ALittleAllExpr all_expr = (ALittleAllExpr) parent;
                         if (all_expr.getForExpr() != null)
                             has_error = false;
-                    }
-                    else if (parent instanceof ALittleNamespaceElementDec)
-                    {
-                        ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec)parent;
+                    } else if (parent instanceof ALittleNamespaceElementDec) {
+                        ALittleNamespaceElementDec namespace_element_dec = (ALittleNamespaceElementDec) parent;
                         has_error = namespace_element_dec.getClassDec() == null;
                     }
 
@@ -343,10 +285,8 @@ public class PsiHelper {
     }
 
     // 获取是否是register
-    public static boolean isRegister(List<ALittleModifier> element_list)
-    {
-        for (ALittleModifier element : element_list)
-        {
+    public static boolean isRegister(List<ALittleModifier> element_list) {
+        for (ALittleModifier element : element_list) {
             if (element.getRegisterModifier() != null)
                 return true;
         }
@@ -354,10 +294,8 @@ public class PsiHelper {
     }
 
     // 获取是否是Const
-    public static boolean isConst(List<ALittleModifier> element_list)
-    {
-        for (ALittleModifier element : element_list)
-        {
+    public static boolean isConst(List<ALittleModifier> element_list) {
+        for (ALittleModifier element : element_list) {
             if (element.getAttributeModifier() != null
                     && element.getAttributeModifier().getConstModifier() != null)
                 return true;
@@ -366,10 +304,8 @@ public class PsiHelper {
     }
 
     // 获取是否是Nullable
-    public static boolean isNullable(List<ALittleModifier> element_list)
-    {
-        for (ALittleModifier element : element_list)
-        {
+    public static boolean isNullable(List<ALittleModifier> element_list) {
+        for (ALittleModifier element : element_list) {
             if (element.getAttributeModifier() != null
                     && element.getAttributeModifier().getNullableModifier() != null)
                 return true;
@@ -379,10 +315,8 @@ public class PsiHelper {
 
     // 获取协程类型
     @NotNull
-    public static String getCoroutineType(List<ALittleModifier> element_list)
-    {
-        for (ALittleModifier element : element_list)
-        {
+    public static String getCoroutineType(List<ALittleModifier> element_list) {
+        for (ALittleModifier element : element_list) {
             if (element.getCoroutineModifier() != null)
                 return element.getCoroutineModifier().getText();
         }
@@ -390,10 +324,8 @@ public class PsiHelper {
     }
 
     // 获取协议类型
-    public static String getProtocolType(List<ALittleModifier> element_list)
-    {
-        for (ALittleModifier element : element_list)
-        {
+    public static String getProtocolType(List<ALittleModifier> element_list) {
+        for (ALittleModifier element : element_list) {
             if (element.getAttributeModifier() != null
                     && element.getAttributeModifier().getProtocolModifier() != null)
                 return element.getAttributeModifier().getProtocolModifier().getText();
@@ -401,20 +333,17 @@ public class PsiHelper {
         return null;
     }
 
-    public static class CommandInfo
-    {
+    public static class CommandInfo {
         public String type;
         public String desc;
     }
+
     // 获取命令类型
-    public static CommandInfo getCommandDetail(List<ALittleModifier> element_list)
-    {
+    public static CommandInfo getCommandDetail(List<ALittleModifier> element_list) {
         CommandInfo info = new CommandInfo();
-        for (ALittleModifier element : element_list)
-        {
+        for (ALittleModifier element : element_list) {
             if (element.getAttributeModifier() != null
-                    && element.getAttributeModifier().getCommandModifier() != null)
-            {
+                    && element.getAttributeModifier().getCommandModifier() != null) {
                 ALittleCommandBodyDec body_dec = element.getAttributeModifier().getCommandModifier().getCommandBodyDec();
                 if (body_dec != null && body_dec.getTextContent() != null) {
                     info.desc = body_dec.getTextContent().getText();
@@ -427,12 +356,9 @@ public class PsiHelper {
     }
 
     // 获取访问权限类型
-    public static ClassAccessType calcAccessType(List<ALittleModifier> element_list)
-    {
-        for (ALittleModifier element : element_list)
-        {
-            if (element.getAccessModifier() != null)
-            {
+    public static ClassAccessType calcAccessType(List<ALittleModifier> element_list) {
+        for (ALittleModifier element : element_list) {
+            if (element.getAccessModifier() != null) {
                 String text = element.getAccessModifier().getText();
                 if (text.equals("public"))
                     return ClassAccessType.PUBLIC;
@@ -451,7 +377,7 @@ public class PsiHelper {
 
     // 获取某个元素的命名域对象
     public static ALittleNamespaceDec getNamespaceDec(@NotNull PsiFile psiFile) {
-        for(PsiElement child = psiFile.getFirstChild(); child != null; child = child.getNextSibling()) {
+        for (PsiElement child = psiFile.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleNamespaceDec) {
                 return ((ALittleNamespaceDec) child);
             }
@@ -467,8 +393,7 @@ public class PsiHelper {
     }
 
     // 判断某个是不是register
-    public static boolean isRegister(PsiElement element)
-    {
+    public static boolean isRegister(PsiElement element) {
         ALittleNamespaceDec namespace_dec = getNamespaceDec(element.getContainingFile());
         if (namespace_dec == null) return false;
 
@@ -484,7 +409,7 @@ public class PsiHelper {
     @NotNull
     public static String getNamespaceName(PsiFile psiFile) {
         if (psiFile == null) return "";
-        for(PsiElement child = psiFile.getFirstChild(); child != null; child = child.getNextSibling()) {
+        for (PsiElement child = psiFile.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof ALittleNamespaceDec) {
                 ALittleNamespaceNameDec nameDec = ((ALittleNamespaceDec) child).getNamespaceNameDec();
                 if (nameDec == null) return "";
@@ -498,7 +423,7 @@ public class PsiHelper {
     public static ALittleClassDec findClassDecFromParent(@NotNull PsiElement dec) {
         while (dec != null && !(dec instanceof PsiFile)) {
             if (dec instanceof ALittleClassDec) {
-                return (ALittleClassDec)dec;
+                return (ALittleClassDec) dec;
             }
             dec = dec.getParent();
         }
@@ -531,9 +456,7 @@ public class PsiHelper {
     // 检查是否在静态函数中
     public static boolean isInClassStaticMethod(@NotNull PsiElement dec) {
         PsiElement parent = dec;
-        while (true) {
-            if (parent == null) break;
-
+        while (parent != null) {
             if (parent instanceof ALittleNamespaceDec) {
                 return false;
             } else if (parent instanceof ALittleClassDec) {
@@ -557,9 +480,9 @@ public class PsiHelper {
 
     // 根据名称，获取这个结构体的成员列表
     public static void findStructVarDecList(@NotNull ALittleStructDec structDec,
-                                                String name,
-                                                @NotNull List<ALittleStructVarDec> result,
-                                                int deep) {
+                                            String name,
+                                            @NotNull List<ALittleStructVarDec> result,
+                                            int deep) {
         // 这个用于跳出无限递归
         if (deep <= 0) return;
 
@@ -608,7 +531,7 @@ public class PsiHelper {
         PsiElement result = ALittleTreeChangeListener.findALittleNameDec(dec.getProject()
                 , PsiHelper.PsiElementType.STRUCT_NAME, dec.getContainingFile().getOriginalFile()
                 , namespaceName, structNameDec.getText(), true);
-        if (result instanceof ALittleStructNameDec) return (ALittleStructDec)result.getParent();
+        if (result instanceof ALittleStructNameDec) return (ALittleStructDec) result.getParent();
         return null;
     }
 
@@ -632,7 +555,7 @@ public class PsiHelper {
                 , PsiHelper.PsiElementType.CLASS_NAME, dec.getContainingFile().getOriginalFile()
                 , namespaceName, classNameDec.getText(), true);
         if (result instanceof ALittleClassNameDec) {
-            return (ALittleClassDec)result.getParent();
+            return (ALittleClassDec) result.getParent();
         }
         return null;
     }
@@ -678,13 +601,13 @@ public class PsiHelper {
     // 计算任意元素访问targetDec的访问权限
     public static int calcAccessLevelByTargetClassDecForElement(@NotNull PsiElement element, @NotNull ALittleClassDec targetDec) {
         // 默认为public
-        int accessLevel =  sAccessOnlyPublic;
+        int accessLevel = sAccessOnlyPublic;
 
         // 如果这个元素在类中，那么可以通过类和targetDec访问权限直接计算
         ALittleClassDec myClassDec = findClassDecFromParent(element);
         if (myClassDec != null) {
             accessLevel = PsiHelper.calcAccessLevelByTargetClassDec(PsiHelper.sAccessPrivateAndProtectedAndPublic, myClassDec, targetDec);
-        // 如果元素不在类中，那么element在lua中，或者和targetDec相同，则返回sAccessProtectedAndPublic
+            // 如果元素不在类中，那么element在lua中，或者和targetDec相同，则返回sAccessProtectedAndPublic
         } else {
             String namespaceName = getNamespaceName(element);
             if (element.getContainingFile().getVirtualFile().getPath().equals(targetDec.getContainingFile().getVirtualFile().getPath()))
@@ -801,33 +724,31 @@ public class PsiHelper {
                 List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
                 paramOneDecList.addAll(paramOneDecTmpList);
             }
-        // 处理成员函数的参数列表
+            // 处理成员函数的参数列表
         } else if (methodDec instanceof ALittleClassMethodDec) {
             ALittleMethodParamDec methodParamDec = ((ALittleClassMethodDec) methodDec).getMethodParamDec();
             if (methodParamDec != null) {
                 List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
                 paramOneDecList.addAll(paramOneDecTmpList);
             }
-        // 处理静态函数的参数列表
+            // 处理静态函数的参数列表
         } else if (methodDec instanceof ALittleClassStaticDec) {
             ALittleMethodParamDec methodParamDec = ((ALittleClassStaticDec) methodDec).getMethodParamDec();
             if (methodParamDec != null) {
                 List<ALittleMethodParamOneDec> paramOneDecTmpList = methodParamDec.getMethodParamOneDecList();
                 paramOneDecList.addAll(paramOneDecTmpList);
             }
-        // 处理setter函数的参数列表
+            // 处理setter函数的参数列表
         } else if (methodDec instanceof ALittleClassSetterDec) {
             ALittleMethodSetterParamDec methodSetterParamDec = ((ALittleClassSetterDec) methodDec).getMethodSetterParamDec();
-            if (methodSetterParamDec != null)
-            {
+            if (methodSetterParamDec != null) {
                 ALittleMethodParamOneDec paramOneDec = methodSetterParamDec.getMethodParamOneDec();
-                if (paramOneDec != null)
-                {
+                if (paramOneDec != null) {
                     paramOneDecList = new ArrayList<>();
                     paramOneDecList.add(paramOneDec);
                 }
             }
-        // 处理全局函数的参数列表
+            // 处理全局函数的参数列表
         } else if (methodDec instanceof ALittleGlobalMethodDec) {
             ALittleMethodParamDec methodParamDec = ((ALittleGlobalMethodDec) methodDec).getMethodParamDec();
             if (methodParamDec != null) {
@@ -850,26 +771,22 @@ public class PsiHelper {
     // 根据名称，查找变量名所在的定义元素
     @NotNull
     public static List<ALittleVarAssignNameDec> findVarAssignNameDecList(PsiElement element, String name) {
-        List<ALittleVarAssignNameDec> var_dec_list = new ArrayList<ALittleVarAssignNameDec>();
-
+        List<ALittleVarAssignNameDec> var_dec_list = new ArrayList<>();
         // 计算出所在的表达式
         PsiElement parent = element;
-        while (parent != null)
-        {
-            if (parent instanceof ALittleAllExpr)
-            {
-                findVarAssignNameDecList((ALittleAllExpr)parent, var_dec_list, name);
+        while (parent != null) {
+            if (parent instanceof ALittleAllExpr) {
+                findVarAssignNameDecList((ALittleAllExpr) parent, var_dec_list, name);
                 break;
             }
-            if (parent instanceof ALittleForStepCondition)
-            {
+            if (parent instanceof ALittleForStepCondition) {
                 PsiElement parentElement = parent.getParent();
                 if (parentElement == null) break;
                 if (!(parentElement instanceof ALittleForCondition)) break;
-                ALittleForCondition for_condition = (ALittleForCondition)parentElement;
+                ALittleForCondition for_condition = (ALittleForCondition) parentElement;
                 parentElement = for_condition.getParent();
                 if (!(parentElement instanceof ALittleForExpr)) break;
-                ALittleForExpr for_expr = (ALittleForExpr)parentElement;
+                ALittleForExpr for_expr = (ALittleForExpr) parentElement;
                 findVarAssignNameDecList(for_expr, var_dec_list, name);
                 break;
             }
@@ -879,46 +796,37 @@ public class PsiHelper {
         return var_dec_list;
     }
 
-    private static void findVarAssignNameDecList(ALittleForExpr for_expr, List<ALittleVarAssignNameDec> var_dec_list, String name)
-    {
+    private static void findVarAssignNameDecList(ALittleForExpr for_expr, List<ALittleVarAssignNameDec> var_dec_list, String name) {
         PsiElement parent = for_expr.getParent();
         if (!(parent instanceof ALittleAllExpr)) return;
-        findVarAssignNameDecList((ALittleAllExpr)parent, var_dec_list, name);
+        findVarAssignNameDecList((ALittleAllExpr) parent, var_dec_list, name);
 
         ALittleForCondition for_condition = for_expr.getForCondition();
         if (for_condition != null)
             FindVarAssignNameDecList(for_condition, var_dec_list, name);
     }
 
-    private static void FindVarAssignNameDecList(ALittleForCondition for_condition, List<ALittleVarAssignNameDec> var_dec_list, String name)
-    {
+    private static void FindVarAssignNameDecList(ALittleForCondition for_condition, List<ALittleVarAssignNameDec> var_dec_list, String name) {
         ALittleForPairDec for_pair_dec = for_condition.getForPairDec();
-        if (for_pair_dec != null)
-        {
+        if (for_pair_dec != null) {
             // 步进式的for有一个临时变量
-            if (for_condition.getForStepCondition() != null)
-            {
+            if (for_condition.getForStepCondition() != null) {
                 ALittleForStartStat start_stat = for_condition.getForStepCondition().getForStartStat();
-                if (start_stat != null)
-                {
+                if (start_stat != null) {
                     ALittleVarAssignNameDec var_assign_name_dec = for_pair_dec.getVarAssignNameDec();
-                    if (var_assign_name_dec != null)
-                    {
+                    if (var_assign_name_dec != null) {
                         if (name.length() == 0 || name.equals(var_assign_name_dec.getText()))
                             var_dec_list.add(var_assign_name_dec);
                     }
                 }
             }
             // 迭代式的for有多个临时变量
-            else if (for_condition.getForInCondition() != null)
-            {
+            else if (for_condition.getForInCondition() != null) {
                 List<ALittleForPairDec> pair_dec_list = for_condition.getForInCondition().getForPairDecList();
                 pair_dec_list.add(0, for_pair_dec);
-                for (ALittleForPairDec pair_dec : pair_dec_list)
-                {
+                for (ALittleForPairDec pair_dec : pair_dec_list) {
                     ALittleVarAssignNameDec var_assign_name_dec = pair_dec.getVarAssignNameDec();
-                    if (var_assign_name_dec != null)
-                    {
+                    if (var_assign_name_dec != null) {
                         if (name.length() == 0 || name.equals(var_assign_name_dec.getText()))
                             var_dec_list.add(var_assign_name_dec);
                     }
@@ -936,19 +844,18 @@ public class PsiHelper {
 
         // 处理函数体
         if (parent instanceof ALittleMethodBodyDec) {
-            ALittleMethodBodyDec curExpr = (ALittleMethodBodyDec)parent;
+            ALittleMethodBodyDec curExpr = (ALittleMethodBodyDec) parent;
             allExprList = curExpr.getAllExprList();
-        // 处理for循环
+            // 处理for循环
         } else if (parent instanceof ALittleForExpr || parent instanceof ALittleForBody) {
             if (parent instanceof ALittleForBody) parent = parent.getParent();
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
+            findVarAssignNameDecList((ALittleAllExpr) parent.getParent(), varDecList, name);
 
-            ALittleForExpr curExpr = (ALittleForExpr)parent;
+            ALittleForExpr curExpr = (ALittleForExpr) parent;
             // 获取for内部的表达式
             if (curExpr.getForBody() != null)
                 allExprList = curExpr.getForBody().getAllExprList();
-            if (curExpr.getAllExpr() != null)
-            {
+            if (curExpr.getAllExpr() != null) {
                 allExprList = new ArrayList<>();
                 allExprList.add(curExpr.getAllExpr());
             }
@@ -956,65 +863,61 @@ public class PsiHelper {
             ALittleForCondition for_condition = curExpr.getForCondition();
             if (for_condition != null)
                 FindVarAssignNameDecList(for_condition, varDecList, name);
-        // 处理while循环
+            // 处理while循环
         } else if (parent instanceof ALittleWhileExpr || parent instanceof ALittleWhileBody) {
             if (parent instanceof ALittleWhileBody) parent = parent.getParent();
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
-            ALittleWhileExpr curExpr = (ALittleWhileExpr)parent;
+            findVarAssignNameDecList((ALittleAllExpr) parent.getParent(), varDecList, name);
+            ALittleWhileExpr curExpr = (ALittleWhileExpr) parent;
             if (curExpr.getWhileBody() != null)
                 allExprList = curExpr.getWhileBody().getAllExprList();
-            else if (curExpr.getAllExpr() != null)
-            {
+            else if (curExpr.getAllExpr() != null) {
                 allExprList = new ArrayList<>();
                 allExprList.add(curExpr.getAllExpr());
             }
-        // 处理do while
+            // 处理do while
         } else if (parent instanceof ALittleDoWhileExpr || parent instanceof ALittleDoWhileBody) {
             if (parent instanceof ALittleDoWhileBody) parent = parent.getParent();
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
-            ALittleDoWhileExpr curExpr = (ALittleDoWhileExpr)parent;
+            findVarAssignNameDecList((ALittleAllExpr) parent.getParent(), varDecList, name);
+            ALittleDoWhileExpr curExpr = (ALittleDoWhileExpr) parent;
             if (curExpr.getDoWhileBody() != null)
                 allExprList = curExpr.getDoWhileBody().getAllExprList();
-        // 处理 if
+            // 处理 if
         } else if (parent instanceof ALittleIfExpr || parent instanceof ALittleIfBody) {
             if (parent instanceof ALittleIfBody) parent = parent.getParent();
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
-            ALittleIfExpr curExpr = (ALittleIfExpr)parent;
+            findVarAssignNameDecList((ALittleAllExpr) parent.getParent(), varDecList, name);
+            ALittleIfExpr curExpr = (ALittleIfExpr) parent;
             if (curExpr.getIfBody() != null)
                 allExprList = curExpr.getIfBody().getAllExprList();
-            else if (curExpr.getAllExpr() != null)
-            {
+            else if (curExpr.getAllExpr() != null) {
                 allExprList = new ArrayList<>();
                 allExprList.add(curExpr.getAllExpr());
             }
-        // 处理 else if
+            // 处理 else if
         } else if (parent instanceof ALittleElseIfExpr || parent instanceof ALittleElseIfBody) {
             if (parent instanceof ALittleElseIfBody) parent = parent.getParent();
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent().getParent(), varDecList, name);
-            ALittleElseIfExpr curExpr = (ALittleElseIfExpr)parent;
+            findVarAssignNameDecList((ALittleAllExpr) parent.getParent().getParent(), varDecList, name);
+            ALittleElseIfExpr curExpr = (ALittleElseIfExpr) parent;
             if (curExpr.getElseIfBody() != null)
                 allExprList = curExpr.getElseIfBody().getAllExprList();
-            else if (curExpr.getAllExpr() != null)
-            {
+            else if (curExpr.getAllExpr() != null) {
                 allExprList = new ArrayList<>();
                 allExprList.add(curExpr.getAllExpr());
             }
-        // 处理 else
+            // 处理 else
         } else if (parent instanceof ALittleElseExpr || parent instanceof ALittleElseBody) {
             if (parent instanceof ALittleElseBody) parent = parent.getParent();
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent().getParent(), varDecList, name);
-            ALittleElseExpr curExpr = (ALittleElseExpr)parent;
+            findVarAssignNameDecList((ALittleAllExpr) parent.getParent().getParent(), varDecList, name);
+            ALittleElseExpr curExpr = (ALittleElseExpr) parent;
             if (curExpr.getElseBody() != null)
                 allExprList = curExpr.getElseBody().getAllExprList();
-            else if (curExpr.getAllExpr() != null)
-            {
+            else if (curExpr.getAllExpr() != null) {
                 allExprList = new ArrayList<>();
                 allExprList.add(curExpr.getAllExpr());
             }
-        // 处理 wrap
+            // 处理 wrap
         } else if (parent instanceof ALittleWrapExpr) {
-            findVarAssignNameDecList((ALittleAllExpr)parent.getParent(), varDecList, name);
-            ALittleWrapExpr curExpr = (ALittleWrapExpr)parent;
+            findVarAssignNameDecList((ALittleAllExpr) parent.getParent(), varDecList, name);
+            ALittleWrapExpr curExpr = (ALittleWrapExpr) parent;
             allExprList = curExpr.getAllExprList();
         }
 
@@ -1041,13 +944,12 @@ public class PsiHelper {
     }
 
     // 检查迭代函数
-    public static boolean isPairsFunction(List<ALittleGuess> guess_list)
-    {
+    public static boolean isPairsFunction(List<ALittleGuess> guess_list) {
         // guess_list长度必须是3
         if (guess_list.size() != 3) return false;
         // 第一个必须是函数
         if (!(guess_list.get(0) instanceof ALittleGuessFunctor)) return false;
-        ALittleGuessFunctor guess = (ALittleGuessFunctor)guess_list.get(0);
+        ALittleGuessFunctor guess = (ALittleGuessFunctor) guess_list.get(0);
         // 函数不能带await
         if (guess.await_modifier) return false;
         // 函数不能带proto
@@ -1074,17 +976,13 @@ public class PsiHelper {
     }
 
     // 计算表达式需要使用什么样的变量方式
-    public static String calcPairsTypeForLua(ALittleValueStat value_stat) throws ALittleGuessException
-    {
+    public static String calcPairsTypeForLua(ALittleValueStat value_stat) throws ALittleGuessException {
         List<ALittleGuess> guess_list = value_stat.guessTypes();
 
         // 必出是模板容器
-        if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessList)
-        {
+        if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessList) {
             return "___ipairs";
-        }
-            else if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessMap)
-        {
+        } else if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessMap) {
             return "___pairs";
         }
 
@@ -1095,21 +993,17 @@ public class PsiHelper {
     }
 
     // 计算表达式在for中使用in还是of
-    public static Tuple2<String, Boolean> calcPairsTypeForJavaScript(ALittleValueStat value_stat) throws ALittleGuessException
-    {
+    public static Tuple2<String, Boolean> calcPairsTypeForJavaScript(ALittleValueStat value_stat) throws ALittleGuessException {
         String result = "Other";
         boolean is_native = false;
         List<ALittleGuess> guess_list = value_stat.guessTypes();
         // 必出是模板容器
-        if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessList)
-        {
+        if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessList) {
             result = "List";
-            is_native = ((ALittleGuessList)guess_list.get(0)).is_native;
+            is_native = ((ALittleGuessList) guess_list.get(0)).is_native;
             return new Tuple2<>(result, is_native);
-        }
-        else if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessMap)
-        {
-            if (((ALittleGuessMap)guess_list.get(0)).key_type instanceof ALittleGuessString)
+        } else if (guess_list.size() == 1 && guess_list.get(0) instanceof ALittleGuessMap) {
+            if (((ALittleGuessMap) guess_list.get(0)).key_type instanceof ALittleGuessString)
                 result = "Object";
             else
                 result = "Map";
@@ -1123,8 +1017,7 @@ public class PsiHelper {
     }
 
     // 判断 parent是否是child的父类
-    public static boolean isClassSuper(ALittleClassDec child, String parent) throws ALittleGuessException
-    {
+    public static boolean isClassSuper(ALittleClassDec child, String parent) throws ALittleGuessException {
         // 获取继承
         ALittleClassExtendsDec extends_dec = child.getClassExtendsDec();
         if (extends_dec == null) return false;
@@ -1137,7 +1030,7 @@ public class PsiHelper {
         ALittleGuess guess = name_dec.guessType();
 
         // 继续判断父类的父类
-        ALittleGuessClass guess_class = (ALittleGuessClass)guess;
+        ALittleGuessClass guess_class = (ALittleGuessClass) guess;
 
         // 检查是否一致
         if (guess_class.getValueWithoutConst().equals(parent))
@@ -1147,10 +1040,9 @@ public class PsiHelper {
     }
 
     // 判断 parent是否是child的父类
-    public static boolean isStructSuper(PsiElement child, String parent) throws ALittleGuessException
-    {
+    public static boolean isStructSuper(PsiElement child, String parent) throws ALittleGuessException {
         if (!(child instanceof ALittleStructDec)) return false;
-        ALittleStructDec struct_child = (ALittleStructDec)child;
+        ALittleStructDec struct_child = (ALittleStructDec) child;
 
         // 获取继承
         ALittleStructExtendsDec extends_dec = struct_child.getStructExtendsDec();
@@ -1164,7 +1056,7 @@ public class PsiHelper {
         ALittleGuess guess = name_dec.guessType();
 
         // 继续判断父结构体的父结构体
-        ALittleGuessStruct guess_struct = (ALittleGuessStruct)guess;
+        ALittleGuessStruct guess_struct = (ALittleGuessStruct) guess;
 
         // 判断是否一致
         if (guess_struct.getValueWithoutConst().equals(parent))
@@ -1174,14 +1066,13 @@ public class PsiHelper {
     }
 
     // 判断ValueStat
-    public static Tuple2<Integer, List<ALittleGuess>> calcReturnCount(ALittleValueStat value_stat) throws ALittleGuessException
-    {
+    public static Tuple2<Integer, List<ALittleGuess>> calcReturnCount(ALittleValueStat value_stat) throws ALittleGuessException {
         int count = 0;
         // 获取右边表达式的
         List<ALittleGuess> guess_list = value_stat.guessTypes();
         count = guess_list.size();
         if (guess_list.size() > 0 && guess_list.get(guess_list.size() - 1) instanceof ALittleGuessReturnTail)
-        count = -1;
+            count = -1;
         return new Tuple2<>(count, guess_list);
     }
 }

@@ -93,7 +93,7 @@ public class ALittleClassNameDecReference extends ALittleReference<ALittleClassN
             throw new ALittleGuessException(myElement, "ALittleClassNameDec出现未知的父节点");
         }
 
-        return null;
+        return guess_list;
     }
 
     @NotNull

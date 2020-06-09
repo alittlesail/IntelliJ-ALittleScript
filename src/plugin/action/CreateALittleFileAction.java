@@ -5,6 +5,7 @@ import com.intellij.ide.actions.CreateFileFromTemplateDialog;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import org.jetbrains.annotations.NotNull;
 import plugin.component.ALittleIcons;
 
 public class CreateALittleFileAction extends CreateFileFromTemplateAction implements DumbAware {
@@ -21,7 +22,7 @@ public class CreateALittleFileAction extends CreateFileFromTemplateAction implem
     }
 
     @Override
-    protected String getActionName(PsiDirectory psiDirectory, String s, String s1) {
+    protected String getActionName(PsiDirectory psiDirectory, @NotNull String s, String s1) {
         return CREATE_LUA_FILE;
     }
 }

@@ -24,7 +24,7 @@ public class ALittleFileType extends LanguageFileType  {
     @NotNull
     @Override
     public String getDescription() {
-        return "ALittle Language File";
+        return "ALittle language file";
     }
 
     @NotNull

@@ -96,25 +96,19 @@ public class ALittleInitComponent implements BaseComponent {
                                 continue;
                             }
                             if (!USED) {
-                                SendLogRunnable.SendLog("fist use gen a single lua file");
+                                SendLogRunnable.SendLog("fist use gen a single target file");
                                 USED = true;
                             }
-                            ALittleTranslation translation = null;
-                            String language = ALittleConfig.getConfig(project).getTargetLanguage();
-                            if (language.equals("Lua"))
-                                translation = new ALittleTranslationLua();
-                            else if (language.equals("JavaScript"))
-                                translation = new ALittleTranslationJavaScript();
                             try {
-                                if (translation != null)
-                                    translation.generate((ALittleFile) psiFile,false);
+                                ALittleTranslation translation = ALittleTranslation.createTranslation(project);
+                                translation.generate((ALittleFile) psiFile,false);
                             } catch (ALittleGuessException e) {
-                                System.out.println(psiFile.getName() + ":生成lua代码失败:" + e.getError());
+                                System.out.println(psiFile.getName() + ":生成目标代码失败:" + e.getError());
                             } catch (Exception e) {
-                                System.out.println(psiFile.getName() + ":生成lua代码失败:" + e.getMessage());
+                                System.out.println(psiFile.getName() + ":生成目标代码失败:" + e.getMessage());
                                 break;
                             }
-                            System.out.println(psiFile.getName() + ":生成lua代码成功");
+                            System.out.println(psiFile.getName() + ":生成目标代码成功");
                             break;
                         }
                     }

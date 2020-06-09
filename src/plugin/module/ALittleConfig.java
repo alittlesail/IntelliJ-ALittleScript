@@ -3,6 +3,7 @@ package plugin.module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.HashSet;
@@ -68,6 +69,15 @@ public class ALittleConfig {
     public void setTargetLanguage(@NotNull String value) {
         if (mTargetLanguage.equals(value)) return;
         mTargetLanguage = value;
+    }
+
+    @NotNull
+    public String getTargetExt() {
+        if (mTargetLanguage.equals("Lua"))
+            return "lua";
+        else if (mTargetLanguage.equals("JavaScript"))
+            return "js";
+        return "";
     }
 
     @NotNull

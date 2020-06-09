@@ -2,7 +2,10 @@ package plugin.alittle;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -27,13 +30,13 @@ public class HttpHelper {
             while((current = in.readLine()) != null)
                 resultList.add(current);
         }
-        catch(IOException e)
-        {
+        catch(Exception ignored) {
         }
 
         if (resultList == null) return null;
         return String.join("\n", resultList);
     }
+
     public static String Post(@NotNull String urlContent, @NotNull String content) {
 
         List<String> resultList = null;

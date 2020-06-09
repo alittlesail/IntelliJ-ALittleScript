@@ -17,9 +17,9 @@ public class ALittleAnnotator implements Annotator {
                 ((ALittleReferenceInterface) ref).colorAnnotator(holder);
             }
         } catch (ALittleGuessException e) {
-            if (holder.getCurrentAnnotationSession().getFile().equals(e.getElement().getContainingFile())) {
-                holder.createErrorAnnotation(e.getElement(), e.getError());
-            }
+            // if (e.getElement() != null && holder.getCurrentAnnotationSession().getFile().equals(e.getElement().getContainingFile())) {
+            //     holder.newAnnotation(HighlightSeverity.ERROR, e.getError()).range(e.getElement()).create();
+            // }
         }
     }
 }

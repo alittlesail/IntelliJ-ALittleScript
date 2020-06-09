@@ -3,7 +3,7 @@ package plugin.alittle;
 import org.jetbrains.annotations.NotNull;
 
 public class SendLogRunnable implements Runnable {
-    private String m_content;
+    private final String m_content;
 
     public SendLogRunnable(@NotNull String content) {
         m_content = content;
@@ -23,8 +23,7 @@ public class SendLogRunnable implements Runnable {
     }
 
 
-    public static void SendLog(@NotNull String content)
-    {
+    public static void SendLog(@NotNull String content) {
         // new Thread(new SendLogRunnable(content)).start();
     }
 }

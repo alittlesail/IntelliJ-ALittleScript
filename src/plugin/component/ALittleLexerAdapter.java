@@ -7,6 +7,6 @@ import java.io.Reader;
 
 public class ALittleLexerAdapter extends FlexAdapter {
     public ALittleLexerAdapter() {
-        super(new _ALittleLexer((Reader) null));
+        super(new _ALittleLexer(null));
     }
 }

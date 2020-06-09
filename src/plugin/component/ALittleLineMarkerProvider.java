@@ -12,7 +12,7 @@ import java.util.Collection;
 
 public class ALittleLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override
-    protected void collectNavigationMarkers(@NotNull PsiElement element, Collection<? super RelatedItemLineMarkerInfo> result) {
+    protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo> result) {
         if (element instanceof ALittleMethodNameDec) {
             ALittleMethodNameDec myElement = (ALittleMethodNameDec) element;
             // 获取函数名

@@ -241,7 +241,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
                     // 计算实际类名
                     String class_name = full_class_name;
-                    if (guess_class.namespace_name == m_namespace_name || guess_class.namespace_name == "lua")
+                    if (guess_class.namespace_name.equals(m_namespace_name) || guess_class.namespace_name.equals("lua"))
                         class_name = guess_class.class_name;
 
                     // 计算模板名
@@ -383,7 +383,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
     private String GenerateOp8Suffix(ALittleOp8Suffix suffix) throws ALittleGuessException {
         String content = "";
         String op_string = suffix.getOp8().getText();
-        if (op_string == "||") op_string = "or";
+        if (op_string.equals("||")) op_string = "or";
 
         String value_functor_result = null;
         if (suffix.getValueFactorStat() != null) {
@@ -456,7 +456,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
     private String GenerateOp7Suffix(ALittleOp7Suffix suffix) throws ALittleGuessException {
         String content = "";
         String op_string = suffix.getOp7().getText();
-        if (op_string == "&&")
+        if (op_string.equals("&&"))
             op_string = "and";
 
         String value_functor_result = null;
@@ -535,7 +535,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
     private String GenerateOp6Suffix(ALittleOp6Suffix suffix) throws ALittleGuessException {
         String content = "";
         String op_string = suffix.getOp6().getText();
-        if (op_string == "!=")
+        if (op_string.equals("!="))
             op_string = "~=";
 
         String value_functor_result = null;
@@ -1073,10 +1073,10 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
             boolean generate = false;
             // 如果是本文件的，那么就生成
-            if (guess_struct.struct_dec.getContainingFile().getOriginalFile().getVirtualFile().getPath() == m_file_path)
+            if (guess_struct.struct_dec.getContainingFile().getOriginalFile().getVirtualFile().getPath().equals(m_file_path))
                 generate = true;
             // 如果不在同一个工程，那么就生成
-            if (!FileHelper.calcModulePath(guess_struct.struct_dec).equals(m_project_path))
+            if (!FileHelper.calcModulePath(guess_struct.struct_dec, true).equals(m_project_path))
                 generate = true;
                 //  如果是同一个工程，并且是register，那么也要生成
             else if (guess_struct.is_register)
@@ -1194,7 +1194,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
         if (enum_name_guess == null) return false;
         if (suffix == null) return false;
 
-        if (FileHelper.calcModulePath(enum_name_guess.enum_name_dec) == m_project_path) return false;
+        if (FileHelper.calcModulePath(enum_name_guess.enum_name_dec, true).equals(m_project_path)) return false;
 
         ALittlePropertyValueDotId dot_id = suffix.getPropertyValueDotId();
         if (dot_id == null) return false;
@@ -1256,8 +1256,8 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 addRelay(((ALittleGuess) custom_guess).getElement());
 
             if (custom_guess instanceof ALittleGuessNamespaceName) {
-                is_lua_namespace = custom_guess.getValue() == "lua";
-                is_alittle_namespace = custom_guess.getValue() == "alittle";
+                is_lua_namespace = custom_guess.getValue().equals("lua");
+                is_alittle_namespace = custom_guess.getValue().equals("alittle");
             }
 
             // 如果是lua命名域，那么就忽略
@@ -1446,7 +1446,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     for (ALittleGuess guess : template_list) {
                         if (guess instanceof ALittleGuessClass) {
                             ALittleGuessClass guess_class = (ALittleGuessClass) guess;
-                            if (guess_class.namespace_name == m_namespace_name || guess_class.namespace_name == "lua")
+                            if (guess_class.namespace_name.equals(m_namespace_name) || guess_class.namespace_name.equals("lua"))
                                 param_list.add(guess_class.class_name);
                             else
                                 param_list.add(guess_class.getValue());
@@ -1742,7 +1742,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
             throw new ALittleGuessException(null, "表达式不完整");
         }
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, continue_num, pre_tab + "\t");
             content += result.getFirst();
@@ -1776,7 +1776,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
             throw new ALittleGuessException(null, "表达式不完整");
         }
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, continue_num, pre_tab + "\t");
 
@@ -1812,7 +1812,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
             throw new ALittleGuessException(null, "表达式不完整");
         }
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, continue_num, pre_tab + "\t");
 
@@ -1933,7 +1933,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         boolean has_continue_expr = false;
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, continue_num, pre_tab + "\t");
 
@@ -1975,7 +1975,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         boolean has_continue_expr = false;
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, continue_num, pre_tab + "\t");
 
@@ -2011,7 +2011,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         boolean has_continue_expr = false;
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, continue_num, pre_tab + "\t");
 
@@ -2033,7 +2033,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
         boolean has_continue_expr = false;
         List<ALittleAllExpr> all_expr_list = root.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, continue_num, pre_tab + "\t");
 
@@ -2287,7 +2287,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         int ctor_count = 0;
         for (ALittleClassElementDec class_element_dec : class_element_list) {
-            if (!PsiHelper.isLanguageEnable(class_element_dec.getModifierList()))
+            if (PsiHelper.isLanguageEnable(class_element_dec.getModifierList()))
                 continue;
 
             if (class_element_dec.getClassCtorDec() != null) {
@@ -2327,7 +2327,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 if (body_dec != null) {
                     List<ALittleAllExpr> all_expr_list = body_dec.getAllExprList();
                     for (ALittleAllExpr all_expr : all_expr_list) {
-                        if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                        if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                             continue;
                         Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
 
@@ -2355,7 +2355,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     throw new ALittleGuessException(null, "class " + class_name + " getter函数没有函数体");
                 List<ALittleAllExpr> all_expr_list = class_method_body_dec.getAllExprList();
                 for (ALittleAllExpr all_expr : all_expr_list) {
-                    if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                    if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
                     Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
 
@@ -2392,7 +2392,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
                 List<ALittleAllExpr> all_expr_list = class_method_body_dec.getAllExprList();
                 for (ALittleAllExpr all_expr : all_expr_list) {
-                    if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                    if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
                     Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
 
@@ -2452,7 +2452,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     throw new ALittleGuessException(null, "class " + class_name + " 成员函数没有函数体");
                 List<ALittleAllExpr> all_expr_list = class_method_body_dec.getAllExprList();
                 for (ALittleAllExpr all_expr : all_expr_list) {
-                    if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                    if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
                     Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
 
@@ -2521,7 +2521,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
                 List<ALittleAllExpr> all_expr_list = class_method_body_dec.getAllExprList();
                 for (ALittleAllExpr all_expr : all_expr_list) {
-                    if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+                    if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                         continue;
                     Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t");
 
@@ -2653,7 +2653,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         List<ALittleAllExpr> all_expr_list = class_method_body_dec.getAllExprList();
         for (ALittleAllExpr all_expr : all_expr_list) {
-            if (!PsiHelper.isLanguageEnable(all_expr.getModifierList()))
+            if (PsiHelper.isLanguageEnable(all_expr.getModifierList()))
                 continue;
             Tuple2<String, Boolean> result = GenerateAllExpr(all_expr, 0, pre_tab +"\t")
             ;
@@ -2786,7 +2786,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         String other_content = "";
         for (ALittleNamespaceElementDec child : element_dec_list) {
-            if (!PsiHelper.isLanguageEnable(child.getModifierList()))
+            if (PsiHelper.isLanguageEnable(child.getModifierList()))
                 continue;
 
             // 处理结构体
