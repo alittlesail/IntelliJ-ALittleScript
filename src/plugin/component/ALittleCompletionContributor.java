@@ -16,7 +16,7 @@ public class ALittleCompletionContributor extends CompletionContributor {
             , "namespace", "class", "struct", "enum", "const"
             , "for", "do", "while", "break", "return", "cast", "reflect", "continue"
             , "get", "set", "fun", "static", "Ctor", "Functor", "this", "using"
-            , "public", "protected", "private", "instance", "tcall"
+            , "public", "protected", "private", "instance", "tcall", "Language"
             , "async", "await", "yield", "bind", "Http", "HttpDownload", "HttpUpload", "Msg", "Cmd", "Constant"
     };
 

@@ -47,7 +47,7 @@ public class ALittleParserDefinition implements ParserDefinition {
             ALittleTypes.SEMI);
 
     public static final TokenSet ANNO_SET = TokenSet.create(ALittleTypes.CMD, ALittleTypes.MSG
-            , ALittleTypes.HTTP, ALittleTypes.HTTPDOWNLOAD, ALittleTypes.HTTPUPLOAD, ALittleTypes.CONSTANT);
+            , ALittleTypes.HTTP, ALittleTypes.HTTPDOWNLOAD, ALittleTypes.HTTPUPLOAD, ALittleTypes.CONSTANT, ALittleTypes.LANGUAGE);
 
     @NotNull
     @Override

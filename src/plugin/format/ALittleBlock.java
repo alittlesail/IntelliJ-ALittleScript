@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
+import groovyjarjarantlr.Token;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugin.psi.*;
@@ -25,6 +26,62 @@ public class ALittleBlock extends AbstractBlock {
     @Override
     protected List<Block> buildChildren() {
         List<Block> blocks = new ArrayList<>();
+        PsiElement element = myNode.getPsi();
+
+        if (myNode.getElementType() == ALittleTypes.NAMESPACE_ELEMENT_DEC) {
+            ASTNode child = myNode.getFirstChildNode();
+            while (child != null) {
+                if (child.getElementType() != TokenType.WHITE_SPACE) {
+                    ALittleBlock block = new ALittleBlock(child,
+                            Wrap.createWrap(WrapType.NONE, false),
+                            Alignment.createAlignment(),
+                            m_spacingBuilder);
+
+                    if (child.getElementType() == ALittleTypes.GLOBAL_METHOD_DEC
+                        || child.getElementType() == ALittleTypes.CLASS_DEC
+                        || child.getElementType() == ALittleTypes.ENUM_DEC
+                        || child.getElementType() == ALittleTypes.STRUCT_DEC
+                        || child.getElementType() == ALittleTypes.USING_DEC
+                        || child.getElementType() == ALittleTypes.INSTANCE_DEC) {
+                        blocks.addAll(block.buildChildren());
+                    }
+                    else
+                    {
+                        blocks.add(block);
+                    }
+                }
+                child = child.getTreeNext();
+            }
+            return blocks;
+        }
+
+        if (myNode.getElementType() == ALittleTypes.CLASS_ELEMENT_DEC) {
+            ASTNode child = myNode.getFirstChildNode();
+            while (child != null) {
+                if (child.getElementType() != TokenType.WHITE_SPACE) {
+                    ALittleBlock block = new ALittleBlock(child,
+                            Wrap.createWrap(WrapType.NONE, false),
+                            Alignment.createAlignment(),
+                            m_spacingBuilder);
+
+                    if (child.getElementType() == ALittleTypes.CLASS_CTOR_DEC
+                            || child.getElementType() == ALittleTypes.CLASS_METHOD_DEC
+                            || child.getElementType() == ALittleTypes.CLASS_GETTER_DEC
+                            || child.getElementType() == ALittleTypes.CLASS_SETTER_DEC
+                            || child.getElementType() == ALittleTypes.CLASS_STATIC_DEC
+                            || child.getElementType() == ALittleTypes.CLASS_VAR_DEC) {
+                        blocks.addAll(block.buildChildren());
+                    }
+                    else
+                    {
+                        blocks.add(block);
+                    }
+                }
+                child = child.getTreeNext();
+            }
+            return blocks;
+        }
+
         ASTNode child = myNode.getFirstChildNode();
         while (child != null) {
             if (child.getElementType() != TokenType.WHITE_SPACE) {
