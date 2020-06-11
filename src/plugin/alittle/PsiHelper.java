@@ -104,7 +104,9 @@ public class PsiHelper {
         // 检查这次所在的函数必须要有await或者async修饰
         PsiElement parent = element;
         while (parent != null) {
-            if (parent instanceof ALittleNamespaceDec) {
+            if (parent instanceof ALittlePropertyValue) {
+                element = parent;
+            } else if (parent instanceof ALittleNamespaceDec) {
                 throw new ALittleGuessException(element, "全局表达式不能调用带有await的函数");
             } else if (parent instanceof ALittleClassCtorDec) {
                 throw new ALittleGuessException(element, "构造函数内不能调用带有await的函数");

@@ -20,7 +20,6 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
     }
 
     public ALittleGuess guessPreType() throws ALittleGuessException {
-        ALittleGuess guess = null;
 
         // 获取父节点
         ALittlePropertyValueSuffix property_value_suffix = (ALittlePropertyValueSuffix) myElement.getParent();
@@ -30,7 +29,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
 
         // 获取所在位置
         int index = suffix_list.indexOf(property_value_suffix);
-        if (index == -1) return guess;
+        if (index == -1) return null;
 
         // 获取前一个类型
         ALittleGuess pre_type = null;
@@ -79,8 +78,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             }
         }
 
-        guess = pre_type;
-        return guess;
+        return pre_type;
     }
 
     @NotNull
@@ -180,7 +178,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                     || left_guess_functor.await_modifier != right_guess_functor.await_modifier
                     || left_guess_functor.proto == null && right_guess_functor.proto != null
                     || left_guess_functor.proto != null && right_guess_functor.proto == null
-                    || (left_guess_functor.proto != null && left_guess_functor.proto != right_guess_functor.proto)
+                    || (left_guess_functor.proto != null && !left_guess_functor.proto.equals(right_guess_functor.proto))
                     || left_guess_functor.param_tail == null && right_guess_functor.param_tail != null
                     || left_guess_functor.param_tail != null && right_guess_functor.param_tail == null
                     || left_guess_functor.return_tail == null && right_guess_functor.return_tail != null
@@ -215,7 +213,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             if (!(right_guess instanceof ALittleGuessClass))
                 throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
 
-            if (left_guess.getValue() == right_guess.getValue()) return;
+            if (left_guess.getValue().equals(right_guess.getValue())) return;
 
             boolean result = PsiHelper.isClassSuper(((ALittleGuessClass) left_guess).class_dec, right_guess.getValue());
             if (result) return;

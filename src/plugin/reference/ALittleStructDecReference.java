@@ -71,7 +71,7 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
 
             if (text.equals("primary")) {
                 text = option_value.getText().trim();
-                text = text.substring(1, text.length() - 2).trim();
+                text = text.substring(1, text.length() - 1).trim();
                 if (!name_set.contains(text))
                     throw new ALittleGuessException(option_value, "没有找到对应的字段名:" + text);
                 continue;
@@ -79,7 +79,7 @@ public class ALittleStructDecReference extends ALittleReference<ALittleStructDec
 
             if (text.equals("unique") || text.equals("index")) {
                 text = option_value.getText().trim();
-                text = text.substring(1, text.length() - 2).trim();
+                text = text.substring(1, text.length() - 1).trim();
                 String[] list = text.split(",");
                 for (String name : list) {
                     text = name.trim();

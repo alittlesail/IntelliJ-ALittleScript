@@ -935,7 +935,7 @@ public class ALittleReferenceOpUtil {
                     || left_guess_functor.await_modifier != right_guess_functor.await_modifier
                     || left_guess_functor.proto == null && right_guess_functor.proto != null
                     || left_guess_functor.proto != null && right_guess_functor.proto == null
-                    || (left_guess_functor.proto != null && left_guess_functor.proto != right_guess_functor.proto)
+                    || (left_guess_functor.proto != null && !left_guess_functor.proto.equals(right_guess_functor.proto))
                     || left_guess_functor.param_tail == null && right_guess_functor.param_tail != null
                     || left_guess_functor.param_tail != null && right_guess_functor.param_tail == null
                     || left_guess_functor.return_tail == null && right_guess_functor.return_tail != null

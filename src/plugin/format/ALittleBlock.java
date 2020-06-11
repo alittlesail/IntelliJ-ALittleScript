@@ -26,7 +26,6 @@ public class ALittleBlock extends AbstractBlock {
     @Override
     protected List<Block> buildChildren() {
         List<Block> blocks = new ArrayList<>();
-        PsiElement element = myNode.getPsi();
 
         if (myNode.getElementType() == ALittleTypes.NAMESPACE_ELEMENT_DEC) {
             ASTNode child = myNode.getFirstChildNode();
