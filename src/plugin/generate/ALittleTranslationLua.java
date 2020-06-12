@@ -1,5 +1,6 @@
 package plugin.generate;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import groovy.lang.Tuple2;
@@ -8,6 +9,7 @@ import org.jsoup.internal.StringUtil;
 import plugin.alittle.FileHelper;
 import plugin.alittle.PsiHelper;
 import plugin.guess.*;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
 
@@ -1003,7 +1005,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
         File info = new File(path);
         if (!info.exists()) throw  new ALittleGuessException(paths_value, "路径不存在:" + path);
         List<String> path_list = new ArrayList<>();
-        FileHelper.getDeepFilePaths(info, "", path_list);
+        ALittleTreeChangeListener.getDeepFilePaths(paths_value.getProject(), info, "", path_list);
 
         content = "{";
         for (int i = 0; i < path_list.size(); ++i)
@@ -1284,7 +1286,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
             if ((custom_guess instanceof ALittleGuessFunctor && ((ALittleGuessFunctor) custom_guess).element instanceof ALittleGlobalMethodDec)
                     || custom_guess instanceof ALittleGuessClassName
                     || custom_guess instanceof ALittleGuessEnumName)
-                addRelay(((ALittleGuess) custom_guess).getElement());
+                addRelay(custom_guess.getElement());
 
             if (custom_guess instanceof ALittleGuessNamespaceName) {
                 is_lua_namespace = custom_guess.getValue().equals("lua");
@@ -1374,7 +1376,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                         addRelay(guess_functor.element);
                     }
                 } else if (guess instanceof ALittleGuessClassName || guess instanceof ALittleGuessEnumName) {
-                    addRelay(((ALittleGuess) guess).getElement());
+                    addRelay(guess.getElement());
                 }
 
                 if (!is_lua_namespace && !is_alittle_namespace)

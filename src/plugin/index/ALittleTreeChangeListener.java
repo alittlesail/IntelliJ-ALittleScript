@@ -4,17 +4,18 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.sqlite.util.StringUtils;
 import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
+import plugin.guess.ALittleGuessClass;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 
 public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeChangeListener {
     public ALittleTreeChangeListener(@NotNull Project project) {
@@ -56,6 +57,120 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
 
         Map<PsiElement, List<ALittleGuess>> map = listener.mGuessTypeMap.computeIfAbsent(element.getContainingFile().getOriginalFile(), k -> new HashMap<>());
         map.put(element, guessTypeList);
+    }
+
+    static class RelayInfo
+    {
+        public Set<RelayInfo> be_used_set; // 被依赖集合
+        public Set<RelayInfo> use_set;    // 依赖集合
+
+        public String path;
+        public Set<String> relay_set;
+        public String rel_path;
+    }
+
+    // 删除文件夹
+    public static void getDeepFilePaths(Project project, File info, String parent_path, List<String> result) throws ALittleGuessException {
+        if (!info.exists()) return;
+
+        // 获取子级列表
+        File[] list = info.listFiles();
+        if (list == null) return;
+
+        // 初始化依赖信息
+        Map<String, RelayInfo> relay_map = new HashMap<>();
+        for (File file : list) {
+            if (!file.isDirectory()) {
+                Set<String> relay_set = new HashSet<>();
+                ALittleTreeChangeListener.findDefineRelay(project, file.getAbsolutePath(), relay_set);
+                RelayInfo relay_info = new RelayInfo();
+                relay_info.path = file.getAbsolutePath();
+                relay_info.rel_path = parent_path + file.getName();
+                relay_info.relay_set = relay_set;
+                relay_info.be_used_set = new HashSet<>();
+                relay_info.use_set = new HashSet<>();
+                relay_map.put(relay_info.path, relay_info);
+            }
+        }
+
+        // 形成通路
+        for (RelayInfo relay_info : relay_map.values()) {
+            for (String child_path : relay_info.relay_set) {
+                RelayInfo child = relay_map.get(child_path);
+                if (child == null) continue;
+                child.be_used_set.add(relay_info);
+                relay_info.use_set.add(child);
+            }
+        }
+
+        // 都放进列表中，并排序
+        List<RelayInfo> info_list = new ArrayList<>(relay_map.values());
+        info_list.sort((RelayInfo a, RelayInfo b) -> { return a.path.compareTo(b.path); });
+
+        // 遍历列表
+        while (info_list.size() > 0) {
+            // 用于接收未处理的列表
+            List<RelayInfo> new_info_list = new ArrayList<>();
+            // 遍历列表进行处理
+            for (RelayInfo relay_info : info_list)
+            {
+                // 如果已经没有依赖了，那么就添加进result，然后解除依赖关系
+                if (relay_info.use_set.size() == 0) {
+                    result.add(relay_info.rel_path);
+                    for (RelayInfo be_used_info : relay_info.be_used_set) {
+                        be_used_info.use_set.remove(relay_info);
+                    }
+                    relay_info.be_used_set.clear();
+                } else {
+                     new_info_list.add(relay_info);
+                }
+            }
+            // 如果一轮下来没有减少，那么就抛异常
+            if (new_info_list.size() == info_list.size()) {
+                String content = "";
+                for (RelayInfo relayInfo : new_info_list) {
+                    content += relayInfo.rel_path + " -> ";
+                    for (RelayInfo use_info : relayInfo.use_set) {
+                        content += use_info.rel_path;
+                    }
+                    content += ";";
+                }
+                throw new ALittleGuessException(null, "出现循环引用 " + content);
+            }
+
+            // 把收集的列表复制给info_list，进行下一轮循环
+            info_list = new_info_list;
+        }
+
+        for (File file : list) {
+            if (file.isDirectory()) {
+                getDeepFilePaths(project, file, parent_path + file.getName() + "/", result);
+            }
+        }
+    }
+
+    @NotNull
+    public static void findDefineRelay(Project project, String file_path, Set<String> result) throws ALittleGuessException {
+        VirtualFile file = VirtualFileManager.getInstance().findFileByUrl("file://" + file_path);
+        if (file == null) return;
+        // 获取管理器
+        PsiManager psi_mgr = PsiManager.getInstance(project);
+        PsiFile psi_file = psi_mgr.findFile(file);
+        if (!(psi_file instanceof ALittleFile)) return;
+        ALittleNamespaceDec dec = PsiHelper.getNamespaceDec(psi_file);
+        if (dec == null) return;
+        List<ALittleNamespaceElementDec> element_dec_list =  dec.getNamespaceElementDecList();
+        for (ALittleNamespaceElementDec element_dec : element_dec_list) {
+            ALittleClassDec classDec = element_dec.getClassDec();
+            if (classDec == null) continue;
+            ALittleClassExtendsDec extendsDec = classDec.getClassExtendsDec();
+            if (extendsDec == null) continue;
+            ALittleGuess guess = extendsDec.guessType();
+            if (!(guess instanceof ALittleGuessClass)) continue;
+            PsiElement element = guess.getElement();
+            if (element == null) return;
+            result.add(element.getContainingFile().getOriginalFile().getVirtualFile().getPath());
+        }
     }
 
     @NotNull

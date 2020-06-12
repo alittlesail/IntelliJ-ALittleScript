@@ -141,6 +141,18 @@
       </method>
     </configuration>
   </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -162,17 +174,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="724" y="198" key="#Auto_Import" timestamp="1591956889161">
-      <screen x="0" y="0" width="1920" height="999" />
+    <state x="515" y="53" key="#Auto_Import" timestamp="1591970956954">
+      <screen x="0" y="0" width="1366" height="738" />
     </state>
+    <state x="515" y="53" key="#Auto_Import/0.0.1366.738@0.0.1366.738" timestamp="1591970956954" />
     <state x="724" y="198" key="#Auto_Import/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591956889161" />
     <state x="731" y="233" key="#HTTP_Proxy" timestamp="1591685413793">
       <screen x="0" y="0" width="1920" height="999" />
@@ -195,6 +209,10 @@
     </state>
     <state x="-1155" y="225" key="#com.intellij.ide.util.MemberChooser/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591074243502" />
     <state x="765" y="216" key="#com.intellij.ide.util.MemberChooser/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591593086704" />
+    <state x="529" y="257" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1591968786850">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="529" y="257" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1366.738@0.0.1366.738" timestamp="1591968786850" />
     <state x="735" y="309" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1591621941355">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
@@ -265,9 +283,10 @@
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1196" y="221" key="RollbackChangesDialog/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590128912537" />
-    <state x="461" y="143" key="SettingsEditor" timestamp="1591692912668">
-      <screen x="0" y="0" width="1920" height="999" />
+    <state x="326" y="0" key="SettingsEditor" timestamp="1591970704811">
+      <screen x="0" y="0" width="1366" height="738" />
     </state>
+    <state x="326" y="0" key="SettingsEditor/0.0.1366.738@0.0.1366.738" timestamp="1591970704811" />
     <state x="-1459" y="149" key="SettingsEditor/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590129036789" />
     <state x="461" y="143" key="SettingsEditor/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591692912668" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1591613063308">
@@ -282,18 +301,20 @@
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="453" y="228" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591769621222" />
-    <state x="662" y="113" width="1071" height="857" key="find.popup" timestamp="1591946658160">
-      <screen x="0" y="0" width="1920" height="999" />
+    <state x="471" y="83" width="844" height="634" key="find.popup" timestamp="1591969954341">
+      <screen x="0" y="0" width="1366" height="738" />
     </state>
+    <state x="471" y="83" width="844" height="634" key="find.popup/0.0.1366.738@0.0.1366.738" timestamp="1591969954341" />
     <state x="-1258" y="118" width="596" height="804" key="find.popup/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590981146199" />
     <state x="662" y="113" width="1071" height="857" key="find.popup/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591946658160" />
     <state x="-1304" y="240" key="run.anything.popup" timestamp="1590995407000">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1304" y="240" key="run.anything.popup/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590995407000" />
-    <state x="616" y="152" width="672" height="676" key="search.everywhere.popup" timestamp="1591956559422">
-      <screen x="0" y="0" width="1920" height="999" />
+    <state x="438" y="112" width="672" height="500" key="search.everywhere.popup" timestamp="1591973229800">
+      <screen x="0" y="0" width="1366" height="738" />
     </state>
+    <state x="438" y="112" width="672" height="500" key="search.everywhere.popup/0.0.1366.738@0.0.1366.738" timestamp="1591973229800" />
     <state x="616" y="152" width="672" height="676" key="search.everywhere.popup/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591956559422" />
   </component>
 </project>

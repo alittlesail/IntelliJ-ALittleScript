@@ -23,7 +23,7 @@ public class ALittleAnnotator implements Annotator {
             if (e.getElement() != null
                     && holder.getCurrentAnnotationSession().getFile().equals(e.getElement().getContainingFile().getOriginalFile())
                     && element.getTextRange().contains(e.getElement().getTextRange())) {
-                holder.newAnnotation(HighlightSeverity.ERROR, e.getError()).range(e.getElement()).create();
+                holder.createErrorAnnotation(e.getElement(), e.getError());
             }
         }
     }

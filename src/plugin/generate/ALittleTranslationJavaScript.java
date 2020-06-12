@@ -8,6 +8,7 @@ import org.jsoup.internal.StringUtil;
 import plugin.alittle.FileHelper;
 import plugin.alittle.PsiHelper;
 import plugin.guess.*;
+import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueCustomTypeReference;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
@@ -1158,7 +1159,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         File info = new File(path);
         if (!info.exists()) throw  new ALittleGuessException(paths_value, "路径不存在:" + path);
         List<String> path_list = new ArrayList<>();
-        FileHelper.getDeepFilePaths(info, "", path_list);
+        ALittleTreeChangeListener.getDeepFilePaths(paths_value.getProject(), info, "", path_list);
 
         content = "[";
         for (int i = 0; i < path_list.size(); ++i)
