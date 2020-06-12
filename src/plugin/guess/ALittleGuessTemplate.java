@@ -20,13 +20,12 @@ public class ALittleGuessTemplate extends ALittleGuess {
 
     public ALittleGuessTemplate(ALittleTemplatePairDec p_template_pair_dec
             , ALittleGuess p_template_extends
-            , boolean p_is_class, boolean p_is_struct, boolean p_is_const) {
+            , boolean p_is_class, boolean p_is_struct) {
         is_register = PsiHelper.isRegister(p_template_pair_dec);
         template_pair_dec = p_template_pair_dec;
         template_extends = p_template_extends;
         is_class = p_is_class;
         is_struct = p_is_struct;
-        is_const = p_is_const;
         if (p_template_extends != null) is_const = p_template_extends.is_const;
 
         ALittleTemplateNameDec name_dec = template_pair_dec.getTemplateNameDec();

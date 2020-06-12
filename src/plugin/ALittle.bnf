@@ -109,9 +109,8 @@ NamespaceNameDec ::= ID_CONTENT
 
 // 模板定义
 private TemplatePairDec_ ::= ',' TemplatePairDec {pin=1}
-TemplateConst ::= const
 TemplateDec ::= '<' TemplatePairDec TemplatePairDec_* '>' {pin=1}
-TemplatePairDec ::= TemplateConst? TemplateNameDec TemplateExtendsDec? {pin=2}
+TemplatePairDec ::= TemplateNameDec TemplateExtendsDec? {pin=1}
 TemplateNameDec ::= ID_CONTENT
 TemplateExtendsDec ::= ':' (AllType | TemplateExtendsClassDec | TemplateExtendsStructDec) {pin=1}
 TemplateExtendsClassDec ::= class

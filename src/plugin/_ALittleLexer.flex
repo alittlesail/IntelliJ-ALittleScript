@@ -89,7 +89,6 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "Constant"            { return CONSTANT; }
   "Native"              { return NATIVE; }
   "namespace"           { return NAMESPACE; }
-  "const"               { return CONST; }
   "class"               { return CLASS; }
   "struct"              { return STRUCT; }
   "option"              { return OPTION; }
@@ -114,6 +113,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "continue"            { return CONTINUE; }
   "throw"               { return THROW; }
   "assert"              { return ASSERT; }
+  "const"               { return CONST; }
   "Map"                 { return MAP; }
   "List"                { return LIST; }
   "Functor"             { return FUNCTOR; }

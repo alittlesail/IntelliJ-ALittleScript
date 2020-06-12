@@ -45,8 +45,6 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
             is_struct = true;
         }
 
-        boolean is_const = myElement.getTemplateConst() != null;
-
         if (myElement.getParent() == null) throw new ALittleGuessException(myElement, "没有父节点");
         PsiElement parent = myElement.getParent();
         if (parent.getParent() == null) throw new ALittleGuessException(parent, "没有父节点");
@@ -54,11 +52,11 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
 
         // 根据定义区分类模板还是函数模板
         if (parent instanceof ALittleClassDec) {
-            ALittleGuessClassTemplate info = new ALittleGuessClassTemplate(myElement, template_extends, is_class, is_struct, is_const);
+            ALittleGuessClassTemplate info = new ALittleGuessClassTemplate(myElement, template_extends, is_class, is_struct);
             info.updateValue();
             guess_list.add(info);
         } else {
-            ALittleGuessMethodTemplate info = new ALittleGuessMethodTemplate(myElement, template_extends, is_class, is_struct, is_const);
+            ALittleGuessMethodTemplate info = new ALittleGuessMethodTemplate(myElement, template_extends, is_class, is_struct);
             info.updateValue();
             guess_list.add(info);
         }
@@ -77,12 +75,5 @@ public class ALittleTemplatePairDecReference extends ALittleReference<ALittleTem
         } else if (guessList.size() != 1) {
             throw new ALittleGuessException(myElement, "重复定义");
         }
-
-        // 这里的AllType不能使用const修饰
-        if (myElement.getTemplateExtendsDec() != null
-                && myElement.getTemplateExtendsDec().getAllType() != null
-                && myElement.getTemplateExtendsDec().getAllType().getAllTypeConst() != null)
-            throw new ALittleGuessException(myElement.getTemplateExtendsDec().getAllType().getAllTypeConst(), "模板参数定义的限定类型，不能使用const修饰");
-
     }
 }
