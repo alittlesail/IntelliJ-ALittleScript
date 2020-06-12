@@ -4029,6 +4029,18 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // const
+  public static boolean TemplateConst(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TemplateConst")) return false;
+    if (!nextTokenIs(b, CONST)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, CONST);
+    exit_section_(b, m, TEMPLATE_CONST, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // '<' TemplatePairDec TemplatePairDec_* '>'
   public static boolean TemplateDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "TemplateDec")) return false;
@@ -4116,22 +4128,30 @@ public class ALittleParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TemplateNameDec TemplateExtendsDec?
+  // TemplateConst? TemplateNameDec TemplateExtendsDec?
   public static boolean TemplatePairDec(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "TemplatePairDec")) return false;
-    if (!nextTokenIs(b, ID_CONTENT)) return false;
+    if (!nextTokenIs(b, "<template pair dec>", CONST, ID_CONTENT)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, TEMPLATE_PAIR_DEC, null);
-    r = TemplateNameDec(b, l + 1);
-    p = r; // pin = 1
-    r = r && TemplatePairDec_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, TEMPLATE_PAIR_DEC, "<template pair dec>");
+    r = TemplatePairDec_0(b, l + 1);
+    r = r && TemplateNameDec(b, l + 1);
+    p = r; // pin = 2
+    r = r && TemplatePairDec_2(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
+  // TemplateConst?
+  private static boolean TemplatePairDec_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TemplatePairDec_0")) return false;
+    TemplateConst(b, l + 1);
+    return true;
+  }
+
   // TemplateExtendsDec?
-  private static boolean TemplatePairDec_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "TemplatePairDec_1")) return false;
+  private static boolean TemplatePairDec_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TemplatePairDec_2")) return false;
     TemplateExtendsDec(b, l + 1);
     return true;
   }

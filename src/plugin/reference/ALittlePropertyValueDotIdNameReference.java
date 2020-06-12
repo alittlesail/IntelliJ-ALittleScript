@@ -356,7 +356,7 @@ public class ALittlePropertyValueDotIdNameReference extends ALittleReference<ALi
 
             if (mPreType instanceof ALittleGuessTemplate) {
                 mPreType = ((ALittleGuessTemplate) mPreType).template_extends;
-                if (is_const && !mPreType.is_const) {
+                if (mPreType != null && is_const && !mPreType.is_const) {
                     mPreType = mPreType.clone();
                     mPreType.is_const = true;
                     mPreType.updateValue();

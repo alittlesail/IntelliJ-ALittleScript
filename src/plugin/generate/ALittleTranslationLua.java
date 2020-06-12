@@ -2272,9 +2272,11 @@ public class ALittleTranslationLua extends ALittleTranslation {
             {
                 if (var_value_dec.getConstValue() != null) {
                     String var_value_content = GenerateConstValue(var_value_dec.getConstValue());
+                    ++m_rawset_usecount;
                     var_init += pre_tab + "\t" + "___rawset(self, \"" + var_name + "\", " + var_value_content + ")\n";
                 } else if (var_value_dec.getOpNewStat() != null) {
                     String op_new_stat_content = GenerateOpNewStat(var_value_dec.getOpNewStat());
+                    ++m_rawset_usecount;
                     var_init += pre_tab + "\t" + "___rawset(self, \"" + var_name + "\", " + op_new_stat_content + ")\n";
                 }
             }

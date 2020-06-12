@@ -165,6 +165,7 @@ public interface ALittleTypes {
   IElementType STRUCT_VAR_DEC = new ALittleElementType("STRUCT_VAR_DEC");
   IElementType STRUCT_VAR_NAME_DEC = new ALittleElementType("STRUCT_VAR_NAME_DEC");
   IElementType TCALL_STAT = new ALittleElementType("TCALL_STAT");
+  IElementType TEMPLATE_CONST = new ALittleElementType("TEMPLATE_CONST");
   IElementType TEMPLATE_DEC = new ALittleElementType("TEMPLATE_DEC");
   IElementType TEMPLATE_EXTENDS_CLASS_DEC = new ALittleElementType("TEMPLATE_EXTENDS_CLASS_DEC");
   IElementType TEMPLATE_EXTENDS_DEC = new ALittleElementType("TEMPLATE_EXTENDS_DEC");
@@ -762,6 +763,9 @@ public interface ALittleTypes {
       }
       else if (type == TCALL_STAT) {
         return new ALittleTcallStatImpl(node);
+      }
+      else if (type == TEMPLATE_CONST) {
+        return new ALittleTemplateConstImpl(node);
       }
       else if (type == TEMPLATE_DEC) {
         return new ALittleTemplateDecImpl(node);

@@ -635,6 +635,10 @@ public class ALittleVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitTemplateConst(@NotNull ALittleTemplateConst o) {
+    visitPsiElement(o);
+  }
+
   public void visitTemplateDec(@NotNull ALittleTemplateDec o) {
     visitPsiElement(o);
   }

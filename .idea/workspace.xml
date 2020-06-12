@@ -21,11 +21,19 @@
   <component name="ChangeListManager">
     <list default="true" id="0fa83c02-5800-4982-b0b2-fb9c6fa549c9" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/format/ALittleBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/format/ALittleBlock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueMethodCallReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueMethodCallReference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceOpUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleReferenceOpUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleStructDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleStructDecReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/parser/ALittleParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/parser/ALittleParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTemplatePairDec.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/ALittleTemplatePairDec.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/ALittleTypes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/ALittleVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/ALittleVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleTemplatePairDecImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/plugin/psi/impl/ALittleTemplatePairDecImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/ALittle.bnf" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/ALittle.bnf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/_ALittleLexer.flex" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/_ALittleLexer.flex" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessClassTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessClassTemplate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessMethodTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessMethodTemplate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/guess/ALittleGuessTemplate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueDotIdNameReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueDotIdNameReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleTemplatePairDecReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleTemplatePairDecReference.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +89,7 @@
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553049610453" />
     <property name="jdk.selected.JAVA_MODULE" value="1.8" />
     <property name="last.edited.regexp" value="/*as/**/" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/plugin" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.33989638" />
@@ -211,11 +219,11 @@
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state width="531" height="466" key="DebuggerActiveHint/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591707407832" />
-    <state x="761" y="323" key="FileChooserDialogImpl" timestamp="1591685398151">
+    <state x="761" y="323" key="FileChooserDialogImpl" timestamp="1591942420605">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="-1159" y="336" key="FileChooserDialogImpl/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591412625701" />
-    <state x="761" y="323" key="FileChooserDialogImpl/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591685398151" />
+    <state x="761" y="323" key="FileChooserDialogImpl/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591942420605" />
     <state width="1877" height="331" key="GridCell.Tab.0.bottom" timestamp="1591774726826">
       <screen x="0" y="0" width="1920" height="999" />
     </state>
