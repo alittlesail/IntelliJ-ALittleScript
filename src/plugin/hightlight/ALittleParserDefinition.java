@@ -33,7 +33,7 @@ public class ALittleParserDefinition implements ParserDefinition {
             ALittleTypes.PUBLIC, ALittleTypes.PRIVATE, ALittleTypes.PROTECTED, ALittleTypes.STATIC, ALittleTypes.USING,
             ALittleTypes.BREAK, ALittleTypes.CONTINUE, ALittleTypes.CTOR, ALittleTypes.YIELD, ALittleTypes.ASYNC, ALittleTypes.AWAIT, ALittleTypes.BIND,
             ALittleTypes.IF, ALittleTypes.ELSE, ALittleTypes.ELSEIF, ALittleTypes.DO, ALittleTypes.WHILE, ALittleTypes.FOR,
-            ALittleTypes.IN, ALittleTypes.LIST, ALittleTypes.MAP, ALittleTypes.TYPE_TAIL, ALittleTypes.CONCAT,
+            ALittleTypes.IN, ALittleTypes.LIST, ALittleTypes.MAP, ALittleTypes.TYPE_TAIL, ALittleTypes.CONCAT, ALittleTypes.PATHS,
             ALittleTypes.NEW, ALittleTypes.RETURN, ALittleTypes.REGISTER, ALittleTypes.NAMESPACE, ALittleTypes.THIS, ALittleTypes.FUNCTOR,
             ALittleTypes.GET, ALittleTypes.SET, ALittleTypes.FUN, ALittleTypes.COMMA, ALittleTypes.CONST);
 

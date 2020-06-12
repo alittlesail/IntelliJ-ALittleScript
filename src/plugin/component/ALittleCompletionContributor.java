@@ -14,7 +14,7 @@ public class ALittleCompletionContributor extends CompletionContributor {
     static String[] KEYWORD_LIST = new String[]{
             "int", "long", "double", "bool", "string", "var", "List", "Map"
             , "namespace", "class", "struct", "enum", "const"
-            , "for", "do", "while", "break", "return", "cast", "reflect", "continue"
+            , "for", "do", "while", "break", "return", "cast", "reflect", "continue", "paths"
             , "get", "set", "fun", "static", "Ctor", "Functor", "this", "using"
             , "public", "protected", "private", "instance", "tcall", "Language"
             , "async", "await", "yield", "bind", "Http", "HttpDownload", "HttpUpload", "Msg", "Cmd", "Constant"

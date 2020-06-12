@@ -1154,7 +1154,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
 
         String value = text.getText();
         // 检查路径是否存在
-        String path = FileHelper.calcModulePath(paths_value, true) + value.substring(1, value.length() - 2).trim();
+        String path = FileHelper.calcModulePath(paths_value, true) + value.substring(1, value.length() - 1).trim();
         File info = new File(path);
         if (!info.exists()) throw  new ALittleGuessException(paths_value, "路径不存在:" + path);
         List<String> path_list = new ArrayList<>();
