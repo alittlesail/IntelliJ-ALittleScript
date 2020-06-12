@@ -131,6 +131,7 @@ ID_CONTENT=[_a-zA-Z][_a-zA-Z0-9]*
   "null"                { return NULL; }
   "co"                  { return CO; }
   "reflect"             { return REFLECT; }
+  "paths"               { return PATHS; }
   "cast"                { return CAST; }
   "this"                { return THIS; }
 

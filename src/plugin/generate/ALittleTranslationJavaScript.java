@@ -12,6 +12,7 @@ import plugin.psi.*;
 import plugin.reference.ALittlePropertyValueCustomTypeReference;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1105,6 +1106,9 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         if (value_factor.getReflectValue() != null)
             return GenerateReflectValue(value_factor.getReflectValue());
 
+        if (value_factor.getPathsValue() != null)
+            return GeneratePathsValue(value_factor.getPathsValue());
+
         if (value_factor.getPropertyValue() != null) {
             Tuple2<String, Tuple2<String, String>> result = GeneratePropertyValue(value_factor.getPropertyValue());
             return result.getFirst();
@@ -1138,6 +1142,31 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
             content += "undefined";
         else
             content += const_value_string;
+        return content;
+    }
+
+    // 生成路径信息
+    private String GeneratePathsValue(ALittlePathsValue paths_value) throws ALittleGuessException
+    {
+        String content = "";
+        PsiElement text = paths_value.getTextContent();
+        if (text == null) throw new ALittleGuessException(paths_value, "请输入路径");
+
+        String value = text.getText();
+        // 检查路径是否存在
+        String path = FileHelper.calcModulePath(paths_value, true) + value.substring(1, value.length() - 2).trim();
+        File info = new File(path);
+        if (!info.exists()) throw  new ALittleGuessException(paths_value, "路径不存在:" + path);
+        List<String> path_list = new ArrayList<>();
+        FileHelper.getDeepFilePaths(info, "", path_list);
+
+        content = "[";
+        for (int i = 0; i < path_list.size(); ++i)
+        {
+            if (i != 0) content += ", ";
+            content += "\"" + path_list.get(i) + "\"";
+        }
+        content += "]";
         return content;
     }
 

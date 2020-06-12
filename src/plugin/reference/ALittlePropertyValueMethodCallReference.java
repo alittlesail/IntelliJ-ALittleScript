@@ -236,15 +236,18 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
             // 处理还未填充
             if (left_guess_template.template_extends != null) {
                 analysisTemplate(fill_map, left_guess_template.template_extends, right_src, right_guess, false);
+                if (right_guess.is_const) { right_guess = right_guess.clone(); right_guess.is_const = false; right_guess.updateValue(); }
                 fill_map.put(left_guess_template.getValueWithoutConst(), right_guess);
                 return;
             } else if (left_guess_template.is_class) {
                 if (right_guess instanceof ALittleGuessClass) {
+                    if (right_guess.is_const) { right_guess = right_guess.clone(); right_guess.is_const = false; right_guess.updateValue(); }
                     fill_map.put(left_guess_template.getValueWithoutConst(), right_guess);
                     return;
                 } else if (right_guess instanceof ALittleGuessTemplate) {
                     ALittleGuessTemplate right_guess_template = (ALittleGuessTemplate) right_guess;
                     if (right_guess_template.template_extends instanceof ALittleGuessClass || right_guess_template.is_class) {
+                        if (right_guess.is_const) { right_guess = right_guess.clone(); right_guess.is_const = false; right_guess.updateValue(); }
                         fill_map.put(right_guess_template.getValueWithoutConst(), right_guess);
                         return;
                     }
@@ -252,11 +255,13 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                 throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
             } else if (left_guess_template.is_struct) {
                 if (right_guess instanceof ALittleGuessStruct) {
+                    if (right_guess.is_const) { right_guess = right_guess.clone(); right_guess.is_const = false; right_guess.updateValue(); }
                     fill_map.put(left_guess_template.getValueWithoutConst(), right_guess);
                     return;
                 } else if (right_guess instanceof ALittleGuessTemplate) {
                     ALittleGuessTemplate right_guess_template = (ALittleGuessTemplate) right_guess;
                     if (right_guess_template.template_extends instanceof ALittleGuessStruct || right_guess_template.is_struct) {
+                        if (right_guess.is_const) { right_guess = right_guess.clone(); right_guess.is_const = false; right_guess.updateValue(); }
                         fill_map.put(left_guess_template.getValueWithoutConst(), right_guess);
                         return;
                     }
@@ -264,6 +269,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                 throw new ALittleGuessException(right_src, "要求是" + left_guess.getValue() + ",不能是:" + right_guess.getValue());
             }
 
+            if (right_guess.is_const) { right_guess = right_guess.clone(); right_guess.is_const = false; right_guess.updateValue(); }
             fill_map.put(left_guess_template.getValueWithoutConst(), right_guess);
             return;
         }
@@ -300,6 +306,7 @@ public class ALittlePropertyValueMethodCallReference extends ALittleReference<AL
                     ALittleGuess all_type_guess = all_type_list.get(i).guessType();
                     ALittleReferenceOpUtil.guessTypeEqual(pre_type_functor.template_param_list.get(i), all_type_list.get(i), all_type_guess, false, false);
                     String key = pre_type_functor.template_param_list.get(i).getValueWithoutConst();
+                    if (all_type_guess.is_const) { all_type_guess = all_type_guess.clone(); all_type_guess.is_const = false; all_type_guess.updateValue(); }
                     fill_map.put(key, all_type_guess);
                 }
             }

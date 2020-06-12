@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class FileHelper {
     // 删除文件夹
@@ -44,6 +45,23 @@ public class FileHelper {
 
         if (!root.delete())
             throw new Exception("文件夹删除失败 path:" + root.getPath());
+    }
+
+    // 删除文件夹
+    public static void getDeepFilePaths(File info, String parent_path, List<String> result) {
+        if (!info.exists()) return;
+
+        // 获取子级列表
+        File[] list = info.listFiles();
+        if (list == null) return;
+
+        for (File file : list) {
+            if (file.isDirectory()) {
+                getDeepFilePaths(file, parent_path + file.getName() + "/", result);
+            } else {
+                result.add(parent_path + file.getName());
+            }
+        }
     }
 
     // 创建文件并写入

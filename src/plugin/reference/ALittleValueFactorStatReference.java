@@ -29,6 +29,8 @@ public class ALittleValueFactorStatReference extends ALittleReference<ALittleVal
             return myElement.getMethodParamTailDec().guessTypes();
         else if (myElement.getCoroutineStat() != null)
             return myElement.getCoroutineStat().guessTypes();
+        else if (myElement.getPathsValue() != null)
+            return myElement.getPathsValue().guessTypes();
 
         return new ArrayList<>();
     }

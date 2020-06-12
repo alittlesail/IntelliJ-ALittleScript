@@ -97,6 +97,8 @@ public class ALittleReferenceOpUtil {
             return new ALittleOpNewListStatReference((ALittleOpNewListStat) element, range);
         if (element instanceof ALittleOpNewStat)
             return new ALittleOpNewStatReference((ALittleOpNewStat) element, range);
+        if (element instanceof ALittlePathsValue)
+            return new ALittlePathsValueReference((ALittlePathsValue) element, range);
         if (element instanceof ALittlePrimitiveType)
             return new ALittlePrimitiveTypeReference((ALittlePrimitiveType) element, range);
         if (element instanceof ALittlePropertyValueBracketValue)

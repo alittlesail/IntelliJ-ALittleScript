@@ -312,7 +312,7 @@ PrimitiveType ::= bool | double | int | long | any | string
 
 //复合值///////////////////////////////////////////////////////////////////
 ValueStat ::= OpNewStat | OpNewListStat | BindStat | TcallStat | Op2Stat | ValueOpStat
-ValueFactorStat ::= WrapValueStat | ConstValue | ReflectValue | PropertyValue | MethodParamTailDec | CoroutineStat
+ValueFactorStat ::= WrapValueStat | ConstValue | ReflectValue | PathsValue | PropertyValue | MethodParamTailDec | CoroutineStat
 ValueOpStat ::= ValueFactorStat (Op3Stat | Op4Stat | Op5Stat | Op6Stat | Op7Stat | Op8Stat)?
 
 // new
@@ -339,6 +339,9 @@ CoroutineStat ::= co
 ReflectValue ::= reflect (ReflectCustomType | ReflectValueStat) {pin=1}
 ReflectCustomType ::= '<' CustomType '>' {pin=1}
 ReflectValueStat ::= '(' ValueStat ')' {pin=1}
+
+// 文件路径宏
+PathsValue ::= paths '(' TEXT_CONTENT? ')' {pin=1}
 
 // 属性
 PropertyValue ::= PropertyValueFirstType PropertyValueSuffix*
