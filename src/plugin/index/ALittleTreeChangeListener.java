@@ -168,6 +168,8 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
                 if (!(guess instanceof ALittleGuessClass)) continue;
                 PsiElement element = guess.getElement();
                 if (element == null) continue;
+                String path = element.getContainingFile().getOriginalFile().getVirtualFile().getPath().replace('/', '\\');
+                if (file_path.equals(path)) continue;
                 result.add(element.getContainingFile().getOriginalFile().getVirtualFile().getPath().replace('/', '\\'));
             }
         }

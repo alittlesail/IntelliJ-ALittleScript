@@ -20,9 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0fa83c02-5800-4982-b0b2-fb9c6fa549c9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/plugin/index/ALittleTreeChangeListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/index/ALittleTreeChangeListener.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
