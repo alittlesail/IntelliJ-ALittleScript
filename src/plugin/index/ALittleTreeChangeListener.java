@@ -161,15 +161,15 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         if (dec == null) return;
         List<ALittleNamespaceElementDec> element_dec_list =  dec.getNamespaceElementDecList();
         for (ALittleNamespaceElementDec element_dec : element_dec_list) {
-            ALittleClassDec classDec = element_dec.getClassDec();
-            if (classDec == null) continue;
-            ALittleClassExtendsDec extendsDec = classDec.getClassExtendsDec();
-            if (extendsDec == null) continue;
-            ALittleGuess guess = extendsDec.guessType();
-            if (!(guess instanceof ALittleGuessClass)) continue;
-            PsiElement element = guess.getElement();
-            if (element == null) return;
-            result.add(element.getContainingFile().getOriginalFile().getVirtualFile().getPath());
+            if (element_dec.getClassDec() != null) {
+                ALittleClassExtendsDec extendsDec = element_dec.getClassDec().getClassExtendsDec();
+                if (extendsDec == null) continue;
+                ALittleGuess guess = extendsDec.guessType();
+                if (!(guess instanceof ALittleGuessClass)) continue;
+                PsiElement element = guess.getElement();
+                if (element == null) continue;
+                result.add(element.getContainingFile().getOriginalFile().getVirtualFile().getPath().replace('/', '\\'));
+            }
         }
     }
 

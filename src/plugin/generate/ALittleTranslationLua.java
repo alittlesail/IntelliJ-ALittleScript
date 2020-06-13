@@ -5,7 +5,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import groovy.lang.Tuple2;
 import org.jetbrains.annotations.NotNull;
-import org.jsoup.internal.StringUtil;
 import plugin.alittle.FileHelper;
 import plugin.alittle.PsiHelper;
 import plugin.guess.*;
