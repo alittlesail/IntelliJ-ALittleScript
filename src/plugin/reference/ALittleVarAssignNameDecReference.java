@@ -6,6 +6,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import plugin.alittle.PsiHelper;
 import plugin.guess.ALittleGuess;
 import plugin.guess.ALittleGuessException;
 import plugin.psi.*;
@@ -83,6 +84,23 @@ public class ALittleVarAssignNameDecReference extends ALittleReference<ALittleVa
             throw new ALittleGuessException(myElement, "未知类型");
         } else if (guessList.size() != 1) {
             throw new ALittleGuessException(myElement, "重复定义");
+        }
+
+        if (mMethodDec == null)
+            reloadInfo();
+
+        // 处理参数
+        if (mMethodDec != null)
+        {
+            List<ALittleMethodParamNameDec> dec_list = PsiHelper.findMethodParamNameDecList(mMethodDec, mKey);
+            if (dec_list.size() > 0)
+                throw new ALittleGuessException(myElement, "重复定义");
+        }
+        // 处理表达式定义
+        {
+            List<ALittleVarAssignNameDec> dec_list = PsiHelper.findVarAssignNameDecList(myElement, mKey);
+            if (dec_list.size() > 0)
+                throw new ALittleGuessException(myElement, "重复定义");
         }
     }
 
