@@ -21,7 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0fa83c02-5800-4982-b0b2-fb9c6fa549c9" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/index/ALittleTreeChangeListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/index/ALittleTreeChangeListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +82,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.33989638" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="PsiViewer.ProjectComponent">
     <option name="HIGHLIGHT" value="false" />
@@ -273,12 +273,12 @@
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1196" y="221" key="RollbackChangesDialog/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590128912537" />
-    <state x="326" y="0" key="SettingsEditor" timestamp="1591970704811">
-      <screen x="0" y="0" width="1366" height="738" />
+    <state x="461" y="143" key="SettingsEditor" timestamp="1592460476226">
+      <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="326" y="0" key="SettingsEditor/0.0.1366.738@0.0.1366.738" timestamp="1591970704811" />
     <state x="-1459" y="149" key="SettingsEditor/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590129036789" />
-    <state x="461" y="143" key="SettingsEditor/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591692912668" />
+    <state x="461" y="143" key="SettingsEditor/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1592460476226" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1591613063308">
       <screen x="0" y="0" width="1920" height="999" />
     </state>

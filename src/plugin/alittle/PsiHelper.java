@@ -778,6 +778,21 @@ public class PsiHelper {
                 findVarAssignNameDecList((ALittleAllExpr) parent, var_dec_list, name);
                 break;
             }
+            if (parent instanceof ALittleForStartStat) {
+                PsiElement parentElement = parent.getParent();
+                if (!(parentElement instanceof ALittleForStepCondition)) break;
+                ALittleForStepCondition for_step_condition = (ALittleForStepCondition) parentElement;
+                parentElement = for_step_condition.getParent();
+                if (!(parentElement instanceof ALittleForCondition)) break;
+                ALittleForCondition for_condition = (ALittleForCondition) parentElement;
+                parentElement = for_condition.getParent();
+                if (!(parentElement instanceof ALittleForExpr)) break;
+                ALittleForExpr for_expr = (ALittleForExpr) parentElement;
+                PsiElement all_expr = for_expr.getParent();
+                if (!(all_expr instanceof ALittleAllExpr)) break;
+                findVarAssignNameDecList((ALittleAllExpr)all_expr, var_dec_list, name);
+                break;
+            }
             if (parent instanceof ALittleForStepCondition) {
                 PsiElement parentElement = parent.getParent();
                 if (parentElement == null) break;
