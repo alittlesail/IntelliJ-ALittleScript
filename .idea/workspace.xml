@@ -21,7 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0fa83c02-5800-4982-b0b2-fb9c6fa549c9" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/alittle/PsiHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleGenericTypeReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleGenericTypeReference.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -92,7 +92,7 @@ public class ALittleGenericTypeReference extends ALittleReference<ALittleGeneric
                                 throw new ALittleGuessException(return_one, "未知类型");
                             if (i + 1 != return_one_list.size())
                                 throw new ALittleGuessException(return_one, "返回值占位符必须定义在最后");
-                            info.param_tail = new ALittleGuessParamTail(return_tail.getText());
+                            info.return_tail = new ALittleGuessReturnTail(return_tail.getText());
                         }
                     }
                 }
