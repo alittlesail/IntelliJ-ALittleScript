@@ -3252,7 +3252,7 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
         for (Map.Entry<String, StructReflectInfo> pair : m_reflect_map.entrySet()) {
             info_list.add(pair.getValue());
         }
-        info_list.sort((a, b) -> a.hash_code - b.hash_code);
+        info_list.sort((a, b) -> Math.abs(a.hash_code) - Math.abs(b.hash_code));
         for (StructReflectInfo info : info_list) {
             if (!info.generate) continue;
             content += "ALittle.RegStruct(" + info.hash_code + ", \"" + info.name + "\", " + info.content + ")\n";
