@@ -10,6 +10,7 @@ import plugin.alittle.PsiHelper;
 import plugin.guess.*;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
+import plugin.reference.ALittlePropertyValueCustomTypeReference;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
 
 import java.io.File;
@@ -214,7 +215,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     if (guess_class.using_name != null) name = guess_class.using_name;
                     // 拆分名称，检查命名域，如果与当前相同，或者是lua，那么就去掉
                     String[] split = name.split("\\.");
-                    if (split.length == 2 && (split[0].equals(m_namespace_name) || split[0].equals("lua")))
+                    if (split.length == 2 && split[0].equals("lua"))
                         template_param_list.add(split[1]);
                     else
                         template_param_list.add(name);
@@ -245,7 +246,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
                     // 计算实际类名
                     String class_name = full_class_name;
-                    if (guess_class.namespace_name.equals(m_namespace_name) || guess_class.namespace_name.equals("lua"))
+                    if (guess_class.namespace_name.equals("lua"))
                         class_name = guess_class.class_name;
 
                     // 计算模板名
@@ -323,11 +324,19 @@ public class ALittleTranslationLua extends ALittleTranslation {
             if (dot_id != null) {
                 ALittleCustomTypeDotIdName dot_id_name = dot_id.getCustomTypeDotIdName();
                 if (dot_id_name != null) {
-                    if (class_name.equals(m_namespace_name) || class_name.equals("lua"))
+                    if (class_name.equals("lua"))
                         class_name = dot_id_name.getText();
                     else
                         class_name += "." + dot_id_name.getText();
                 }
+                else
+                {
+                    class_name = guess_class.namespace_name + "." + class_name;
+                }
+            }
+            else
+            {
+                class_name = guess_class.namespace_name + "." + class_name;
             }
 
             // 如果有填充模板参数，那么就模板模板
@@ -1038,7 +1047,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 // 如果是using定义而来，那么就使用using_name
                 if (guess_class.using_name != null) name = guess_class.using_name;
                 String[] split = name.split("\\.");
-                if (split.length == 2 && (split[0].equals(m_namespace_name) || split[0].equals("lua")))
+                if (split.length == 2 && split[0].equals("lua"))
                     content = split[1];
                 else
                     content = name;
@@ -1271,7 +1280,6 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         // 用来标记第一个变量是不是lua命名域
         boolean is_lua_namespace = false;
-        boolean is_alittle_namespace = false;
 
         // 获取开头的属性信息
         ALittlePropertyValueFirstType first_type = prop_value.getPropertyValueFirstType();
@@ -1287,14 +1295,25 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     || custom_guess instanceof ALittleGuessEnumName)
                 addRelay(custom_guess.getElement());
 
-            if (custom_guess instanceof ALittleGuessNamespaceName) {
-                is_lua_namespace = custom_guess.getValue().equals("lua");
-                is_alittle_namespace = custom_guess.getValue().equals("alittle");
+            if (custom_guess instanceof ALittleGuessNamespaceName && (custom_guess.getValue().equals("lua") || custom_guess.getValue().equals("alittle"))) {
+                is_lua_namespace = true;
             }
 
             // 如果是lua命名域，那么就忽略
-            if (!is_lua_namespace && !is_alittle_namespace)
+            if (!is_lua_namespace) {
+                // 如果custom_type不是命名域，那么就自动补上命名域
+                if (!(custom_guess instanceof ALittleGuessNamespaceName) && custom_guess instanceof ALittleGuess) {
+                    // 判断custom_type的来源
+                    String pre_namespace_name;
+                    pre_namespace_name = ((ALittlePropertyValueCustomTypeReference)(custom_type.getReference())).calcNamespaceName();
+
+                    if (pre_namespace_name.equals("alittle")) pre_namespace_name = "";
+                    if (pre_namespace_name.length() > 0)
+                        content += pre_namespace_name + ".";
+                }
+
                 content += custom_type.getText();
+            }
         }
         // 如果是this，那么就变为self
         else if (this_type != null) {
@@ -1378,7 +1397,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     addRelay(guess.getElement());
                 }
 
-                if (!is_lua_namespace && !is_alittle_namespace)
+                if (!is_lua_namespace)
                     content += split;
 
                 if (dot_id.getPropertyValueDotIdName() == null)
@@ -1393,7 +1412,6 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
                 // 置为false，表示不是命名域
                 is_lua_namespace = false;
-                is_alittle_namespace = false;
                 continue;
             }
 
@@ -1478,7 +1496,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     for (ALittleGuess guess : template_list) {
                         if (guess instanceof ALittleGuessClass) {
                             ALittleGuessClass guess_class = (ALittleGuessClass) guess;
-                            if (guess_class.namespace_name.equals(m_namespace_name) || guess_class.namespace_name.equals("lua"))
+                            if (guess_class.namespace_name.equals("lua"))
                                 param_list.add(guess_class.class_name);
                             else
                                 param_list.add(guess_class.getValue());
@@ -2195,7 +2213,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
         ALittleEnumNameDec name_dec = root.getEnumNameDec();
         if (name_dec == null) throw new ALittleGuessException(null, root.getText() + "没有定义枚举名");
 
-        content += pre_tab + name_dec.getText() + " = {\n";
+        content += pre_tab + m_alittle_gen_namespace_pre + name_dec.getText() + " = {\n";
 
         int enum_value = -1;
         String enum_string;
@@ -2255,8 +2273,6 @@ public class ALittleTranslationLua extends ALittleTranslation {
         String extends_name = "";
         if (extends_dec != null && extends_dec.getClassNameDec() != null) {
             ALittleGuess guess = extends_dec.getClassNameDec().guessType();
-
-
             ALittleGuessClass guess_class = (ALittleGuessClass) guess;
             if (guess_class == null)
                 throw new ALittleGuessException(extends_dec, "extends_dec.getClassNameDec().guessType 得到的不是ALittleGuessClass");
@@ -2272,7 +2288,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
         else
             content += pre_tab + "assert(" + extends_name + ", \" extends class:" + extends_name + " is nil\")\n";
 
-        content += pre_tab + class_name + " = "
+        content += pre_tab + m_alittle_gen_namespace_pre + class_name + " = "
                 + "Lua.Class(" + extends_name + ", \""
                 + PsiHelper.getNamespaceName(root) + "." + class_name + "\")\n\n";
 
@@ -2314,7 +2330,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         // 如果没有ctor，并且有初始化函数
         if (!has_ctor && var_init.length() > 0) {
-            content += pre_tab + "function " + class_name + ":Ctor()\n";
+            content += pre_tab + "function " + m_alittle_gen_namespace_pre + class_name + ":Ctor()\n";
             content += var_init;
             content += pre_tab + "end\n";
             content += "\n";
@@ -2346,7 +2362,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     }
                 }
                 ctor_param_list = StringUtil.join(param_name_list, ", ");
-                content += pre_tab + "function " + class_name + ":Ctor(" + ctor_param_list + ")\n";
+                content += pre_tab + "function " + m_alittle_gen_namespace_pre + class_name + ":Ctor(" + ctor_param_list + ")\n";
 
                 m_open_rawset = true;
 
@@ -2383,7 +2399,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 if (class_method_name_dec == null)
                     throw new ALittleGuessException(null, "class " + class_name + " getter函数没有函数名");
 
-                content += pre_tab + "function " + class_name + ".__getter:" + class_method_name_dec.getText() + "()\n";
+                content += pre_tab + "function " + m_alittle_gen_namespace_pre + class_name + ".__getter:" + class_method_name_dec.getText() + "()\n";
 
                 ALittleMethodBodyDec class_method_body_dec = class_getter_dec.getMethodBodyDec();
                 if (class_method_body_dec == null)
@@ -2417,7 +2433,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 if (param_name_dec == null)
                     throw new ALittleGuessException(null, "class " + class_name + " 函数没有定义函数名");
 
-                content += pre_tab + "function " + class_name + ".__setter:"
+                content += pre_tab + "function " + m_alittle_gen_namespace_pre + class_name + ".__setter:"
                         + class_method_name_dec.getText() + "("
                         + param_name_dec.getText() + ")\n";
 
@@ -2474,7 +2490,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     }
                 }
                 String method_param_list = StringUtil.join(param_name_list, ", ");
-                content += pre_tab + "function " + class_name + ":"
+                content += pre_tab + "function " + m_alittle_gen_namespace_pre + class_name + ":"
                         + class_method_name_dec.getText()
                         + "(" + method_param_list + ")\n";
 
@@ -2497,9 +2513,9 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
                 if (coroutine_type.equals("async")) {
                     content += pre_tab
-                            + class_name + "." + class_method_name_dec.getText()
+                            + m_alittle_gen_namespace_pre + class_name + "." + class_method_name_dec.getText()
                             + " = " + "Lua.CoWrap("
-                            + class_name + "." + class_method_name_dec.getText()
+                            + m_alittle_gen_namespace_pre + class_name + "." + class_method_name_dec.getText()
                             + ")\n";
                 }
 
@@ -2542,7 +2558,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 }
 
                 String method_param_list = StringUtil.join(param_name_list, ", ");
-                content += pre_tab + "function " + class_name + "."
+                content += pre_tab + "function " + m_alittle_gen_namespace_pre + class_name + "."
                         + class_method_name_dec.getText()
                         + "(" + method_param_list + ")\n";
 
@@ -2566,9 +2582,9 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
                 if (coroutine_type.equals("async")) {
                     content += pre_tab
-                            + class_name + "." + class_method_name_dec.getText()
+                            + m_alittle_gen_namespace_pre + class_name + "." + class_method_name_dec.getText()
                             + " = " + "Lua.CoWrap("
-                            + class_name + "." + class_method_name_dec.getText()
+                            + m_alittle_gen_namespace_pre + class_name + "." + class_method_name_dec.getText()
                             + ")\n";
                 }
                 content += "\n";
@@ -2600,7 +2616,8 @@ public class ALittleTranslationLua extends ALittleTranslation {
             content += "local ";
             content += StringUtil.join(name_list, ", ");
         } else if (access_type == PsiHelper.ClassAccessType.PROTECTED) {
-            content += StringUtil.join(name_list, ", ");
+            content += m_alittle_gen_namespace_pre;
+            content += StringUtil.join(name_list, ", " + m_alittle_gen_namespace_pre);
         } else if (access_type == PsiHelper.ClassAccessType.PUBLIC) {
             content += "_G.";
             content += StringUtil.join(name_list, ", _G.");
@@ -2641,7 +2658,6 @@ public class ALittleTranslationLua extends ALittleTranslation {
             for (ALittleTemplatePairDec pair_dec : pair_dec_list) {
                 ALittleGuess guess = pair_dec.guessType();
 
-
                 // 把模板名作为参数名
                 if (guess instanceof ALittleGuessTemplate) {
                     ALittleGuessTemplate guess_template = (ALittleGuessTemplate) guess;
@@ -2675,7 +2691,7 @@ public class ALittleTranslationLua extends ALittleTranslation {
             content += pre_tab + "local " + method_name + "\n"
                     + pre_tab + method_name + " = " + "function(" + method_param_list + ")\n";
         } else {
-            content += pre_tab + "function " + method_name + "(" + method_param_list + ")\n";
+            content += pre_tab + "function " + m_alittle_gen_namespace_pre + method_name + "(" + method_param_list + ")\n";
         }
 
         String coroutine_type = PsiHelper.getCoroutineType(modifier);
@@ -2698,9 +2714,9 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         // 协程判定
         if (coroutine_type.equals("async")) {
-            content += pre_tab + method_name
+            content += pre_tab + m_alittle_gen_namespace_pre + method_name
                     + " = " + "Lua.CoWrap("
-                    + method_name + ")\n";
+                    + m_alittle_gen_namespace_pre + method_name + ")\n";
         }
 
         content += "\n";
@@ -2716,7 +2732,6 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，必须有两个参数");
 
             ALittleGuess guess_param = one_dec_list.get(1).getAllType().guessType();
-
 
             if (!(guess_param instanceof ALittleGuessStruct))
                 throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，第二个参数必须是struct");
@@ -2741,18 +2756,18 @@ public class ALittleTranslationLua extends ALittleTranslation {
             if (proto_type.equals("Http")) {
                 if (return_list.size() != 1)
                     throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，有且仅有一个返回值");
-                content += pre_tab + m_alittle_gen_namespace_pre + "RegHttpCallback(\"" + guess_param_struct.getValue() + "\", " + method_name + ")\n";
+                content += pre_tab + "ALittle.RegHttpCallback(\"" + guess_param_struct.getValue() + "\", " + method_name + ")\n";
             } else if (proto_type.equals("HttpDownload")) {
                 if (return_list.size() != 2)
                     throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，有且仅有两个返回值");
-                content += pre_tab + m_alittle_gen_namespace_pre
-                        + "RegHttpDownloadCallback(\""
+                content += pre_tab
+                        + "ALittle.RegHttpDownloadCallback(\""
                         + guess_param_struct.getValue() + "\", " + method_name + ")\n";
             } else if (proto_type.equals("HttpUpload")) {
                 if (return_list.size() != 0)
                     throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，不能有返回值");
-                content += pre_tab + m_alittle_gen_namespace_pre
-                        + "RegHttpFileCallback(\""
+                content += pre_tab
+                        + "ALittle.RegHttpFileCallback(\""
                         + guess_param_struct.getValue() + "\", " + method_name + ")\n";
             } else if (proto_type.equals("Msg")) {
                 if (return_list.size() > 1)
@@ -2761,16 +2776,16 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
 
                 if (guess_return == null) {
-                    content += pre_tab + m_alittle_gen_namespace_pre
-                            + "RegMsgCallback(" + PsiHelper.structHash(guess_param_struct)
+                    content += pre_tab
+                            + "ALittle.RegMsgCallback(" + PsiHelper.structHash(guess_param_struct)
                             + ", " + method_name + ")\n";
                 } else {
                     if (!(guess_return instanceof ALittleGuessStruct))
                         throw new ALittleGuessException(null, "带" + proto_type + "的全局函数，返回值必须是struct");
                     ALittleGuessStruct guess_return_struct = (ALittleGuessStruct) guess_return;
 
-                    content += pre_tab + m_alittle_gen_namespace_pre
-                            + "RegMsgRpcCallback(" + PsiHelper.structHash(guess_param_struct)
+                    content += pre_tab
+                            + "ALittle.RegMsgRpcCallback(" + PsiHelper.structHash(guess_param_struct)
                             + ", " + method_name + ", " + PsiHelper.structHash(guess_return_struct)
                             + ")\n";
 
@@ -2794,8 +2809,8 @@ public class ALittleTranslationLua extends ALittleTranslation {
                 }
             }
 
-            content += pre_tab + m_alittle_gen_namespace_pre
-                    + "RegCmdCallback(\"" + method_name + "\", " + method_name
+            content += pre_tab
+                    + "ALittle.RegCmdCallback(\"" + method_name + "\", " + method_name
                     + ", {" + StringUtil.join(var_list, ",") + "}, {" + StringUtil.join(name_list, ",")
                     + "}, \"" + command_info.desc + "\")\n";
         }
@@ -2808,17 +2823,13 @@ public class ALittleTranslationLua extends ALittleTranslation {
     @Override
     protected String generateRoot(List<ALittleNamespaceElementDec> element_dec_list) throws ALittleGuessException {
         String content = "-- ALittle Generate Lua And Do Not Edit This Line!";
-
-        m_alittle_gen_namespace_pre = "ALittle.";
-        if (m_namespace_name.equals("ALittle")) m_alittle_gen_namespace_pre = "";
-
         m_reflect_map = new HashMap<String, StructReflectInfo>();
 
-        // 如果是lua命名域，那么就不要使用module;
+        m_alittle_gen_namespace_pre = "";
         if (m_namespace_name.equals("lua") || m_namespace_name.equals("alittle"))
-            content += "\n";
+            m_alittle_gen_namespace_pre = "_G.";
         else
-            content += "\nmodule(\"" + m_namespace_name + "\", package.seeall)\n\n";
+            m_alittle_gen_namespace_pre = m_namespace_name + ".";
 
         String other_content = "";
         for (ALittleNamespaceElementDec child : element_dec_list) {
@@ -2877,11 +2888,15 @@ public class ALittleTranslationLua extends ALittleTranslation {
             }
         }
 
+        if (m_namespace_name.equals("lua") || m_namespace_name.equals("alittle"))
+            content += "do\n";
+        else
+            content += "do\nif _G." + m_namespace_name + " == nil then _G." + m_namespace_name + " = {} end\n";
+
         if (m_rawset_usecount > 0) content += "local ___rawset = rawset\n";
         content += "local ___pairs = pairs\n";
         content += "local ___ipairs = ipairs\n";
-        if (m_need_all_struct)
-            content += "local ___all_struct = " + m_alittle_gen_namespace_pre + "GetAllStruct()\n";
+        if (m_need_all_struct) content += "local ___all_struct = ALittle.GetAllStruct()\n";
         content += "\n";
 
         List<StructReflectInfo> info_list = new ArrayList<>();
@@ -2891,12 +2906,13 @@ public class ALittleTranslationLua extends ALittleTranslation {
         info_list.sort((a, b) -> Math.abs(a.hash_code) - Math.abs(b.hash_code));
         for (StructReflectInfo info : info_list) {
             if (!info.generate) continue;
-            content += m_alittle_gen_namespace_pre
-                    + "RegStruct(" + info.hash_code + ", \"" + info.name + "\", " + info.content + ")\n";
+            content += "ALittle.RegStruct(" + info.hash_code + ", \"" + info.name + "\", " + info.content + ")\n";
         }
         content += "\n";
 
         content += other_content;
+
+        content += "end";
 
         return content;
     }
