@@ -10,6 +10,7 @@ import plugin.alittle.PsiHelper;
 import plugin.guess.*;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
+import plugin.reference.ALittleCustomTypeReference;
 import plugin.reference.ALittlePropertyValueCustomTypeReference;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
 
@@ -465,11 +466,23 @@ public class ALittleTranslationJavaScript extends ALittleTranslation {
                         class_name = dot_id_name.getText();
                     else
                         class_name += "." + dot_id_name.getText();
-                } else {
-                    class_name = guess_class.namespace_name + "." + class_name;
                 }
-            } else {
-                class_name = guess_class.namespace_name + "." + class_name;
+                else
+                {
+                    // 判断custom_type的来源
+                    String pre_namespace_name = ((ALittleCustomTypeReference)custom_type.getReference()).CalcNamespaceName();
+                    if (pre_namespace_name.equals("alittle")) pre_namespace_name = "";
+                    if (pre_namespace_name.length() > 0) pre_namespace_name += ".";
+                    class_name = pre_namespace_name + class_name;
+                }
+            }
+            else
+            {
+                // 判断custom_type的来源
+                String pre_namespace_name = ((ALittleCustomTypeReference)custom_type.getReference()).CalcNamespaceName();
+                if (pre_namespace_name.equals("alittle")) pre_namespace_name = "";
+                if (pre_namespace_name.length() > 0) pre_namespace_name += ".";
+                class_name = pre_namespace_name + class_name;
             }
 
             // 如果有填充模板参数，那么就模板模板

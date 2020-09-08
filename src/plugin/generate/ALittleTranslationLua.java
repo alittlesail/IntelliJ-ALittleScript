@@ -10,6 +10,7 @@ import plugin.alittle.PsiHelper;
 import plugin.guess.*;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
+import plugin.reference.ALittleCustomTypeReference;
 import plugin.reference.ALittlePropertyValueMethodCallReference;
 
 import java.io.File;
@@ -328,6 +329,22 @@ public class ALittleTranslationLua extends ALittleTranslation {
                     else
                         class_name += "." + dot_id_name.getText();
                 }
+                else
+                {
+                    // 判断custom_type的来源
+                    String pre_namespace_name = ((ALittleCustomTypeReference)custom_type.getReference()).CalcNamespaceName();
+                    if (pre_namespace_name.equals("alittle")) pre_namespace_name = "";
+                    if (pre_namespace_name.length() > 0) pre_namespace_name += ".";
+                    class_name = pre_namespace_name + class_name;
+                }
+            }
+            else
+            {
+                // 判断custom_type的来源
+                String pre_namespace_name = ((ALittleCustomTypeReference)custom_type.getReference()).CalcNamespaceName();
+                if (pre_namespace_name.equals("alittle")) pre_namespace_name = "";
+                if (pre_namespace_name.length() > 0) pre_namespace_name += ".";
+                class_name = pre_namespace_name + class_name;
             }
 
             // 如果有填充模板参数，那么就模板模板
@@ -1555,6 +1572,8 @@ public class ALittleTranslationLua extends ALittleTranslation {
 
         if (PsiHelper.calcAccessType(modifier) == PsiHelper.ClassAccessType.PRIVATE)
             content += "local ";
+        else
+            content += m_alittle_gen_namespace_pre;
 
         String sub_content = GenerateCustomType(custom_type);
 

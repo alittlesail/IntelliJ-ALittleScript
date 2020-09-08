@@ -21,7 +21,11 @@
   <component name="ChangeListManager">
     <list default="true" id="0fa83c02-5800-4982-b0b2-fb9c6fa549c9" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleGenericTypeReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleGenericTypeReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ALittleScript.jar" beforeDir="false" afterPath="$PROJECT_DIR$/ALittleScript.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationJavaScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationJavaScript.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/generate/ALittleTranslationLua.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeCommonReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittleCustomTypeCommonReference.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueThisTypeReference.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin/reference/ALittlePropertyValueThisTypeReference.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -301,10 +305,10 @@
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1304" y="240" key="run.anything.popup/0.0.1920.999/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1590995407000" />
-    <state x="438" y="112" width="672" height="500" key="search.everywhere.popup" timestamp="1591973229800">
-      <screen x="0" y="0" width="1366" height="738" />
+    <state x="616" y="152" width="672" height="676" key="search.everywhere.popup" timestamp="1596423660216">
+      <screen x="0" y="0" width="1920" height="999" />
     </state>
     <state x="438" y="112" width="672" height="500" key="search.everywhere.popup/0.0.1366.738@0.0.1366.738" timestamp="1591973229800" />
-    <state x="616" y="152" width="672" height="676" key="search.everywhere.popup/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1591956559422" />
+    <state x="616" y="152" width="672" height="676" key="search.everywhere.popup/0.0.1920.999/-1920.0.1920.1040@0.0.1920.999" timestamp="1596423660216" />
   </component>
 </project>

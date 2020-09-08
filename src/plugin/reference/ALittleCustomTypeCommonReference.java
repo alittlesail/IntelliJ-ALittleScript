@@ -11,10 +11,7 @@ import com.intellij.psi.ResolveResult;
 import org.jetbrains.annotations.NotNull;
 import plugin.alittle.PsiHelper;
 import plugin.component.ALittleIcons;
-import plugin.guess.ALittleGuess;
-import plugin.guess.ALittleGuessClass;
-import plugin.guess.ALittleGuessException;
-import plugin.guess.ALittleGuessStruct;
+import plugin.guess.*;
 import plugin.index.ALittleTreeChangeListener;
 import plugin.psi.*;
 
@@ -363,5 +360,64 @@ public class ALittleCustomTypeCommonReference<T extends PsiElement> extends ALit
         }
 
         return variants.toArray();
+    }
+
+    public String CalcNamespaceName() throws ALittleGuessException
+    {
+        if (mKey.length() == 0) throw new ALittleGuessException(myElement, "找不到指定类型, namespace:" + mNamespace + ", key:" + mKey);
+
+        ALittleCustomTypeTemplate custom_type_template = mCustomType.getCustomTypeTemplate();
+        {
+            List<PsiElement> dec_list = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(), PsiHelper.PsiElementType.USING_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
+            for (PsiElement dec : dec_list)
+            {
+                ALittleUsingDec using_dec = (ALittleUsingDec)(dec.getParent());
+                if (using_dec == null)
+                    throw new ALittleGuessException(myElement, "ALittleScriptUsingNameDecElement的父节点不是ALittleScriptUsingDecElement");
+                ALittleNamespaceElementDec element_dec = (ALittleNamespaceElementDec)(using_dec.getParent());
+                if (element_dec == null)
+                    throw new ALittleGuessException(myElement, "ALittleScriptUsingDecElement的父节点不是ALittleScriptNamespaceElementDecElement");
+                PsiHelper.ClassAccessType access_type = PsiHelper.calcAccessType(element_dec.getModifierList());
+                if (access_type != PsiHelper.ClassAccessType.PRIVATE)
+                    return PsiHelper.getNamespaceName(dec);
+                return "";
+            }
+        }
+        {
+            // 根据名字获取对应的类
+            List<PsiElement> dec_list = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(), PsiHelper.PsiElementType.CLASS_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
+            for (PsiElement dec : dec_list)
+            {
+                ALittleGuess class_guess = ((ALittleClassNameDec)dec).guessType();
+                if (!(class_guess instanceof ALittleGuessClass))
+                    throw new ALittleGuessException(myElement, "ALittleClassNameDec->GuessType()的结果不是ALittleScriptGuessClass");
+                ALittleGuessClass class_guess_class = (ALittleGuessClass)class_guess;
+                return class_guess_class.namespace_name;
+            }
+        }
+        {
+            List<PsiElement> dec_list = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(), PsiHelper.PsiElementType.STRUCT_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
+            for (PsiElement dec : dec_list)
+            {
+                ALittleGuess struct_guess = ((ALittleStructNameDec)dec).guessType();
+                if (!(struct_guess instanceof ALittleGuessStruct))
+                    throw new ALittleGuessException(myElement, "ALittleStructNameDec->GuessType()的结果不是ALittleScriptGuessStruct");
+                ALittleGuessStruct struct_guess_struct = (ALittleGuessStruct)struct_guess;
+                return struct_guess_struct.namespace_name;
+            }
+        }
+        {
+            List<PsiElement> dec_list = ALittleTreeChangeListener.findALittleNameDecList(myElement.getProject(), PsiHelper.PsiElementType.ENUM_NAME, myElement.getContainingFile().getOriginalFile(), mNamespace, mKey, true);
+            for (PsiElement dec : dec_list)
+            {
+                ALittleGuess enum_guess = ((ALittleEnumNameDec)dec).guessType();
+                if (!(enum_guess instanceof ALittleGuessEnum))
+                    throw new ALittleGuessException(myElement, "ALittleEnumNameDec->GuessType()的结果不是ALittleScriptGuessEnum");
+                ALittleGuessEnum enum_guess_enum = (ALittleGuessEnum)enum_guess;
+                return enum_guess_enum.namespace_name;
+            }
+        }
+
+        return "";
     }
 }

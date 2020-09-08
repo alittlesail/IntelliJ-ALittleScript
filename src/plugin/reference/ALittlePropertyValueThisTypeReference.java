@@ -86,8 +86,9 @@ public class ALittlePropertyValueThisTypeReference extends ALittleReference<ALit
                 ALittleGuess guess = ((ALittleClassDec) result).guessType();
                 if (mIsConst && !guess.is_const) {
                     if (guess instanceof ALittleGuessPrimitive) {
+                        String guess_value = guess.getValue();
                         guess = ALittleGuessPrimitive.sPrimitiveGuessMap.get("const " + guess.getValue());
-                        if (guess == null) throw new ALittleGuessException(myElement, "找不到const " + guess.getValue());
+                        if (guess == null) throw new ALittleGuessException(myElement, "找不到const " + guess_value);
                     } else {
                         guess = guess.clone();
                         guess.is_const = true;
