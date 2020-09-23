@@ -81,6 +81,10 @@ public class ALittleTreeChangeListener extends ALittleIndex implements PsiTreeCh
         Map<String, RelayInfo> relay_map = new HashMap<>();
         for (File file : list) {
             if (!file.isDirectory()) {
+                PsiManager psi_mgr = PsiManager.getInstance(project);
+                PsiFile psi_file = psi_mgr.findFile(file);
+                if (!(psi_file instanceof ALittleFile) || PsiHelper.isRegister(psi_file)) continue;
+
                 Set<String> relay_set = new HashSet<>();
                 ALittleTreeChangeListener.findDefineRelay(project, file.getAbsolutePath(), relay_set);
                 RelayInfo relay_info = new RelayInfo();

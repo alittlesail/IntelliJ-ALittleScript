@@ -398,6 +398,13 @@ public class PsiHelper {
 
         return isRegister(namespace_dec.getModifierList());
     }
+    public static boolean isRegister(PsiFile file) {
+        if (file == null) return false;
+        ALittleNamespaceDec namespace_dec = getNamespaceDec(file);
+        if (namespace_dec == null) return false;
+
+        return isRegister(namespace_dec.getModifierList());
+    }
 
     // 获取某个元素的命名域
     @NotNull
