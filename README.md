@@ -1,2 +1,2 @@
 # ALittleScript
-ALittle Script can Generate Lua 5.1 script
+ALittle Script can Generate Lua 5.4 script
